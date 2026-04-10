@@ -1,0 +1,328 @@
+/* RESET E BASE */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #020617;
+    color: white;
+    line-height: 1.5;
+}
+
+/* LAYOUT */
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #020617;
+    border-right: 1px solid #1e293b;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    color: #06b6d4;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.sidebar nav a {
+    display: block;
+    color: #94a3b8;
+    text-decoration: none;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.sidebar nav a:hover {
+    color: white;
+    background: #0f172a;
+}
+
+/* MAIN AREA */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.topbar {
+    padding: 20px 40px;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
+}
+
+.content {
+    padding: 30px 40px;
+    overflow-y: auto;
+    background: #020617;
+}
+
+/* CARDS */
+.card {
+    background: #0f172a;
+    padding: 24px;
+    border-radius: 14px;
+    margin-bottom: 25px;
+    border: 1px solid #1e293b;
+}
+
+/* FORMULÁRIO */
+input,
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: #020617;
+    border: 1px solid #334155;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #06b6d4;
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* BOTÕES */
+button {
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+}
+
+.btn-publicar {
+    background: #06b6d4;
+    color: #020617;
+    width: 100%;
+}
+
+.btn-publicar:hover {
+    background: #22d3ee;
+}
+
+/* GRID DE PASSEIOS */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.card-passeio {
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #1e293b;
+}
+
+/* GALERIA CARROSSEL */
+.carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+}
+
+.card-img {
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+    height: 100%;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.card-img::-webkit-scrollbar {
+    display: none;
+}
+
+.img-passeio {
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+/* INFO DO PASSEIO */
+.card-content {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.card-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.card-content p {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.card-footer strong {
+    color: #22c55e;
+    font-size: 1.1rem;
+}
+
+/* BOTÕES DE AÇÃO */
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    background: #3b82f6;
+    color: white;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* ==========================
+   📸 NOVA ÁREA DE UPLOAD (DARK MODE FIX)
+   ========================== */
+.upload-container {
+    margin: 10px 0 20px 0;
+}
+
+.upload-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 30px;
+    border: 2px dashed #334155; /* Cor mais discreta */
+    border-radius: 10px;
+    background-color: #0f172a; /* Harmonizado com o Card */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+    background-color: #1e293b;
+    border-color: #06b6d4; /* Realce em ciano no hover */
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    font-size: 2rem;
+}
+
+.upload-text {
+    display: flex;
+    flex-direction: column;
+    color: #94a3b8;
+}
+
+.upload-text strong {
+    font-size: 1rem;
+    color: #06b6d4;
+}
+
+.upload-text span {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* Preview Grid */
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.img-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: visible; /* Para o botão de excluir aparecer fora da borda */
+}
+
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #1e293b;
+}
+
+.btn-delete-img {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.btn-delete-img:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .topbar {
+        padding: 15px 20px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+

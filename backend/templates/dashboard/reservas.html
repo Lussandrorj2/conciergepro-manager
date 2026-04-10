@@ -1,0 +1,592 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservas — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .content { padding: 28px; }
+
+        .reserva-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card-form {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .card-form h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+        }
+
+        .form-group label .opcional {
+            font-size: 10px;
+            color: #475569;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color .2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: #059669; }
+
+        .form-group textarea { resize: vertical; min-height: 70px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row .form-group { margin-bottom: 0; }
+
+        .passeio-info {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .passeio-info.show { display: block; }
+        .passeio-info-nome { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 2px; }
+        .passeio-info-preco { font-size: 18px; font-weight: 700; color: #34d399; }
+
+        .btn-registrar {
+            width: 100%;
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s;
+            margin-top: 8px;
+        }
+
+        .btn-registrar:hover { background: #047857; }
+
+        /* Painel direito */
+        .painel-reservas { display: flex; flex-direction: column; gap: 16px; }
+
+        .busca-bar {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .busca-input-wrap { flex: 1; min-width: 160px; position: relative; }
+
+        .busca-input-wrap input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .busca-input-wrap input:focus { border-color: #059669; }
+
+        .busca-icon {
+            position: absolute; left: 10px; top: 50%;
+            transform: translateY(-50%); color: #475569; font-size: 13px; pointer-events: none;
+        }
+
+        .busca-bar input[type=date] {
+            background: #0f172a; border: 1px solid #334155;
+            border-radius: 8px; color: #e2e8f0;
+            padding: 8px 10px; font-size: 13px;
+            font-family: 'Inter', sans-serif; outline: none;
+        }
+
+        .btn-limpar {
+            background: #1a2538; border: 1px solid #334155;
+            color: #94a3b8; padding: 8px 12px;
+            border-radius: 8px; font-size: 12px; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+        }
+
+        .btn-limpar:hover { border-color: #475569; color: #cbd5e1; }
+
+        /* Tabela */
+        .tabela-container {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .tabela-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid #263348;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tabela-header h3 { font-size: 14px; color: #e2e8f0; }
+
+        .tabela-scroll { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
+
+        thead th {
+            text-align: left; padding: 10px 14px;
+            color: #64748b; font-size: 11px; text-transform: uppercase;
+            letter-spacing: .5px; border-bottom: 1px solid #263348;
+            white-space: nowrap;
+        }
+
+        tbody tr { border-bottom: 1px solid #1a2538; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #243040; }
+        tbody td { padding: 9px 14px; color: #cbd5e1; vertical-align: middle; }
+
+        .empty { padding: 32px; text-align: center; color: #475569; font-size: 13px; }
+
+        /* Status select inline */
+        .status-sel {
+            background: none;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            padding: 3px 6px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .status-sel.confirmada { border-color: #059669; color: #34d399; }
+        .status-sel.pendente   { border-color: #d97706; color: #fbbf24; }
+        .status-sel.cancelada  { border-color: #dc2626; color: #f87171; }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #059669; color: white;
+            padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999;
+            animation: fadeIn .2s;
+        }
+
+        .toast.error { background: #dc2626; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media(max-width: 1024px) { .reserva-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <h2>🔔 Concierge</h2>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a class="active">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr style="border-color:#1e293b;margin:12px 0;">
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>📅 Reservas</h1>
+                <p style="font-size:13px;color:#64748b;">{{ hotel.nome }}</p>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="reserva-layout">
+
+                <!-- FORMULÁRIO -->
+                <div class="card-form">
+                    <h3>Nova Reserva</h3>
+
+                    <div class="form-group">
+                        <label>Passeio *</label>
+                        <select id="passeio-select" onchange="mostrarInfoPasseio()">
+                            <option value="">Carregando passeios...</option>
+                        </select>
+                        <div class="passeio-info" id="passeio-info">
+                            <div class="passeio-info-nome" id="info-nome"></div>
+                            <div class="passeio-info-preco" id="info-preco"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome do cliente *</label>
+                        <input type="text" id="nome-cliente" placeholder="Nome completo">
+                    </div>
+
+                    <div class="form-row" style="margin-bottom:14px;">
+                        <div class="form-group">
+                            <label>Telefone *</label>
+                            <input type="text" id="telefone" placeholder="(21) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail <span class="opcional">(opcional)</span></label>
+                            <input type="email" id="email" placeholder="email@exemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-bottom:14px;">
+                        <div class="form-group">
+                            <label>Data do passeio *</label>
+                            <input type="date" id="data-passeio">
+                        </div>
+                        <div class="form-group">
+                            <label>Horário</label>
+                            <input type="time" id="horario-passeio">
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-bottom:14px;">
+                        <div class="form-group">
+                            <label>Nº de pessoas</label>
+                            <input type="number" id="num-pessoas" placeholder="Ex: 2" min="1" value="1" oninput="calcularValor()">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor total (R$)</label>
+                            <input type="number" id="valor-total" placeholder="Auto ou manual" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status">
+                            <option value="pendente">⏳ Pendente</option>
+                            <option value="confirmada">✓ Confirmada</option>
+                            <option value="cancelada">✕ Cancelada</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observações <span class="opcional">(opcional)</span></label>
+                        <textarea id="obs" placeholder="Informações adicionais..."></textarea>
+                    </div>
+
+                    <button class="btn-registrar" onclick="criarReserva()">
+                        💾 Registrar Reserva
+                    </button>
+                </div>
+
+                <!-- LISTA -->
+                <div class="painel-reservas">
+
+                    <div class="busca-bar">
+                        <div class="busca-input-wrap">
+                            <span class="busca-icon">🔍</span>
+                            <input type="text" id="busca-texto" placeholder="Buscar por nome ou telefone..."
+                                   oninput="filtrarLocal()">
+                        </div>
+                        <input type="date" id="busca-data" onchange="filtrarLocal()" title="Filtrar por data do passeio">
+                        <button class="btn-limpar" onclick="limparBusca()">✕ Limpar</button>
+                    </div>
+
+                    <div class="tabela-container">
+                        <div class="tabela-header">
+                            <h3>Todas as Reservas</h3>
+                            <span style="font-size:12px;color:#64748b;" id="badge-total">—</span>
+                        </div>
+                        <div class="tabela-scroll">
+                            <div id="lista-reservas">
+                                <div class="empty">Carregando...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const hotelSlug = "{{ hotel.slug }}";
+let passeiosCache = [];
+let todasReservas = [];
+
+async function carregarPasseios() {
+    const sel = document.getElementById('passeio-select');
+    try {
+        const res = await fetch(`/api/${hotelSlug}/passeios/`);
+        passeiosCache = await res.json();
+
+        if (!passeiosCache.length) {
+            sel.innerHTML = '<option value="">Nenhum passeio cadastrado</option>';
+            return;
+        }
+
+        sel.innerHTML = '<option value="">Selecione um passeio...</option>' +
+            passeiosCache.map(p => {
+                const preco = p.preco_sob_consulta
+                    ? 'Sob consulta'
+                    : `R$ ${parseFloat(p.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+                return `<option value="${p.id}">${p.nome} — ${preco}</option>`;
+            }).join('');
+    } catch(e) {
+        sel.innerHTML = '<option value="">Erro ao carregar passeios</option>';
+    }
+}
+
+function mostrarInfoPasseio() {
+    const sel = document.getElementById('passeio-select');
+    const info = document.getElementById('passeio-info');
+
+    if (!sel.value) { info.classList.remove('show'); return; }
+
+    const passeio = passeiosCache.find(p => p.id == sel.value);
+    if (!passeio) { info.classList.remove('show'); return; }
+
+    document.getElementById('info-nome').innerText = passeio.nome;
+
+    if (passeio.preco_sob_consulta) {
+        document.getElementById('info-preco').innerText = 'Sob consulta';
+        document.getElementById('info-preco').style.color = '#94a3b8';
+    } else {
+        const sufixo = passeio.preco_por_pessoa ? ' / pessoa' : ' (total)';
+        document.getElementById('info-preco').innerText =
+            `R$ ${parseFloat(passeio.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}${sufixo}`;
+        document.getElementById('info-preco').style.color = '#34d399';
+    }
+
+    info.classList.add('show');
+    calcularValor();
+}
+
+function calcularValor() {
+    const sel = document.getElementById('passeio-select');
+    if (!sel.value) return;
+    const passeio = passeiosCache.find(p => p.id == sel.value);
+    if (!passeio || passeio.preco_sob_consulta || !passeio.preco_por_pessoa) return;
+    const pessoas = parseInt(document.getElementById('num-pessoas').value) || 1;
+    document.getElementById('valor-total').value = (parseFloat(passeio.preco || 0) * pessoas).toFixed(2);
+}
+
+async function criarReserva() {
+    const passeio  = document.getElementById('passeio-select').value;
+    const nome     = document.getElementById('nome-cliente').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const data     = document.getElementById('data-passeio').value;
+
+    if (!passeio)   { mostrarToast('Selecione um passeio', 'error'); return; }
+    if (!nome)      { mostrarToast('Informe o nome do cliente', 'error'); return; }
+    if (!telefone)  { mostrarToast('Informe o telefone', 'error'); return; }
+    if (!data)      { mostrarToast('Informe a data do passeio', 'error'); return; }
+
+    const form = new FormData();
+    form.append('passeio_id',   passeio);
+    form.append('nome_cliente', nome);
+    form.append('telefone',     telefone);
+    form.append('email',        document.getElementById('email').value);
+    form.append('data_passeio', data);
+    form.append('horario',      document.getElementById('horario-passeio').value);
+    form.append('num_pessoas',  document.getElementById('num-pessoas').value);
+    form.append('valor_total',  document.getElementById('valor-total').value);
+    form.append('status',       document.getElementById('status').value);
+    form.append('observacoes',  document.getElementById('obs').value);
+
+    try {
+        const res   = await fetch(`/api/admin/${hotelSlug}/reservas/`, { method: 'POST', body: form });
+        const data2 = await res.json();
+        if (data2.erro) throw new Error(data2.erro);
+
+        mostrarToast('✔ Reserva registrada!');
+        limparForm();
+        carregarReservas();
+    } catch(e) {
+        mostrarToast(e.message || 'Erro ao registrar', 'error');
+    }
+}
+
+function limparForm() {
+    ['nome-cliente','telefone','email','data-passeio','horario-passeio','obs'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('num-pessoas').value = '1';
+    document.getElementById('valor-total').value = '';
+    document.getElementById('status').value = 'pendente';
+    document.getElementById('passeio-select').value = '';
+    document.getElementById('passeio-info').classList.remove('show');
+}
+
+async function carregarReservas() {
+    try {
+        const res = await fetch(`/api/admin/${hotelSlug}/reservas/`);
+        todasReservas = await res.json();
+        filtrarLocal();
+    } catch(e) {
+        document.getElementById('lista-reservas').innerHTML = '<div class="empty">Erro ao carregar reservas.</div>';
+    }
+}
+
+function filtrarLocal() {
+    const texto = (document.getElementById('busca-texto').value || '').toLowerCase().trim();
+    const data  = document.getElementById('busca-data').value;
+
+    let filtradas = todasReservas;
+
+    if (texto) {
+        filtradas = filtradas.filter(r =>
+            (r.nome_cliente || '').toLowerCase().includes(texto) ||
+            (r.telefone || '').replace(/\D/g,'').includes(texto.replace(/\D/g,''))
+        );
+    }
+
+    if (data) {
+        filtradas = filtradas.filter(r => (r.data_passeio || '').startsWith(data));
+    }
+
+    renderReservas(filtradas);
+}
+
+function limparBusca() {
+    document.getElementById('busca-texto').value = '';
+    document.getElementById('busca-data').value  = '';
+    filtrarLocal();
+}
+
+function renderReservas(lista) {
+    document.getElementById('badge-total').innerText =
+        `${lista.length} de ${todasReservas.length} reserva(s)`;
+
+    if (!lista.length) {
+        document.getElementById('lista-reservas').innerHTML =
+            '<div class="empty">Nenhuma reserva encontrada.</div>';
+        return;
+    }
+
+    document.getElementById('lista-reservas').innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Telefone</th>
+                    <th>Passeio</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Pessoas</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${lista.map(r => {
+                    const dataPass = r.data_passeio
+                        ? new Date(r.data_passeio + 'T00:00:00').toLocaleDateString('pt-BR')
+                        : '—';
+                    const valor = parseFloat(r.valor_total || 0)
+                        .toLocaleString('pt-BR', {minimumFractionDigits:2});
+                    return `
+                    <tr>
+                        <td>
+                            <strong style="color:#e2e8f0">${r.nome_cliente || '—'}</strong>
+                            ${r.email ? `<br><span style="font-size:11px;color:#475569">${r.email}</span>` : ''}
+                        </td>
+                        <td>${r.telefone || '—'}</td>
+                        <td>${r.passeio_nome || r.passeio || '—'}</td>
+                        <td style="color:#64748b;white-space:nowrap">${dataPass}</td>
+                        <td style="color:#64748b">${r.horario || '—'}</td>
+                        <td style="text-align:center">${r.num_pessoas || 1}</td>
+                        <td style="white-space:nowrap">R$ ${valor}</td>
+                        <td>
+                            <select class="status-sel ${r.status || 'pendente'}"
+                                    onchange="atualizarStatus(${r.id}, this)"
+                                    data-id="${r.id}">
+                                <option value="pendente"   ${r.status==='pendente'   ? 'selected':''}>⏳ Pendente</option>
+                                <option value="confirmada" ${r.status==='confirmada' ? 'selected':''}>✓ Confirmada</option>
+                                <option value="cancelada"  ${r.status==='cancelada'  ? 'selected':''}>✕ Cancelada</option>
+                            </select>
+                        </td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>`;
+}
+
+async function atualizarStatus(id, sel) {
+    const novoStatus = sel.value;
+    sel.className = `status-sel ${novoStatus}`;
+
+    const form = new FormData();
+    form.append('status', novoStatus);
+
+    try {
+        const res  = await fetch(`/api/admin/${hotelSlug}/reservas/${id}/`, { method: 'PATCH', body: form });
+        const data = await res.json();
+        if (data.erro) throw new Error(data.erro);
+
+        const r = todasReservas.find(r => r.id === id);
+        if (r) r.status = novoStatus;
+
+        mostrarToast('Status atualizado.');
+    } catch(e) {
+        mostrarToast(e.message || 'Erro ao atualizar status', 'error');
+        carregarReservas();
+    }
+}
+
+function mostrarToast(msg, tipo = '') {
+    const t = document.createElement('div');
+    t.className = `toast ${tipo}`;
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarPasseios();
+    carregarReservas();
+});
+</script>
+</body>
+</html>

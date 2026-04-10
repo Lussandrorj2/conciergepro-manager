@@ -1,0 +1,856 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .content { padding: 28px; }
+
+        /* KPIs */
+        .kpis-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--accent, #059669);
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .kpi-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 22px;
+            opacity: 0.4;
+        }
+
+        /* FILTROS */
+        .filtros-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filtros-bar select,
+        .filtros-bar input {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+        .btn-filtrar {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* GRID DE GRÁFICOS */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .chart-card.full { grid-column: 1 / -1; }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .chart-badge {
+            font-size: 11px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #64748b;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 240px;
+        }
+
+        .chart-wrap canvas { max-height: 240px; }
+
+        /* DIVISÃO RECEPCIONISTAS */
+        .divisao-card {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .divisao-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #263348;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .divisao-header h3 { font-size: 14px; color: #e2e8f0; }
+
+        .divisao-form {
+            padding: 16px 20px;
+            border-bottom: 1px solid #263348;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .divisao-form .field { display: flex; flex-direction: column; gap: 5px; }
+
+        .divisao-form label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .divisao-form input, .divisao-form select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+        .btn-calcular {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .divisao-resultado {
+            padding: 20px;
+        }
+
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .rec-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .rec-avatar {
+            width: 40px;
+            height: 40px;
+            background: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin: 0 auto 10px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .rec-nome { font-size: 13px; color: #e2e8f0; font-weight: 500; margin-bottom: 4px; }
+        .rec-pct { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+        .rec-valor { font-size: 20px; font-weight: 700; color: #34d399; }
+
+        .divisao-total {
+            background: #064e3b22;
+            border: 1px solid #059669;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .divisao-total span:first-child { font-size: 13px; color: #64748b; }
+        .divisao-total span:last-child { font-size: 18px; font-weight: 700; color: #34d399; }
+
+        /* TABELA PASSEIOS */
+        .tabela-card {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 11px 16px;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid #263348;
+            font-weight: 500;
+        }
+
+        tbody tr { border-bottom: 1px solid #1a2538; }
+        tbody tr:hover { background: #243040; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody td { padding: 11px 16px; color: #cbd5e1; }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .rank-1 { background: #78350f; color: #fbbf24; }
+        .rank-2 { background: #334155; color: #94a3b8; }
+        .rank-3 { background: #431407; color: #c2855a; }
+        .rank-n { background: #1e293b; color: #475569; }
+
+        .bar-mini {
+            background: #0f172a;
+            border-radius: 4px;
+            height: 6px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .bar-mini-fill {
+            height: 100%;
+            background: #059669;
+            border-radius: 4px;
+        }
+
+        /* Export */
+        .btn-export {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .2s;
+        }
+
+        .btn-export:hover { background: #334155; color: #e2e8f0; }
+
+        @media(max-width: 900px) {
+            .kpis-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .chart-card.full { grid-column: 1; }
+        }
+
+        @media(max-width: 600px) {
+            .kpis-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <h2>🔔 Concierge</h2>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a class="active">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr style="border-color:#1e293b;margin:12px 0;">
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>📊 Relatórios</h1>
+                <p style="font-size:13px;color:#64748b;">{{ hotel.nome }}</p>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- FILTROS -->
+            <div class="filtros-bar">
+                <div>
+                    <span style="font-size:11px;color:#64748b;text-transform:uppercase;margin-right:8px;">Período:</span>
+                </div>
+                <select id="filtro-ano">
+                    <option value="">Todos os anos</option>
+                </select>
+                <select id="filtro-mes">
+                    <option value="">Todos os meses</option>
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+                <button class="btn-filtrar" onclick="carregarTudo()">Atualizar</button>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpis-row">
+                <div class="kpi-card" style="--accent:#059669">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-label">Faturamento Total</div>
+                    <div class="kpi-value" id="kpi-fat">R$ —</div>
+                    <div class="kpi-sub" id="kpi-fat-sub">passeios confirmados</div>
+                </div>
+                <div class="kpi-card" style="--accent:#3b82f6">
+                    <div class="kpi-icon">🧾</div>
+                    <div class="kpi-label">Total de Reservas</div>
+                    <div class="kpi-value" id="kpi-res">—</div>
+                    <div class="kpi-sub" id="kpi-res-sub">incluindo pendentes</div>
+                </div>
+                <div class="kpi-card" style="--accent:#8b5cf6">
+                    <div class="kpi-icon">💱</div>
+                    <div class="kpi-label">Lucro Câmbio</div>
+                    <div class="kpi-value" id="kpi-cambio">R$ —</div>
+                    <div class="kpi-sub">todas as moedas</div>
+                </div>
+                <div class="kpi-card" style="--accent:#f59e0b">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-label">Resultado Total</div>
+                    <div class="kpi-value" id="kpi-total">R$ —</div>
+                    <div class="kpi-sub">passeios + câmbio</div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS ROW 1 -->
+            <div class="charts-grid">
+                <div class="chart-card full">
+                    <div class="chart-header">
+                        <span class="chart-title">📅 Faturamento Mensal — Comparativo</span>
+                        <span class="chart-badge" id="badge-mensal">—</span>
+                    </div>
+                    <div class="chart-wrap" style="height:280px;">
+                        <canvas id="chart-mensal"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">🏖️ Top Passeios por Vendas</span>
+                        <span class="chart-badge" id="badge-passeios">—</span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="chart-passeios"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">💱 Lucro por Moeda (Câmbio)</span>
+                        <span class="chart-badge" id="badge-cambio">—</span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="chart-cambio"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RANKING PASSEIOS -->
+            <div class="tabela-card">
+                <div class="tabela-header" style="padding:14px 20px;border-bottom:1px solid #263348;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:14px;color:#e2e8f0;font-weight:600;">🏆 Ranking de Passeios</span>
+                    <span style="font-size:12px;color:#64748b;" id="badge-ranking">—</span>
+                </div>
+                <div id="tabela-ranking">
+                    <div style="padding:32px;text-align:center;color:#475569;font-size:13px;">Carregando...</div>
+                </div>
+            </div>
+
+            <!-- DIVISÃO RECEPCIONISTAS -->
+            <div class="divisao-card">
+                <div class="divisao-header">
+                    <h3>👤 Divisão de Lucro — Recepcionistas</h3>
+                    <span style="font-size:12px;color:#64748b;">Configure a distribuição abaixo</span>
+                </div>
+
+                <div class="divisao-form">
+                    <div class="field">
+                        <label>% Lucro p/ recepcionistas</label>
+                        <input type="number" id="pct-rec" value="30" min="0" max="100" style="width:100px;">
+                    </div>
+                    <div class="field">
+                        <label>Nº de recepcionistas</label>
+                        <input type="number" id="num-rec" value="3" min="1" max="20" style="width:100px;"
+                               oninput="gerarCamposRecepcionistas()">
+                    </div>
+                    <button class="btn-calcular" onclick="calcularDivisao()">Calcular Divisão</button>
+                </div>
+
+                <!-- Campos dos nomes -->
+                <div id="campos-recepcionistas" style="padding:0 20px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;"></div>
+
+                <div class="divisao-resultado" id="divisao-resultado" style="display:none;">
+                    <div class="divisao-total">
+                        <span>Resultado total (passeios + câmbio)</span>
+                        <span id="div-total">R$ —</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 16px;flex:1;min-width:140px;">
+                            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">🏨 Hotel</div>
+                            <div style="font-size:18px;font-weight:700;color:#e2e8f0;" id="div-hotel">R$ —</div>
+                        </div>
+                        <div style="background:#064e3b22;border:1px solid #059669;border-radius:8px;padding:10px 16px;flex:1;min-width:140px;">
+                            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">👤 Total Recepcionistas</div>
+                            <div style="font-size:18px;font-weight:700;color:#34d399;" id="div-rec-total">R$ —</div>
+                        </div>
+                    </div>
+                    <div class="rec-grid" id="rec-grid"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+const hotelSlug = "{{ hotel.slug }}";
+
+// Chart.js global defaults
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = '#1e293b';
+
+const COLORS = [
+    '#059669','#3b82f6','#f59e0b','#8b5cf6','#ef4444',
+    '#06b6d4','#84cc16','#f97316','#ec4899','#14b8a6'
+];
+
+let dadosMensal = [], dadosPasseios = [], dadosCambio = [];
+let chartMensal, chartPasseios, chartCambio;
+let fatTotal = 0, lucroTotal = 0;
+
+// ==========================
+// CARREGAR TUDO
+// ==========================
+async function carregarTudo() {
+    await Promise.all([
+        carregarMensal(),
+        carregarPasseios(),
+        carregarCambio()
+    ]);
+    atualizarKPIs();
+    gerarCamposRecepcionistas();
+}
+
+// ==========================
+// MENSAL
+// ==========================
+async function carregarMensal() {
+    try {
+        const res = await fetch(`/api/${hotelSlug}/relatorios/mensal/`);
+        dadosMensal = await res.json();
+
+        const labels = dadosMensal.map(d => {
+            if (!d.mes) return '—';
+            const dt = new Date(d.mes);
+            return dt.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+        });
+
+        const faturamento = dadosMensal.map(d => parseFloat(d.faturamento || 0));
+        const reservas = dadosMensal.map(d => parseInt(d.total || 0));
+
+        fatTotal = faturamento.reduce((s, v) => s + v, 0);
+
+        document.getElementById('badge-mensal').innerText =
+            `${dadosMensal.length} meses | Total: R$ ${fatTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+        if (chartMensal) chartMensal.destroy();
+
+        chartMensal = new Chart(document.getElementById('chart-mensal').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Faturamento (R$)',
+                        data: faturamento,
+                        backgroundColor: 'rgba(5,150,105,0.7)',
+                        borderColor: '#059669',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Reservas',
+                        data: reservas,
+                        type: 'line',
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.1)',
+                        pointBackgroundColor: '#3b82f6',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { font: { size: 12 }, color: '#94a3b8' } }
+                },
+                scales: {
+                    x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 11 } } },
+                    y: {
+                        type: 'linear', position: 'left',
+                        grid: { color: '#1e293b' },
+                        ticks: {
+                            color: '#64748b', font: { size: 11 },
+                            callback: v => 'R$ ' + v.toLocaleString('pt-BR')
+                        }
+                    },
+                    y1: {
+                        type: 'linear', position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#3b82f6', font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    } catch(e) { console.error('Mensal:', e); }
+}
+
+// ==========================
+// PASSEIOS
+// ==========================
+async function carregarPasseios() {
+    try {
+        const res = await fetch(`/api/${hotelSlug}/relatorios/passeios/`);
+        dadosPasseios = await res.json();
+
+        const labels = dadosPasseios.slice(0, 8).map(p => p.nome || 'Sem nome');
+        const valores = dadosPasseios.slice(0, 8).map(p => parseInt(p.total_vendas || 0));
+
+        document.getElementById('badge-passeios').innerText = `${dadosPasseios.length} passeios`;
+
+        if (chartPasseios) chartPasseios.destroy();
+
+        chartPasseios = new Chart(document.getElementById('chart-passeios').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Vendas',
+                    data: valores,
+                    backgroundColor: COLORS.slice(0, labels.length),
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 11 } } },
+                    y: { ticks: { color: '#94a3b8', font: { size: 11 } } }
+                }
+            }
+        });
+
+        // Tabela ranking
+        const maxVendas = Math.max(...valores, 1);
+        const tabelaEl = document.getElementById('tabela-ranking');
+        const totalVendas = valores.reduce((s, v) => s + v, 0);
+        document.getElementById('badge-ranking').innerText = `${totalVendas} vendas no total`;
+
+        tabelaEl.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Passeio</th>
+                        <th>Vendas</th>
+                        <th style="width:200px;">Distribuição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${dadosPasseios.map((p, i) => {
+                        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+                        const pct = totalVendas > 0 ? Math.round((p.total_vendas / totalVendas) * 100) : 0;
+                        return `
+                        <tr>
+                            <td><span class="rank-badge ${rankClass}">${i + 1}</span></td>
+                            <td>${p.nome || '—'}</td>
+                            <td style="font-weight:600;color:#e2e8f0">${p.total_vendas} venda(s)</td>
+                            <td>
+                                <span style="font-size:11px;color:#64748b;">${pct}%</span>
+                                <div class="bar-mini">
+                                    <div class="bar-mini-fill" style="width:${pct}%"></div>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>`;
+
+    } catch(e) { console.error('Passeios:', e); }
+}
+
+// ==========================
+// CÂMBIO
+// ==========================
+async function carregarCambio() {
+    try {
+        const res = await fetch(`/api/${hotelSlug}/relatorios/cambio/`);
+        dadosCambio = await res.json();
+
+        lucroTotal = dadosCambio.reduce((s, d) => s + parseFloat(d.total || 0), 0);
+
+        document.getElementById('badge-cambio').innerText =
+            `R$ ${lucroTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+        if (chartCambio) chartCambio.destroy();
+
+        chartCambio = new Chart(document.getElementById('chart-cambio').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: dadosCambio.map(d => d.moeda),
+                datasets: [{
+                    data: dadosCambio.map(d => parseFloat(d.total || 0)),
+                    backgroundColor: COLORS,
+                    borderColor: '#0f172a',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { font: { size: 12 }, color: '#94a3b8', padding: 12 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `R$ ${ctx.raw.toLocaleString('pt-BR', {minimumFractionDigits:2})}`
+                        }
+                    }
+                }
+            }
+        });
+    } catch(e) { console.error('Câmbio:', e); }
+}
+
+// ==========================
+// KPIs
+// ==========================
+function atualizarKPIs() {
+    const totalReservas = dadosMensal.reduce((s, d) => s + parseInt(d.total || 0), 0);
+    const resultado = fatTotal + lucroTotal;
+
+    document.getElementById('kpi-fat').innerText =
+        'R$ ' + fatTotal.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('kpi-res').innerText = totalReservas;
+    document.getElementById('kpi-cambio').innerText =
+        'R$ ' + lucroTotal.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('kpi-total').innerText =
+        'R$ ' + resultado.toLocaleString('pt-BR', {minimumFractionDigits:2});
+}
+
+// ==========================
+// DIVISÃO RECEPCIONISTAS
+// ==========================
+function gerarCamposRecepcionistas() {
+    const n = parseInt(document.getElementById('num-rec').value) || 1;
+    const container = document.getElementById('campos-recepcionistas');
+
+    container.innerHTML = Array.from({length: n}, (_, i) => `
+        <div>
+            <label style="font-size:11px;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Recepcionista ${i + 1}</label>
+            <input type="text" class="rec-nome-input" placeholder="Nome" value="Recepcionista ${i + 1}"
+                   style="width:100%;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;">
+        </div>
+    `).join('');
+}
+
+function calcularDivisao() {
+    const pctRec = parseFloat(document.getElementById('pct-rec').value) || 30;
+    const nomes = [...document.querySelectorAll('.rec-nome-input')].map(i => i.value.trim() || 'Recepcionista');
+    const n = nomes.length;
+    const resultado = fatTotal + lucroTotal;
+
+    const parteRec = resultado * (pctRec / 100);
+    const parteHotel = resultado - parteRec;
+    const porPessoa = n > 0 ? parteRec / n : 0;
+
+    document.getElementById('div-total').innerText =
+        'R$ ' + resultado.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('div-hotel').innerText =
+        'R$ ' + parteHotel.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('div-rec-total').innerText =
+        'R$ ' + parteRec.toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+    const grid = document.getElementById('rec-grid');
+    grid.innerHTML = nomes.map((nome, i) => `
+        <div class="rec-card">
+            <div class="rec-avatar">${nome.charAt(0).toUpperCase()}</div>
+            <div class="rec-nome">${nome}</div>
+            <div class="rec-pct">${(pctRec / n).toFixed(1)}% do total</div>
+            <div class="rec-valor">R$ ${porPessoa.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+        </div>
+    `).join('');
+
+    document.getElementById('divisao-resultado').style.display = 'block';
+}
+
+// ==========================
+// EXPORT CSV
+// ==========================
+function exportarCSV() {
+    const linhas = [
+        ['Mês', 'Reservas', 'Faturamento (R$)'],
+        ...dadosMensal.map(d => [
+            d.mes || '—',
+            d.total || 0,
+            parseFloat(d.faturamento || 0).toFixed(2)
+        ])
+    ];
+
+    const csv = linhas.map(l => l.join(';')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio_${hotelSlug}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+}
+
+// ==========================
+// ANOS DISPONÍVEIS
+// ==========================
+function popularAnos() {
+    const anoAtual = new Date().getFullYear();
+    const select = document.getElementById('filtro-ano');
+    for (let a = anoAtual; a >= anoAtual - 4; a--) {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.innerText = a;
+        select.appendChild(opt);
+    }
+}
+
+// ==========================
+// INIT
+// ==========================
+document.addEventListener('DOMContentLoaded', () => {
+    popularAnos();
+    carregarTudo();
+    gerarCamposRecepcionistas();
+});
+</script>
+</body>
+</html>

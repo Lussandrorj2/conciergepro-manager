@@ -1,0 +1,449 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .content { padding: 28px; }
+
+        .agenda-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card-form {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .card-form h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color .2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: #059669; }
+
+        .form-group textarea { resize: vertical; min-height: 70px; }
+
+        .passeio-loading {
+            font-size: 12px;
+            color: #475569;
+            padding: 4px 0;
+        }
+
+        .btn-agendar {
+            width: 100%;
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s;
+            margin-top: 8px;
+        }
+
+        .btn-agendar:hover { background: #047857; }
+
+        /* Painel direito */
+        .painel-agenda {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Filtro de data */
+        .filtro-bar {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filtro-bar label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .filtro-bar input[type=date] {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+        .btn-filtrar {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Tabela */
+        .tabela-container {
+            background: #1e293b;
+            border: 1px solid #263348;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .tabela-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid #263348;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tabela-header h3 { font-size: 14px; color: #e2e8f0; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+        thead th {
+            text-align: left;
+            padding: 10px 16px;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid #263348;
+        }
+
+        tbody tr { border-bottom: 1px solid #1a2538; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #243040; }
+        tbody td { padding: 10px 16px; color: #cbd5e1; }
+
+        .empty { padding: 32px; text-align: center; color: #475569; font-size: 13px; }
+
+        .btn-del {
+            background: none;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+        }
+
+        .btn-del:hover { background: #ef444433; border-color: #ef4444; color: #ef4444; }
+
+        .vagas-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #1e3a5f33;
+            color: #60a5fa;
+        }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #059669; color: white;
+            padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999;
+        }
+
+        .toast.error { background: #dc2626; }
+
+        @media(max-width: 900px) {
+            .agenda-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <h2>⚡ Concierge</h2>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a class="active">🗓️ Agenda</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr style="border-color:#1e293b;margin:12px 0;">
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>🗓️ Agenda de Passeios</h1>
+                <p style="font-size:13px;color:#64748b;">{{ hotel.nome }}</p>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="agenda-grid">
+
+                <!-- FORMULÁRIO -->
+                <div class="card-form">
+                    <h3>Novo Agendamento</h3>
+
+                    <div class="form-group">
+                        <label>Passeio *</label>
+                        <select id="passeio-select">
+                            <option value="">Carregando passeios...</option>
+                        </select>
+                        <div class="passeio-loading" id="passeio-status"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data do passeio *</label>
+                        <input type="date" id="data-passeio">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Horário</label>
+                        <input type="time" id="horario-passeio" placeholder="Ex: 08:00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vagas disponíveis</label>
+                        <input type="number" id="vagas" placeholder="Ex: 20" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="obs" placeholder="Informações adicionais para este agendamento..."></textarea>
+                    </div>
+
+                    <button class="btn-agendar" onclick="criarAgendamento()">
+                        📅 Criar Agendamento
+                    </button>
+                </div>
+
+                <!-- PAINEL DIREITO -->
+                <div class="painel-agenda">
+
+                    <!-- Filtro -->
+                    <div class="filtro-bar">
+                        <label>Filtrar por data:</label>
+                        <input type="date" id="filtro-data" onchange="carregarAgenda()">
+                        <button class="btn-filtrar" onclick="limparFiltro()">Limpar</button>
+                    </div>
+
+                    <!-- Agenda -->
+                    <div class="tabela-container">
+                        <div class="tabela-header">
+                            <h3>Agendamentos</h3>
+                            <span style="font-size:12px;color:#64748b;" id="badge-agenda">—</span>
+                        </div>
+                        <div id="lista-agenda">
+                            <div class="empty">Carregando...</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const hotelSlug = "{{ hotel.slug }}";
+
+// Define data de hoje no filtro por padrão
+document.getElementById('filtro-data').value = new Date().toISOString().split('T')[0];
+
+async function carregarPasseios() {
+    const sel = document.getElementById('passeio-select');
+    const status = document.getElementById('passeio-status');
+
+    try {
+        const res = await fetch(`/api/${hotelSlug}/passeios/`);
+        const passeios = await res.json();
+
+        if (!passeios.length) {
+            sel.innerHTML = '<option value="">Nenhum passeio cadastrado</option>';
+            status.innerHTML = '⚠️ <a href="/' + hotelSlug + '/dashboard/criar/" style="color:#059669;">Criar passeio primeiro</a>';
+            return;
+        }
+
+        sel.innerHTML = '<option value="">Selecione um passeio...</option>' +
+            passeios.map(p => {
+                const preco = p.preco_sob_consulta ? 'Sob consulta' : `R$ ${parseFloat(p.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+                return `<option value="${p.id}">${p.nome} — ${preco}</option>`;
+            }).join('');
+
+        status.innerHTML = `${passeios.length} passeio(s) disponível(is)`;
+        status.style.color = '#34d399';
+    } catch(e) {
+        sel.innerHTML = '<option value="">Erro ao carregar</option>';
+        status.innerHTML = 'Erro ao buscar passeios';
+        status.style.color = '#f87171';
+    }
+}
+
+async function criarAgendamento() {
+    const passeio = document.getElementById('passeio-select').value;
+    const data = document.getElementById('data-passeio').value;
+    const horario = document.getElementById('horario-passeio').value;
+    const vagas = document.getElementById('vagas').value;
+    const obs = document.getElementById('obs').value;
+
+    if (!passeio) { mostrarToast('Selecione um passeio', 'error'); return; }
+    if (!data) { mostrarToast('Informe a data do passeio', 'error'); return; }
+
+    const form = new FormData();
+    form.append('passeio_id', passeio);
+    form.append('data', data);
+    if (horario) form.append('horario', horario);
+    if (vagas) form.append('vagas', vagas);
+    if (obs) form.append('observacoes', obs);
+
+    try {
+        const res = await fetch(`/api/admin/${hotelSlug}/agenda/`, { method: 'POST', body: form });
+        const data2 = await res.json();
+        if (data2.erro) throw new Error(data2.erro);
+
+        mostrarToast('✔ Agendamento criado!');
+        document.getElementById('data-passeio').value = '';
+        document.getElementById('horario-passeio').value = '';
+        document.getElementById('vagas').value = '';
+        document.getElementById('obs').value = '';
+        carregarAgenda();
+    } catch(e) {
+        mostrarToast(e.message || 'Erro ao criar', 'error');
+    }
+}
+
+async function carregarAgenda() {
+    const container = document.getElementById('lista-agenda');
+    container.innerHTML = '<div class="empty">Carregando...</div>';
+
+    const filtroData = document.getElementById('filtro-data').value;
+
+    try {
+        let url = `/api/admin/${hotelSlug}/agenda/`;
+        if (filtroData) url += `?data=${filtroData}`;
+
+        const res = await fetch(url);
+        const lista = await res.json();
+
+        document.getElementById('badge-agenda').innerText = `${lista.length} agendamento(s)`;
+
+        if (!lista.length) {
+            container.innerHTML = '<div class="empty">Nenhum agendamento' + (filtroData ? ' nesta data.' : '.') + '</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Passeio</th>
+                        <th>Vagas</th>
+                        <th>Obs</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lista.map(a => {
+                        const dataFmt = a.data ? new Date(a.data).toLocaleDateString('pt-BR') : '—';
+                        return `
+                        <tr>
+                            <td style="color:#64748b">${dataFmt}</td>
+                            <td>${a.horario || '—'}</td>
+                            <td><strong style="color:#e2e8f0">${a.passeio_nome || a.passeio || '—'}</strong></td>
+                            <td>${a.vagas ? `<span class="vagas-badge">${a.vagas} vagas</span>` : '—'}</td>
+                            <td style="color:#64748b;font-size:12px">${a.observacoes || '—'}</td>
+                            <td><button class="btn-del" onclick="deletarAgendamento(${a.id})">🗑️</button></td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>`;
+    } catch(e) {
+        container.innerHTML = '<div class="empty">Erro ao carregar.</div>';
+    }
+}
+
+function limparFiltro() {
+    document.getElementById('filtro-data').value = '';
+    carregarAgenda();
+}
+
+async function deletarAgendamento(id) {
+    if (!confirm('Excluir este agendamento?')) return;
+    try {
+        await fetch(`/api/admin/${hotelSlug}/agenda/${id}/`, { method: 'DELETE' });
+        mostrarToast('Agendamento excluído.');
+        carregarAgenda();
+    } catch(e) {
+        mostrarToast('Erro ao excluir', 'error');
+    }
+}
+
+function mostrarToast(msg, tipo = '') {
+    const t = document.createElement('div');
+    t.className = `toast ${tipo}`;
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarPasseios();
+    carregarAgenda();
+});
+</script>
+</body>
+</html>
