@@ -218,13 +218,20 @@ class Cambio(models.Model):
 
 
 class CambioTransacao(models.Model):
-    hotel        = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='cambio_transacoes')
-    moeda        = models.CharField(max_length=10)
-    valor        = models.DecimalField(max_digits=10, decimal_places=2)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='cambio_transacoes')
+    moeda = models.CharField(max_length=10)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+
     cotacao_usada = models.DecimalField(max_digits=10, decimal_places=4)
-    valor_reais  = models.DecimalField(max_digits=10, decimal_places=2)
-    lucro        = models.DecimalField(max_digits=10, decimal_places=2)
-    data         = models.DateTimeField(auto_now_add=True)
+    valor_reais = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # 🔥 AQUI
+    cotacao_compra = models.DecimalField(max_digits=10, decimal_places=4, default=0)
+    cotacao_venda = models.DecimalField(max_digits=10, decimal_places=4, default=0)
+    valor_recebido = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    lucro = models.DecimalField(max_digits=10, decimal_places=2)
+    data = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.hotel} — {self.moeda} {self.valor}"

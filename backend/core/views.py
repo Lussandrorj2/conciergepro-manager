@@ -246,7 +246,18 @@ def api_cambio(request, hotel_slug):
             cotacao_compra = float(request.POST.get("cotacao_compra") or request.POST.get("cotacao") or 0)
             cotacao_venda  = float(request.POST.get("cotacao_venda")  or 0)
             valor_recebido = float(request.POST.get("valor_recebido") or 0)
-            valor_pago     = valor * cotacao_compra
+            valor_pago = valor * cotacao_compra
+
+            # prioridade: valor recebido manual
+            if valor_recebido > 0:
+                lucro = valor_recebido - valor_pago
+            else:
+                if cotacao_venda > 0:
+                    valor_recebido = valor * cotacao_venda
+                    lucro = valor_recebido - valor_pago
+                else:
+                    valor_recebido = 0
+                    lucro = 0
             valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
             lucro          = valor_recebido_calc - valor_pago
 
@@ -280,22 +291,32 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
 
     if request.method == "PUT":
         try:
-            moeda          = request.POST.get("moeda", transacao.moeda)
-            valor          = float(request.POST.get("valor") or transacao.valor)
-            cotacao_compra = float(request.POST.get("cotacao_compra") or transacao.cotacao_usada)
-            cotacao_venda  = float(request.POST.get("cotacao_venda") or getattr(transacao, 'cotacao_venda', 0) or 0)
-            valor_recebido = float(request.POST.get("valor_recebido") or getattr(transacao, 'valor_recebido', 0) or 0)
+            # LER O CORPO DA REQUISIÇÃO JSON
+            data = json.loads(request.body)
+            
+            # Pegar os valores do JSON ou manter os atuais
+            moeda          = data.get("moeda", transacao.moeda)
+            valor          = float(data.get("valor") or transacao.valor)
+            cotacao_compra = float(data.get("cotacao_compra") or transacao.cotacao_usada)
+            cotacao_venda  = float(data.get("cotacao_venda") or 0)
+            valor_recebido = float(data.get("valor_recebido") or 0)
 
-            valor_pago          = valor * cotacao_compra
-            valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
-            lucro               = valor_recebido_calc - valor_pago
+            valor_pago = valor * cotacao_compra
 
+            # Cálculo do lucro baseado no que foi recebido
+            if valor_recebido > 0:
+                lucro = valor_recebido - valor_pago
+            else:
+                lucro = 0
+
+            # Atualizar o objeto
             transacao.moeda         = moeda
             transacao.valor         = valor
             transacao.cotacao_usada = cotacao_compra
             transacao.valor_reais   = valor_pago
             transacao.lucro         = lucro
 
+            # Salvar campos extras se existirem no Model
             if hasattr(transacao, 'cotacao_compra'): transacao.cotacao_compra = cotacao_compra
             if hasattr(transacao, 'cotacao_venda'):  transacao.cotacao_venda  = cotacao_venda
             if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido
@@ -639,8 +660,18 @@ def relatorio_cambio(request, hotel_slug):
     quando disponíveis, caso contrário usa o campo lucro salvo.
     """
     qs    = CambioTransacao.objects.filter(hotel__slug=hotel_slug)
+    total_lucro = qs.aggregate(total=Sum('lucro'))['total'] or 0
+    total_recebido = qs.aggregate(total=Sum('valor_recebido'))['total'] or 0
+    total_pago = qs.aggregate(total=Sum('valor_reais'))['total'] or 0
     dados = qs.values('moeda').annotate(total=Sum('lucro'))
-    return JsonResponse(list(dados), safe=False)
+    return JsonResponse({
+    "resumo": {
+        "total_lucro": float(total_lucro),
+        "total_recebido": float(total_recebido),
+        "total_pago": float(total_pago),
+    },
+    "dados": list(dados)
+})
 
 
 # =========================

@@ -10,6 +10,7 @@
         body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
         .layout { display: flex; min-height: 100vh; }
 
+        /* Sidebar & Layout */
         .sidebar { width: 220px; background: #111827; border-right: 1px solid #1e293b; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
         .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px; border-bottom: 1px solid #1e293b; }
         .logo-icon { width: 30px; height: 30px; background: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -18,10 +19,8 @@
         nav a { display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13.5px; color: #94a3b8; text-decoration: none; border-left: 2px solid transparent; transition: .15s; }
         nav a:hover { color: #e2e8f0; background: #1e293b; }
         nav a.active { color: #f1f5f9; background: #1e293b; border-left-color: #059669; font-weight: 500; }
-        nav a span.icon { font-size: 15px; width: 18px; text-align: center; }
         .sidebar-footer { padding: 16px 18px; border-top: 1px solid #1e293b; }
-        .logout-link { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; text-decoration: none; transition: .15s; }
-        .logout-link:hover { color: #94a3b8; }
+        .logout-link { font-size: 13px; color: #64748b; text-decoration: none; }
 
         .main { flex: 1; margin-left: 220px; display: flex; flex-direction: column; }
         .topbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; background: #111827; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 5; }
@@ -30,264 +29,145 @@
         .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
         .content { padding: 24px 28px; display: flex; flex-direction: column; gap: 18px; }
 
+        /* Grid */
         .cambio-grid { display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start; }
 
-        /* CARD FORM */
+        /* Card Form */
         .card-form { background: #1e293b; border: 1px solid #263348; border-radius: 14px; padding: 24px; }
-        .card-form h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 6px; font-weight: 600; }
-        .card-form .sub { font-size: 11px; color: #475569; margin-bottom: 20px; }
-
+        .card-form h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 20px; font-weight: 600; }
         .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; box-sizing: border-box; }
-        .form-group input:focus, .form-group select:focus { border-color: #059669; }
-
+        .form-group label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; outline: none; }
+        
         .moedas-rapidas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-        .moeda-chip { padding: 5px 14px; border-radius: 20px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 12px; cursor: pointer; transition: all .15s; }
-        .moeda-chip:hover, .moeda-chip.active { background: #059669; border-color: #059669; color: white; }
+        .moeda-chip { padding: 5px 14px; border-radius: 20px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 12px; cursor: pointer; }
+        .moeda-chip.active { background: #059669; color: white; border-color: #059669; }
 
-        /* Resumo fluxo simples */
         .fluxo-resumo { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin: 16px 0; display: none; }
         .fluxo-resumo.show { display: block; }
-        .fluxo-linha { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; align-items: center; }
-        .fluxo-linha:last-child { margin-bottom: 0; }
-        .fluxo-linha span:first-child { color: #64748b; }
-        .fluxo-linha span:last-child { color: #e2e8f0; font-weight: 600; }
-        .fluxo-sep { border: none; border-top: 1px solid #334155; margin: 10px 0; }
-        .fluxo-lucro { background: rgba(16,185,129,.08); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid rgba(16,185,129,.25); }
-        .fluxo-lucro span:first-child { font-size: 12px; color: #6ee7b7; font-weight: 500; }
-        .fluxo-lucro span:last-child { font-size: 18px; font-weight: 700; color: #34d399; }
+        .fluxo-linha { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
+        .fluxo-lucro { border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px; display: flex; justify-content: space-between; font-weight: bold; color: #34d399; }
 
-        .btn-registrar { width: 100%; background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .2s; }
-        .btn-registrar:hover { background: #047857; }
+        .btn-registrar { width: 100%; background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        /* Painel direito */
+        /* Tabela e Stats */
         .painel-direito { display: flex; flex-direction: column; gap: 16px; }
-
-        .filtro-bar { background: #1e293b; border: 1px solid #263348; border-radius: 12px; padding: 14px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filtro-bar span { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
-        .filtro-bar select { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
-        .btn-filtrar { background: #059669; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; }
-
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         .stat-mini { background: #1e293b; border: 1px solid #263348; border-radius: 10px; padding: 14px; }
-        .stat-mini-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-        .stat-mini-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
-        .stat-mini-value.green { color: #34d399; }
-        .stat-mini-value.red   { color: #f87171; }
-        .stat-mini-value.blue  { color: #38bdf8; }
+        .stat-mini-label { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-mini-value { font-size: 18px; font-weight: 700; }
+        .green { color: #34d399; } .red { color: #f87171; } .blue { color: #38bdf8; }
 
         .tabela-container { background: #1e293b; border: 1px solid #263348; border-radius: 14px; overflow: hidden; }
-        .tabela-header { padding: 14px 18px; border-bottom: 1px solid #263348; display: flex; justify-content: space-between; align-items: center; }
-        .tabela-header h3 { font-size: 14px; color: #e2e8f0; }
-        .total-lucro-badge { font-size: 12px; color: #34d399; background: #064e3b33; padding: 4px 12px; border-radius: 20px; }
-        .tabela-scroll { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
-        thead th { text-align: left; padding: 10px 14px; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid #263348; white-space: nowrap; }
-        tbody tr { border-bottom: 1px solid #1a2538; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #243040; }
-        tbody td { padding: 10px 14px; color: #cbd5e1; vertical-align: middle; }
-        .empty { padding: 32px; text-align: center; color: #475569; font-size: 13px; }
-
-        .btn-acao { background: none; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; margin-left: 4px; }
-        .btn-acao:hover { background: #334155; color: #e2e8f0; }
-        .btn-acao.del:hover { background: #ef444433; border-color: #ef4444; color: #ef4444; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        thead th { text-align: left; padding: 12px 14px; color: #64748b; border-bottom: 1px solid #263348; }
+        tbody td { padding: 12px 14px; border-bottom: 1px solid #1a2538; }
+        .btn-acao { background: none; border: 1px solid #334155; color: #94a3b8; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-right: 4px; }
+        .btn-acao:hover { background: #334155; color: white; }
 
         /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: #00000088; z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-overlay { position: fixed; inset: 0; background: #000000aa; z-index: 100; display: none; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
-        .modal { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; width: 420px; max-width: 95vw; }
-        .modal h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 18px; }
+        .modal { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; width: 400px; }
         .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-modal-save { flex: 1; background: #059669; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
-        .btn-modal-cancel { background: #1a2538; border: 1px solid #334155; color: #94a3b8; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-save { flex: 1; background: #059669; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: #334155; color: #94a3b8; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
 
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #059669; color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 9999; font-family: 'Inter', sans-serif; }
-        .toast.error { background: #dc2626; }
-
-        @media(max-width:1100px) { .cambio-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #059669; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
 <div class="layout">
-
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🔔</div>
-            <span class="logo-text">Concierge</span>
-        </div>
+        <div class="sidebar-logo"><div class="logo-icon">🔔</div><span class="logo-text">Concierge</span></div>
         <nav>
             <a href="/{{ hotel.slug }}/dashboard/"><span class="icon">🏠</span> Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/"><span class="icon">➕</span> Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/"><span class="icon">📋</span> Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/"><span class="icon">📅</span> Reservas</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active"><span class="icon">💱</span> Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/"><span class="icon">📊</span> Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/"><span class="icon">⚙️</span> Configurações</a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="/logout/" class="logout-link"><span>↩</span> Sair</a>
-        </div>
     </aside>
 
     <main class="main">
         <div class="topbar">
-            <span class="topbar-title">💱 Câmbio</span>
+            <span class="topbar-title">💱 Gerenciamento de Câmbio</span>
             <div class="hotel-badge"><div class="hotel-dot"></div>{{ hotel.nome }}</div>
         </div>
 
         <div class="content">
             <div class="cambio-grid">
-
-                <!-- ════ FORMULÁRIO ════ -->
                 <div class="card-form">
-                    <h3>Nova Transação de Câmbio</h3>
-                    <p class="sub">Registre o valor comprado do hóspede e o valor repassado (vendido) para calcular o lucro.</p>
-
+                    <h3>Nova Transação</h3>
                     <div class="moedas-rapidas">
                         <button class="moeda-chip" onclick="selecionarMoeda('USD')">🇺🇸 USD</button>
                         <button class="moeda-chip" onclick="selecionarMoeda('EUR')">🇪🇺 EUR</button>
                         <button class="moeda-chip" onclick="selecionarMoeda('ARS')">🇦🇷 ARS</button>
-                        <button class="moeda-chip" onclick="selecionarMoeda('GBP')">🇬🇧 GBP</button>
-                        <button class="moeda-chip" onclick="selecionarMoeda('PYG')">🇵🇾 PYG</button>
                     </div>
-
                     <div class="form-group">
                         <label>Moeda</label>
                         <select id="moeda" onchange="calcular()">
-                            <option value="USD">🇺🇸 Dólar Americano (USD)</option>
-                            <option value="EUR">🇪🇺 Euro (EUR)</option>
-                            <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
-                            <option value="GBP">🇬🇧 Libra Esterlina (GBP)</option>
-                            <option value="PYG">🇵🇾 Guarani Paraguaio (PYG)</option>
-                            <option value="UYU">🇺🇾 Peso Uruguaio (UYU)</option>
-                            <option value="CLP">🇨🇱 Peso Chileno (CLP)</option>
-                            <option value="COP">🇨🇴 Peso Colombiano (COP)</option>
+                            <option value="USD">USD - Dólar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="ARS">ARS - Peso</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label>Quantidade em moeda estrangeira</label>
-                        <input type="number" id="valor" placeholder="Ex: 100" step="0.01" min="0" oninput="calcular()">
+                        <label>Quantidade</label>
+                        <input type="number" id="valor" step="0.01" oninput="calcular()">
+                    </div>
+                    <div class="form-group">
+                        <label>Cotação Compra (Pago ao Hóspede)</label>
+                        <input type="number" id="cotacao_compra" step="0.01" oninput="calcular()">
+                    </div>
+                    <div class="form-group">
+                        <label>Cotação Venda (Repasse)</label>
+                        <input type="number" id="cotacao_venda" step="0.01" oninput="calcular()">
                     </div>
 
-                    <div class="form-group">
-                        <label>Valor pago ao hóspede (R$) — cotação de compra × quantidade</label>
-                        <input type="number" id="valor_compra" placeholder="Ex: 440,00" step="0.01" min="0" oninput="calcular()">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Valor recebido no repasse (R$) — o que a recepção recebeu ao vender</label>
-                        <input type="number" id="valor_repasse" placeholder="Ex: 520,00" step="0.01" min="0" oninput="calcular()">
-                    </div>
-
-                    <!-- Resumo do cálculo -->
                     <div class="fluxo-resumo" id="fluxo-resumo">
-                        <div class="fluxo-linha">
-                            <span>💸 Pago ao hóspede</span>
-                            <span id="res-compra" style="color:#f87171;">—</span>
-                        </div>
-                        <div class="fluxo-linha">
-                            <span>💰 Recebido no repasse</span>
-                            <span id="res-repasse" style="color:#38bdf8;">—</span>
-                        </div>
-                        <div class="fluxo-lucro">
-                            <span>✅ Lucro da operação</span>
-                            <span id="res-lucro">—</span>
-                        </div>
+                        <div class="fluxo-linha"><span>Total Pago:</span> <span id="res-compra">R$ 0,00</span></div>
+                        <div class="fluxo-linha"><span>Total Recebido:</span> <span id="res-repasse">R$ 0,00</span></div>
+                        <div class="fluxo-lucro"><span>Lucro Estimado:</span> <span id="res-lucro">R$ 0,00</span></div>
                     </div>
-
-                    <button class="btn-registrar" onclick="registrar()">💾 Registrar Transação</button>
+                    <button class="btn-registrar" onclick="registrar()">💾 Registrar Operação</button>
                 </div>
 
-                <!-- ════ PAINEL DIREITO ════ -->
                 <div class="painel-direito">
-
-                    <div class="filtro-bar">
-                        <span>Período:</span>
-                        <select id="filtro-ano"></select>
-                        <select id="filtro-mes">
-                            <option value="">Todos os meses</option>
-                            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
-                            <option value="3">Março</option><option value="4">Abril</option>
-                            <option value="5">Maio</option><option value="6">Junho</option>
-                            <option value="7">Julho</option><option value="8">Agosto</option>
-                            <option value="9">Setembro</option><option value="10">Outubro</option>
-                            <option value="11">Novembro</option><option value="12">Dezembro</option>
-                        </select>
-                        <button class="btn-filtrar" onclick="carregar()">Filtrar</button>
-                        <button class="btn-filtrar" style="background:#334155;" onclick="limparFiltro()">Limpar</button>
-                    </div>
-
                     <div class="stats-row">
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Transações</div>
-                            <div class="stat-mini-value" id="stat-total">—</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Total pago hóspedes</div>
-                            <div class="stat-mini-value red" id="stat-compra">—</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Total recebido</div>
-                            <div class="stat-mini-value blue" id="stat-repasse">—</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Lucro período</div>
-                            <div class="stat-mini-value green" id="stat-lucro">—</div>
-                        </div>
+                        <div class="stat-mini"><div class="stat-mini-label">Pago</div><div class="stat-mini-value red" id="stat-pago">R$ 0,00</div></div>
+                        <div class="stat-mini"><div class="stat-mini-label">Recebido</div><div class="stat-mini-value blue" id="stat-recebido">R$ 0,00</div></div>
+                        <div class="stat-mini"><div class="stat-mini-label">Lucro Período</div><div class="stat-mini-value green" id="stat-lucro">R$ 0,00</div></div>
                     </div>
 
                     <div class="tabela-container">
-                        <div class="tabela-header">
-                            <h3>Histórico</h3>
-                            <span class="total-lucro-badge" id="badge-lucro">Lucro: R$ —</span>
-                        </div>
-                        <div class="tabela-scroll">
-                            <div id="lista-cambio"><div class="empty">Carregando...</div></div>
-                        </div>
+                        <div id="lista-cambio"></div>
                     </div>
-
                 </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- MODAL EDIÇÃO -->
 <div class="modal-overlay" id="modal-edicao">
     <div class="modal">
-        <h3>✏️ Editar Transação</h3>
+        <h3>✏️ Registrar Revenda / Editar</h3>
         <input type="hidden" id="edit-id">
-        <div class="form-group">
-            <label>Moeda</label>
-            <select id="edit-moeda">
-                <option value="USD">USD — Dólar Americano</option>
-                <option value="EUR">EUR — Euro</option>
-                <option value="ARS">ARS — Peso Argentino</option>
-                <option value="GBP">GBP — Libra Esterlina</option>
-                <option value="PYG">PYG — Guarani Paraguaio</option>
-                <option value="UYU">UYU — Peso Uruguaio</option>
-                <option value="CLP">CLP — Peso Chileno</option>
-                <option value="COP">COP — Peso Colombiano</option>
-            </select>
+        <input type="hidden" id="edit-compra-total"> <div class="form-group">
+            <label>Moeda e Quantidade</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="edit-moeda" disabled style="flex:1; opacity:0.6;">
+                <input type="number" id="edit-valor" step="0.01" style="flex:1;">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Quantidade em moeda estrangeira</label>
-            <input type="number" id="edit-valor" step="0.01" min="0">
+        
+        <div class="form-group" style="background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+            <label style="color: #34d399;">Cotação de Revenda (Ex: 5,50)</label>
+            <input type="number" id="edit-cotacao-venda" step="0.01" oninput="preverLucro()" placeholder="5.50">
+            <div id="previa-lucro" style="font-size: 11px; margin-top: 8px; color: #94a3b8;"></div>
         </div>
-        <div class="form-group">
-            <label>Valor pago ao hóspede (R$)</label>
-            <input type="number" id="edit-compra" step="0.01" min="0" placeholder="0,00">
-        </div>
-        <div class="form-group">
-            <label>Valor recebido no repasse (R$)</label>
-            <input type="number" id="edit-repasse" step="0.01" min="0" placeholder="0,00">
-        </div>
+
         <div class="modal-btns">
-            <button class="btn-modal-cancel" onclick="fecharModal()">Cancelar</button>
-            <button class="btn-modal-save" onclick="salvarEdicao()">💾 Salvar</button>
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-save" onclick="salvarEdicao()">💾 Salvar Revenda</button>
         </div>
     </div>
 </div>
@@ -295,234 +175,163 @@
 <script>
 const hotelSlug = "{{ hotel.slug }}";
 
-// ── Init anos e mês atual
-(function() {
-    const ano = new Date().getFullYear();
-    const sel = document.getElementById('filtro-ano');
-    const opt0 = document.createElement('option');
-    opt0.value = ''; opt0.innerText = 'Todos os anos';
-    sel.appendChild(opt0);
-    for (let a = ano; a >= ano - 4; a--) {
-        const opt = document.createElement('option');
-        opt.value = a; opt.innerText = a;
-        if (a === ano) opt.selected = true;
-        sel.appendChild(opt);
-    }
-    document.getElementById('filtro-mes').value = new Date().getMonth() + 1;
-})();
-
-function selecionarMoeda(m) {
-    document.getElementById('moeda').value = m;
-    document.querySelectorAll('.moeda-chip').forEach(c => c.classList.toggle('active', c.innerText.includes(m)));
-}
-
-function fmt(v) {
-    return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2});
-}
+function fmt(v) { return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2}); }
 
 function calcular() {
-    const compra  = parseFloat(document.getElementById('valor_compra').value) || 0;
-    const repasse = parseFloat(document.getElementById('valor_repasse').value) || 0;
-    const resumo  = document.getElementById('fluxo-resumo');
-
-    if (!compra && !repasse) { resumo.classList.remove('show'); return; }
-
-    const lucro = repasse - compra;
-    document.getElementById('res-compra').innerText  = fmt(compra);
-    document.getElementById('res-repasse').innerText = fmt(repasse);
-    document.getElementById('res-lucro').innerText   = (lucro >= 0 ? '+ ' : '− ') + fmt(Math.abs(lucro));
-    document.getElementById('res-lucro').style.color = lucro >= 0 ? '#34d399' : '#f87171';
-    resumo.classList.add('show');
+    const v = parseFloat(document.getElementById('valor').value) || 0;
+    const cc = parseFloat(document.getElementById('cotacao_compra').value) || 0;
+    const cv = parseFloat(document.getElementById('cotacao_venda').value) || 0;
+    
+    const totalCompra = v * cc;
+    const totalVenda = v * cv;
+    
+    document.getElementById('res-compra').innerText = fmt(totalCompra);
+    document.getElementById('res-repasse').innerText = fmt(totalVenda);
+    document.getElementById('res-lucro').innerText = fmt(totalVenda > 0 ? totalVenda - totalCompra : 0);
+    document.getElementById('fluxo-resumo').classList.toggle('show', totalCompra > 0);
 }
 
 async function registrar() {
-    const moeda   = document.getElementById('moeda').value;
-    const valor   = document.getElementById('valor').value || '0';
-    const compra  = document.getElementById('valor_compra').value;
-    const repasse = document.getElementById('valor_repasse').value;
-
-    if (!compra)  return toast('Informe o valor pago ao hóspede', 'error');
-    if (!repasse) return toast('Informe o valor recebido no repasse', 'error');
-
-    // Calcula cotacao_compra estimada (para compatibilidade com o model)
-    const v       = parseFloat(valor) || 1;
-    const compraF  = parseFloat(compra);
-    const repasseF = parseFloat(repasse);
-    const cotacaoCompra = compraF / v;
-    const cotacaoVenda  = repasseF / v;
-    const lucro         = repasseF - compraF;
+    const v = parseFloat(document.getElementById('valor').value);
+    const cc = parseFloat(document.getElementById('cotacao_compra').value);
+    const cv = parseFloat(document.getElementById('cotacao_venda').value) || 0;
 
     const form = new FormData();
-    form.append('moeda',          moeda);
-    form.append('valor',          valor);
-    form.append('cotacao_compra', cotacaoCompra.toFixed(4));
-    form.append('cotacao_venda',  cotacaoVenda.toFixed(4));
-    form.append('valor_recebido', repasse);   // repasse real
+    form.append('moeda', document.getElementById('moeda').value);
+    form.append('valor', v);
+    form.append('cotacao_compra', cc);
+    form.append('cotacao_venda', cv);
+    form.append('valor_reais', (v * cc).toFixed(2)); // Total pago ao hóspede
+    form.append('valor_recebido', (v * cv).toFixed(2)); // Total recebido no repasse
 
-    try {
-        const res  = await fetch(`/api/admin/${hotelSlug}/cambio/`, { method: 'POST', body: form });
-        const data = await res.json();
-        if (data.erro) throw new Error(data.erro);
-        toast('✔ Transação registrada!');
-        ['valor','valor_compra','valor_repasse'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('fluxo-resumo').classList.remove('show');
-        carregar();
-    } catch(e) { toast(e.message || 'Erro', 'error'); }
-}
-
-function limparFiltro() {
-    document.getElementById('filtro-ano').value = '';
-    document.getElementById('filtro-mes').value = '';
+    await fetch(`/api/admin/${hotelSlug}/cambio/`, { method: 'POST', body: form });
+    toast("Transação registrada!");
     carregar();
 }
 
 async function carregar() {
-    const container = document.getElementById('lista-cambio');
-    container.innerHTML = '<div class="empty">Carregando...</div>';
+    const res = await fetch(`/api/admin/${hotelSlug}/cambio/`);
+    const lista = await res.json();
+    let totalPago = 0, totalRecebido = 0, totalLucro = 0;
 
-    const ano = document.getElementById('filtro-ano').value;
-    const mes = document.getElementById('filtro-mes').value;
+    let html = `<table><thead><tr><th>Data</th><th>Moeda</th><th>Qtd</th><th>Pago (Hóspede)</th><th>Recebido (Venda)</th><th>Lucro</th><th>Ações</th></tr></thead><tbody>`;
+    
+    lista.forEach(t => {
+        const pago = parseFloat(t.valor_reais || 0);
+        const recebido = parseFloat(t.valor_recebido || 0);
+        const lucro = recebido > 0 ? recebido - pago : 0;
+        
+        totalPago += pago; totalRecebido += recebido; totalLucro += lucro;
 
-    try {
-        let url = `/api/admin/${hotelSlug}/cambio/`;
-        const params = [];
-        if (ano) params.push(`ano=${ano}`);
-        if (mes) params.push(`mes=${mes}`);
-        if (params.length) url += '?' + params.join('&');
+        html += `<tr>
+            <td>${new Date(t.data).toLocaleDateString('pt-BR')}</td>
+            <td><b>${t.moeda}</b></td>
+            <td>${parseFloat(t.valor).toFixed(2)}</td>
+            <td class="red">${fmt(pago)}</td>
+            <td class="blue">${recebido > 0 ? fmt(recebido) : '--'}</td>
+            <td class="green" style="font-weight:600">${fmt(lucro)}</td>
+            <td>
+                <button class="btn-acao" onclick="abrirEdicao(${t.id}, '${t.moeda}', ${t.valor}, ${pago}, ${t.cotacao_venda})">✏️</button>
+                <button class="btn-acao" onclick="deletar(${t.id})">🗑️</button>
+            </td>
+        </tr>`;
+    });
 
-        const res   = await fetch(url);
-        const lista = await res.json();
+    document.getElementById('lista-cambio').innerHTML = html + `</tbody></table>`;
+    document.getElementById('stat-pago').innerText = fmt(totalPago);
+    document.getElementById('stat-recebido').innerText = fmt(totalRecebido);
+    document.getElementById('stat-lucro').innerText = fmt(totalLucro);
+}
 
-        let totalCompra  = 0;
-        let totalRepasse = 0;
-        let totalLucro   = 0;
+function abrirEdicao(id, moeda, valor, pagoTotal, cotacaoVenda) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-moeda').value = moeda;
+    document.getElementById('edit-valor').value = valor;
+    document.getElementById('edit-compra-total').value = pagoTotal;
+    document.getElementById('edit-cotacao-venda').value = cotacaoVenda || '';
+    
+    document.getElementById('modal-edicao').classList.add('show');
+    preverLucro();
+}
 
-        lista.forEach(t => {
-            // valor_recebido = repasse real; valor_reais = compra (pago ao hóspede)
-            const compra  = parseFloat(t.valor_reais     || 0);
-            const repasse = parseFloat(t.valor_recebido  || 0);
-            // fallback: calcula pela cotação de venda se repasse=0
-            const repasseCalc = repasse > 0
-                ? repasse
-                : (parseFloat(t.cotacao_venda||0) > 0
-                    ? parseFloat(t.valor||0) * parseFloat(t.cotacao_venda||0)
-                    : 0);
-            const lucro = repasseCalc > 0 ? repasseCalc - compra : parseFloat(t.lucro || 0);
+function preverLucro() {
+    const qtd = parseFloat(document.getElementById('edit-valor').value) || 0;
+    const taxa = parseFloat(document.getElementById('edit-cotacao-venda').value) || 0;
+    const pago = parseFloat(document.getElementById('edit-compra-total').value) || 0;
+    
+    const totalVenda = qtd * taxa;
+    const lucro = totalVenda - pago;
 
-            totalCompra  += compra;
-            totalRepasse += repasseCalc;
-            totalLucro   += lucro;
-        });
-
-        document.getElementById('stat-total').innerText   = lista.length;
-        document.getElementById('stat-compra').innerText  = fmt(totalCompra);
-        document.getElementById('stat-repasse').innerText = fmt(totalRepasse);
-        document.getElementById('stat-lucro').innerText   = fmt(totalLucro);
-        document.getElementById('badge-lucro').innerText  = 'Lucro: ' + fmt(totalLucro);
-
-        if (!lista.length) {
-            container.innerHTML = '<div class="empty">Nenhuma transação no período.</div>';
-            return;
-        }
-
-        container.innerHTML = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Moeda</th>
-                        <th>Qtd</th>
-                        <th>Pago ao hóspede</th>
-                        <th>Recebido repasse</th>
-                        <th>Lucro</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${lista.map(t => {
-                        const dataStr  = t.data ? new Date(t.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
-                        const compra   = parseFloat(t.valor_reais    || 0);
-                        const repasseR = parseFloat(t.valor_recebido || 0);
-                        const repasseC = parseFloat(t.cotacao_venda||0) > 0
-                            ? parseFloat(t.valor||0) * parseFloat(t.cotacao_venda||0) : 0;
-                        const repasse  = repasseR > 0 ? repasseR : repasseC;
-                        const lucro    = repasse > 0 ? repasse - compra : parseFloat(t.lucro || 0);
-                        const lucroClr = lucro >= 0 ? '#34d399' : '#f87171';
-
-                        return `<tr>
-                            <td style="color:#64748b;white-space:nowrap">${dataStr}</td>
-                            <td><strong style="color:#e2e8f0">${t.moeda}</strong></td>
-                            <td style="color:#94a3b8">${parseFloat(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-                            <td style="color:#f87171">R$ ${compra.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-                            <td style="color:#38bdf8">${repasse > 0 ? 'R$ ' + repasse.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '<span style="color:#475569">—</span>'}</td>
-                            <td style="color:${lucroClr};font-weight:600">
-                                ${lucro >= 0 ? '+' : '−'} R$ ${Math.abs(lucro).toLocaleString('pt-BR',{minimumFractionDigits:2})}
-                            </td>
-                            <td style="white-space:nowrap">
-                                <button class="btn-acao" onclick="abrirEdicao(${t.id},'${t.moeda}',${parseFloat(t.valor||0)},${compra},${repasse})">✏️</button>
-                                <button class="btn-acao del" onclick="deletar(${t.id})">🗑️</button>
-                            </td>
-                        </tr>`;
-                    }).join('')}
-                </tbody>
-            </table>`;
-    } catch(e) {
-        container.innerHTML = '<div class="empty">Erro ao carregar.</div>';
-        console.error(e);
+    if (taxa > 0) {
+        document.getElementById('previa-lucro').innerHTML = 
+            `Cálculo: ${qtd} x ${taxa} = <b>${fmt(totalVenda)}</b><br>` +
+            `Lucro: ${fmt(totalVenda)} - ${fmt(pago)} = <b style="color:#34d399">${fmt(lucro)}</b>`;
+    } else {
+        document.getElementById('previa-lucro').innerText = "Aguardando cotação...";
     }
 }
 
-function abrirEdicao(id, moeda, valor, compra, repasse) {
-    document.getElementById('edit-id').value      = id;
-    document.getElementById('edit-moeda').value   = moeda;
-    document.getElementById('edit-valor').value   = valor;
-    document.getElementById('edit-compra').value  = compra || '';
-    document.getElementById('edit-repasse').value = repasse || '';
-    document.getElementById('modal-edicao').classList.add('show');
+async function salvarEdicao() {
+    const id = document.getElementById('edit-id').value;
+    const qtd = parseFloat(document.getElementById('edit-valor').value);
+    
+    // Pega o valor do input, troca vírgula por ponto antes de converter
+    let taxaRaw = document.getElementById('edit-cotacao-venda').value;
+    const taxaVenda = parseFloat(taxaRaw.replace(',', '.')) || 0;
+    
+    const valorRecebidoFinal = (qtd * taxaVenda).toFixed(2);
+
+    try {
+        const response = await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                valor: qtd,
+                cotacao_venda: taxaVenda, // Corrigido de 'colacao' para 'cotacao'
+                valor_recebido: valorRecebidoFinal
+            })
+        });
+
+        if (response.ok) {
+            fecharModal();
+            toast("✅ Revenda atualizada!");
+            await carregar(); // Isso vai atualizar os cards de Lucro e Recebido no topo
+        } else {
+            const erro = await response.json();
+            console.error("Erro do servidor:", erro);
+            toast("❌ Erro ao salvar. Verifique os dados.");
+        }
+    } catch (error) {
+        console.error("Erro na requisição:", error);
+        toast("❌ Erro de conexão.");
+    }
+}
+
+// Adicione isso logo no início do seu <script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 function fecharModal() { document.getElementById('modal-edicao').classList.remove('show'); }
-
-async function salvarEdicao() {
-    const id      = document.getElementById('edit-id').value;
-    const valor   = parseFloat(document.getElementById('edit-valor').value) || 1;
-    const compra  = parseFloat(document.getElementById('edit-compra').value) || 0;
-    const repasse = parseFloat(document.getElementById('edit-repasse').value) || 0;
-    const cotacaoCompra = compra / valor;
-    const cotacaoVenda  = repasse / valor;
-
-    const form = new FormData();
-    form.append('moeda',          document.getElementById('edit-moeda').value);
-    form.append('valor',          valor);
-    form.append('cotacao_compra', cotacaoCompra.toFixed(4));
-    form.append('cotacao_venda',  cotacaoVenda.toFixed(4));
-    form.append('valor_recebido', repasse);
-
-    try {
-        const res  = await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'PUT', body: form });
-        const data = await res.json();
-        if (data.erro) throw new Error(data.erro);
-        fecharModal();
-        toast('✔ Atualizado!');
-        carregar();
-    } catch(e) { toast(e.message || 'Erro', 'error'); }
+function toast(m) {
+    const t = document.createElement('div'); t.className = 'toast'; t.innerText = m;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
 }
-
-async function deletar(id) {
-    if (!confirm('Excluir esta transação?')) return;
-    await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'DELETE' });
-    toast('Excluído.');
-    carregar();
-}
-
-function toast(msg, tipo = '') {
-    const t = document.createElement('div');
-    t.className = `toast ${tipo}`; t.innerText = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2500);
-}
-
-document.getElementById('modal-edicao').addEventListener('click', e => { if (e.target === e.currentTarget) fecharModal(); });
+function selecionarMoeda(m) { document.getElementById('moeda').value = m; }
 document.addEventListener('DOMContentLoaded', carregar);
 </script>
 </body>
