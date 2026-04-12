@@ -4,396 +4,148 @@
 <head>
     <meta charset="UTF-8">
     <title>Câmbio — {{ hotel.nome }}</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        .cambio-grid {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 24px;
-            align-items: start;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        .layout { display: flex; min-height: 100vh; }
 
-        .card-form {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 14px;
-            padding: 24px;
-        }
+        .sidebar { width: 220px; background: #111827; border-right: 1px solid #1e293b; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
+        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px; border-bottom: 1px solid #1e293b; }
+        .logo-icon { width: 30px; height: 30px; background: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .logo-text { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+        nav { display: flex; flex-direction: column; padding: 12px 0; flex: 1; }
+        nav a { display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13.5px; color: #94a3b8; text-decoration: none; border-left: 2px solid transparent; transition: .15s; }
+        nav a:hover { color: #e2e8f0; background: #1e293b; }
+        nav a.active { color: #f1f5f9; background: #1e293b; border-left-color: #059669; font-weight: 500; }
+        nav a span.icon { font-size: 15px; width: 18px; text-align: center; }
+        .sidebar-footer { padding: 16px 18px; border-top: 1px solid #1e293b; }
+        .logout-link { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; text-decoration: none; transition: .15s; }
+        .logout-link:hover { color: #94a3b8; }
 
-        .card-form h3 {
-            font-size: 15px;
-            color: #e2e8f0;
-            margin-bottom: 20px;
-        }
+        .main { flex: 1; margin-left: 220px; display: flex; flex-direction: column; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; background: #111827; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 5; }
+        .topbar-title { font-size: 16px; font-weight: 600; color: #f1f5f9; }
+        .hotel-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #94a3b8; background: #1e293b; padding: 6px 12px; border-radius: 8px; }
+        .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+        .content { padding: 24px 28px; display: flex; flex-direction: column; gap: 18px; }
+
+        .cambio-grid { display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start; }
+
+        /* CARD FORM */
+        .card-form { background: #1e293b; border: 1px solid #263348; border-radius: 14px; padding: 24px; }
+        .card-form h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 6px; font-weight: 600; }
+        .card-form .sub { font-size: 11px; color: #475569; margin-bottom: 20px; }
 
         .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        .form-group input:focus, .form-group select:focus { border-color: #059669; }
 
-        .form-group label {
-            display: block;
-            font-size: 11px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 6px;
-        }
+        .moedas-rapidas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+        .moeda-chip { padding: 5px 14px; border-radius: 20px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 12px; cursor: pointer; transition: all .15s; }
+        .moeda-chip:hover, .moeda-chip.active { background: #059669; border-color: #059669; color: white; }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 14px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #e2e8f0;
-            font-size: 14px;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-            box-sizing: border-box;
-        }
+        /* Resumo fluxo simples */
+        .fluxo-resumo { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin: 16px 0; display: none; }
+        .fluxo-resumo.show { display: block; }
+        .fluxo-linha { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; align-items: center; }
+        .fluxo-linha:last-child { margin-bottom: 0; }
+        .fluxo-linha span:first-child { color: #64748b; }
+        .fluxo-linha span:last-child { color: #e2e8f0; font-weight: 600; }
+        .fluxo-sep { border: none; border-top: 1px solid #334155; margin: 10px 0; }
+        .fluxo-lucro { background: rgba(16,185,129,.08); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid rgba(16,185,129,.25); }
+        .fluxo-lucro span:first-child { font-size: 12px; color: #6ee7b7; font-weight: 500; }
+        .fluxo-lucro span:last-child { font-size: 18px; font-weight: 700; color: #34d399; }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: #059669;
-        }
-
-        .resumo-cambio {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            display: none;
-        }
-
-        .resumo-cambio.show { display: block; }
-
-        .resumo-linha {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .resumo-linha span:first-child { color: #64748b; }
-        .resumo-linha span:last-child { color: #e2e8f0; font-weight: 500; }
-
-        .resumo-total-cambio {
-            border-top: 1px solid #334155;
-            padding-top: 10px;
-            margin-top: 6px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .resumo-total-cambio span:first-child { color: #94a3b8; font-size: 12px; }
-        .resumo-total-cambio span:last-child { color: #34d399; font-size: 18px; font-weight: 700; }
-
-        .lucro-badge {
-            display: inline-block;
-            background: #064e3b33;
-            color: #34d399;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .btn-registrar {
-            width: 100%;
-            background: #059669;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background .2s;
-        }
-
+        .btn-registrar { width: 100%; background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .2s; }
         .btn-registrar:hover { background: #047857; }
 
-        .moedas-rapidas {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .moeda-chip {
-            padding: 5px 14px;
-            border-radius: 20px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all .15s;
-        }
-
-        .moeda-chip:hover, .moeda-chip.active {
-            background: #059669;
-            border-color: #059669;
-            color: white;
-        }
-
         /* Painel direito */
-        .painel-direito {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .painel-direito { display: flex; flex-direction: column; gap: 16px; }
 
-        /* Filtros de mês/ano */
-        .filtro-bar {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 12px;
-            padding: 14px 18px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .filtro-bar { background: #1e293b; border: 1px solid #263348; border-radius: 12px; padding: 14px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filtro-bar span { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
+        .filtro-bar select { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+        .btn-filtrar { background: #059669; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-        .filtro-bar span {
-            font-size: 12px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-        }
-
-        .filtro-bar select {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-        }
-
-        .btn-filtrar {
-            background: #059669;
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Resumo mensal */
-        .resumo-mensal {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .stat-mini {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .stat-mini-label {
-            font-size: 11px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 6px;
-        }
-
-        .stat-mini-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #f1f5f9;
-        }
-
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .stat-mini { background: #1e293b; border: 1px solid #263348; border-radius: 10px; padding: 14px; }
+        .stat-mini-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+        .stat-mini-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
         .stat-mini-value.green { color: #34d399; }
+        .stat-mini-value.red   { color: #f87171; }
+        .stat-mini-value.blue  { color: #38bdf8; }
 
-        /* Tabela */
-        .tabela-container {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        .tabela-header {
-            padding: 14px 18px;
-            border-bottom: 1px solid #263348;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        .tabela-container { background: #1e293b; border: 1px solid #263348; border-radius: 14px; overflow: hidden; }
+        .tabela-header { padding: 14px 18px; border-bottom: 1px solid #263348; display: flex; justify-content: space-between; align-items: center; }
         .tabela-header h3 { font-size: 14px; color: #e2e8f0; }
-
-        .total-lucro-badge {
-            font-size: 12px;
-            color: #34d399;
-            background: #064e3b33;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        thead th {
-            text-align: left;
-            padding: 10px 16px;
-            color: #64748b;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            border-bottom: 1px solid #263348;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #1a2538;
-        }
-
+        .total-lucro-badge { font-size: 12px; color: #34d399; background: #064e3b33; padding: 4px 12px; border-radius: 20px; }
+        .tabela-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+        thead th { text-align: left; padding: 10px 14px; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid #263348; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #1a2538; }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #243040; }
-
-        tbody td { padding: 10px 16px; color: #cbd5e1; }
-
+        tbody td { padding: 10px 14px; color: #cbd5e1; vertical-align: middle; }
         .empty { padding: 32px; text-align: center; color: #475569; font-size: 13px; }
 
-        .btn-acao {
-            background: none;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-            margin-left: 4px;
-        }
-
+        .btn-acao { background: none; border: 1px solid #334155; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; margin-left: 4px; }
         .btn-acao:hover { background: #334155; color: #e2e8f0; }
         .btn-acao.del:hover { background: #ef444433; border-color: #ef4444; color: #ef4444; }
 
-        /* Modal edição */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: #00000088;
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: #00000088; z-index: 100; display: none; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
-
-        .modal {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 24px;
-            width: 420px;
-            max-width: 95vw;
-        }
-
+        .modal { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; width: 420px; max-width: 95vw; }
         .modal h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 18px; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-modal-save { flex: 1; background: #059669; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-modal-cancel { background: #1a2538; border: 1px solid #334155; color: #94a3b8; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-        .modal-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-modal-save {
-            flex: 1;
-            background: #059669;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-modal-cancel {
-            background: #1a2538;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .badge-mes {
-            font-size: 11px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #64748b;
-            padding: 3px 10px;
-            border-radius: 20px;
-        }
-
-        .toast {
-            position: fixed; bottom: 20px; right: 20px;
-            background: #059669; color: white;
-            padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 999;
-        }
-
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #059669; color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 9999; font-family: 'Inter', sans-serif; }
         .toast.error { background: #dc2626; }
 
-        @media(max-width: 900px) {
-            .cambio-grid { grid-template-columns: 1fr; }
-            .resumo-mensal { grid-template-columns: 1fr 1fr; }
-        }
+        @media(max-width:1100px) { .cambio-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
 <div class="layout">
+
     <aside class="sidebar">
-        <h2>🔔 Concierge</h2>
+        <div class="sidebar-logo">
+            <div class="logo-icon">🔔</div>
+            <span class="logo-text">Concierge</span>
+        </div>
         <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a class="active">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-            <hr style="border-color:#1e293b;margin:12px 0;">
-            <a href="/logout/">↩ Sair</a>
+            <a href="/{{ hotel.slug }}/dashboard/"><span class="icon">🏠</span> Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/"><span class="icon">➕</span> Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/"><span class="icon">📋</span> Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/"><span class="icon">📅</span> Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active"><span class="icon">💱</span> Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/"><span class="icon">📊</span> Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/"><span class="icon">⚙️</span> Configurações</a>
         </nav>
+        <div class="sidebar-footer">
+            <a href="/logout/" class="logout-link"><span>↩</span> Sair</a>
+        </div>
     </aside>
 
     <main class="main">
-        <header class="topbar">
-            <div>
-                <h1>💱 Câmbio</h1>
-                <p style="font-size:13px;color:#64748b;">{{ hotel.nome }}</p>
-            </div>
-        </header>
+        <div class="topbar">
+            <span class="topbar-title">💱 Câmbio</span>
+            <div class="hotel-badge"><div class="hotel-dot"></div>{{ hotel.nome }}</div>
+        </div>
 
         <div class="content">
             <div class="cambio-grid">
 
-                <!-- FORMULÁRIO -->
+                <!-- ════ FORMULÁRIO ════ -->
                 <div class="card-form">
-                    <h3>Nova Transação</h3>
+                    <h3>Nova Transação de Câmbio</h3>
+                    <p class="sub">Registre o valor comprado do hóspede e o valor repassado (vendido) para calcular o lucro.</p>
 
-                    <div class="moedas-rapidas" id="moedas-rapidas">
+                    <div class="moedas-rapidas">
                         <button class="moeda-chip" onclick="selecionarMoeda('USD')">🇺🇸 USD</button>
                         <button class="moeda-chip" onclick="selecionarMoeda('EUR')">🇪🇺 EUR</button>
                         <button class="moeda-chip" onclick="selecionarMoeda('ARS')">🇦🇷 ARS</button>
@@ -403,7 +155,7 @@
 
                     <div class="form-group">
                         <label>Moeda</label>
-                        <select id="moeda" onchange="calcularCambio()">
+                        <select id="moeda" onchange="calcular()">
                             <option value="USD">🇺🇸 Dólar Americano (USD)</option>
                             <option value="EUR">🇪🇺 Euro (EUR)</option>
                             <option value="ARS">🇦🇷 Peso Argentino (ARS)</option>
@@ -416,85 +168,70 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Valor em moeda estrangeira</label>
-                        <input type="number" id="valor" placeholder="Ex: 100.00" step="0.01" min="0" oninput="calcularCambio()">
+                        <label>Quantidade em moeda estrangeira</label>
+                        <input type="number" id="valor" placeholder="Ex: 100" step="0.01" min="0" oninput="calcular()">
                     </div>
 
                     <div class="form-group">
-                        <label>Cotação de compra (R$ por 1 unidade)</label>
-                        <input type="number" id="cotacao" placeholder="Ex: 5.10" step="0.0001" min="0" oninput="calcularCambio()">
+                        <label>Valor pago ao hóspede (R$) — cotação de compra × quantidade</label>
+                        <input type="number" id="valor_compra" placeholder="Ex: 440,00" step="0.01" min="0" oninput="calcular()">
                     </div>
 
                     <div class="form-group">
-                        <label>Margem de lucro (%)</label>
-                        <input type="number" id="lucro_percent" placeholder="Ex: 5" value="5" min="0" max="100" oninput="calcularCambio()">
+                        <label>Valor recebido no repasse (R$) — o que a recepção recebeu ao vender</label>
+                        <input type="number" id="valor_repasse" placeholder="Ex: 520,00" step="0.01" min="0" oninput="calcular()">
                     </div>
 
-                    <div class="resumo-cambio" id="resumo-cambio">
-                        <div class="resumo-linha">
-                            <span>Valor em moeda</span>
-                            <span id="res-valor-moeda">—</span>
+                    <!-- Resumo do cálculo -->
+                    <div class="fluxo-resumo" id="fluxo-resumo">
+                        <div class="fluxo-linha">
+                            <span>💸 Pago ao hóspede</span>
+                            <span id="res-compra" style="color:#f87171;">—</span>
                         </div>
-                        <div class="resumo-linha">
-                            <span>Cotação base</span>
-                            <span id="res-cotacao">—</span>
+                        <div class="fluxo-linha">
+                            <span>💰 Recebido no repasse</span>
+                            <span id="res-repasse" style="color:#38bdf8;">—</span>
                         </div>
-                        <div class="resumo-linha">
-                            <span>Valor em R$ (base)</span>
-                            <span id="res-valor-reais">—</span>
-                        </div>
-                        <div class="resumo-linha">
-                            <span>Lucro estimado</span>
-                            <span id="res-lucro" class="lucro-badge">—</span>
-                        </div>
-                        <div class="resumo-total-cambio">
-                            <span>Valor cobrado do cliente</span>
-                            <span id="res-total">—</span>
+                        <div class="fluxo-lucro">
+                            <span>✅ Lucro da operação</span>
+                            <span id="res-lucro">—</span>
                         </div>
                     </div>
 
-                    <button class="btn-registrar" onclick="registrarCambio()">
-                        💾 Registrar Transação
-                    </button>
+                    <button class="btn-registrar" onclick="registrar()">💾 Registrar Transação</button>
                 </div>
 
-                <!-- PAINEL DIREITO -->
+                <!-- ════ PAINEL DIREITO ════ -->
                 <div class="painel-direito">
 
-                    <!-- Filtro mês/ano -->
                     <div class="filtro-bar">
                         <span>Período:</span>
-                        <select id="filtro-ano">
-                            <option value="">Todos os anos</option>
-                        </select>
+                        <select id="filtro-ano"></select>
                         <select id="filtro-mes">
                             <option value="">Todos os meses</option>
-                            <option value="1">Janeiro</option>
-                            <option value="2">Fevereiro</option>
-                            <option value="3">Março</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Maio</option>
-                            <option value="6">Junho</option>
-                            <option value="7">Julho</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setembro</option>
-                            <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12">Dezembro</option>
+                            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+                            <option value="3">Março</option><option value="4">Abril</option>
+                            <option value="5">Maio</option><option value="6">Junho</option>
+                            <option value="7">Julho</option><option value="8">Agosto</option>
+                            <option value="9">Setembro</option><option value="10">Outubro</option>
+                            <option value="11">Novembro</option><option value="12">Dezembro</option>
                         </select>
-                        <button class="btn-filtrar" onclick="carregarCambio()">Filtrar</button>
+                        <button class="btn-filtrar" onclick="carregar()">Filtrar</button>
                         <button class="btn-filtrar" style="background:#334155;" onclick="limparFiltro()">Limpar</button>
                     </div>
 
-                    <!-- Resumo mensal -->
-                    <div class="resumo-mensal">
+                    <div class="stats-row">
                         <div class="stat-mini">
                             <div class="stat-mini-label">Transações</div>
-                            <div class="stat-mini-value" id="stat-total-tx">—</div>
+                            <div class="stat-mini-value" id="stat-total">—</div>
                         </div>
                         <div class="stat-mini">
-                            <div class="stat-mini-label">Volume (R$)</div>
-                            <div class="stat-mini-value" id="stat-volume">—</div>
+                            <div class="stat-mini-label">Total pago hóspedes</div>
+                            <div class="stat-mini-value red" id="stat-compra">—</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-mini-label">Total recebido</div>
+                            <div class="stat-mini-value blue" id="stat-repasse">—</div>
                         </div>
                         <div class="stat-mini">
                             <div class="stat-mini-label">Lucro período</div>
@@ -502,18 +239,17 @@
                         </div>
                     </div>
 
-                    <!-- Histórico -->
                     <div class="tabela-container">
                         <div class="tabela-header">
-                            <h3>Histórico de Transações <span class="badge-mes" id="badge-periodo"></span></h3>
-                            <span class="total-lucro-badge" id="total-lucro-badge">Lucro: R$ —</span>
+                            <h3>Histórico</h3>
+                            <span class="total-lucro-badge" id="badge-lucro">Lucro: R$ —</span>
                         </div>
-                        <div id="lista-cambio">
-                            <div class="empty">Carregando...</div>
+                        <div class="tabela-scroll">
+                            <div id="lista-cambio"><div class="empty">Carregando...</div></div>
                         </div>
                     </div>
 
-                </div><!-- /painel-direito -->
+                </div>
             </div>
         </div>
     </main>
@@ -524,7 +260,6 @@
     <div class="modal">
         <h3>✏️ Editar Transação</h3>
         <input type="hidden" id="edit-id">
-
         <div class="form-group">
             <label>Moeda</label>
             <select id="edit-moeda">
@@ -539,18 +274,17 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Valor em moeda estrangeira</label>
+            <label>Quantidade em moeda estrangeira</label>
             <input type="number" id="edit-valor" step="0.01" min="0">
         </div>
         <div class="form-group">
-            <label>Cotação usada (R$)</label>
-            <input type="number" id="edit-cotacao" step="0.0001" min="0">
+            <label>Valor pago ao hóspede (R$)</label>
+            <input type="number" id="edit-compra" step="0.01" min="0" placeholder="0,00">
         </div>
         <div class="form-group">
-            <label>Margem de lucro (%)</label>
-            <input type="number" id="edit-lucro" step="0.01" min="0" max="100">
+            <label>Valor recebido no repasse (R$)</label>
+            <input type="number" id="edit-repasse" step="0.01" min="0" placeholder="0,00">
         </div>
-
         <div class="modal-btns">
             <button class="btn-modal-cancel" onclick="fecharModal()">Cancelar</button>
             <button class="btn-modal-save" onclick="salvarEdicao()">💾 Salvar</button>
@@ -561,101 +295,93 @@
 <script>
 const hotelSlug = "{{ hotel.slug }}";
 
-// Populando anos
+// ── Init anos e mês atual
 (function() {
     const ano = new Date().getFullYear();
     const sel = document.getElementById('filtro-ano');
-    // Seleciona o mês e ano atual por padrão
+    const opt0 = document.createElement('option');
+    opt0.value = ''; opt0.innerText = 'Todos os anos';
+    sel.appendChild(opt0);
     for (let a = ano; a >= ano - 4; a--) {
         const opt = document.createElement('option');
         opt.value = a; opt.innerText = a;
         if (a === ano) opt.selected = true;
         sel.appendChild(opt);
     }
-    // Seleciona mês atual por padrão
     document.getElementById('filtro-mes').value = new Date().getMonth() + 1;
 })();
 
-function selecionarMoeda(moeda) {
-    document.getElementById('moeda').value = moeda;
-    document.querySelectorAll('.moeda-chip').forEach(c => {
-        c.classList.toggle('active', c.innerText.includes(moeda));
-    });
-    calcularCambio();
+function selecionarMoeda(m) {
+    document.getElementById('moeda').value = m;
+    document.querySelectorAll('.moeda-chip').forEach(c => c.classList.toggle('active', c.innerText.includes(m)));
 }
 
-function calcularCambio() {
-    const valor = parseFloat(document.getElementById('valor').value) || 0;
-    const cotacao = parseFloat(document.getElementById('cotacao').value) || 0;
-    const lucroPercent = parseFloat(document.getElementById('lucro_percent').value) || 0;
-    const moeda = document.getElementById('moeda').value;
-
-    if (!valor || !cotacao) {
-        document.getElementById('resumo-cambio').classList.remove('show');
-        return;
-    }
-
-    const valorReais = valor * cotacao;
-    const lucro = valorReais * (lucroPercent / 100);
-    const totalCliente = valorReais - lucro;
-
-    document.getElementById('res-valor-moeda').innerText = `${valor.toLocaleString('pt-BR', {minimumFractionDigits:2})} ${moeda}`;
-    document.getElementById('res-cotacao').innerText = `R$ ${cotacao.toLocaleString('pt-BR', {minimumFractionDigits:4})}`;
-    document.getElementById('res-valor-reais').innerText = `R$ ${valorReais.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-    document.getElementById('res-lucro').innerText = `+ R$ ${lucro.toLocaleString('pt-BR', {minimumFractionDigits:2})} (${lucroPercent}%)`;
-    document.getElementById('res-total').innerText = `R$ ${totalCliente.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-
-    document.getElementById('resumo-cambio').classList.add('show');
+function fmt(v) {
+    return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
 
-async function registrarCambio() {
-    const moeda = document.getElementById('moeda').value;
-    const valor = document.getElementById('valor').value;
-    const cotacao = document.getElementById('cotacao').value;
-    const lucro_percent = document.getElementById('lucro_percent').value;
+function calcular() {
+    const compra  = parseFloat(document.getElementById('valor_compra').value) || 0;
+    const repasse = parseFloat(document.getElementById('valor_repasse').value) || 0;
+    const resumo  = document.getElementById('fluxo-resumo');
 
-    if (!valor || !cotacao) { mostrarToast('Preencha valor e cotação', 'error'); return; }
+    if (!compra && !repasse) { resumo.classList.remove('show'); return; }
+
+    const lucro = repasse - compra;
+    document.getElementById('res-compra').innerText  = fmt(compra);
+    document.getElementById('res-repasse').innerText = fmt(repasse);
+    document.getElementById('res-lucro').innerText   = (lucro >= 0 ? '+ ' : '− ') + fmt(Math.abs(lucro));
+    document.getElementById('res-lucro').style.color = lucro >= 0 ? '#34d399' : '#f87171';
+    resumo.classList.add('show');
+}
+
+async function registrar() {
+    const moeda   = document.getElementById('moeda').value;
+    const valor   = document.getElementById('valor').value || '0';
+    const compra  = document.getElementById('valor_compra').value;
+    const repasse = document.getElementById('valor_repasse').value;
+
+    if (!compra)  return toast('Informe o valor pago ao hóspede', 'error');
+    if (!repasse) return toast('Informe o valor recebido no repasse', 'error');
+
+    // Calcula cotacao_compra estimada (para compatibilidade com o model)
+    const v       = parseFloat(valor) || 1;
+    const compraF  = parseFloat(compra);
+    const repasseF = parseFloat(repasse);
+    const cotacaoCompra = compraF / v;
+    const cotacaoVenda  = repasseF / v;
+    const lucro         = repasseF - compraF;
 
     const form = new FormData();
-    form.append('moeda', moeda);
-    form.append('valor', valor);
-    form.append('cotacao', cotacao);
-    form.append('lucro_percent', lucro_percent);
+    form.append('moeda',          moeda);
+    form.append('valor',          valor);
+    form.append('cotacao_compra', cotacaoCompra.toFixed(4));
+    form.append('cotacao_venda',  cotacaoVenda.toFixed(4));
+    form.append('valor_recebido', repasse);   // repasse real
 
     try {
-        const res = await fetch(`/api/admin/${hotelSlug}/cambio/`, { method: 'POST', body: form });
+        const res  = await fetch(`/api/admin/${hotelSlug}/cambio/`, { method: 'POST', body: form });
         const data = await res.json();
         if (data.erro) throw new Error(data.erro);
-        mostrarToast('✔ Transação registrada!');
-        document.getElementById('valor').value = '';
-        document.getElementById('resumo-cambio').classList.remove('show');
-        carregarCambio();
-    } catch(e) {
-        mostrarToast(e.message || 'Erro', 'error');
-    }
+        toast('✔ Transação registrada!');
+        ['valor','valor_compra','valor_repasse'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('fluxo-resumo').classList.remove('show');
+        carregar();
+    } catch(e) { toast(e.message || 'Erro', 'error'); }
 }
 
 function limparFiltro() {
     document.getElementById('filtro-ano').value = '';
     document.getElementById('filtro-mes').value = '';
-    carregarCambio();
+    carregar();
 }
 
-async function carregarCambio() {
+async function carregar() {
     const container = document.getElementById('lista-cambio');
     container.innerHTML = '<div class="empty">Carregando...</div>';
 
     const ano = document.getElementById('filtro-ano').value;
     const mes = document.getElementById('filtro-mes').value;
-
-    // Badge do período
-    const nomeMes = ['', 'Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    let periodo = '';
-    if (mes && ano) periodo = `${nomeMes[mes]}/${ano}`;
-    else if (mes) periodo = nomeMes[mes];
-    else if (ano) periodo = ano;
-    else periodo = 'Todos os períodos';
-    document.getElementById('badge-periodo').innerText = periodo;
 
     try {
         let url = `/api/admin/${hotelSlug}/cambio/`;
@@ -664,20 +390,38 @@ async function carregarCambio() {
         if (mes) params.push(`mes=${mes}`);
         if (params.length) url += '?' + params.join('&');
 
-        const res = await fetch(url);
+        const res   = await fetch(url);
         const lista = await res.json();
 
-        // Stats
-        const totalLucro = lista.reduce((s, t) => s + parseFloat(t.lucro || 0), 0);
-        const totalVolume = lista.reduce((s, t) => s + parseFloat(t.valor_reais || 0), 0);
+        let totalCompra  = 0;
+        let totalRepasse = 0;
+        let totalLucro   = 0;
 
-        document.getElementById('stat-total-tx').innerText = lista.length;
-        document.getElementById('stat-volume').innerText = 'R$ ' + totalVolume.toLocaleString('pt-BR', {minimumFractionDigits:2});
-        document.getElementById('stat-lucro').innerText = 'R$ ' + totalLucro.toLocaleString('pt-BR', {minimumFractionDigits:2});
-        document.getElementById('total-lucro-badge').innerText = `Lucro: R$ ${totalLucro.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+        lista.forEach(t => {
+            // valor_recebido = repasse real; valor_reais = compra (pago ao hóspede)
+            const compra  = parseFloat(t.valor_reais     || 0);
+            const repasse = parseFloat(t.valor_recebido  || 0);
+            // fallback: calcula pela cotação de venda se repasse=0
+            const repasseCalc = repasse > 0
+                ? repasse
+                : (parseFloat(t.cotacao_venda||0) > 0
+                    ? parseFloat(t.valor||0) * parseFloat(t.cotacao_venda||0)
+                    : 0);
+            const lucro = repasseCalc > 0 ? repasseCalc - compra : parseFloat(t.lucro || 0);
+
+            totalCompra  += compra;
+            totalRepasse += repasseCalc;
+            totalLucro   += lucro;
+        });
+
+        document.getElementById('stat-total').innerText   = lista.length;
+        document.getElementById('stat-compra').innerText  = fmt(totalCompra);
+        document.getElementById('stat-repasse').innerText = fmt(totalRepasse);
+        document.getElementById('stat-lucro').innerText   = fmt(totalLucro);
+        document.getElementById('badge-lucro').innerText  = 'Lucro: ' + fmt(totalLucro);
 
         if (!lista.length) {
-            container.innerHTML = '<div class="empty">Nenhuma transação no período selecionado.</div>';
+            container.innerHTML = '<div class="empty">Nenhuma transação no período.</div>';
             return;
         }
 
@@ -687,27 +431,36 @@ async function carregarCambio() {
                     <tr>
                         <th>Data</th>
                         <th>Moeda</th>
-                        <th>Valor</th>
-                        <th>Cotação</th>
-                        <th>Em R$</th>
+                        <th>Qtd</th>
+                        <th>Pago ao hóspede</th>
+                        <th>Recebido repasse</th>
                         <th>Lucro</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${lista.map(t => {
-                        const data = t.data ? new Date(t.data).toLocaleDateString('pt-BR') : '—';
-                        return `
-                        <tr>
-                            <td style="color:#64748b">${data}</td>
-                            <td><strong>${t.moeda}</strong></td>
-                            <td>${parseFloat(t.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                            <td style="color:#64748b">${parseFloat(t.cotacao_usada).toLocaleString('pt-BR', {minimumFractionDigits:4})}</td>
-                            <td>R$ ${parseFloat(t.valor_reais).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                            <td style="color:#34d399;font-weight:600">+ R$ ${parseFloat(t.lucro).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                            <td>
-                                <button class="btn-acao" onclick="abrirEdicao(${t.id}, '${t.moeda}', ${t.valor}, ${t.cotacao_usada}, ${t.lucro_percent || 5})">✏️</button>
-                                <button class="btn-acao del" onclick="deletarTransacao(${t.id})">🗑️</button>
+                        const dataStr  = t.data ? new Date(t.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+                        const compra   = parseFloat(t.valor_reais    || 0);
+                        const repasseR = parseFloat(t.valor_recebido || 0);
+                        const repasseC = parseFloat(t.cotacao_venda||0) > 0
+                            ? parseFloat(t.valor||0) * parseFloat(t.cotacao_venda||0) : 0;
+                        const repasse  = repasseR > 0 ? repasseR : repasseC;
+                        const lucro    = repasse > 0 ? repasse - compra : parseFloat(t.lucro || 0);
+                        const lucroClr = lucro >= 0 ? '#34d399' : '#f87171';
+
+                        return `<tr>
+                            <td style="color:#64748b;white-space:nowrap">${dataStr}</td>
+                            <td><strong style="color:#e2e8f0">${t.moeda}</strong></td>
+                            <td style="color:#94a3b8">${parseFloat(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                            <td style="color:#f87171">R$ ${compra.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                            <td style="color:#38bdf8">${repasse > 0 ? 'R$ ' + repasse.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '<span style="color:#475569">—</span>'}</td>
+                            <td style="color:${lucroClr};font-weight:600">
+                                ${lucro >= 0 ? '+' : '−'} R$ ${Math.abs(lucro).toLocaleString('pt-BR',{minimumFractionDigits:2})}
+                            </td>
+                            <td style="white-space:nowrap">
+                                <button class="btn-acao" onclick="abrirEdicao(${t.id},'${t.moeda}',${parseFloat(t.valor||0)},${compra},${repasse})">✏️</button>
+                                <button class="btn-acao del" onclick="deletar(${t.id})">🗑️</button>
                             </td>
                         </tr>`;
                     }).join('')}
@@ -715,68 +468,62 @@ async function carregarCambio() {
             </table>`;
     } catch(e) {
         container.innerHTML = '<div class="empty">Erro ao carregar.</div>';
+        console.error(e);
     }
 }
 
-// ===== EDIÇÃO =====
-function abrirEdicao(id, moeda, valor, cotacao, lucro_percent) {
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-moeda').value = moeda;
-    document.getElementById('edit-valor').value = valor;
-    document.getElementById('edit-cotacao').value = cotacao;
-    document.getElementById('edit-lucro').value = lucro_percent;
+function abrirEdicao(id, moeda, valor, compra, repasse) {
+    document.getElementById('edit-id').value      = id;
+    document.getElementById('edit-moeda').value   = moeda;
+    document.getElementById('edit-valor').value   = valor;
+    document.getElementById('edit-compra').value  = compra || '';
+    document.getElementById('edit-repasse').value = repasse || '';
     document.getElementById('modal-edicao').classList.add('show');
 }
 
-function fecharModal() {
-    document.getElementById('modal-edicao').classList.remove('show');
-}
+function fecharModal() { document.getElementById('modal-edicao').classList.remove('show'); }
 
 async function salvarEdicao() {
-    const id = document.getElementById('edit-id').value;
+    const id      = document.getElementById('edit-id').value;
+    const valor   = parseFloat(document.getElementById('edit-valor').value) || 1;
+    const compra  = parseFloat(document.getElementById('edit-compra').value) || 0;
+    const repasse = parseFloat(document.getElementById('edit-repasse').value) || 0;
+    const cotacaoCompra = compra / valor;
+    const cotacaoVenda  = repasse / valor;
+
     const form = new FormData();
-    form.append('moeda', document.getElementById('edit-moeda').value);
-    form.append('valor', document.getElementById('edit-valor').value);
-    form.append('cotacao', document.getElementById('edit-cotacao').value);
-    form.append('lucro_percent', document.getElementById('edit-lucro').value);
+    form.append('moeda',          document.getElementById('edit-moeda').value);
+    form.append('valor',          valor);
+    form.append('cotacao_compra', cotacaoCompra.toFixed(4));
+    form.append('cotacao_venda',  cotacaoVenda.toFixed(4));
+    form.append('valor_recebido', repasse);
 
     try {
-        const res = await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'PUT', body: form });
+        const res  = await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'PUT', body: form });
         const data = await res.json();
         if (data.erro) throw new Error(data.erro);
         fecharModal();
-        mostrarToast('✔ Transação atualizada!');
-        carregarCambio();
-    } catch(e) {
-        mostrarToast(e.message || 'Erro ao salvar', 'error');
-    }
+        toast('✔ Atualizado!');
+        carregar();
+    } catch(e) { toast(e.message || 'Erro', 'error'); }
 }
 
-async function deletarTransacao(id) {
+async function deletar(id) {
     if (!confirm('Excluir esta transação?')) return;
-    try {
-        await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'DELETE' });
-        mostrarToast('Transação excluída.');
-        carregarCambio();
-    } catch(e) {
-        mostrarToast('Erro ao excluir', 'error');
-    }
+    await fetch(`/api/admin/${hotelSlug}/cambio/${id}/`, { method: 'DELETE' });
+    toast('Excluído.');
+    carregar();
 }
 
-function mostrarToast(msg, tipo = '') {
+function toast(msg, tipo = '') {
     const t = document.createElement('div');
-    t.className = `toast ${tipo}`;
-    t.innerText = msg;
+    t.className = `toast ${tipo}`; t.innerText = msg;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2500);
 }
 
-// Fechar modal ao clicar fora
-document.getElementById('modal-edicao').addEventListener('click', function(e) {
-    if (e.target === this) fecharModal();
-});
-
-document.addEventListener('DOMContentLoaded', carregarCambio);
+document.getElementById('modal-edicao').addEventListener('click', e => { if (e.target === e.currentTarget) fecharModal(); });
+document.addEventListener('DOMContentLoaded', carregar);
 </script>
 </body>
 </html>

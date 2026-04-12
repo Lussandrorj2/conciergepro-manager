@@ -20,7 +20,8 @@ const i18n = {
         sob_consulta: 'Sob consulta',
         por_pessoa: '/ pessoa',
         modal_eyebrow: 'Interesse no Passeio',
-        lbl_data: 'Data / Horário',
+        lbl_data: 'Data desejada',
+        lbl_horario: 'Horário desejado',
         lbl_nome: 'Nome completo',
         lbl_tel: 'Telefone',
         lbl_qtd: 'Número de pessoas',
@@ -28,13 +29,16 @@ const i18n = {
         resumo_qtd: 'Pessoas',
         resumo_total: 'Total estimado',
         btn_confirmar: 'Falar no WhatsApp',
-        sem_agenda: '— sem datas disponíveis —',
         sucesso: 'Redirecionando para o WhatsApp!',
         sem_imagem: 'Sem imagem',
-        wpp_msg: (nome, passeio, qtd, data) =>
-            `Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*${data ? ` na data *${data}*` : ''}. Poderia me passar mais informações e confirmar a disponibilidade?`,
+        wpp_msg: (nome, passeio, qtd, data, horario) => {
+            let msg = `Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*`;
+            if (data) msg += `, na data *${data}*`;
+            if (horario) msg += ` às *${horario}*`;
+            msg += `. Poderia confirmar a disponibilidade?`;
+            return msg;
+        },
         aviso_wpp: 'Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.',
-        lbl_interesse: 'Tenho interesse neste passeio',
         campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
     },
     en: {
@@ -47,7 +51,8 @@ const i18n = {
         sob_consulta: 'On request',
         por_pessoa: '/ person',
         modal_eyebrow: 'Tour Inquiry',
-        lbl_data: 'Date / Time',
+        lbl_data: 'Preferred date',
+        lbl_horario: 'Preferred time',
         lbl_nome: 'Full name',
         lbl_tel: 'Phone',
         lbl_qtd: 'Number of guests',
@@ -55,13 +60,16 @@ const i18n = {
         resumo_qtd: 'Guests',
         resumo_total: 'Estimated total',
         btn_confirmar: 'Chat on WhatsApp',
-        sem_agenda: '— no dates available —',
         sucesso: 'Redirecting to WhatsApp!',
         sem_imagem: 'No image',
-        wpp_msg: (nome, passeio, qtd, data) =>
-            `Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*${data ? ` on *${data}*` : ''}. Could you provide more information and confirm availability?`,
+        wpp_msg: (nome, passeio, qtd, data, horario) => {
+            let msg = `Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*`;
+            if (data) msg += ` on *${data}*`;
+            if (horario) msg += ` at *${horario}*`;
+            msg += `. Could you confirm availability?`;
+            return msg;
+        },
         aviso_wpp: 'You will be redirected to the hotel\'s WhatsApp to confirm your booking.',
-        lbl_interesse: 'I\'m interested in this tour',
         campos_obrigatorios: 'Please fill in your name and phone number.',
     },
     es: {
@@ -74,7 +82,8 @@ const i18n = {
         sob_consulta: 'Bajo consulta',
         por_pessoa: '/ persona',
         modal_eyebrow: 'Consulta de Paseo',
-        lbl_data: 'Fecha / Hora',
+        lbl_data: 'Fecha preferida',
+        lbl_horario: 'Hora preferida',
         lbl_nome: 'Nombre completo',
         lbl_tel: 'Teléfono',
         lbl_qtd: 'Número de personas',
@@ -82,13 +91,16 @@ const i18n = {
         resumo_qtd: 'Personas',
         resumo_total: 'Total estimado',
         btn_confirmar: 'Hablar en WhatsApp',
-        sem_agenda: '— sin fechas disponibles —',
         sucesso: '¡Redirigiendo al WhatsApp!',
         sem_imagem: 'Sin imagen',
-        wpp_msg: (nome, passeio, qtd, data) =>
-            `¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*${data ? ` en la fecha *${data}*` : ''}. ¿Podría darme más información y confirmar disponibilidad?`,
+        wpp_msg: (nome, passeio, qtd, data, horario) => {
+            let msg = `¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*`;
+            if (data) msg += ` en la fecha *${data}*`;
+            if (horario) msg += ` a las *${horario}*`;
+            msg += `. ¿Podría confirmar disponibilidad?`;
+            return msg;
+        },
         aviso_wpp: 'Será redirigido al WhatsApp del hotel para confirmar su reserva.',
-        lbl_interesse: 'Me interesa este paseo',
         campos_obrigatorios: 'Por favor, complete su nombre y teléfono.',
     },
     fr: {
@@ -101,7 +113,8 @@ const i18n = {
         sob_consulta: 'Sur demande',
         por_pessoa: '/ personne',
         modal_eyebrow: 'Demande de Visite',
-        lbl_data: 'Date / Heure',
+        lbl_data: 'Date souhaitée',
+        lbl_horario: 'Heure souhaitée',
         lbl_nome: 'Nom complet',
         lbl_tel: 'Téléphone',
         lbl_qtd: 'Nombre de personnes',
@@ -109,13 +122,16 @@ const i18n = {
         resumo_qtd: 'Personnes',
         resumo_total: 'Total estimé',
         btn_confirmar: 'Contacter sur WhatsApp',
-        sem_agenda: '— aucune date disponible —',
         sucesso: 'Redirection vers WhatsApp!',
         sem_imagem: 'Sans image',
-        wpp_msg: (nome, passeio, qtd, data) =>
-            `Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*${data ? ` à la date *${data}*` : ''}. Pourriez-vous me donner plus d'informations et confirmer la disponibilité ?`,
+        wpp_msg: (nome, passeio, qtd, data, horario) => {
+            let msg = `Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*`;
+            if (data) msg += ` à la date *${data}*`;
+            if (horario) msg += ` à *${horario}*`;
+            msg += `. Pourriez-vous confirmer la disponibilité ?`;
+            return msg;
+        },
         aviso_wpp: 'Vous serez redirigé vers le WhatsApp de l\'hôtel pour confirmer votre réservation.',
-        lbl_interesse: 'Je suis intéressé(e) par cette visite',
         campos_obrigatorios: 'Veuillez remplir votre nom et numéro de téléphone.',
     }
 };
@@ -140,15 +156,10 @@ async function carregarHotel(lang) {
             if (wppLink) wppLink.href = `https://wa.me/${data.whatsapp}`;
         }
 
-        // Suporta foto_capa, foto_hero, imagem_capa como nomes alternativos
         const fotoCapa = data.foto_capa || data.foto_hero || data.imagem_capa || data.capa || '';
         if (fotoCapa) {
             const heroBg = document.getElementById('hero-bg');
-            if (heroBg) {
-                // Garante URL absoluta
-                const url = fotoCapa.startsWith('http') ? fotoCapa : fotoCapa;
-                heroBg.style.backgroundImage = `url('${url}')`;
-            }
+            if (heroBg) heroBg.style.backgroundImage = `url('${fotoCapa}')`;
         }
 
         const elTitle = document.getElementById('txt-hero-title');
@@ -162,11 +173,11 @@ async function carregarHotel(lang) {
 }
 
 // ==========================================
-// CARROSSEL — estado
+// CARROSSEL
 // ==========================================
-let carrIndex    = 0;   // slide atual
-let carrVisiveis = 3;   // quantos cards cabem na tela
-let carrTotal    = 0;   // total de cards
+let carrIndex    = 0;
+let carrVisiveis = 3;
+let carrTotal    = 0;
 
 function carrosselAtualizar() {
     const track   = document.getElementById('passeios-track');
@@ -175,14 +186,12 @@ function carrosselAtualizar() {
     const dotsEl  = document.getElementById('carr-dots');
     if (!track) return;
 
-    // Largura de um card + gap
     const cardW = 320 + 24;
     track.style.transform = `translateX(-${carrIndex * cardW}px)`;
 
     if (btnPrev) btnPrev.disabled = carrIndex === 0;
     if (btnNext) btnNext.disabled = carrIndex >= carrTotal - carrVisiveis;
 
-    // Dots
     if (dotsEl) {
         dotsEl.innerHTML = '';
         const numDots = Math.max(1, carrTotal - carrVisiveis + 1);
@@ -207,7 +216,6 @@ function carrosselCalcularVisiveis() {
     return Math.max(1, Math.floor(viewport.offsetWidth / (320 + 24)));
 }
 
-// Drag / swipe no carrossel
 function initCarrosselDrag() {
     const el = document.getElementById('passeios');
     if (!el) return;
@@ -241,9 +249,8 @@ function initCarrosselDrag() {
 // PASSEIOS
 // ==========================================
 async function carregarPasseios(lang) {
-    const viewport = document.getElementById('passeios');
-    const track    = document.getElementById('passeios-track');
-    if (!viewport || !track) return;
+    const track = document.getElementById('passeios-track');
+    if (!track) return;
 
     try {
         const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/?lang=${lang}`);
@@ -263,10 +270,8 @@ async function carregarPasseios(lang) {
             return;
         }
 
-        // Renderiza cards no track
         track.innerHTML = listaPasseios.map(p => renderCard(p)).join('');
 
-        // Inicializa carrossel
         carrTotal    = listaPasseios.length;
         carrIndex    = 0;
         carrVisiveis = carrosselCalcularVisiveis();
@@ -293,7 +298,6 @@ function renderCard(p) {
 
     const precoSub = p.preco_por_pessoa && !p.preco_sob_consulta ? t('por_pessoa') : '';
 
-    // Banner principal; fallback para primeira foto da galeria
     const primeiraFoto = (p.fotos && p.fotos.length)
         ? (typeof p.fotos[0] === 'string' ? p.fotos[0] : p.fotos[0].url || '')
         : '';
@@ -326,35 +330,36 @@ function renderCard(p) {
 }
 
 // ==========================================
-// MODAL — AGORA É SÓ WHATSAPP (sem POST)
+// MODAL
 // ==========================================
-async function abrirModal(passeioId) {
+function abrirModal(passeioId) {
     passeioAtual = listaPasseios.find(p => p.id === passeioId);
     if (!passeioAtual) return;
 
     // Labels i18n
-    document.getElementById('modal-eyebrow').innerText    = t('modal_eyebrow');
-    document.getElementById('modal-passeio-nome').innerText = passeioAtual.nome;
-    document.getElementById('lbl-data').innerText          = t('lbl_data');
-    document.getElementById('lbl-nome').innerText          = t('lbl_nome');
-    document.getElementById('lbl-tel').innerText           = t('lbl_tel');
-    document.getElementById('lbl-qtd').innerText           = t('lbl_qtd');
+    document.getElementById('modal-eyebrow').innerText       = t('modal_eyebrow');
+    document.getElementById('modal-passeio-nome').innerText  = passeioAtual.nome;
+    document.getElementById('lbl-data').innerText            = t('lbl_data');
+    document.getElementById('lbl-horario').innerText         = t('lbl_horario');
+    document.getElementById('lbl-nome').innerText            = t('lbl_nome');
+    document.getElementById('lbl-tel').innerText             = t('lbl_tel');
+    document.getElementById('lbl-qtd').innerText             = t('lbl_qtd');
     document.getElementById('resumo-label-passeio').innerText = t('resumo_passeio');
-    document.getElementById('resumo-label-qtd').innerText  = t('resumo_qtd');
-    document.getElementById('resumo-label-total').innerText = t('resumo_total');
-    document.getElementById('btn-confirmar').innerText     = t('btn_confirmar');
+    document.getElementById('resumo-label-qtd').innerText    = t('resumo_qtd');
+    document.getElementById('resumo-label-total').innerText  = t('resumo_total');
 
-    // Aviso WhatsApp
     const avisoEl = document.getElementById('modal-aviso-wpp');
     if (avisoEl) avisoEl.innerText = t('aviso_wpp');
 
     // Limpa campos
-    document.getElementById('res-nome').value = '';
-    document.getElementById('res-tel').value  = '';
-    document.getElementById('res-qtd').value  = 1;
+    document.getElementById('res-nome').value    = '';
+    document.getElementById('res-tel').value     = '';
+    document.getElementById('res-qtd').value     = 1;
+    document.getElementById('res-data').value    = '';
+    document.getElementById('res-horario').value = '';
     document.getElementById('modal-resumo').classList.remove('show');
 
-    // Galeria — suporta múltiplos nomes de campo
+    // Galeria
     const galeriaEl = document.getElementById('modal-galeria');
     galeriaEl.innerHTML = '';
     const fotos = passeioAtual.fotos || passeioAtual.galeria || passeioAtual.imagens || [];
@@ -378,9 +383,6 @@ async function abrirModal(passeioId) {
         galeriaEl.appendChild(img);
     });
 
-    // Agenda (para referência na mensagem, mas sem bloquear)
-    await carregarAgendaModal(passeioId);
-
     calcularTotal();
     document.getElementById('modalReserva').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -389,32 +391,6 @@ async function abrirModal(passeioId) {
 function selecionarGaleria(imgEl) {
     document.querySelectorAll('#modal-galeria img').forEach(i => i.classList.remove('active'));
     imgEl.classList.add('active');
-}
-
-async function carregarAgendaModal(passeioId) {
-    const select = document.getElementById('agenda-select');
-    select.innerHTML = `<option value="">${t('sem_agenda')}</option>`;
-
-    try {
-        const res = await fetch(`/api/admin/${hotelSlug}/agenda/?passeio_id=${passeioId}`);
-        if (!res.ok) return;
-        const agendas = await res.json();
-
-        agendas.forEach(a => {
-            const opt = document.createElement('option');
-            opt.value = a.id;
-            opt.dataset.vagas   = a.vagas;
-            opt.dataset.data    = a.data || '';
-            opt.dataset.horario = a.horario || '';
-            const dataFmt = a.data
-                ? new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR')
-                : '—';
-            opt.innerText = `${dataFmt} às ${a.horario || '—'} (${a.vagas} vagas)`;
-            select.appendChild(opt);
-        });
-    } catch (e) {
-        console.error('Erro agenda:', e);
-    }
 }
 
 function fecharModal() {
@@ -438,47 +414,45 @@ function calcularTotal() {
         totalStr = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     }
 
-    document.getElementById('resumo-passeio').innerText    = passeioAtual.nome;
-    document.getElementById('resumo-qtd').innerText        = qtd;
+    document.getElementById('resumo-passeio').innerText     = passeioAtual.nome;
+    document.getElementById('resumo-qtd').innerText         = qtd;
     document.getElementById('resumo-total-valor').innerText = totalStr;
     resumo.classList.add('show');
 }
 
 // ==========================================
-// CONFIRMAR → REDIRECIONA PARA WHATSAPP
+// CONFIRMAR → WHATSAPP
 // ==========================================
 function confirmarReserva() {
-    const nome      = document.getElementById('res-nome').value.trim();
-    const telefone  = document.getElementById('res-tel').value.trim();
-    const qtd       = parseInt(document.getElementById('res-qtd').value) || 1;
-    const select    = document.getElementById('agenda-select');
-    const optSel    = select.options[select.selectedIndex];
+    const nome    = document.getElementById('res-nome').value.trim();
+    const telefone = document.getElementById('res-tel').value.trim();
+    const qtd     = parseInt(document.getElementById('res-qtd').value) || 1;
+    const dataVal = document.getElementById('res-data').value;
+    const horario = document.getElementById('res-horario').value;
 
     if (!nome || !telefone) {
         mostrarToast(t('campos_obrigatorios'), 'error');
         return;
     }
 
-    // Monta data legível se houver agenda selecionada
+    // Formata data legível se preenchida
     let dataLabel = '';
-    if (optSel && optSel.value && optSel.dataset.data) {
-        const dataFmt = new Date(optSel.dataset.data + 'T00:00:00')
-            .toLocaleDateString(idiomaAtual === 'pt' ? 'pt-BR' : idiomaAtual, { day: '2-digit', month: 'long', year: 'numeric' });
-        dataLabel = `${dataFmt}${optSel.dataset.horario ? ' às ' + optSel.dataset.horario : ''}`;
+    if (dataVal) {
+        dataLabel = new Date(dataVal + 'T00:00:00').toLocaleDateString(
+            idiomaAtual === 'pt' ? 'pt-BR' : idiomaAtual,
+            { day: '2-digit', month: 'long', year: 'numeric' }
+        );
     }
 
-    // Gera mensagem no idioma atual
-    const msgFn  = t('wpp_msg');
+    const msgFn = t('wpp_msg');
     const mensagem = typeof msgFn === 'function'
-        ? msgFn(nome, passeioAtual.nome, qtd, dataLabel)
+        ? msgFn(nome, passeioAtual.nome, qtd, dataLabel, horario)
         : `Olá! Tenho interesse no passeio ${passeioAtual.nome} para ${qtd} pessoa(s).`;
 
     const url = `https://wa.me/${whatsappAtual}?text=${encodeURIComponent(mensagem)}`;
 
     mostrarToast(t('sucesso'), 'success');
     fecharModal();
-
-    // Abre WhatsApp
     window.open(url, '_blank');
 }
 
@@ -495,7 +469,7 @@ function mostrarToast(msg, tipo = '') {
 }
 
 // ==========================================
-// COOKIE CSRF (mantido por compatibilidade)
+// CSRF
 // ==========================================
 function getCookie(name) {
     for (const c of document.cookie.split(';')) {
@@ -506,18 +480,16 @@ function getCookie(name) {
 }
 
 // ==========================================
-// TROCAR IDIOMA
+// IDIOMA
 // ==========================================
 async function trocarIdioma(lang) {
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
 
-    // Marca botão ativo
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
 
-    // Textos estáticos da página
     const scrollEl    = document.getElementById('txt-scroll');
     const labelSecao  = document.getElementById('label-secao');
     const tituloSecao = document.getElementById('titulo-secao');
@@ -526,7 +498,6 @@ async function trocarIdioma(lang) {
     if (labelSecao)  labelSecao.innerText  = t('secao_label');
     if (tituloSecao) tituloSecao.innerText = t('secao_titulo');
 
-    // Carrega dados traduzidos da API
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
@@ -551,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
     trocarIdioma(idiomaAtual);
 });
 
-// Expõe globalmente
 window.trocarIdioma     = trocarIdioma;
 window.abrirModal       = abrirModal;
 window.fecharModal      = fecharModal;

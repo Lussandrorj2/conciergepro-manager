@@ -60,6 +60,7 @@ urlpatterns = [
     # CÂMBIO
     # =========================
     path('api/admin/<slug:hotel_slug>/cambio/', views.api_cambio, name='api_cambio'),
+    path('api/admin/<slug:hotel_slug>/cambio/<int:transacao_id>/', views.api_cambio_detail, name='api_cambio_detail'),
 
     # =========================
     # RELATÓRIOS
@@ -67,6 +68,13 @@ urlpatterns = [
     path('api/<slug:hotel_slug>/relatorios/passeios/', views.relatorio_passeios, name='relatorio_passeios'),
     path('api/<slug:hotel_slug>/relatorios/mensal/', views.relatorio_mensal, name='relatorio_mensal'),
     path('api/<slug:hotel_slug>/relatorios/cambio/', views.relatorio_cambio, name='relatorio_cambio'),
+    path('api/<slug:hotel_slug>/relatorios/comissoes/', views.relatorio_comissoes, name='relatorio_comissoes'),
+    path('api/admin/<slug:hotel_slug>/divisao/', views.api_divisao, name='api_divisao'),
+
+    # =========================
+    # ADIANTAMENTOS  ← ESTAVA FALTANDO
+    # =========================
+    path('api/admin/<slug:hotel_slug>/adiantamentos/', views.api_adiantamentos, name='api_adiantamentos'),
 
     # =========================
     # IMAGENS

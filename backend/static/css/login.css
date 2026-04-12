@@ -1,37 +1,120 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    background: #020617;
-    color: white;
-    font-family: Arial;
+    font-family: 'Inter', sans-serif;
+    background: #0f172a; /* Cor de fundo do Dashboard */
+    color: #e2e8f0;
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
+    justify-content: center;
+    min-height: 100vh;
 }
 
-.box {
-    background: #0f172a;
-    padding: 30px;
-    border-radius: 10px;
-    width: 300px;
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-box {
+    background: #1e293b; /* Cor dos cards do Dashboard */
+    border: 1px solid #263348;
+    border-radius: 16px;
+    padding: 40px 32px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.logo-icon {
+    width: 45px;
+    height: 45px;
+    background: #059669; /* Verde esmeralda do Dashboard */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.logo-text span { color: #059669; }
+
+h2 { font-size: 22px; font-weight: 600; text-align: center; margin-bottom: 8px; }
+.subtitle { color: #94a3b8; font-size: 14px; text-align: center; margin-bottom: 32px; }
+
+/* Inputs */
+.input-group { margin-bottom: 20px; }
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 8px;
 }
 
 input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background: #22c55e;
-    border: none;
+    background: #0f172a;
+    border: 1px solid #334155;
+    padding: 12px 16px;
+    border-radius: 10px;
     color: white;
-    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
-.erro {
-    color: #ef4444;
-    margin-bottom: 10px;
-    font-size: 14px;
+input:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+}
+
+/* Botão */
+.btn-login {
+    width: 100%;
+    background: #059669;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+.btn-login:hover { background: #047857; }
+
+/* Erro */
+.erro-box {
+    background: #7f1d1d33;
+    border: 1px solid #7f1d1d;
+    color: #f87171;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 12px;
+    color: #475569;
 }
