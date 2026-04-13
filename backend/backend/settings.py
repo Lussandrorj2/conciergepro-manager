@@ -9,12 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- SEGURANÇA ---
 DEBUG = False
 
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-dev-key"
-)
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECRET_KEY = os.environ["SECRET_KEY"]
+
+ALLOWED_HOSTS = ["https://conciergepro-manager.onrender.com"]
+
 
 # --- APLICATIVOS ---
 INSTALLED_APPS = [
@@ -88,7 +86,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 
 # Como agora é um deploy único, você pode simplificar o CORS
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:8000,http://127.0.0.1:8000"
-).split(",")
+CSRF_TRUSTED_ORIGINS = ["https://conciergepro-manager.onrender.com"]
+
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUD_NAME'),
+    'API_KEY': os.getenv('API_KEY'),
+    'API_SECRET': os.getenv('API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
