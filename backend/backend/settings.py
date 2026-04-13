@@ -11,7 +11,7 @@ DEBUG = False
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 
-ALLOWED_HOSTS = ["https://conciergepro-manager.onrender.com"]
+ALLOWED_HOSTS = ["conciergepro-manager.onrender.com"]
 
 
 # --- APLICATIVOS ---
