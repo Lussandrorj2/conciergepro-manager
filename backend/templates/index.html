@@ -8,7 +8,7 @@
     <title>Concierge Digital | {{ hotel.nome|default:"Bem-vindo" }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -22,11 +22,7 @@
             --border: rgba(201, 169, 110, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'DM Sans', sans-serif;
@@ -59,9 +55,9 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(to bottom,
-                    rgba(0, 0, 0, 0.1) 0%,
-                    rgba(0, 0, 0, 0.3) 40%,
-                    rgba(0, 0, 0, 0.85) 100%);
+                    rgba(0,0,0,0.1) 0%,
+                    rgba(0,0,0,0.3) 40%,
+                    rgba(0,0,0,0.85) 100%);
         }
 
         .hero-content {
@@ -91,7 +87,7 @@
 
         #txt-hero-subtitle {
             font-size: 16px;
-            color: rgba(255, 255, 255, 0.65);
+            color: rgba(255,255,255,0.65);
             font-weight: 300;
             line-height: 1.6;
         }
@@ -104,17 +100,17 @@
             z-index: 10;
             display: flex;
             gap: 4px;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(10px);
             padding: 6px;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .lang-btn {
             border: none;
             background: transparent;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255,255,255,0.5);
             padding: 5px 12px;
             border-radius: 18px;
             cursor: pointer;
@@ -125,16 +121,10 @@
             font-family: 'DM Sans', sans-serif;
         }
 
-        .lang-btn:hover {
-            color: white;
-        }
+        .lang-btn:hover { color: white; }
+        .lang-btn.active { background: var(--gold); color: var(--dark); }
 
-        .lang-btn.active {
-            background: var(--gold);
-            color: var(--dark);
-        }
-
-        /* ===== SCROLL INDICATOR ===== */
+        /* ===== SCROLL HINT ===== */
         .scroll-hint {
             position: absolute;
             bottom: 24px;
@@ -143,7 +133,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.4);
             font-size: 11px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -187,34 +177,25 @@
             color: var(--text);
         }
 
-        .section-count {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+        .section-count { font-size: 13px; color: var(--text-muted); }
 
         /* ===== CARROSSEL ===== */
-        .carrossel-wrapper {
-            position: relative;
-        }
+        .carrossel-wrapper { position: relative; }
 
         #passeios {
             display: flex;
             gap: 24px;
             overflow: hidden;
-            /* esconde o que sai da tela */
             cursor: grab;
             user-select: none;
         }
 
-        #passeios.dragging {
-            cursor: grabbing;
-        }
+        #passeios.dragging { cursor: grabbing; }
 
-        /* trilho interno que desliza */
         #passeios-track {
             display: flex;
             gap: 24px;
-            transition: transform 0.45s cubic-bezier(.25, .8, .25, 1);
+            transition: transform 0.45s cubic-bezier(.25,.8,.25,1);
             will-change: transform;
         }
 
@@ -224,16 +205,16 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
             flex: 0 0 320px;
-            /* largura fixa no carrossel */
             min-width: 0;
         }
 
         .card-passeio:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
             border-color: var(--gold);
+            box-shadow: 0 20px 48px rgba(201,169,110,0.12);
         }
 
         .card-img {
@@ -247,12 +228,10 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s ease;
         }
 
-        .card-passeio:hover .card-img img {
-            transform: scale(1.05);
-        }
+        .card-passeio:hover .card-img img { transform: scale(1.07); }
 
         .card-img-empty {
             height: 100%;
@@ -267,19 +246,48 @@
             position: absolute;
             top: 16px;
             right: 16px;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0,0,0,0.75);
             backdrop-filter: blur(8px);
             color: var(--gold-light);
             font-size: 12px;
             font-weight: 600;
             padding: 5px 12px;
             border-radius: 20px;
-            border: 1px solid rgba(201, 169, 110, 0.3);
+            border: 1px solid rgba(201,169,110,0.3);
         }
 
-        .card-body {
-            padding: 24px;
+        .card-img-hover {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
         }
+
+        .card-passeio:hover .card-img-hover { background: rgba(0,0,0,0.35); }
+
+        .card-img-hover span {
+            background: var(--gold);
+            color: var(--dark);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 18px;
+            border-radius: 24px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+        }
+
+        .card-passeio:hover .card-img-hover span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-body { padding: 24px; }
 
         .card-nome {
             font-family: 'Playfair Display', serif;
@@ -295,7 +303,7 @@
             line-height: 1.7;
             margin-bottom: 20px;
             display: -webkit-box;
-
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -307,7 +315,6 @@
             gap: 12px;
         }
 
-        /* ===== SETAS DO CARROSSEL ===== */
         .carr-btn {
             position: absolute;
             top: 50%;
@@ -317,7 +324,7 @@
             height: 44px;
             border-radius: 50%;
             border: 1px solid var(--border);
-            background: rgba(10, 10, 10, 0.75);
+            background: rgba(10,10,10,0.75);
             backdrop-filter: blur(8px);
             color: var(--gold);
             font-size: 18px;
@@ -328,27 +335,11 @@
             transition: background 0.2s, border-color 0.2s, opacity 0.2s;
         }
 
-        .carr-btn:hover {
-            background: var(--gold);
-            color: var(--dark);
-            border-color: var(--gold);
-        }
+        .carr-btn:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+        .carr-btn:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
+        .carr-prev { left: -22px; }
+        .carr-next { right: -22px; }
 
-        .carr-btn:disabled {
-            opacity: 0.25;
-            cursor: default;
-            pointer-events: none;
-        }
-
-        .carr-prev {
-            left: -22px;
-        }
-
-        .carr-next {
-            right: -22px;
-        }
-
-        /* ===== DOTS ===== */
         .carr-dots {
             display: flex;
             justify-content: center;
@@ -367,10 +358,7 @@
             padding: 0;
         }
 
-        .carr-dot.active {
-            background: var(--gold);
-            transform: scale(1.4);
-        }
+        .carr-dot.active { background: var(--gold); transform: scale(1.4); }
 
         .card-preco {
             font-size: 20px;
@@ -400,17 +388,51 @@
             font-family: 'DM Sans', sans-serif;
         }
 
-        .btn-reservar:hover {
-            background: var(--gold-light);
+        .btn-reservar:hover { background: var(--gold-light); }
+
+        /* ===== ESTADOS ===== */
+        .estado-vazio, .estado-erro {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
         }
 
-        /* ===== MODAL ===== */
+        .estado-vazio .icon, .estado-erro .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* ===== SKELETON ===== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--dark3) 25%, #222 50%, var(--dark3) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0%  { background-position: 200% 0; }
+            100%{ background-position: -200% 0; }
+        }
+
+        .card-skeleton {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* =========================================
+           MODAL DETALHES DO PASSEIO
+        ========================================= */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(12px);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -418,32 +440,275 @@
             overflow-y: auto;
         }
 
-        .modal-overlay.open {
+        .modal-overlay.open { display: flex; }
+
+        .modal-detalhe {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 860px;
+            position: relative;
+            animation: slideUp 0.35s cubic-bezier(.25,.8,.25,1);
+            margin: auto;
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
         }
 
-        .modal {
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .det-foto-wrap {
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+            background: var(--dark3);
+            flex-shrink: 0;
+        }
+
+        .det-foto-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(.25,.8,.25,1);
+            will-change: transform;
+        }
+
+        .det-foto-slide {
+            flex: 0 0 100%;
+            height: 100%;
+        }
+
+        .det-foto-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .det-foto-slide-empty {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: var(--text-muted);
+        }
+
+        .det-foto-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 50%,
+                rgba(10,10,10,0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        .det-foto-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .det-foto-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+        .det-foto-btn.prev  { left: 16px; }
+        .det-foto-btn.next  { right: 16px; }
+        .det-foto-btn:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
+
+        .det-foto-counter {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            z-index: 5;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        .det-foto-thumbs {
+            position: absolute;
+            bottom: 16px;
+            left: 20px;
+            z-index: 5;
+            display: flex;
+            gap: 6px;
+            max-width: calc(100% - 100px);
+            overflow-x: auto;
+        }
+
+        .det-foto-thumbs::-webkit-scrollbar { display: none; }
+
+        .det-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+        }
+
+        .det-thumb.active { border-color: var(--gold); }
+        .det-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .modal-close-det {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 20;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close-det:hover { background: rgba(255,255,255,0.15); }
+
+        .det-body {
+            padding: 32px 40px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .det-eyebrow {
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .det-nome {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .det-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+
+        .det-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        .det-chip {
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .det-chip span { color: var(--text); font-weight: 500; }
+
+        .det-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .det-preco {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .det-preco small {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .btn-reservar-det {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.2s, transform 0.2s;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .btn-reservar-det:hover {
+            background: var(--gold-light);
+            transform: scale(1.02);
+        }
+
+        /* =========================================
+           MODAL RESERVA (WHATSAPP)
+        ========================================= */
+        .modal-reserva {
             background: var(--dark2);
             border: 1px solid var(--border);
             border-radius: 20px;
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             padding: 36px;
             position: relative;
             animation: slideUp 0.3s ease;
             margin: auto;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .modal-close {
@@ -461,7 +726,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.2s;
         }
+
+        .modal-close:hover { background: rgba(255,255,255,0.08); }
+
+        .btn-voltar-det {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 20px;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .btn-voltar-det:hover { color: var(--gold); }
 
         .modal-eyebrow {
             font-size: 10px;
@@ -478,13 +763,12 @@
             margin-bottom: 20px;
         }
 
-        /* ===== AVISO WHATSAPP ===== */
         .modal-aviso-wpp {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(37, 211, 102, 0.08);
-            border: 1px solid rgba(37, 211, 102, 0.25);
+            background: rgba(37,211,102,0.08);
+            border: 1px solid rgba(37,211,102,0.25);
             border-radius: 10px;
             padding: 12px 16px;
             margin-bottom: 20px;
@@ -493,13 +777,9 @@
             line-height: 1.5;
         }
 
-        .modal-aviso-wpp svg {
-            flex-shrink: 0;
-        }
+        .modal-aviso-wpp svg { flex-shrink: 0; }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
 
         .form-group label {
             display: block;
@@ -525,13 +805,9 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus {
-            border-color: var(--gold);
-        }
+        .form-group select:focus { border-color: var(--gold); }
 
-        .form-group select option {
-            background: var(--dark3);
-        }
+        .form-group select option { background: var(--dark3); }
 
         .form-row {
             display: grid;
@@ -548,9 +824,7 @@
             display: none;
         }
 
-        .modal-resumo.show {
-            display: block;
-        }
+        .modal-resumo.show { display: block; }
 
         .resumo-linha {
             display: flex;
@@ -571,7 +845,6 @@
             margin-top: 10px;
         }
 
-        /* ===== BOTÃO WHATSAPP CONFIRMAR ===== */
         .btn-confirmar {
             width: 100%;
             background: #25d366;
@@ -590,9 +863,7 @@
             gap: 8px;
         }
 
-        .btn-confirmar:hover {
-            background: #1ebe5a;
-        }
+        .btn-confirmar:hover { background: #1ebe5a; }
 
         /* ===== TOAST ===== */
         .toast-container {
@@ -615,26 +886,12 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .toast.success {
-            border-color: #059669;
-            color: #34d399;
-        }
-
-        .toast.error {
-            border-color: #dc2626;
-            color: #f87171;
-        }
+        .toast.success { border-color: #059669; color: #34d399; }
+        .toast.error   { border-color: #dc2626; color: #f87171; }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         /* ===== WHATSAPP FIXO ===== */
@@ -653,105 +910,216 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 8px 24px rgba(37,211,102,0.3);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         #wpp-main:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(37, 211, 102, 0.4);
+            box-shadow: 0 12px 32px rgba(37,211,102,0.4);
         }
 
-        /* ===== ESTADOS ===== */
-        .estado-vazio,
-        .estado-erro {
-            grid-column: 1/-1;
-            text-align: center;
-            padding: 60px 20px;
+        /* =========================================
+           MAPA TURÍSTICO
+        ========================================= */
+        .mapa-section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filtros-mapa {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-mapa-btn {
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filtro-mapa-btn:hover { border-color: var(--gold); color: var(--text); }
+        .filtro-mapa-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+
+        /* Grade de cards de lugares */
+        #mapa-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .lugar-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .lugar-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(201,169,110,0.4);
+            box-shadow: 0 12px 32px rgba(201,169,110,0.08);
+        }
+
+        .lugar-card.selecionado {
+            border-color: var(--gold);
+            background: rgba(201,169,110,0.05);
+            box-shadow: 0 0 0 1px var(--gold);
+        }
+
+        .lugar-tipo-badge {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .lugar-nome {
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .lugar-info-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .lugar-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .lugar-estrelas {
+            font-size: 12px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .lugar-distancia {
+            font-size: 11px;
             color: var(--text-muted);
         }
 
-        .estado-vazio .icon,
-        .estado-erro .icon {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        /* ===== GALERIA MODAL ===== */
-        .galeria-thumb {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .galeria-thumb img {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-            flex-shrink: 0;
-        }
-
-        .galeria-thumb img.active {
-            border-color: var(--gold);
-        }
-
-        /* ===== LOADING SKELETON ===== */
-        .skeleton {
-            background: linear-gradient(90deg, var(--dark3) 25%, #222 50%, var(--dark3) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .card-skeleton {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+        /* Container do mapa */
+        #mapa-container {
             border-radius: 16px;
             overflow: hidden;
+            border: 1px solid var(--border);
+            height: 500px;
+            background: var(--dark3);
+            position: relative;
+        }
+
+        #mapa-iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        #mapa-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--dark3);
+            color: var(--text-muted);
+            flex-direction: column;
+            gap: 14px;
+            font-size: 14px;
+            transition: opacity 0.4s ease;
+            z-index: 2;
+        }
+
+        #mapa-loading.oculto { opacity: 0; pointer-events: none; }
+
+        .mapa-spinner {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Link direto GMaps */
+        .lugar-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--gold);
+            text-decoration: none;
+            margin-top: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .lugar-card-link:hover { opacity: 0.7; }
+
+        /* Divider entre seções */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .hero-content {
-                padding: 40px 24px;
-            }
+            .hero-content { padding: 40px 24px; }
+            .section { padding: 48px 20px; }
+            .card-passeio { flex: 0 0 280px; }
+            .carr-prev { left: -14px; }
+            .carr-next { right: -14px; }
+            .form-row  { grid-template-columns: 1fr; }
+            .det-foto-wrap { height: 280px; }
+            .det-body { padding: 24px 20px 28px; }
+            .det-nome { font-size: 22px; }
+            .det-footer { flex-direction: column; align-items: flex-start; gap: 14px; }
+            .btn-reservar-det { width: 100%; text-align: center; }
+            .modal-detalhe { border-radius: 16px; }
+            .modal-reserva { padding: 28px 20px; }
+            #mapa-container { height: 340px; }
+            #mapa-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .mapa-section-head { flex-direction: column; align-items: flex-start; }
+        }
 
-            .section {
-                padding: 48px 20px;
-            }
-
-            .card-passeio {
-                flex: 0 0 280px;
-            }
-
-            .carr-prev {
-                left: -14px;
-            }
-
-            .carr-next {
-                right: -14px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 480px) {
+            .det-foto-wrap { height: 220px; }
+            #mapa-cards-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -795,11 +1163,8 @@
             <button class="carr-btn carr-prev" id="carr-prev" onclick="carrosselMover(-1)" disabled>‹</button>
             <button class="carr-btn carr-next" id="carr-next" onclick="carrosselMover(1)">›</button>
 
-            <!-- viewport com overflow hidden -->
             <div id="passeios">
-                <!-- trilho que desliza -->
                 <div id="passeios-track">
-                    <!-- skeletons enquanto carrega -->
                     <div class="card-skeleton" style="flex:0 0 320px">
                         <div class="skeleton" style="height:220px;"></div>
                         <div style="padding:24px;">
@@ -819,46 +1184,117 @@
                 </div>
             </div>
 
-            <!-- dots de navegação -->
             <div class="carr-dots" id="carr-dots"></div>
         </div>
     </section>
 
-    <!-- MODAL INTERESSE / WHATSAPP -->
+    <!-- DIVISOR -->
+    <div class="section-divider"></div>
+
+    <!-- =========================================
+         MAPA TURÍSTICO
+    ========================================= -->
+    <section class="section" id="secao-mapa">
+        <div class="mapa-section-head">
+            <div>
+                <div class="section-label" id="label-mapa">Nos arredores</div>
+                <h2 class="section-title" id="titulo-mapa">Restaurantes &amp; Centros Comerciais</h2>
+            </div>
+            <div class="filtros-mapa">
+                <button class="filtro-mapa-btn active" data-tipo="todos" onclick="filtrarMapa('todos')" id="filtro-todos">Todos</button>
+                <button class="filtro-mapa-btn" data-tipo="restaurante" onclick="filtrarMapa('restaurante')" id="filtro-restaurante">🍽 Restaurantes</button>
+                <button class="filtro-mapa-btn" data-tipo="shopping" onclick="filtrarMapa('shopping')" id="filtro-shopping">🛍 Compras</button>
+            </div>
+        </div>
+
+        <!-- Cards de lugares -->
+        <div id="mapa-cards-grid"></div>
+
+        <!-- Iframe Google Maps -->
+        <div id="mapa-container">
+            <iframe
+                id="mapa-iframe"
+                src=""
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <div id="mapa-loading">
+                <div class="mapa-spinner"></div>
+                <span id="mapa-loading-txt">Carregando mapa…</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         MODAL DETALHES DO PASSEIO
+    ========================================= -->
+    <div class="modal-overlay" id="modalDetalhe">
+        <div class="modal-detalhe">
+
+            <button class="modal-close-det" onclick="fecharDetalhe()">✕</button>
+
+            <div class="det-foto-wrap" id="det-foto-wrap">
+                <div class="det-foto-track" id="det-foto-track"></div>
+
+                <button class="det-foto-btn prev" id="det-foto-prev" onclick="detFotoMover(-1)">‹</button>
+                <button class="det-foto-btn next" id="det-foto-next" onclick="detFotoMover(1)">›</button>
+
+                <div class="det-foto-counter" id="det-foto-counter">1 / 1</div>
+                <div class="det-foto-thumbs"  id="det-foto-thumbs"></div>
+            </div>
+
+            <div class="det-body">
+                <div class="det-eyebrow" id="det-eyebrow">Passeio</div>
+                <h2 class="det-nome" id="det-nome">—</h2>
+                <p  class="det-desc" id="det-desc"></p>
+
+                <div class="det-chips" id="det-chips"></div>
+
+                <div class="det-footer">
+                    <div class="det-preco" id="det-preco">
+                        —
+                        <small id="det-preco-sub"></small>
+                    </div>
+                    <button class="btn-reservar-det" id="btn-reservar-det" onclick="abrirModalReservaDoDetalhe()">
+                        Reservar agora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         MODAL RESERVA / WHATSAPP
+    ========================================= -->
     <div class="modal-overlay" id="modalReserva">
-        <div class="modal">
-            <button class="modal-close" onclick="fecharModal()">✕</button>
+        <div class="modal-reserva">
+            <button class="modal-close" onclick="fecharModalReserva()">✕</button>
+
+            <button class="btn-voltar-det" onclick="voltarParaDetalhe()">
+                ← <span id="btn-voltar-txt">Voltar aos detalhes</span>
+            </button>
+
             <div class="modal-eyebrow" id="modal-eyebrow">Reserva</div>
             <h2 class="modal-title" id="modal-passeio-nome">—</h2>
 
-            <!-- Galeria de fotos -->
-            <div class="galeria-thumb" id="modal-galeria"></div>
-
-            <!-- Aviso de que vai para WhatsApp -->
             <div class="modal-aviso-wpp" id="modal-aviso-wpp">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                    <path
-                        d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z" />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z"/>
                 </svg>
                 Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.
             </div>
 
-            <!-- Data preferida (opcional) -->
-            <div class="form-group">
-                <label id="lbl-data">Data / Horário</label>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label id="lbl-data">Data desejada</label>
-                        <input type="date" id="res-data">
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl-horario">Horário desejado</label>
-                        <input type="time" id="res-horario">
-                    </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label id="lbl-data">Data desejada</label>
+                    <input type="date" id="res-data">
                 </div>
-                
+                <div class="form-group">
+                    <label id="lbl-horario">Horário desejado</label>
+                    <input type="time" id="res-horario">
+                </div>
             </div>
 
             <div class="form-row">
@@ -877,7 +1313,6 @@
                 <input type="number" id="res-qtd" value="1" min="1" oninput="calcularTotal()">
             </div>
 
-            <!-- Resumo de preço -->
             <div class="modal-resumo" id="modal-resumo">
                 <div class="resumo-linha">
                     <span id="resumo-label-passeio">Passeio</span>
@@ -893,13 +1328,10 @@
                 </div>
             </div>
 
-            <!-- Botão verde WhatsApp -->
             <button class="btn-confirmar" id="btn-confirmar" onclick="confirmarReserva()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                    <path
-                        d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z" />
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z"/>
                 </svg>
                 Falar no WhatsApp
             </button>
@@ -909,10 +1341,8 @@
     <!-- WHATSAPP FIXO -->
     <a href="#" target="_blank" id="wpp-main">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path
-                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-            <path
-                d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z" />
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.124 1.534 5.854L0 24l6.335-1.51A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.875 9.875 0 01-5.031-1.373l-.361-.214-3.741.892.938-3.63-.235-.374A9.86 9.86 0 012.118 12C2.118 6.533 6.533 2.118 12 2.118S21.882 6.533 21.882 12 17.467 21.882 12 21.882z"/>
         </svg>
         Concierge Online
     </a>
@@ -924,5 +1354,4 @@
     </script>
     <script src="{% static 'js/concierge.js' %}"></script>
 </body>
-
 </html>

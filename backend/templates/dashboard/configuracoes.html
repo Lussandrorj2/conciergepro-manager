@@ -16,6 +16,105 @@
             color: #e2e8f0;
         }
 
+
+        /* 1. AS CORES TÊM QUE SER AS MESMAS (VARIÁVEIS) */
+        :root {
+            --bg-main: #0b0f19;
+            --bg-sidebar: #0f1626;
+            --bg-card: #121a2b;
+            --bg-hover: #1a2438;
+            --border: #1f2a40;
+            --border-light: #2a3754;
+            --text-main: #e6edf3;
+            --text-muted: #9fb0c7;
+            --text-soft: #6b7a90;
+            --gold: #c9a96e;
+            --primary: #22c55e;
+        }
+
+        /* 2. BASE IGUAL EM TUDO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        /* 3. SIDEBAR PADRÃO (O MESMO DO PRINT) */
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 24px 16px;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px 30px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: .2s;
+        }
+
+        nav a:hover {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+
+        nav a.active {
+            background: rgba(201, 169, 110, 0.1);
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Ajuste para o conteúdo não ficar embaixo da sidebar */
+        .main {
+            margin-left: 240px;
+            width: calc(100% - 240px);
+        }
+
+        /* 4. SEUS CARDS E FOTOS (MANTENDO SEU DESIGN) */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+
         .content {
             padding: 30px;
             max-width: 900px;
@@ -106,169 +205,171 @@
 
 <body>
 
-<div class="layout">
+    <div class="layout">
 
-    <!-- SIDEBAR -->
-     <aside class="sidebar">
-        <h2>🔔 Concierge</h2>
-        <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a class="active">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-            <hr style="border-color:#1e293b;margin:12px 0;">
-            <a href="/logout/">↩ Sair</a>
-        </nav>
-    </aside>
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2>🔔 Concierge</h2>
+            <nav>
+                <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+                <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+                <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+                <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+                <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+                <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+                <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+                <hr style="border-color:#1e293b;margin:12px 0;">
+                <a href="/logout/">↩ Sair</a>
+            </nav>
+        </aside>
 
-    <!-- MAIN -->
-    <main class="main">
-        <div class="content">
+        <!-- MAIN -->
+        <main class="main">
+            <div class="content">
 
-            <h1>⚙️ Configurações</h1>
+                <h1>⚙️ Configurações</h1>
 
-            <!-- APARÊNCIA -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>🎨 Aparência</h3>
-                    <button class="btn-save" onclick="salvarHero()">Salvar</button>
+                <!-- APARÊNCIA -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🎨 Aparência</h3>
+                        <button class="btn-save" onclick="salvarHero()">Salvar</button>
+                    </div>
+
+                    <label>Banner</label>
+                    <div class="banner-preview" id="bannerBox">
+                        <img id="previewBanner" style="display:none;">
+                        <span id="placeholder">Clique para selecionar imagem</span>
+                    </div>
+                    <input type="file" id="bannerInput" hidden>
+
+                    <label>Título</label>
+                    <input type="text" id="titulo">
+
+                    <label>Subtítulo</label>
+                    <input type="text" id="subtitulo">
                 </div>
 
-                <label>Banner</label>
-                <div class="banner-preview" id="bannerBox">
-                    <img id="previewBanner" style="display:none;">
-                    <span id="placeholder">Clique para selecionar imagem</span>
+                <!-- CONTATO -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📞 Contato</h3>
+                        <button class="btn-save" onclick="salvarContato()">Salvar</button>
+                    </div>
+
+                    <label>WhatsApp</label>
+
+                    <div style="display:flex; gap:6px;">
+                        <span
+                            style="background:#1e293b;border:1px solid #334155;padding:10px;border-radius:8px;color:#94a3b8;">
+                            +55
+                        </span>
+                        <input type="text" id="whatsapp" placeholder="DDD + número">
+                    </div>
                 </div>
-                <input type="file" id="bannerInput" hidden>
 
-                <label>Título</label>
-                <input type="text" id="titulo">
-
-                <label>Subtítulo</label>
-                <input type="text" id="subtitulo">
             </div>
+        </main>
 
-            <!-- CONTATO -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📞 Contato</h3>
-                    <button class="btn-save" onclick="salvarContato()">Salvar</button>
-                </div>
+    </div>
 
-                <label>WhatsApp</label>
+    <script>
+        const hotelSlug = "{{ hotel.slug }}";
 
-                <div style="display:flex; gap:6px;">
-                    <span style="background:#1e293b;border:1px solid #334155;padding:10px;border-radius:8px;color:#94a3b8;">
-                        +55
-                    </span>
-                    <input type="text" id="whatsapp" placeholder="DDD + número">
-                </div>
-            </div>
+        // =========================
+        // PREVIEW IMAGEM
+        // =========================
+        const bannerBox = document.getElementById("bannerBox");
+        const bannerInput = document.getElementById("bannerInput");
 
-        </div>
-    </main>
+        bannerBox.onclick = () => bannerInput.click();
 
-</div>
+        bannerInput.addEventListener("change", e => {
+            const file = e.target.files[0];
+            if (file) {
+                const img = document.getElementById("previewBanner");
+                img.src = URL.createObjectURL(file);
+                img.style.display = "block";
+                document.getElementById("placeholder").style.display = "none";
+            }
+        });
 
-<script>
-const hotelSlug = "{{ hotel.slug }}";
+        // =========================
+        // CARREGAR
+        // =========================
+        async function carregar() {
+            const res = await fetch(`/api/admin/${hotelSlug}/hero/get/`);
+            const data = await res.json();
 
-// =========================
-// PREVIEW IMAGEM
-// =========================
-const bannerBox = document.getElementById("bannerBox");
-const bannerInput = document.getElementById("bannerInput");
+            document.getElementById("titulo").value = data.titulo || "";
+            document.getElementById("subtitulo").value = data.subtitulo || "";
 
-bannerBox.onclick = () => bannerInput.click();
+            if (data.banner) {
+                document.getElementById("previewBanner").src = data.banner;
+                document.getElementById("previewBanner").style.display = "block";
+                document.getElementById("placeholder").style.display = "none";
+            }
 
-bannerInput.addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (file) {
-        const img = document.getElementById("previewBanner");
-        img.src = URL.createObjectURL(file);
-        img.style.display = "block";
-        document.getElementById("placeholder").style.display = "none";
-    }
-});
+            if (data.whatsapp) {
+                document.getElementById("whatsapp").value = data.whatsapp.replace(/^55/, "");
+            }
+        }
 
-// =========================
-// CARREGAR
-// =========================
-async function carregar() {
-    const res = await fetch(`/api/admin/${hotelSlug}/hero/get/`);
-    const data = await res.json();
+        // =========================
+        // SALVAR HERO
+        // =========================
+        async function salvarHero() {
+            const form = new FormData();
 
-    document.getElementById("titulo").value = data.titulo || "";
-    document.getElementById("subtitulo").value = data.subtitulo || "";
+            form.append("titulo", document.getElementById("titulo").value);
+            form.append("subtitulo", document.getElementById("subtitulo").value);
 
-    if (data.banner) {
-        document.getElementById("previewBanner").src = data.banner;
-        document.getElementById("previewBanner").style.display = "block";
-        document.getElementById("placeholder").style.display = "none";
-    }
+            const file = bannerInput.files[0];
+            if (file) form.append("banner", file);
 
-    if (data.whatsapp) {
-        document.getElementById("whatsapp").value = data.whatsapp.replace(/^55/, "");
-    }
-}
+            await fetch(`/api/admin/${hotelSlug}/hero/`, {
+                method: "POST",
+                body: form
+            });
 
-// =========================
-// SALVAR HERO
-// =========================
-async function salvarHero() {
-    const form = new FormData();
+            toast("✔ Aparência salva");
+        }
 
-    form.append("titulo", document.getElementById("titulo").value);
-    form.append("subtitulo", document.getElementById("subtitulo").value);
+        // =========================
+        // SALVAR CONTATO
+        // =========================
+        async function salvarContato() {
+            let numero = document.getElementById("whatsapp").value.replace(/\D/g, "");
 
-    const file = bannerInput.files[0];
-    if (file) form.append("banner", file);
+            if (!numero.startsWith("55")) {
+                numero = "55" + numero;
+            }
 
-    await fetch(`/api/admin/${hotelSlug}/hero/`, {
-        method: "POST",
-        body: form
-    });
+            const form = new FormData();
+            form.append("whatsapp", numero);
 
-    toast("✔ Aparência salva");
-}
+            await fetch(`/api/admin/${hotelSlug}/hero/`, {
+                method: "POST",
+                body: form
+            });
 
-// =========================
-// SALVAR CONTATO
-// =========================
-async function salvarContato() {
-    let numero = document.getElementById("whatsapp").value.replace(/\D/g, "");
+            toast("✔ Contato salvo");
+        }
 
-    if (!numero.startsWith("55")) {
-        numero = "55" + numero;
-    }
+        // =========================
+        // TOAST
+        // =========================
+        function toast(msg) {
+            const t = document.createElement("div");
+            t.className = "toast";
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2000);
+        }
 
-    const form = new FormData();
-    form.append("whatsapp", numero);
-
-    await fetch(`/api/admin/${hotelSlug}/hero/`, {
-        method: "POST",
-        body: form
-    });
-
-    toast("✔ Contato salvo");
-}
-
-// =========================
-// TOAST
-// =========================
-function toast(msg) {
-    const t = document.createElement("div");
-    t.className = "toast";
-    t.innerText = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2000);
-}
-
-carregar();
-</script>
+        carregar();
+    </script>
 
 </body>
+
 </html>

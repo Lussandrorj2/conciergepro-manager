@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Relatórios — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -12,17 +13,11 @@
         .layout { display: flex; min-height: 100vh; }
 
         .sidebar { width: 220px; background: #111827; border-right: 1px solid #1e293b; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
-        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px; border-bottom: 1px solid #1e293b; }
-        .logo-icon { width: 30px; height: 30px; background: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .logo-text { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+        .sidebar h2 { padding: 20px 18px; font-size: 15px; font-weight: 600; color: #f1f5f9; border-bottom: 1px solid #1e293b; }
         nav { display: flex; flex-direction: column; padding: 12px 0; flex: 1; }
         nav a { display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13.5px; color: #94a3b8; text-decoration: none; border-left: 2px solid transparent; transition: .15s; }
         nav a:hover { color: #e2e8f0; background: #1e293b; }
         nav a.active { color: #f1f5f9; background: #1e293b; border-left-color: #059669; font-weight: 500; }
-        nav a span.icon { font-size: 15px; width: 18px; text-align: center; }
-        .sidebar-footer { padding: 16px 18px; border-top: 1px solid #1e293b; }
-        .logout-link { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; text-decoration: none; transition: .15s; }
-        .logout-link:hover { color: #94a3b8; }
 
         .main { flex: 1; margin-left: 220px; display: flex; flex-direction: column; }
         .topbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; background: #111827; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 5; }
@@ -31,6 +26,23 @@
         .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
         .content { padding: 24px 28px; display: flex; flex-direction: column; gap: 18px; }
 
+        /* ── ABAS ── */
+        .tabs-nav {
+            display: flex; gap: 4px; background: #111827;
+            border: 1px solid #1e293b; border-radius: 12px; padding: 4px;
+            width: fit-content;
+        }
+        .tab-btn {
+            padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 500;
+            border: none; cursor: pointer; font-family: 'Inter', sans-serif;
+            color: #64748b; background: transparent; transition: all .15s;
+        }
+        .tab-btn.active { background: #1e293b; color: #f1f5f9; }
+        .tab-btn:hover:not(.active) { color: #94a3b8; }
+        .tab-content { display: none; }
+        .tab-content.active { display: contents; }
+
+        /* FILTROS */
         .filtros-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #1e293b; border: 1px solid #263348; border-radius: 12px; padding: 12px 16px; }
         .filtros-bar label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .8px; }
         .filtros-bar select { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; }
@@ -38,8 +50,13 @@
         .btn-filtrar { background: #059669; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; }
         .btn-export { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; margin-left: auto; }
         .btn-export:hover { border-color: #475569; color: #e2e8f0; }
+        .btn-pdf { background: #1e293b; border: 1px solid #7c3aed; color: #a78bfa; padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; font-weight: 500; }
+        .btn-pdf:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .btn-print { background: #1e293b; border: 1px solid #0284c7; color: #38bdf8; padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; font-weight: 500; }
+        .btn-print:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
         .periodo-badge { background: #064e3b44; border: 1px solid #059669; color: #6ee7b7; padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; }
 
+        /* KPIs */
         .kpis-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
         .kpi { background: #1e293b; border: 1px solid #263348; border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden; }
         .kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent, #10b981); }
@@ -60,17 +77,34 @@
         .chart-tall { height: 270px; }
         .chart-tall canvas { max-height: 270px; }
 
-        /* CÂMBIO detalhado */
+        /* CÂMBIO */
         .cambio-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
         .cambio-item { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; }
         .cambio-item-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
         .cambio-item-val   { font-size: 16px; font-weight: 700; }
 
-        .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 10px; }
-        .rec-item { background: #064e3b33; border: 1px solid #059669; border-radius: 10px; padding: 14px; }
-        .rec-item-nome  { font-size: 11px; color: #6ee7b7; margin-bottom: 3px; font-weight: 500; }
-        .rec-item-valor { font-size: 18px; font-weight: 700; color: #10b981; }
-        .rec-item-qtd   { font-size: 10px; color: #047857; margin-top: 2px; }
+        /* ══ RANKING RECEPCIONISTAS — Apenas nomes ══ */
+        .ranking-simples { display: flex; flex-direction: column; gap: 10px; }
+        .ranking-simples-item {
+            display: flex; align-items: center; gap: 14px;
+            background: #0f172a; border: 1px solid #263348; border-radius: 10px;
+            padding: 14px 18px; transition: border-color .2s;
+        }
+        .ranking-simples-item:hover { border-color: #334155; }
+        .ranking-simples-item.pos-1 { border-color: #78350f; background: rgba(120,53,15,.08); }
+        .ranking-simples-item.pos-2 { border-color: #334155; }
+        .ranking-simples-item.pos-3 { border-color: #431407; background: rgba(67,20,7,.05); }
+        .ranking-pos-num {
+            font-size: 13px; font-weight: 800; min-width: 28px; text-align: center;
+        }
+        .ranking-pos-num.pos-1 { color: #fbbf24; }
+        .ranking-pos-num.pos-2 { color: #94a3b8; }
+        .ranking-pos-num.pos-3 { color: #c2855a; }
+        .ranking-pos-num.posn  { color: #475569; }
+        .ranking-medal { font-size: 18px; min-width: 24px; text-align: center; }
+        .ranking-nome { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+        .ranking-bar-wrap { flex: 1; background: #1e293b; border-radius: 4px; height: 5px; overflow: hidden; margin-left: auto; max-width: 160px; }
+        .ranking-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#10b981,#06b6d4); }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         thead th { text-align: left; padding: 10px 16px; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid #263348; font-weight: 500; }
@@ -86,6 +120,7 @@
         .bar-mini { background: #0f172a; border-radius: 3px; height: 5px; margin-top: 4px; overflow: hidden; }
         .bar-fill  { height: 100%; background: #10b981; border-radius: 3px; }
 
+        /* DIVISÃO */
         .divisao-config { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid #263348; margin-bottom: 18px; }
         .field { display: flex; flex-direction: column; gap: 5px; }
         .field label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .8px; }
@@ -119,14 +154,12 @@
         .cor-saldo-pos { color: #10b981; font-size: 14px; }
         .cor-saldo-neg { color: #f87171; font-size: 14px; }
 
+        /* ADIANTAMENTOS */
         .adiant-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #263348; }
         .adiant-title { font-size: 11px; font-weight: 600; color: #f59e0b; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
         .adiant-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
         .adiant-linha { display: grid; grid-template-columns: 1fr 120px 130px 32px; gap: 6px; align-items: center; }
-        .adiant-linha input, .adiant-linha select {
-            padding: 7px 10px; background: #0f172a; border: 1px solid #334155;
-            border-radius: 8px; color: #e2e8f0; font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
-        }
+        .adiant-linha input, .adiant-linha select { padding: 7px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; }
         .adiant-linha input:focus, .adiant-linha select:focus { border-color: #f59e0b; }
         .btn-add-adiant { display: inline-flex; align-items: center; gap: 6px; background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.3); color: #f59e0b; padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; }
         .btn-add-adiant:hover { background: rgba(245,158,11,.18); }
@@ -135,6 +168,61 @@
         .btn-salvar-adiant { background: #f59e0b; color: #0f172a; border: none; padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 4px; }
         .btn-salvar-adiant:hover { background: #d97706; }
         .adiant-col-label { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: .6px; }
+
+        /* ══ ABA ADIANTAMENTOS (subpágina) ══ */
+        .adiant-page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 16px; }
+        .adiant-rec-card {
+            background: #0f172a; border: 1px solid #263348; border-radius: 14px; overflow: hidden;
+        }
+        .adiant-rec-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 18px; border-bottom: 1px solid #1e293b;
+            background: rgba(245,158,11,.04);
+        }
+        .adiant-rec-avatar {
+            width: 38px; height: 38px; background: #059669; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .adiant-rec-nome  { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+        .adiant-rec-sub   { font-size: 10px; color: #64748b; }
+        .adiant-rec-body  { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+        .adiant-rec-section-title {
+            font-size: 9px; text-transform: uppercase; letter-spacing: .8px;
+            font-weight: 600; margin-bottom: 4px; margin-top: 6px;
+        }
+        .adiant-rec-section-title.pix   { color: #38bdf8; }
+        .adiant-rec-section-title.vale  { color: #f59e0b; }
+        .adiant-rec-section-title.saldo { color: #10b981; }
+        .adiant-rec-linha-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 8px; background: #1a2538; border-radius: 6px; font-size: 11px;
+        }
+        .adiant-rec-linha-data { color: #475569; font-size: 10px; }
+        .adiant-rec-linha-val  { font-weight: 600; }
+        .adiant-rec-linha-val.pix  { color: #38bdf8; }
+        .adiant-rec-linha-val.vale { color: #f59e0b; }
+        .adiant-rec-saldo-box {
+            margin-top: 10px; padding: 10px 14px;
+            border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .adiant-rec-saldo-box.positivo { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); }
+        .adiant-rec-saldo-box.negativo { background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.2); }
+        .adiant-rec-saldo-label { font-size: 11px; color: #64748b; font-weight: 500; }
+        .adiant-rec-saldo-val   { font-size: 18px; font-weight: 800; }
+        .adiant-rec-saldo-val.positivo { color: #10b981; }
+        .adiant-rec-saldo-val.negativo { color: #f87171; }
+        .adiant-empty { font-size: 11px; color: #334155; padding: 6px 0; }
+
+        /* BOTÃO LINK ADIANTAMENTOS */
+        .btn-link-adiant {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.3);
+            color: #f59e0b; padding: 9px 16px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: all .15s; text-decoration: none;
+        }
+        .btn-link-adiant:hover { background: rgba(245,158,11,.18); border-color: #f59e0b; }
 
         .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 18px; border-radius: 8px; font-size: 12px; z-index: 9999; animation: fadeUp .2s ease; font-family: 'Inter', sans-serif; }
         .toast.ok  { background: #059669; color: #fff; }
@@ -145,28 +233,115 @@
         @media(max-width:1200px) { .kpis-row { grid-template-columns: repeat(3,1fr); } }
         @media(max-width:900px)  { .two-col { grid-template-columns: 1fr; } .cambio-breakdown { grid-template-columns: 1fr 1fr; } }
         @media(max-width:600px)  { .kpis-row { grid-template-columns: 1fr; } }
+
+        /* ══ ESTILOS DE IMPRESSÃO / PDF ══ */
+        @media print {
+            body { background: #fff !important; color: #111 !important; font-size: 11px; }
+            .sidebar, .topbar, .tabs-nav, .filtros-bar, .btn-pdf, .btn-print, .btn-export,
+            .btn-add-adiant, .btn-salvar-adiant, .btn-salvar, .btn-filtrar, .btn-link-adiant,
+            .adiant-section, .divisao-config, .campos-recs { display: none !important; }
+            .layout { display: block !important; }
+            .main { margin-left: 0 !important; }
+            .content { padding: 0 !important; gap: 12px !important; }
+            .panel { background: #fff !important; border: 1px solid #ccc !important; border-radius: 6px !important; page-break-inside: avoid; }
+            .panel-header { background: #f8fafc !important; border-bottom: 1px solid #ccc !important; }
+            .panel-title { color: #111 !important; }
+            .panel-badge { border: 1px solid #ccc !important; color: #555 !important; background: #f1f5f9 !important; }
+            .kpi { background: #f8fafc !important; border: 1px solid #ccc !important; }
+            .kpi-label { color: #555 !important; }
+            .kpi-value { color: #111 !important; }
+            .kpi-sub   { color: #777 !important; }
+            .kpis-row  { grid-template-columns: repeat(3,1fr) !important; }
+            .cambio-item { background: #f8fafc !important; border: 1px solid #ccc !important; }
+            .cambio-item-label { color: #555 !important; }
+            .cambio-breakdown { grid-template-columns: repeat(3,1fr) !important; }
+            thead th { color: #555 !important; }
+            tbody tr { border-bottom: 1px solid #eee !important; }
+            tbody td { color: #333 !important; }
+            tbody tr:hover { background: transparent !important; }
+            .bar-mini { background: #e2e8f0 !important; }
+            .periodo-badge { color: #059669 !important; border-color: #059669 !important; background: #f0fdf4 !important; }
+            .ranking-simples-item { background: #f8fafc !important; border: 1px solid #ccc !important; }
+            .ranking-nome { color: #111 !important; }
+            .ranking-bar-wrap { background: #e2e8f0 !important; }
+            .div-rec-card { background: #f8fafc !important; border: 1px solid #ccc !important; }
+            .div-rec-nome { color: #111 !important; }
+            .divisao-total-row { background: #f0fdf4 !important; border-color: #059669 !important; }
+            .divisao-total-row span:first-child { color: #555 !important; }
+            .divisao-total-row span:last-child  { color: #059669 !important; }
+
+            /* Ocultar gráficos na impressão (não renderizam bem) */
+            .chart-wrap, .chart-tall { display: none !important; }
+            #tab-relatorios, #tab-adiantamentos { display: block !important; }
+
+            /* Mostrar apenas o conteúdo que deve ser impresso */
+            .print-only { display: block !important; }
+            .no-print   { display: none !important; }
+
+            /* Área de assinatura */
+            .assinatura-section { display: block !important; }
+        }
+
+        /* Área de assinatura — visível apenas no PDF/impressão */
+        .assinatura-section {
+            display: none;
+            page-break-before: always;
+            padding: 28px;
+            font-family: 'Inter', sans-serif;
+        }
+        .assinatura-titulo {
+            font-size: 16px; font-weight: 700; color: #111;
+            text-align: center; margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .assinatura-subtitulo {
+            font-size: 11px; color: #555; text-align: center; margin-bottom: 28px;
+        }
+        .assinatura-linha-sep {
+            border: none; border-top: 1px solid #ccc; margin: 18px 0;
+        }
+        .assinatura-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 36px 48px;
+        }
+        .assinatura-item { display: flex; flex-direction: column; gap: 40px; }
+        .assinatura-nome-label {
+            font-size: 13px; font-weight: 600; color: #111; margin-bottom: 2px;
+        }
+        .assinatura-sub-label { font-size: 10px; color: #555; }
+        .assinatura-linha {
+            border-bottom: 1px solid #444; padding-bottom: 4px;
+            min-width: 200px;
+        }
+        .assinatura-campo-label {
+            font-size: 9px; color: #888; text-transform: uppercase;
+            letter-spacing: .5px; margin-top: 4px;
+        }
+        .assinatura-aviso {
+            font-size: 10px; color: #777; text-align: center;
+            margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 14px;
+        }
+        .assinatura-header-info {
+            display: flex; justify-content: space-between; font-size: 10px;
+            color: #777; margin-bottom: 24px;
+        }
     </style>
 </head>
 <body>
 <div class="layout">
 
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">🔔</div>
-            <span class="logo-text">Concierge</span>
-        </div>
+        <h2>🔔 Concierge</h2>
         <nav>
-            <a href="/{{ hotel.slug }}/dashboard/"><span class="icon">🏠</span> Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/"><span class="icon">➕</span> Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/"><span class="icon">📋</span> Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/"><span class="icon">📅</span> Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/"><span class="icon">💱</span> Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="active"><span class="icon">📊</span> Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/"><span class="icon">⚙️</span> Configurações</a>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="active">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr style="border-color:#1e293b;margin:12px 0;">
+            <a href="/logout/">↩ Sair</a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="/logout/" class="logout-link"><span>↩</span> Sair</a>
-        </div>
     </aside>
 
     <main class="main">
@@ -177,182 +352,287 @@
 
         <div class="content">
 
-            <!-- FILTROS -->
-            <div class="filtros-bar">
-                <label>Período</label>
-                <select id="filtro-ano"><option value="">Todos os anos</option></select>
-                <select id="filtro-mes">
-                    <option value="">Todos os meses</option>
-                    <option value="01">Janeiro</option><option value="02">Fevereiro</option>
-                    <option value="03">Março</option><option value="04">Abril</option>
-                    <option value="05">Maio</option><option value="06">Junho</option>
-                    <option value="07">Julho</option><option value="08">Agosto</option>
-                    <option value="09">Setembro</option><option value="10">Outubro</option>
-                    <option value="11">Novembro</option><option value="12">Dezembro</option>
-                </select>
-                <button class="btn-filtrar" onclick="carregarTudo()">↻ Atualizar</button>
-                <span class="periodo-badge" id="periodo-ativo">Carregando...</span>
-                <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+            <!-- ── ABAS ── -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="mudarAba('relatorios', this)">📊 Relatórios</button>
+                <button class="tab-btn" onclick="mudarAba('adiantamentos', this)">💸 Adiantamentos</button>
             </div>
 
-            <!-- KPIs -->
-            <div class="kpis-row">
-                <div class="kpi" style="--accent:#10b981">
-                    <div class="kpi-icon">💰</div>
-                    <div class="kpi-label">Comissão Passeios</div>
-                    <div class="kpi-value" id="kpi-recepcao" style="color:#10b981">R$ —</div>
-                    <div class="kpi-sub">reservas pagas no período</div>
-                </div>
-                <div class="kpi" style="--accent:#06b6d4">
-                    <div class="kpi-icon">💱</div>
-                    <div class="kpi-label">Lucro Câmbio</div>
-                    <div class="kpi-value" id="kpi-cambio" style="color:#06b6d4">R$ —</div>
-                    <div class="kpi-sub" id="kpi-cambio-sub">repasse − compra</div>
-                </div>
-                <div class="kpi" style="--accent:#8b5cf6">
-                    <div class="kpi-icon">📊</div>
-                    <div class="kpi-label">Total Geral (Passeios + Câmbio)</div>
-                    <div class="kpi-value" id="kpi-total-geral" style="color:#c4b5fd">R$ —</div>
-                    <div class="kpi-sub">soma de todas as entradas</div>
-                </div>
-                <div class="kpi" style="--accent:#38bdf8">
-                    <div class="kpi-icon">📱</div>
-                    <div class="kpi-label">Total Pix Recebido</div>
-                    <div class="kpi-value" id="kpi-pix" style="color:#38bdf8">R$ —</div>
-                    <div class="kpi-sub">pix confirmados no período</div>
-                </div>
-                <div class="kpi" style="--accent:#f59e0b">
-                    <div class="kpi-icon">💸</div>
-                    <div class="kpi-label">Adiantamentos</div>
-                    <div class="kpi-value" id="kpi-adiant" style="color:#f59e0b">R$ —</div>
-                    <div class="kpi-sub">vales e adiantamentos</div>
-                </div>
-            </div>
+            <!-- ══════════════════════════════════════
+                 ABA: RELATÓRIOS
+            ══════════════════════════════════════ -->
+            <div id="tab-relatorios" class="tab-content active">
 
-            <!-- CÂMBIO DETALHADO -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">💱 Resumo de Câmbio no Período</span>
-                    <span class="panel-badge" id="badge-cambio-count">— transações</span>
+                <!-- FILTROS -->
+                <div class="filtros-bar">
+                    <label>Período</label>
+                    <select id="filtro-ano"><option value="">Todos os anos</option></select>
+                    <select id="filtro-mes">
+                        <option value="">Todos os meses</option>
+                        <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+                        <option value="03">Março</option><option value="04">Abril</option>
+                        <option value="05">Maio</option><option value="06">Junho</option>
+                        <option value="07">Julho</option><option value="08">Agosto</option>
+                        <option value="09">Setembro</option><option value="10">Outubro</option>
+                        <option value="11">Novembro</option><option value="12">Dezembro</option>
+                    </select>
+                    <button class="btn-filtrar" onclick="carregarTudo()">↻ Atualizar</button>
+                    <span class="periodo-badge" id="periodo-ativo">Carregando...</span>
+                    <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+                    <button class="btn-pdf" onclick="gerarPDFRelatorio()">📄 Gerar PDF</button>
+                    <a class="btn-link-adiant" onclick="mudarAbaBtn('adiantamentos')">💸 Ver Adiantamentos</a>
                 </div>
-                <div class="panel-body">
-                    <div class="cambio-breakdown">
-                        <div class="cambio-item">
-                            <div class="cambio-item-label">Total pago aos hóspedes</div>
-                            <div class="cambio-item-val" style="color:#f87171;" id="cb-compra">R$ —</div>
-                        </div>
-                        <div class="cambio-item">
-                            <div class="cambio-item-label">Total recebido no repasse</div>
-                            <div class="cambio-item-val" style="color:#38bdf8;" id="cb-repasse">R$ —</div>
-                        </div>
-                        <div class="cambio-item" style="border-color:#059669;">
-                            <div class="cambio-item-label">Lucro líquido câmbio</div>
-                            <div class="cambio-item-val" style="color:#34d399;" id="cb-lucro">R$ —</div>
-                        </div>
+
+                <!-- KPIs -->
+                <div class="kpis-row">
+                    <div class="kpi" style="--accent:#10b981">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-label">Comissão Passeios</div>
+                        <div class="kpi-value" id="kpi-recepcao" style="color:#10b981">R$ —</div>
+                        <div class="kpi-sub">reservas pagas no período</div>
                     </div>
-                    <div id="cambio-por-moeda" style="font-size:11px;color:#475569;"></div>
+                    <div class="kpi" style="--accent:#06b6d4">
+                        <div class="kpi-icon">💱</div>
+                        <div class="kpi-label">Lucro Câmbio</div>
+                        <div class="kpi-value" id="kpi-cambio" style="color:#06b6d4">R$ —</div>
+                        <div class="kpi-sub" id="kpi-cambio-sub">repasse − compra</div>
+                    </div>
+                    <div class="kpi" style="--accent:#8b5cf6">
+                        <div class="kpi-icon">📊</div>
+                        <div class="kpi-label">Total Geral</div>
+                        <div class="kpi-value" id="kpi-total-geral" style="color:#c4b5fd">R$ —</div>
+                        <div class="kpi-sub">passeios + câmbio</div>
+                    </div>
+                    <div class="kpi" style="--accent:#38bdf8">
+                        <div class="kpi-icon">📱</div>
+                        <div class="kpi-label">Total Pix Recebido</div>
+                        <div class="kpi-value" id="kpi-pix" style="color:#38bdf8">R$ —</div>
+                        <div class="kpi-sub">pix confirmados no período</div>
+                    </div>
+                    <div class="kpi" style="--accent:#f59e0b">
+                        <div class="kpi-icon">💸</div>
+                        <div class="kpi-label">Adiantamentos</div>
+                        <div class="kpi-value" id="kpi-adiant" style="color:#f59e0b">R$ —</div>
+                        <div class="kpi-sub">vales e adiantamentos</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- GRÁFICO MENSAL -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">📅 Comissão Passeios + Lucro Câmbio por Mês</span>
-                    <span class="panel-badge" id="badge-mensal">—</span>
-                </div>
-                <div class="panel-body">
-                    <div class="chart-wrap chart-tall"><canvas id="chart-mensal"></canvas></div>
-                </div>
-            </div>
-
-            <!-- TOP PASSEIOS + PIX POR RECEPCIONISTA -->
-            <div class="two-col">
+                <!-- CÂMBIO DETALHADO -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span class="panel-title">🏖️ Top Passeios — Vendas Pagas</span>
-                        <span class="panel-badge" id="badge-passeios">—</span>
+                        <span class="panel-title">💱 Resumo de Câmbio no Período</span>
+                        <span class="panel-badge" id="badge-cambio-count">— transações</span>
                     </div>
                     <div class="panel-body">
-                        <div class="chart-wrap"><canvas id="chart-passeios"></canvas></div>
+                        <div class="cambio-breakdown">
+                            <div class="cambio-item">
+                                <div class="cambio-item-label">Total pago aos hóspedes</div>
+                                <div class="cambio-item-val" style="color:#f87171;" id="cb-compra">R$ —</div>
+                            </div>
+                            <div class="cambio-item">
+                                <div class="cambio-item-label">Total recebido no repasse</div>
+                                <div class="cambio-item-val" style="color:#38bdf8;" id="cb-repasse">R$ —</div>
+                            </div>
+                            <div class="cambio-item" style="border-color:#059669;">
+                                <div class="cambio-item-label">Lucro líquido câmbio</div>
+                                <div class="cambio-item-val" style="color:#34d399;" id="cb-lucro">R$ —</div>
+                            </div>
+                        </div>
+                        <div id="cambio-por-moeda" style="font-size:11px;color:#475569;"></div>
                     </div>
                 </div>
+
+                <!-- GRÁFICO MENSAL — agora com Doughnut (pizza) para passeios e Bar para mensal -->
+                <div class="two-col">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">📅 Comissão + Lucro Câmbio por Mês</span>
+                            <span class="panel-badge" id="badge-mensal">—</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="chart-wrap chart-tall"><canvas id="chart-mensal"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">🏖️ Top Passeios — Vendas Pagas</span>
+                            <span class="panel-badge" id="badge-passeios">—</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="chart-wrap chart-tall"><canvas id="chart-passeios"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RANKING DE RECEPCIONISTAS — somente nomes -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span class="panel-title">📱 Pix por Recepcionista</span>
-                        <span class="panel-badge" id="badge-pgto">—</span>
+                        <span class="panel-title">🥇 Ranking — Recepcionistas que Mais Venderam</span>
+                        <span class="panel-badge" id="badge-ranking-rec">—</span>
                     </div>
                     <div class="panel-body">
-                        <div class="chart-wrap"><canvas id="chart-pgto"></canvas></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COMISSÕES POR RECEPCIONISTA -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">🤝 Comissão por Recepcionista</span>
-                    <span class="panel-badge" id="badge-rec">—</span>
-                </div>
-                <div class="panel-body">
-                    <div class="rec-grid" id="rec-grid"><div class="loading">Carregando...</div></div>
-                </div>
-            </div>
-
-            <!-- RANKING -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">🏆 Ranking de Passeios</span>
-                    <span class="panel-badge" id="badge-ranking">—</span>
-                </div>
-                <div id="tabela-ranking"><div class="loading">Carregando...</div></div>
-            </div>
-
-            <!-- DIVISÃO COM ADIANTAMENTOS -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">👤 Divisão de Comissão — Saldo por Recepcionista</span>
-                    <span class="salvo-badge" id="salvo-badge">✔ Configuração salva</span>
-                </div>
-                <div class="panel-body">
-
-                    <div class="divisao-config">
-                        <div class="field">
-                            <label>Nº de recepcionistas</label>
-                            <input type="number" id="num-rec" value="1" min="1" max="20" oninput="gerarCampos()">
-                        </div>
-                        <button class="btn-salvar" onclick="salvarDivisao()">💾 Salvar configuração</button>
-                    </div>
-                    <div class="campos-recs" id="campos-recs"></div>
-
-                    <div class="divisao-total-row">
-                        <span>Total de comissão recepção — passeios pagos no período</span>
-                        <span id="div-total">R$ —</span>
-                    </div>
-
-                    <div class="div-rec-grid" id="div-rec-grid"></div>
-
-                    <!-- ADIANTAMENTOS -->
-                    <div class="adiant-section">
-                        <div class="adiant-title">💸 Adiantamentos / Vales de Caixa</div>
-                        <div style="display:grid;grid-template-columns:1fr 120px 130px 32px;gap:6px;margin-bottom:6px;padding:0 2px;">
-                            <span class="adiant-col-label">Recepcionista</span>
-                            <span class="adiant-col-label">Valor (R$)</span>
-                            <span class="adiant-col-label">Data</span>
-                            <span></span>
-                        </div>
-                        <div class="adiant-grid" id="adiant-grid"></div>
-                        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap;">
-                            <button type="button" class="btn-add-adiant" onclick="adicionarAdiantamento()">+ Adicionar adiantamento</button>
-                            <button type="button" class="btn-salvar-adiant" onclick="salvarAdiantamentos()">💾 Salvar adiantamentos</button>
+                        <div id="ranking-rec-grid" class="ranking-simples">
+                            <div class="loading">Carregando...</div>
                         </div>
                     </div>
-
                 </div>
-            </div>
+
+                <!-- RANKING PASSEIOS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">🏆 Ranking de Passeios</span>
+                        <span class="panel-badge" id="badge-ranking">—</span>
+                    </div>
+                    <div id="tabela-ranking"><div class="loading">Carregando...</div></div>
+                </div>
+
+                <!-- DIVISÃO COM ADIANTAMENTOS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">👤 Divisão de Comissão — Saldo por Recepcionista</span>
+                        <span class="salvo-badge" id="salvo-badge">✔ Configuração salva</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="divisao-config">
+                            <div class="field">
+                                <label>Nº de recepcionistas</label>
+                                <input type="number" id="num-rec" value="1" min="1" max="20" oninput="gerarCampos()">
+                            </div>
+                            <button class="btn-salvar" onclick="salvarDivisao()">💾 Salvar configuração</button>
+                        </div>
+                        <div class="campos-recs" id="campos-recs"></div>
+                        <div class="divisao-total-row">
+                            <span>Total de comissão recepção — passeios pagos no período</span>
+                            <span id="div-total">R$ —</span>
+                        </div>
+                        <div class="div-rec-grid" id="div-rec-grid"></div>
+
+                        <!-- ADIANTAMENTOS inline na divisão -->
+                        <div class="adiant-section">
+                            <div class="adiant-title">💸 Adiantamentos / Vales de Caixa</div>
+                            <div style="display:grid;grid-template-columns:1fr 120px 130px 32px;gap:6px;margin-bottom:6px;padding:0 2px;">
+                                <span class="adiant-col-label">Recepcionista</span>
+                                <span class="adiant-col-label">Valor (R$)</span>
+                                <span class="adiant-col-label">Data</span>
+                                <span></span>
+                            </div>
+                            <div class="adiant-grid" id="adiant-grid"></div>
+                            <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+                                <button type="button" class="btn-add-adiant" onclick="adicionarAdiantamento()">+ Adicionar adiantamento</button>
+                                <button type="button" class="btn-salvar-adiant" onclick="salvarAdiantamentos()">💾 Salvar adiantamentos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- fim tab-relatorios -->
+
+            <!-- ══════════════════════════════════════
+                 ABA: ADIANTAMENTOS (subpágina detalhada)
+            ══════════════════════════════════════ -->
+            <div id="tab-adiantamentos" class="tab-content">
+
+                <!-- FILTROS iguais -->
+                <div class="filtros-bar">
+                    <label>Período</label>
+                    <select id="filtro-ano-ad"><option value="">Todos os anos</option></select>
+                    <select id="filtro-mes-ad">
+                        <option value="">Todos os meses</option>
+                        <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+                        <option value="03">Março</option><option value="04">Abril</option>
+                        <option value="05">Maio</option><option value="06">Junho</option>
+                        <option value="07">Julho</option><option value="08">Agosto</option>
+                        <option value="09">Setembro</option><option value="10">Outubro</option>
+                        <option value="11">Novembro</option><option value="12">Dezembro</option>
+                    </select>
+                    <button class="btn-filtrar" onclick="carregarPaginaAdiantamentos()">↻ Atualizar</button>
+                    <span class="periodo-badge" id="periodo-ativo-ad">Carregando...</span>
+                    <button class="btn-pdf" onclick="gerarPDFAdiantamentos()">📄 Gerar PDF</button>
+                    <button class="btn-print" onclick="imprimirAdiantamentos()">🖨️ Imprimir</button>
+                </div>
+
+                <!-- KPIs sumário adiantamentos -->
+                <div class="kpis-row" style="grid-template-columns:repeat(3,1fr);">
+                    <div class="kpi" style="--accent:#38bdf8">
+                        <div class="kpi-icon">📱</div>
+                        <div class="kpi-label">Total Pix Distribuído</div>
+                        <div class="kpi-value" id="ad-kpi-pix" style="color:#38bdf8">R$ —</div>
+                        <div class="kpi-sub">pix recebidos pelas recepcionistas</div>
+                    </div>
+                    <div class="kpi" style="--accent:#f59e0b">
+                        <div class="kpi-icon">💸</div>
+                        <div class="kpi-label">Total Vales / Adiantamentos</div>
+                        <div class="kpi-value" id="ad-kpi-vales" style="color:#f59e0b">R$ —</div>
+                        <div class="kpi-sub">valores sacados antecipadamente</div>
+                    </div>
+                    <div class="kpi" style="--accent:#10b981">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-label">Comissão Total Passeios</div>
+                        <div class="kpi-value" id="ad-kpi-comissao" style="color:#10b981">R$ —</div>
+                        <div class="kpi-sub">base para cálculo do saldo</div>
+                    </div>
+                </div>
+
+                <!-- CARDS POR RECEPCIONISTA -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">👤 Detalhamento por Recepcionista</span>
+                        <span class="panel-badge" id="ad-badge-recs">— recepcionistas</span>
+                    </div>
+                    <div class="panel-body">
+                        <div id="adiant-page-grid" class="adiant-page-grid">
+                            <div class="loading">Carregando...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- fim tab-adiantamentos -->
 
         </div>
     </main>
 </div>
+
+<!-- ══════════════════════════════════════
+     MODAL PDF RELATÓRIO
+══════════════════════════════════════ -->
+<div id="modal-pdf" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:32px;max-width:520px;width:90%;max-height:90vh;overflow-y:auto;">
+        <div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:6px;">📄 Gerar Relatório em PDF</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:24px;">Selecione o que deseja incluir no relatório</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;cursor:pointer;">
+                <input type="checkbox" id="pdf-opt-kpis" checked style="accent-color:#059669;">
+                Resumo de KPIs (comissões, câmbio, pix)
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;cursor:pointer;">
+                <input type="checkbox" id="pdf-opt-cambio" checked style="accent-color:#059669;">
+                Detalhamento de Câmbio por Moeda
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;cursor:pointer;">
+                <input type="checkbox" id="pdf-opt-ranking-rec" checked style="accent-color:#059669;">
+                Ranking de Recepcionistas
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;cursor:pointer;">
+                <input type="checkbox" id="pdf-opt-ranking-pass" checked style="accent-color:#059669;">
+                Ranking de Passeios
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#94a3b8;cursor:pointer;">
+                <input type="checkbox" id="pdf-opt-divisao" checked style="accent-color:#059669;">
+                Divisão de Comissão por Recepcionista
+            </label>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="fecharModalPDF()" style="background:#0f172a;border:1px solid #334155;color:#94a3b8;padding:9px 18px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">Cancelar</button>
+            <button onclick="confirmarGerarPDF()" style="background:#7c3aed;border:none;color:#fff;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📄 Gerar e Baixar PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CONTEÚDO PARA IMPRESSÃO (oculto na tela)
+══════════════════════════════════════ -->
+<div id="print-content-relatorio" style="display:none;"></div>
+<div id="print-content-adiantamentos" style="display:none;"></div>
 
 <script>
 const hotelSlug = "{{ hotel.slug }}";
@@ -360,22 +640,42 @@ Chart.defaults.color       = '#475569';
 Chart.defaults.borderColor = '#1e293b';
 const CORES = ['#10b981','#38bdf8','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16','#f97316'];
 
-/* ── ESTADO GLOBAL ── */
-let todasReservas = [];
-let dadosMensal   = [];
-let dadosPasseios = [];
-let totalComissao = 0;
-let totalCambio   = 0;    // lucro líquido câmbio (repasse - compra)
-let totalCompra   = 0;    // total pago aos hóspedes
-let totalRepasse  = 0;    // total recebido nos repasses
-let totalPix      = 0;
-let pixPorRec     = {};
-let adiantamentos = [];
-let adiantCount   = 0;
-let nomesDiv      = [];
+/* ── ESTADO ── */
+let todasReservas  = [];
+let dadosMensal    = [];
+let dadosPasseios  = [];
+let totalComissao  = 0;
+let totalCambio    = 0;
+let totalCompra    = 0;
+let totalRepasse   = 0;
+let totalPix       = 0;
+let pixPorRec      = {};
+let adiantamentos  = [];
+let adiantCount    = 0;
+let nomesDiv       = [];
 let cambioPorMoeda = {};
 let totalTxCambio  = 0;
-let chartMensal, chartPasseios, chartPgto;
+let chartMensal, chartPasseios;
+let _adDados       = null; // cache para PDF da aba adiantamentos
+
+/* ── ABAS ── */
+function mudarAba(aba, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${aba}`).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (aba === 'adiantamentos') carregarPaginaAdiantamentos();
+}
+
+function mudarAbaBtn(aba) {
+    const btns = document.querySelectorAll('.tab-btn');
+    btns.forEach(b => {
+        if (b.textContent.includes('Adiantamentos') && aba === 'adiantamentos') b.classList.add('active');
+        else if (b.textContent.includes('Relatórios') && aba === 'relatorios') b.classList.add('active');
+        else b.classList.remove('active');
+    });
+    mudarAba(aba, null);
+}
 
 /* ── HELPERS ── */
 function parsePix(raw) {
@@ -390,8 +690,10 @@ function fmt(v) { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractio
 function getMesRef() {
     return { ano: document.getElementById('filtro-ano').value, mes: document.getElementById('filtro-mes').value };
 }
-function labelPeriodo() {
-    const {ano,mes} = getMesRef();
+function getMesRefAd() {
+    return { ano: document.getElementById('filtro-ano-ad').value, mes: document.getElementById('filtro-mes-ad').value };
+}
+function labelPeriodo(ano, mes) {
     const NOMES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     if (ano && mes) return `${NOMES[parseInt(mes)]} / ${ano}`;
     if (ano) return `Ano ${ano}`;
@@ -399,9 +701,10 @@ function labelPeriodo() {
     return 'Todos os períodos';
 }
 
-/* ── CARREGAR TUDO ── */
+/* ── CARREGAR TUDO (aba relatórios) ── */
 async function carregarTudo() {
-    document.getElementById('periodo-ativo').textContent = labelPeriodo();
+    const {ano,mes} = getMesRef();
+    document.getElementById('periodo-ativo').textContent = labelPeriodo(ano,mes);
     await carregarDivisao();
     await carregarAdiantamentos();
     await Promise.all([carregarReservas(), carregarCambio()]);
@@ -409,9 +712,8 @@ async function carregarTudo() {
     renderCambioDetalhado();
     renderGraficoMensal();
     renderGraficoPasseios();
-    renderGraficoPix();
-    renderRecepcionistas();
-    renderRanking();
+    renderRankingPasseios();
+    renderRankingRecepcionistas();
     renderDivisao();
 }
 
@@ -475,11 +777,10 @@ async function carregarReservas() {
             porPasseio[nome].comissao += parseFloat(r.comissao_recepcao||0);
         });
         dadosPasseios = Object.values(porPasseio).sort((a,b) => b.qtd - a.qtd);
-
     } catch(e) { console.error('Erro reservas:', e); }
 }
 
-/* ── CÂMBIO — calcula lucro como repasse - compra ── */
+/* ── CÂMBIO ── */
 async function carregarCambio() {
     try {
         const {ano, mes} = getMesRef();
@@ -499,15 +800,12 @@ async function carregarCambio() {
         cambioPorMoeda = {};
 
         lista.forEach(t => {
-            // valor_reais   = total pago ao hóspede (compra)
-            // valor_recebido = total recebido no repasse
-            // Fallback: usa cotacao_venda × valor se valor_recebido = 0
-            const compra   = parseFloat(t.valor_reais    || 0);
-            const repasse  = parseFloat(t.valor_recebido || 0);
-            const v        = parseFloat(t.valor || 0);
-            const cv       = parseFloat(t.cotacao_venda  || 0);
+            const compra     = parseFloat(t.valor_reais    || 0);
+            const repasse    = parseFloat(t.valor_recebido || 0);
+            const v          = parseFloat(t.valor || 0);
+            const cv         = parseFloat(t.cotacao_venda  || 0);
             const repasseReal = repasse > 0 ? repasse : (cv > 0 ? v * cv : 0);
-            const lucro    = repasseReal > 0 ? repasseReal - compra : parseFloat(t.lucro || 0);
+            const lucro      = repasseReal > 0 ? repasseReal - compra : parseFloat(t.lucro || 0);
 
             totalCompra  += compra;
             totalRepasse += repasseReal;
@@ -520,32 +818,24 @@ async function carregarCambio() {
             cambioPorMoeda[moeda].lucro   += lucro;
             cambioPorMoeda[moeda].qtd     += 1;
 
-            // Injeta no mensal
             const mesRef = t.data ? t.data.slice(0,7) : 'sem-ref';
             let slot = dadosMensal.find(d => d.mes === mesRef);
-            if (!slot) {
-                slot = {mes:mesRef, comissao:0, qtd:0, lucro_cambio:0};
-                dadosMensal.push(slot);
-            }
+            if (!slot) { slot = {mes:mesRef, comissao:0, qtd:0, lucro_cambio:0}; dadosMensal.push(slot); }
             slot.lucro_cambio = (slot.lucro_cambio || 0) + lucro;
         });
 
         dadosMensal.sort((a,b) => a.mes.localeCompare(b.mes));
-
     } catch(e) { console.error('Erro câmbio:', e); }
 }
 
 /* ── KPIs ── */
 function renderKPIs() {
     const totalAdiant = adiantamentos.reduce((s,a) => s + (parseFloat(a.valor)||0), 0);
-    const totalGeral  = totalComissao + totalCambio;   // passeios + lucro câmbio
-
+    const totalGeral  = totalComissao + totalCambio;
     document.getElementById('kpi-recepcao').textContent    = 'R$ ' + fmt(totalComissao);
     document.getElementById('kpi-cambio').textContent      = 'R$ ' + fmt(totalCambio);
     document.getElementById('kpi-cambio-sub').textContent  =
-        totalRepasse > 0
-            ? `R$ ${fmt(totalRepasse)} recebido − R$ ${fmt(totalCompra)} pago`
-            : 'repasse − compra';
+        totalRepasse > 0 ? `R$ ${fmt(totalRepasse)} recebido − R$ ${fmt(totalCompra)} pago` : 'repasse − compra';
     document.getElementById('kpi-total-geral').textContent = 'R$ ' + fmt(totalGeral);
     document.getElementById('kpi-pix').textContent         = 'R$ ' + fmt(totalPix);
     document.getElementById('kpi-adiant').textContent      = 'R$ ' + fmt(totalAdiant);
@@ -557,19 +847,11 @@ function renderCambioDetalhado() {
     document.getElementById('cb-compra').textContent  = 'R$ ' + fmt(totalCompra);
     document.getElementById('cb-repasse').textContent = 'R$ ' + fmt(totalRepasse);
     document.getElementById('cb-lucro').textContent   = 'R$ ' + fmt(totalCambio);
-
     const moedas = Object.entries(cambioPorMoeda);
-    if (!moedas.length) {
-        document.getElementById('cambio-por-moeda').innerHTML = 'Nenhuma transação de câmbio no período.';
-        return;
-    }
-
+    if (!moedas.length) { document.getElementById('cambio-por-moeda').innerHTML = 'Nenhuma transação de câmbio no período.'; return; }
     document.getElementById('cambio-por-moeda').innerHTML = `
         <table style="margin-top:8px;">
-            <thead><tr>
-                <th>Moeda</th><th>Transações</th>
-                <th>Pago hóspedes</th><th>Recebido repasse</th><th>Lucro</th>
-            </tr></thead>
+            <thead><tr><th>Moeda</th><th>Transações</th><th>Pago hóspedes</th><th>Recebido repasse</th><th>Lucro</th></tr></thead>
             <tbody>
                 ${moedas.map(([moeda,d]) => `<tr>
                     <td><strong style="color:#e2e8f0;">${moeda}</strong></td>
@@ -613,10 +895,8 @@ function renderGraficoMensal() {
             plugins: { legend: { labels: { font:{size:11}, color:'#94a3b8' } } },
             scales: {
                 x:  { grid:{color:'#1a2538'}, ticks:{color:'#475569',font:{size:10}} },
-                y:  { type:'linear', position:'left', grid:{color:'#1a2538'},
-                      ticks:{color:'#475569',font:{size:10},callback:v=>'R$ '+v.toLocaleString('pt-BR')} },
-                y1: { type:'linear', position:'right', grid:{drawOnChartArea:false},
-                      ticks:{color:'#38bdf8',font:{size:10}} }
+                y:  { type:'linear', position:'left', grid:{color:'#1a2538'}, ticks:{color:'#475569',font:{size:10},callback:v=>'R$ '+v.toLocaleString('pt-BR')} },
+                y1: { type:'linear', position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#38bdf8',font:{size:10}} }
             }
         }
     });
@@ -627,67 +907,85 @@ function renderGraficoPasseios() {
     document.getElementById('badge-passeios').textContent = `${dadosPasseios.length} passeio(s)`;
     if (chartPasseios) chartPasseios.destroy();
     chartPasseios = new Chart(document.getElementById('chart-passeios').getContext('2d'), {
-        type: 'bar',
-        data: { labels: top.map(p=>p.nome), datasets: [{label:'Vendas pagas',data:top.map(p=>p.qtd),backgroundColor:CORES,borderRadius:5}] },
-        options: { responsive:true, maintainAspectRatio:false, indexAxis:'y',
-            plugins:{legend:{display:false}},
-            scales:{x:{grid:{color:'#1a2538'},ticks:{color:'#475569',font:{size:10}}},y:{ticks:{color:'#94a3b8',font:{size:10}}}}
-        }
-    });
-}
-
-function renderGraficoPix() {
-    const nomes   = Object.keys(pixPorRec);
-    const valores = Object.values(pixPorRec);
-    document.getElementById('badge-pgto').textContent = 'R$ ' + fmt(totalPix);
-    if (chartPgto) chartPgto.destroy();
-    if (!nomes.length) return;
-    chartPgto = new Chart(document.getElementById('chart-pgto').getContext('2d'), {
         type: 'doughnut',
-        data: { labels:nomes, datasets:[{data:valores,backgroundColor:CORES,borderColor:'#111827',borderWidth:2}] },
+        data: {
+            labels: top.map(p => p.nome),
+            datasets: [{
+                label: 'Vendas pagas',
+                data: top.map(p => p.qtd),
+                backgroundColor: CORES,
+                borderColor: '#0f172a',
+                borderWidth: 2,
+                hoverOffset: 8
+            }]
+        },
         options: {
-            responsive:true, maintainAspectRatio:false, cutout:'58%',
-            plugins:{
-                legend:{position:'right',labels:{font:{size:11},color:'#94a3b8',padding:12}},
-                tooltip:{callbacks:{label:ctx=>ctx.label+': R$ '+ctx.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}
-            }
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { font:{size:11}, color:'#94a3b8', padding: 14, boxWidth: 12 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.label}: ${ctx.parsed} venda(s)`
+                    }
+                }
+            },
+            cutout: '55%'
         }
     });
 }
 
-/* ── RECEPCIONISTAS ── */
-function renderRecepcionistas() {
+/* ══════════════════════════════════════
+   RANKING RECEPCIONISTAS — Apenas nomes
+══════════════════════════════════════ */
+function renderRankingRecepcionistas() {
     const porRec = {};
     todasReservas.forEach(r => {
         const recs  = parseRecs(r.recepcionista);
-        const parte = recs.length > 0 ? parseFloat(r.comissao_recepcao||0) / recs.length : 0;
+        if (!recs.length) return;
+        const parte = parseFloat(r.comissao_recepcao||0) / recs.length;
         recs.forEach(nome => {
             if (!nome) return;
-            if (!porRec[nome]) porRec[nome] = {nome, comissao:0, qtd:0};
-            porRec[nome].comissao += parte;
-            porRec[nome].qtd      += 1;
+            if (!porRec[nome]) porRec[nome] = { nome, comissaoPasseios: 0, qtdPasseios: 0 };
+            porRec[nome].comissaoPasseios += parte;
+            porRec[nome].qtdPasseios      += 1;
         });
-        if (!recs.length) {
-            const nome = 'Sem recepcionista';
-            if (!porRec[nome]) porRec[nome] = {nome, comissao:0, qtd:0};
-            porRec[nome].comissao += parseFloat(r.comissao_recepcao||0);
-            porRec[nome].qtd      += 1;
-        }
     });
-    const lista = Object.values(porRec).sort((a,b) => b.comissao - a.comissao);
-    const grid  = document.getElementById('rec-grid');
-    document.getElementById('badge-rec').textContent = `${lista.length} recepcionista(s)`;
-    if (!lista.length) { grid.innerHTML = '<div style="color:#475569;font-size:12px;">Nenhuma comissão registrada.</div>'; return; }
-    grid.innerHTML = lista.map(d => `
-        <div class="rec-item">
-            <div class="rec-item-nome">${d.nome}</div>
-            <div class="rec-item-valor">R$ ${fmt(d.comissao)}</div>
-            <div class="rec-item-qtd">${d.qtd} reserva(s) paga(s)</div>
-        </div>`).join('');
+
+    const lista = Object.values(porRec).sort((a,b) => b.comissaoPasseios - a.comissaoPasseios);
+
+    if (!lista.length) {
+        document.getElementById('ranking-rec-grid').innerHTML =
+            '<div style="color:#475569;font-size:12px;">Nenhum dado disponível.</div>';
+        document.getElementById('badge-ranking-rec').textContent = '0 recepcionistas';
+        return;
+    }
+
+    document.getElementById('badge-ranking-rec').textContent = `${lista.length} recepcionista(s)`;
+    const maxVal  = lista[0]?.comissaoPasseios || 1;
+    const medals  = ['🥇','🥈','🥉'];
+    const posClass = ['pos-1','pos-2','pos-3'];
+
+    document.getElementById('ranking-rec-grid').innerHTML = lista.map((d, i) => {
+        const pos   = i < 3 ? posClass[i] : '';
+        const medal = medals[i] || '';
+        const pct   = maxVal > 0 ? (d.comissaoPasseios / maxVal * 100).toFixed(0) : 0;
+        const sc    = i < 3 ? posClass[i] : 'posn';
+        return `<div class="ranking-simples-item ${pos}">
+            <span class="ranking-pos-num ${sc}">#${i+1}</span>
+            ${medal ? `<span class="ranking-medal">${medal}</span>` : '<span style="min-width:24px;"></span>'}
+            <span class="ranking-nome">${d.nome}</span>
+            <div class="ranking-bar-wrap">
+                <div class="ranking-bar-fill" style="width:${pct}%"></div>
+            </div>
+        </div>`;
+    }).join('');
 }
 
-/* ── RANKING ── */
-function renderRanking() {
+/* ── RANKING PASSEIOS ── */
+function renderRankingPasseios() {
     const totalVendas = dadosPasseios.reduce((s,p) => s + p.qtd, 0);
     document.getElementById('badge-ranking').textContent = `${totalVendas} venda(s) paga(s)`;
     if (!dadosPasseios.length) {
@@ -732,22 +1030,18 @@ function renderDivisao() {
     const nomes  = inputs.map((inp,i) => inp.value.trim() || `Rec ${i+1}`);
     const n      = nomes.length;
     const parte  = n > 0 ? totalComissao / n : 0;
-
     document.getElementById('div-total').textContent = 'R$ ' + fmt(totalComissao);
-
     const adiantPorRec = {};
     adiantamentos.forEach(a => {
         const nome = (a.rec||'').trim();
         if (nome) adiantPorRec[nome] = (adiantPorRec[nome]||0) + (parseFloat(a.valor)||0);
     });
-
     document.getElementById('div-rec-grid').innerHTML = nomes.map(nome => {
         const pixRec    = pixPorRec[nome] || 0;
         const adiantRec = adiantPorRec[nome] || 0;
         const saldo     = parte - pixRec - adiantRec;
         const saldoClass = saldo >= 0 ? 'cor-saldo-pos' : 'cor-saldo-neg';
         const saldoLabel = saldo >= 0 ? 'A receber' : 'Devendo';
-
         return `<div class="div-rec-card">
             <div class="div-rec-top">
                 <div class="div-rec-avatar">${nome.charAt(0).toUpperCase()}</div>
@@ -756,18 +1050,9 @@ function renderDivisao() {
                     <div class="div-rec-pct">${n>0?(100/n).toFixed(1):0}% do total passeios</div>
                 </div>
             </div>
-            <div class="div-rec-linha">
-                <span class="div-rec-linha-label">Parte da comissão</span>
-                <span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span>
-            </div>
-            <div class="div-rec-linha">
-                <span class="div-rec-linha-label">📱 Pix já recebido</span>
-                <span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span>
-            </div>
-            <div class="div-rec-linha">
-                <span class="div-rec-linha-label">💸 Adiantamentos</span>
-                <span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span>
-            </div>
+            <div class="div-rec-linha"><span class="div-rec-linha-label">Parte da comissão</span><span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span></div>
+            <div class="div-rec-linha"><span class="div-rec-linha-label">📱 Pix já recebido</span><span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span></div>
+            <div class="div-rec-linha"><span class="div-rec-linha-label">💸 Adiantamentos</span><span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span></div>
             <div class="div-rec-linha" style="padding-top:8px;margin-top:4px;border-top:1px solid #263348;border-bottom:none;">
                 <span class="div-rec-linha-label" style="font-weight:600;color:#e2e8f0;">${saldoLabel}</span>
                 <span class="div-rec-linha-val ${saldoClass}">R$ ${fmt(Math.abs(saldo))}</span>
@@ -789,7 +1074,6 @@ function adicionarAdiantamento(rec='',valor='',data='') {
     const opts  = nomes.length
         ? nomes.map(n=>`<option value="${n}" ${rec===n?'selected':''}>${n}</option>`).join('')
         : `<option value="${rec}">${rec||'Recepcionista'}</option>`;
-
     const div = document.createElement('div');
     div.className = 'adiant-linha';
     div.id = `adiant-${id}`;
@@ -870,22 +1154,558 @@ async function salvarDivisao() {
     } catch(e) { toast('Erro: '+e.message, 'err'); }
 }
 
+/* ══════════════════════════════════════
+   ABA ADIANTAMENTOS — SUBPÁGINA
+══════════════════════════════════════ */
+async function carregarPaginaAdiantamentos() {
+    const {ano, mes} = getMesRefAd();
+    document.getElementById('periodo-ativo-ad').textContent = labelPeriodo(ano,mes);
+
+    const resRv = await fetch(`/api/admin/${hotelSlug}/reservas/`);
+    const todasRv = await resRv.json();
+    const pagas = todasRv.filter(r => {
+        if (r.status !== 'pago') return false;
+        const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.slice(0,7) : '');
+        if (ano && !ref.startsWith(ano)) return false;
+        if (mes && ref.slice(5,7) !== mes) return false;
+        return true;
+    });
+
+    const comissaoTotal = pagas.reduce((s,r) => s+parseFloat(r.comissao_recepcao||0),0);
+    let pixGlobal = 0;
+    const pixDetalhe = {};
+    pagas.forEach(r => {
+        parsePix(r.pix_recebimentos).forEach(p => {
+            if (!p.nome || p.valor <= 0) return;
+            pixGlobal += p.valor;
+            if (!pixDetalhe[p.nome]) pixDetalhe[p.nome] = [];
+            pixDetalhe[p.nome].push({data: r.data_pagamento||'', valor: p.valor});
+        });
+    });
+
+    const mesRef = ano && mes ? `${ano}-${mes}` : '';
+    const urlAd  = `/api/admin/${hotelSlug}/adiantamentos/` + (mesRef ? `?mes_referencia=${mesRef}` : '');
+    const resAd  = await fetch(urlAd);
+    const dAd    = await resAd.json();
+    const valesDetalhe = {};
+    let valesGlobal = 0;
+    (dAd.adiantamentos||[]).forEach(a => {
+        if (!a.rec) return;
+        valesGlobal += parseFloat(a.valor)||0;
+        if (!valesDetalhe[a.rec]) valesDetalhe[a.rec] = [];
+        valesDetalhe[a.rec].push({data:a.data||'', valor:parseFloat(a.valor)||0});
+    });
+
+    document.getElementById('ad-kpi-pix').textContent      = 'R$ ' + fmt(pixGlobal);
+    document.getElementById('ad-kpi-vales').textContent    = 'R$ ' + fmt(valesGlobal);
+    document.getElementById('ad-kpi-comissao').textContent = 'R$ ' + fmt(comissaoTotal);
+
+    let nomesList = [...new Set([
+        ...Object.keys(pixDetalhe),
+        ...Object.keys(valesDetalhe),
+        ...nomesDiv
+    ])].filter(Boolean);
+
+    document.getElementById('ad-badge-recs').textContent = `${nomesList.length} recepcionista(s)`;
+
+    const n = nomesDiv.length || 1;
+    const parteComissao = comissaoTotal / n;
+
+    // Salva dados para uso no PDF
+    _adDados = { nomesList, pixDetalhe, valesDetalhe, parteComissao, nomesDiv, comissaoTotal, pixGlobal, valesGlobal, periodo: labelPeriodo(ano,mes) };
+
+    if (!nomesList.length) {
+        document.getElementById('adiant-page-grid').innerHTML = '<div class="loading">Nenhum dado no período.</div>';
+        return;
+    }
+
+    document.getElementById('adiant-page-grid').innerHTML = nomesList.map(nome => {
+        const pixItens    = pixDetalhe[nome]   || [];
+        const valesItens  = valesDetalhe[nome] || [];
+        const totalPixRec = pixItens.reduce((s,x)=>s+x.valor,0);
+        const totalValesRec = valesItens.reduce((s,x)=>s+x.valor,0);
+        const parteRec    = nomesDiv.includes(nome) ? parteComissao : 0;
+        const saldo       = parteRec - totalPixRec - totalValesRec;
+        const saldoPos    = saldo >= 0;
+
+        const pixHTML = pixItens.length
+            ? pixItens.map(x => `<div class="adiant-rec-linha-item">
+                <div>
+                    <span style="color:#e2e8f0;font-size:10px;">Pix</span>
+                    ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
+                </div>
+                <span class="adiant-rec-linha-val pix">R$ ${fmt(x.valor)}</span>
+              </div>`).join('')
+            : `<div class="adiant-empty">Nenhum pix registrado</div>`;
+
+        const valesHTML = valesItens.length
+            ? valesItens.map(x => `<div class="adiant-rec-linha-item">
+                <div>
+                    <span style="color:#e2e8f0;font-size:10px;">Vale</span>
+                    ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
+                </div>
+                <span class="adiant-rec-linha-val vale">R$ ${fmt(x.valor)}</span>
+              </div>`).join('')
+            : `<div class="adiant-empty">Nenhum vale registrado</div>`;
+
+        return `<div class="adiant-rec-card">
+            <div class="adiant-rec-header">
+                <div class="adiant-rec-avatar">${nome.charAt(0).toUpperCase()}</div>
+                <div>
+                    <div class="adiant-rec-nome">${nome}</div>
+                    <div class="adiant-rec-sub">Comissão base: R$ ${fmt(parteRec)}</div>
+                </div>
+            </div>
+            <div class="adiant-rec-body">
+                <div class="adiant-rec-section-title pix">📱 Pix Recebidos</div>
+                ${pixHTML}
+                <div style="text-align:right;font-size:11px;color:#38bdf8;font-weight:600;margin-top:4px;">
+                    Total: R$ ${fmt(totalPixRec)}
+                </div>
+                <div class="adiant-rec-section-title vale" style="margin-top:10px;">💸 Vales / Adiantamentos</div>
+                ${valesHTML}
+                <div style="text-align:right;font-size:11px;color:#f59e0b;font-weight:600;margin-top:4px;">
+                    Total: R$ ${fmt(totalValesRec)}
+                </div>
+                <div class="adiant-rec-saldo-box ${saldoPos?'positivo':'negativo'}">
+                    <span class="adiant-rec-saldo-label">${saldoPos ? '✅ A Receber' : '⚠️ Devendo'}</span>
+                    <span class="adiant-rec-saldo-val ${saldoPos?'positivo':'negativo'}">R$ ${fmt(Math.abs(saldo))}</span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ══════════════════════════════════════
+   PDF — RELATÓRIO GERAL
+══════════════════════════════════════ */
+function gerarPDFRelatorio() {
+    document.getElementById('modal-pdf').style.display = 'flex';
+}
+function fecharModalPDF() {
+    document.getElementById('modal-pdf').style.display = 'none';
+}
+
+function confirmarGerarPDF() {
+    fecharModalPDF();
+    const opts = {
+        kpis:       document.getElementById('pdf-opt-kpis').checked,
+        cambio:     document.getElementById('pdf-opt-cambio').checked,
+        rankingRec: document.getElementById('pdf-opt-ranking-rec').checked,
+        rankingPass:document.getElementById('pdf-opt-ranking-pass').checked,
+        divisao:    document.getElementById('pdf-opt-divisao').checked,
+    };
+
+    const {ano,mes} = getMesRef();
+    const periodo   = labelPeriodo(ano,mes);
+    const dataGer   = new Date().toLocaleDateString('pt-BR');
+    const nomes     = nomesDiv.length
+        ? nomesDiv
+        : [...document.querySelectorAll('.rec-nome-input')].map(i=>i.value.trim()).filter(Boolean);
+    const n         = nomes.length || 1;
+    const parte     = totalComissao / n;
+    const adiantPorRec = {};
+    adiantamentos.forEach(a => {
+        const nome = (a.rec||'').trim();
+        if (nome) adiantPorRec[nome] = (adiantPorRec[nome]||0) + (parseFloat(a.valor)||0);
+    });
+
+    // Ranking recepcionistas
+    const porRec = {};
+    todasReservas.forEach(r => {
+        const recs  = parseRecs(r.recepcionista);
+        if (!recs.length) return;
+        const parte2 = parseFloat(r.comissao_recepcao||0) / recs.length;
+        recs.forEach(nome => {
+            if (!nome) return;
+            if (!porRec[nome]) porRec[nome] = { nome, qtd:0 };
+            porRec[nome].qtd += 1;
+        });
+    });
+    const listaRec = Object.values(porRec).sort((a,b) => b.qtd - a.qtd);
+
+    // Moedas câmbio
+    const moedas = Object.entries(cambioPorMoeda);
+
+    const htmlPDF = `<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Relatório — ${periodo}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',Arial,sans-serif; background:#fff; color:#111; font-size:11px; padding:32px; }
+  h1 { font-size:20px; font-weight:700; color:#111; margin-bottom:4px; }
+  .sub { font-size:12px; color:#555; margin-bottom:24px; }
+  .header-info { display:flex; justify-content:space-between; font-size:10px; color:#777; margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px; }
+  .section-title { font-size:13px; font-weight:700; color:#111; border-left:4px solid #059669; padding-left:10px; margin:24px 0 12px; }
+  .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:8px; }
+  .kpi-box { border:1px solid #ddd; border-radius:8px; padding:12px 14px; background:#f8fafc; }
+  .kpi-lbl { font-size:9px; color:#777; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+  .kpi-val { font-size:16px; font-weight:700; color:#059669; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { text-align:left; padding:7px 10px; font-size:9px; text-transform:uppercase; letter-spacing:.5px; color:#777; border-bottom:1px solid #ddd; }
+  td { padding:7px 10px; border-bottom:1px solid #f1f5f9; font-size:11px; }
+  tr:last-child td { border-bottom:none; }
+  .badge { display:inline-block; background:#f1f5f9; border-radius:4px; padding:1px 6px; font-size:9px; color:#555; }
+  .pos1 { color:#d97706; font-weight:700; }
+  .pos2 { color:#94a3b8; font-weight:600; }
+  .pos3 { color:#c2855a; font-weight:600; }
+  .green { color:#059669; font-weight:600; }
+  .red   { color:#dc2626; font-weight:600; }
+  .blue  { color:#0284c7; font-weight:600; }
+  .divisao-card { border:1px solid #ddd; border-radius:8px; padding:14px; background:#f8fafc; margin-bottom:10px; }
+  .divisao-row  { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f1f5f9; font-size:11px; }
+  .divisao-row:last-child { border-bottom:none; font-weight:700; }
+
+  /* ASSINATURAS */
+  .assinatura-page { page-break-before:always; padding:32px 0; }
+  .assin-titulo { font-size:18px; font-weight:700; text-align:center; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .assin-sub    { font-size:11px; color:#555; text-align:center; margin-bottom:28px; }
+  .assin-header { display:flex; justify-content:space-between; font-size:10px; color:#777; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px; }
+  .assin-grid   { display:grid; grid-template-columns:1fr 1fr; gap:40px 48px; }
+  .assin-item   { padding:20px 0; border-bottom:1px solid #ccc; }
+  .assin-nome   { font-size:14px; font-weight:700; margin-bottom:8px; }
+  .assin-campos { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .assin-campo  { }
+  .assin-linha  { border-bottom:1px solid #555; padding-bottom:4px; min-height:24px; margin-bottom:4px; }
+  .assin-label  { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:#888; }
+  .assin-aviso  { font-size:10px; color:#777; text-align:center; margin-top:40px; border-top:1px dashed #ccc; padding-top:14px; }
+  @media print { body { padding:16px; } }
+</style>
+</head>
+<body>
+
+<h1>📊 Relatório de Comissões</h1>
+<div class="sub">Hotel: <strong>{{ hotel.nome }}</strong></div>
+<div class="header-info">
+  <span>Período: <strong>${periodo}</strong></span>
+  <span>Gerado em: ${dataGer}</span>
+</div>
+
+${opts.kpis ? `
+<div class="section-title">Resumo Geral</div>
+<div class="kpi-grid">
+  <div class="kpi-box"><div class="kpi-lbl">Comissão Passeios</div><div class="kpi-val">R$ ${fmt(totalComissao)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Lucro Câmbio</div><div class="kpi-val" style="color:#0284c7;">R$ ${fmt(totalCambio)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Total Geral</div><div class="kpi-val" style="color:#7c3aed;">R$ ${fmt(totalComissao+totalCambio)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Total Pix Recebido</div><div class="kpi-val" style="color:#0284c7;">R$ ${fmt(totalPix)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Adiantamentos</div><div class="kpi-val" style="color:#d97706;">R$ ${fmt(adiantamentos.reduce((s,a)=>s+(parseFloat(a.valor)||0),0))}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Reservas Pagas</div><div class="kpi-val">${todasReservas.length}</div></div>
+</div>` : ''}
+
+${opts.cambio && moedas.length ? `
+<div class="section-title">Câmbio por Moeda</div>
+<table>
+  <thead><tr><th>Moeda</th><th>Transações</th><th>Pago aos hóspedes</th><th>Recebido (repasse)</th><th>Lucro</th></tr></thead>
+  <tbody>
+    ${moedas.map(([moeda,d]) => `<tr>
+      <td><strong>${moeda}</strong></td>
+      <td><span class="badge">${d.qtd}</span></td>
+      <td class="red">R$ ${fmt(d.compra)}</td>
+      <td class="blue">R$ ${fmt(d.repasse)}</td>
+      <td class="green">R$ ${fmt(d.lucro)}</td>
+    </tr>`).join('')}
+    <tr style="background:#f0fdf4;">
+      <td><strong>TOTAL</strong></td>
+      <td><span class="badge">${totalTxCambio}</span></td>
+      <td class="red"><strong>R$ ${fmt(totalCompra)}</strong></td>
+      <td class="blue"><strong>R$ ${fmt(totalRepasse)}</strong></td>
+      <td class="green"><strong>R$ ${fmt(totalCambio)}</strong></td>
+    </tr>
+  </tbody>
+</table>` : ''}
+
+${opts.rankingRec && listaRec.length ? `
+<div class="section-title">Ranking de Recepcionistas</div>
+<table>
+  <thead><tr><th>#</th><th>Nome</th><th>Reservas Vendidas</th></tr></thead>
+  <tbody>
+    ${listaRec.map((d,i) => `<tr>
+      <td class="${i===0?'pos1':i===1?'pos2':i===2?'pos3':''}">#${i+1} ${['🥇','🥈','🥉'][i]||''}</td>
+      <td><strong>${d.nome}</strong></td>
+      <td>${d.qtd}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>` : ''}
+
+${opts.rankingPass && dadosPasseios.length ? `
+<div class="section-title">Ranking de Passeios</div>
+<table>
+  <thead><tr><th>#</th><th>Passeio</th><th>Vendas Pagas</th><th>Comissão</th></tr></thead>
+  <tbody>
+    ${dadosPasseios.map((p,i) => `<tr>
+      <td class="${i===0?'pos1':i===1?'pos2':i===2?'pos3':''}">#${i+1}</td>
+      <td>${p.nome}</td>
+      <td>${p.qtd}</td>
+      <td class="green">R$ ${fmt(p.comissao)}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>` : ''}
+
+${opts.divisao && nomes.length ? `
+<div class="section-title">Divisão de Comissão por Recepcionista</div>
+${nomes.map(nome => {
+    const pixRec    = pixPorRec[nome] || 0;
+    const adiantRec = adiantPorRec[nome] || 0;
+    const saldo     = parte - pixRec - adiantRec;
+    return `<div class="divisao-card">
+        <div class="divisao-row"><span><strong>${nome}</strong> (${(100/n).toFixed(1)}%)</span><span></span></div>
+        <div class="divisao-row"><span>Parte da comissão</span><span class="green">R$ ${fmt(parte)}</span></div>
+        <div class="divisao-row"><span>Pix já recebido</span><span class="blue">− R$ ${fmt(pixRec)}</span></div>
+        <div class="divisao-row"><span>Adiantamentos / Vales</span><span style="color:#d97706;">− R$ ${fmt(adiantRec)}</span></div>
+        <div class="divisao-row"><span>${saldo>=0?'A Receber':'Devendo'}</span><span class="${saldo>=0?'green':'red'}">R$ ${fmt(Math.abs(saldo))}</span></div>
+    </div>`;
+}).join('')}` : ''}
+
+<!-- ══ PÁGINA DE ASSINATURA ══ -->
+<div class="assinatura-page">
+  <div class="assin-titulo">Declaração de Recebimento — Fechamento de Mês</div>
+  <div class="assin-sub">Confirmo que recebi os valores referentes às comissões do período indicado</div>
+  <div class="assin-header">
+    <span>Hotel: <strong>{{ hotel.nome }}</strong></span>
+    <span>Período: <strong>${periodo}</strong></span>
+    <span>Data de fechamento: ___/___/______</span>
+  </div>
+  <div class="assin-grid">
+    ${nomes.map(nome => {
+        const pixRec    = pixPorRec[nome] || 0;
+        const adiantRec = adiantPorRec[nome] || 0;
+        const saldo     = parte - pixRec - adiantRec;
+        return `<div>
+            <div class="assin-item">
+                <div class="assin-nome">${nome}</div>
+                <div style="font-size:10px;color:#555;margin-bottom:10px;">
+                    Comissão: R$ ${fmt(parte)} &nbsp;|&nbsp; Pix: R$ ${fmt(pixRec)} &nbsp;|&nbsp; Adiant.: R$ ${fmt(adiantRec)}<br>
+                    <strong style="color:${saldo>=0?'#059669':'#dc2626'};">${saldo>=0?'Saldo a receber':'Saldo devendo'}: R$ ${fmt(Math.abs(saldo))}</strong>
+                </div>
+                <div class="assin-campos">
+                    <div class="assin-campo">
+                        <div class="assin-linha"></div>
+                        <div class="assin-label">Assinatura</div>
+                    </div>
+                    <div class="assin-campo">
+                        <div class="assin-linha"></div>
+                        <div class="assin-label">Data de recebimento</div>
+                    </div>
+                    <div class="assin-campo" style="grid-column:1/-1;">
+                        <div class="assin-linha"></div>
+                        <div class="assin-label">Valor efetivamente recebido no fechamento (R$)</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('')}
+  </div>
+  <div class="assin-aviso">
+    Este documento é válido como comprovante de recebimento de comissões. Guarde uma cópia assinada para seus registros.
+  </div>
+</div>
+
+</body></html>`;
+
+    abrirJanelaImpressao(htmlPDF);
+}
+
+/* ══════════════════════════════════════
+   PDF / IMPRESSÃO — ADIANTAMENTOS
+══════════════════════════════════════ */
+function gerarPDFAdiantamentos() {
+    if (!_adDados) { toast('Carregue os dados primeiro.', 'err'); return; }
+    const html = buildHTMLAdiantamentos(true);
+    abrirJanelaImpressao(html);
+}
+
+function imprimirAdiantamentos() {
+    if (!_adDados) { toast('Carregue os dados primeiro.', 'err'); return; }
+    const html = buildHTMLAdiantamentos(false);
+    abrirJanelaImpressao(html);
+}
+
+function buildHTMLAdiantamentos(comAssinatura) {
+    if (!_adDados) return '';
+    const { nomesList, pixDetalhe, valesDetalhe, parteComissao, nomesDiv: divNomes, comissaoTotal, pixGlobal, valesGlobal, periodo } = _adDados;
+    const dataGer = new Date().toLocaleDateString('pt-BR');
+
+    const recCards = nomesList.map(nome => {
+        const pixItens   = pixDetalhe[nome]   || [];
+        const valesItens = valesDetalhe[nome] || [];
+        const totalPxRec = pixItens.reduce((s,x)=>s+x.valor,0);
+        const totalVlRec = valesItens.reduce((s,x)=>s+x.valor,0);
+        const parteRec   = divNomes.includes(nome) ? parteComissao : 0;
+        const saldo      = parteRec - totalPxRec - totalVlRec;
+        const pos        = saldo >= 0;
+
+        const pixRows = pixItens.length
+            ? pixItens.map(x=>`<tr><td>Pix</td><td style="color:#777;">${x.data||'—'}</td><td class="blue">R$ ${fmt(x.valor)}</td></tr>`).join('')
+            : `<tr><td colspan="3" style="color:#aaa;font-style:italic;">Nenhum pix registrado</td></tr>`;
+        const valeRows = valesItens.length
+            ? valesItens.map(x=>`<tr><td>Vale</td><td style="color:#777;">${x.data||'—'}</td><td class="amber">R$ ${fmt(x.valor)}</td></tr>`).join('')
+            : `<tr><td colspan="3" style="color:#aaa;font-style:italic;">Nenhum vale registrado</td></tr>`;
+
+        return `<div class="rec-bloco">
+            <div class="rec-bloco-header">
+                <span class="rec-avatar">${nome.charAt(0).toUpperCase()}</span>
+                <div>
+                    <div class="rec-nome">${nome}</div>
+                    <div class="rec-sub">Comissão base: R$ ${fmt(parteRec)}</div>
+                </div>
+                <div class="rec-saldo ${pos?'saldo-pos':'saldo-neg'}">
+                    <span>${pos?'A Receber':'Devendo'}</span>
+                    <strong>R$ ${fmt(Math.abs(saldo))}</strong>
+                </div>
+            </div>
+            <div class="rec-bloco-body">
+                <div class="table-label blue-label">📱 Pix Recebidos — Total: R$ ${fmt(totalPxRec)}</div>
+                <table><thead><tr><th>Tipo</th><th>Data</th><th>Valor</th></tr></thead><tbody>${pixRows}</tbody></table>
+                <div class="table-label amber-label" style="margin-top:10px;">💸 Vales / Adiantamentos — Total: R$ ${fmt(totalVlRec)}</div>
+                <table><thead><tr><th>Tipo</th><th>Data</th><th>Valor</th></tr></thead><tbody>${valeRows}</tbody></table>
+            </div>
+        </div>`;
+    }).join('');
+
+    const assinaturas = comAssinatura ? `
+    <div class="assinatura-page">
+      <div class="assin-titulo">Declaração de Recebimento — Fechamento de Mês</div>
+      <div class="assin-sub">Declaro que recebi os adiantamentos, vales e valores de comissão referentes ao período indicado</div>
+      <div class="assin-header">
+        <span>Hotel: <strong>{{ hotel.nome }}</strong></span>
+        <span>Período: <strong>${periodo}</strong></span>
+        <span>Data de fechamento: ___/___/______</span>
+      </div>
+      <div class="assin-grid">
+        ${nomesList.filter(nome => divNomes.includes(nome) || (pixDetalhe[nome]||[]).length || (valesDetalhe[nome]||[]).length).map(nome => {
+            const pixItens   = pixDetalhe[nome]   || [];
+            const valesItens = valesDetalhe[nome] || [];
+            const totalPxRec = pixItens.reduce((s,x)=>s+x.valor,0);
+            const totalVlRec = valesItens.reduce((s,x)=>s+x.valor,0);
+            const parteRec   = divNomes.includes(nome) ? parteComissao : 0;
+            const saldo      = parteRec - totalPxRec - totalVlRec;
+            const pos        = saldo >= 0;
+            return `<div>
+                <div class="assin-item">
+                    <div class="assin-nome">${nome}</div>
+                    <div style="font-size:10px;color:#555;margin-bottom:12px;">
+                        Comissão: R$ ${fmt(parteRec)} &nbsp;|&nbsp;
+                        Pix: R$ ${fmt(totalPxRec)} &nbsp;|&nbsp;
+                        Vales: R$ ${fmt(totalVlRec)}<br>
+                        <strong style="color:${pos?'#059669':'#dc2626'};">${pos?'Saldo a receber':'Saldo devendo'}: R$ ${fmt(Math.abs(saldo))}</strong>
+                    </div>
+                    <div class="assin-campos">
+                        <div class="assin-campo">
+                            <div class="assin-linha"></div>
+                            <div class="assin-label">Assinatura do(a) Recepcionista</div>
+                        </div>
+                        <div class="assin-campo">
+                            <div class="assin-linha"></div>
+                            <div class="assin-label">Data de recebimento</div>
+                        </div>
+                        <div class="assin-campo" style="grid-column:1/-1;">
+                            <div class="assin-linha"></div>
+                            <div class="assin-label">Valor total efetivamente recebido no fechamento (R$)</div>
+                        </div>
+                        <div class="assin-campo" style="grid-column:1/-1;">
+                            <div class="assin-linha"></div>
+                            <div class="assin-label">Observações / ressalvas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:32px;padding-top:14px;border-top:1px solid #ddd;font-size:10px;color:#777;text-align:center;">
+        Este documento é válido como comprovante de recebimento de adiantamentos e comissões.<br>
+        Guarde a via assinada para controle interno do hotel.
+      </div>
+    </div>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Adiantamentos — ${periodo}</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',Arial,sans-serif; background:#fff; color:#111; font-size:11px; padding:32px; }
+  h1 { font-size:20px; font-weight:700; margin-bottom:4px; }
+  .sub { font-size:12px; color:#555; margin-bottom:20px; }
+  .header-info { display:flex; justify-content:space-between; font-size:10px; color:#777; margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px; }
+  .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+  .kpi-box { border:1px solid #ddd; border-radius:8px; padding:12px 14px; background:#f8fafc; }
+  .kpi-lbl { font-size:9px; color:#777; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+  .kpi-val { font-size:16px; font-weight:700; }
+  .rec-bloco { border:1px solid #ddd; border-radius:10px; overflow:hidden; margin-bottom:16px; page-break-inside:avoid; }
+  .rec-bloco-header { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#f8fafc; border-bottom:1px solid #eee; }
+  .rec-avatar { width:36px; height:36px; background:#059669; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#fff; flex-shrink:0; }
+  .rec-nome { font-size:14px; font-weight:700; }
+  .rec-sub  { font-size:10px; color:#777; }
+  .rec-saldo { margin-left:auto; text-align:right; font-size:11px; display:flex; flex-direction:column; gap:2px; }
+  .saldo-pos { color:#059669; }
+  .saldo-neg { color:#dc2626; }
+  .rec-bloco-body { padding:14px 16px; }
+  .table-label { font-size:10px; font-weight:600; margin-bottom:6px; }
+  .blue-label  { color:#0284c7; }
+  .amber-label { color:#d97706; }
+  table { width:100%; border-collapse:collapse; margin-bottom:4px; }
+  th { text-align:left; padding:6px 8px; font-size:9px; text-transform:uppercase; letter-spacing:.4px; color:#777; border-bottom:1px solid #eee; }
+  td { padding:6px 8px; border-bottom:1px solid #f5f5f5; font-size:11px; }
+  tr:last-child td { border-bottom:none; }
+  .blue  { color:#0284c7; font-weight:600; }
+  .amber { color:#d97706; font-weight:600; }
+  /* assinaturas */
+  .assinatura-page { page-break-before:always; padding:0; }
+  .assin-titulo { font-size:18px; font-weight:700; text-align:center; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .assin-sub    { font-size:11px; color:#555; text-align:center; margin-bottom:24px; }
+  .assin-header { display:flex; justify-content:space-between; font-size:10px; color:#777; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px; }
+  .assin-grid   { display:grid; grid-template-columns:1fr 1fr; gap:32px 48px; }
+  .assin-item   { padding:20px 0; border-bottom:1px solid #ccc; }
+  .assin-nome   { font-size:14px; font-weight:700; margin-bottom:6px; }
+  .assin-campos { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .assin-campo  { }
+  .assin-linha  { border-bottom:1px solid #555; padding-bottom:4px; min-height:24px; margin-bottom:4px; }
+  .assin-label  { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:#888; }
+  @media print { body { padding:16px; } }
+</style>
+</head>
+<body>
+
+<h1>💸 Adiantamentos e Vales</h1>
+<div class="sub">Hotel: <strong>{{ hotel.nome }}</strong></div>
+<div class="header-info">
+  <span>Período: <strong>${periodo}</strong></span>
+  <span>Gerado em: ${dataGer}</span>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-box"><div class="kpi-lbl">Total Pix Distribuído</div><div class="kpi-val" style="color:#0284c7;">R$ ${fmt(pixGlobal)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Total Vales / Adiantamentos</div><div class="kpi-val" style="color:#d97706;">R$ ${fmt(valesGlobal)}</div></div>
+  <div class="kpi-box"><div class="kpi-lbl">Comissão Total Passeios</div><div class="kpi-val" style="color:#059669;">R$ ${fmt(comissaoTotal)}</div></div>
+</div>
+
+${recCards}
+
+${assinaturas}
+
+</body></html>`;
+}
+
+function abrirJanelaImpressao(html) {
+    const win = window.open('', '_blank', 'width=900,height=700');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 600);
+}
+
 /* ── EXPORT CSV ── */
 function exportarCSV() {
     const linhas = [
         ['Mês Ref.','Reservas Pagas','Comissão Passeios (R$)','Lucro Câmbio (R$)','Total (R$)'],
-        ...dadosMensal.map(d => [
-            d.mes||'—', d.qtd,
-            d.comissao.toFixed(2),
-            (d.lucro_cambio||0).toFixed(2),
-            (d.comissao+(d.lucro_cambio||0)).toFixed(2)
-        ])
+        ...dadosMensal.map(d => [d.mes||'—', d.qtd, d.comissao.toFixed(2), (d.lucro_cambio||0).toFixed(2), (d.comissao+(d.lucro_cambio||0)).toFixed(2)])
     ];
-    // Linha de total câmbio separada
     linhas.push(['']);
     linhas.push(['CÂMBIO — Resumo','Transações','Pago Hóspedes','Recebido Repasse','Lucro']);
     linhas.push(['',totalTxCambio,totalCompra.toFixed(2),totalRepasse.toFixed(2),totalCambio.toFixed(2)]);
-
     const csv  = linhas.map(l=>l.join(';')).join('\n');
     const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
     const a    = document.createElement('a');
@@ -904,15 +1724,19 @@ function toast(msg, tipo='ok') {
 
 /* ── INIT ── */
 function popularAnos() {
-    const sel = document.getElementById('filtro-ano');
     const anoAtual = new Date().getFullYear();
-    for (let a = anoAtual; a >= anoAtual-4; a--) {
-        const opt = document.createElement('option');
-        opt.value = a; opt.textContent = a;
-        if (a === anoAtual) opt.selected = true;
-        sel.appendChild(opt);
-    }
-    document.getElementById('filtro-mes').value = String(new Date().getMonth()+1).padStart(2,'0');
+    ['filtro-ano','filtro-ano-ad'].forEach(id => {
+        const sel = document.getElementById(id);
+        for (let a = anoAtual; a >= anoAtual-4; a--) {
+            const opt = document.createElement('option');
+            opt.value = a; opt.textContent = a;
+            if (a === anoAtual) opt.selected = true;
+            sel.appendChild(opt);
+        }
+    });
+    const mesAtual = String(new Date().getMonth()+1).padStart(2,'0');
+    document.getElementById('filtro-mes').value    = mesAtual;
+    document.getElementById('filtro-mes-ad').value = mesAtual;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

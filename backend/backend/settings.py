@@ -1,12 +1,20 @@
 from pathlib import Path
 import os
+import dj_database_url
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- SEGURANÇA ---
-DEBUG = True  # Mude para False apenas no deploy final
-SECRET_KEY = 'django-insecure-i_(whnni7ilw$((&x9od+3a#bv47sx5ssfuhj%*s#n*7a4&b7-'
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-dev-key"
+)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # --- APLICATIVOS ---
 INSTALLED_APPS = [
@@ -17,8 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'rest_framework',
-    'corsheaders', # Pode manter para testes, mas não será mais vital após unificar
+    'rest_framework'
 ]
 
 # --- MIDDLEWARE (Ordem Vital para Unificação e Produção) ---
@@ -26,7 +33,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # DEVE vir logo após o SecurityMiddleware para servir CSS/JS
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -68,10 +74,7 @@ TEMPLATES = [
 
 # --- BANCO DE DADOS ---
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
 }
 
 # --- OUTRAS CONFIGURAÇÕES ---
@@ -85,5 +88,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 
 # Como agora é um deploy único, você pode simplificar o CORS
-CORS_ALLOW_ALL_ORIGINS = True 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:8000,http://127.0.0.1:8000"
+).split(",")

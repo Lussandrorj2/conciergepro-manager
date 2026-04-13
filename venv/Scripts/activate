@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Lussandro Farias\OneDrive\Área de Trabalho\concierge\venv"
+VIRTUAL_ENV="C:\Users\Lussandro Farias\OneDrive\Área de Trabalho\conciergepro-manager\conciergepro-manager\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

@@ -18,6 +18,12 @@ from rest_framework.response import Response
 from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 
+def to_float(valor):
+    try:
+        return float(str(valor).replace(",", "."))
+    except:
+        return 0
+
 
 # =========================
 # HOME
@@ -358,26 +364,50 @@ def deletar_imagem(request, id):
 @permission_classes([AllowAny])
 def criar_reserva(request, hotel_slug):
     try:
-        hotel     = Hotel.objects.get(slug=hotel_slug)
+        hotel = Hotel.objects.get(slug=hotel_slug)
+
         agenda_id = request.data.get("agenda_id")
         nome      = request.data.get("nome")
         telefone  = request.data.get("telefone")
         qtd       = int(request.data.get("qtd_pessoas", 1))
-        agenda    = PasseioAgenda.objects.get(id=agenda_id)
-        passeio   = agenda.passeio
+
+        # 🔥 NOVOS CAMPOS
+        comissao_recepcao = float(str(request.data.get("comissao_recepcao", 0)).replace(",", "."))
+        comissao_agencia  = float(str(request.data.get("comissao_agencia", 0)).replace(",", "."))
+        recepcionista     = request.data.get("recepcionista", "")
+        forma_pagamento   = request.data.get("forma_pagamento", "pendente")
+
+        agenda  = PasseioAgenda.objects.get(id=agenda_id)
+        passeio = agenda.passeio
 
         if passeio.preco_sob_consulta:
             valor_total = 0
         else:
-            preco       = passeio.preco or 0
+            preco = passeio.preco or 0
             valor_total = float(preco) * qtd if passeio.preco_por_pessoa else float(preco)
 
         Reserva.objects.create(
-            hotel=hotel, passeio_agenda=agenda,
-            nome_cliente=nome, telefone=telefone,
-            num_pessoas=qtd, valor_bruto=valor_total,
+            hotel=hotel,
+            passeio_agenda=agenda,
+
+            nome_cliente=nome,
+            telefone=telefone,
+            num_pessoas=qtd,
+
+            valor_bruto=valor_total,
+
+            # SALVA
+            comissao_recepcao=comissao_recepcao,
+            comissao_agencia=comissao_agencia,
+            recepcionista=recepcionista,
+            forma_pagamento=forma_pagamento,
         )
-        return Response({"status": "ok", "valor_total": float(valor_total)})
+
+        return Response({
+            "status": "ok",
+            "valor_total": float(valor_total)
+        })
+
     except Exception as e:
         return Response({"erro": str(e)}, status=500)
 
@@ -453,8 +483,8 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             data_pass        = request.POST.get("data_passeio") or None
             horario          = request.POST.get("horario") or None
             num_pessoas      = int(request.POST.get("num_pessoas") or 1)
-            valor_bruto      = float(request.POST.get("valor_bruto") or 0)
-            comissao_agencia = float(request.POST.get("comissao_agencia") or 0)
+            valor_bruto      = to_float(request.POST.get("valor_bruto"))
+            comissao_agencia = to_float(request.POST.get("comissao_agencia"))
             forma_pagamento  = request.POST.get("forma_pagamento", "pendente")
             status           = request.POST.get("status", "pendente")
             obs              = request.POST.get("observacoes", "")
@@ -474,7 +504,14 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             else:
                 recepcionista_final = recepcionista_str
 
-            comissao_recepcao = max(valor_bruto - comissao_agencia, 0)
+            comissao_recepcao = to_float(request.POST.get("comissao_recepcao"))
+
+            # ✅ VALIDAÇÃO (COLOCA AQUI)
+            if comissao_recepcao <= 0:
+                return JsonResponse({"erro": "Comissão da recepção inválida"}, status=400)
+
+            if comissao_recepcao > valor_bruto:
+                return JsonResponse({"erro": "Comissão maior que valor bruto"}, status=400)
 
             if not all([passeio_id, nome, telefone, data_pass]):
                 return JsonResponse({"erro": "Campos obrigatórios faltando"}, status=400)
@@ -619,6 +656,11 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             return JsonResponse({"status": "ok"})
         except Exception as e:
             return JsonResponse({"erro": str(e)}, status=500)
+        
+    if request.method == "DELETE" and reserva_id:
+        reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+        reserva.delete()
+        return JsonResponse({"status": "ok"})
 
     return JsonResponse({"erro": "Método inválido"}, status=405)
 
