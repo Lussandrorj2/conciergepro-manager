@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- SEGURANÇA ---
 DEBUG = False
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 
 ALLOWED_HOSTS = ["https://conciergepro-manager.onrender.com"]
 
