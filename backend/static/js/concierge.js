@@ -1,6 +1,13 @@
 // ==========================================
 // CONFIG GLOBAL
 // ==========================================
+function getImageUrl(img) {
+    if (!img) return '';
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '';
+}
+
 const hotelSlug = window.hotelSlug || '';
 const API_BASE  = '/api';
 
@@ -208,12 +215,18 @@ async function carregarHotel(lang) {
             if (wppLink) wppLink.href = `https://wa.me/${data.whatsapp}`;
         }
 
-        const fotoCapa = data.foto_capa || data.foto_hero || data.imagem_capa || data.capa || '';
+        const fotoCapa = getImageUrl(
+            data.foto_capa ||
+            data.foto_hero ||
+            data.imagem_capa ||
+            data.capa
+        );
+        
         if (fotoCapa) {
             const heroBg = document.getElementById('hero-bg');
             if (heroBg) heroBg.style.backgroundImage = `url('${fotoCapa}')`;
         }
-
+        
         const elTitle = document.getElementById('txt-hero-title');
         const elSub   = document.getElementById('txt-hero-subtitle');
         if (elTitle && (data.titulo_hero || data.titulo)) elTitle.innerText = data.titulo_hero || data.titulo;
@@ -352,8 +365,15 @@ function renderCard(p) {
     const primeiraFoto = (p.fotos && p.fotos.length)
         ? (typeof p.fotos[0] === 'string' ? p.fotos[0] : p.fotos[0].url || '')
         : '';
-    const imgSrc = p.banner || p.imagem || p.foto || p.foto_capa || p.image || primeiraFoto;
-
+    const imgSrc = getImageUrl(
+        p.banner ||
+        p.imagem ||
+        p.foto ||
+        p.foto_capa ||
+        p.image ||
+        primeiraFoto
+    );
+    
     const imgHTML = imgSrc
         ? `<img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-img-empty\\'>🌊</div>'">`
         : `<div class="card-img-empty">🌊</div>`;
@@ -363,7 +383,7 @@ function renderCard(p) {
         <div class="card-img">
             ${imgHTML}
             <span class="card-preco-badge">${precoLabel}</span>
-            <div class="card-img-hover"><span>Ver detalhes</span></div>
+            <div class="card-img-hover"><span>${t('btn')}</span></div>
         </div>
         <div class="card-body">
             <h3 class="card-nome">${p.nome}</h3>
@@ -385,14 +405,18 @@ function renderCard(p) {
 // MODAL DETALHE — Carrossel de fotos
 // ==========================================
 function coletarFotos(p) {
-    const fotos  = [];
-    const principal = p.banner || p.imagem || p.foto || p.foto_capa || p.image || '';
+    const fotos = [];
+
+    const principal = getImageUrl(
+        p.banner || p.imagem || p.foto || p.foto_capa || p.image
+    );
 
     if (principal) fotos.push(principal);
 
-    const extras = p.fotos || p.galeria || p.imagens || [];
+    const extras = p.fotos || [];
+
     extras.forEach(f => {
-        const src = typeof f === 'string' ? f : (f.url || f.imagem || f.foto || '');
+        const src = getImageUrl(f);
         if (src && src !== principal) fotos.push(src);
     });
 
