@@ -20,7 +20,7 @@ from django.db.models.functions import TruncMonth
 
 def to_float(valor):
 try:
-return float(str(valor).replace(”,”, “.”))
+return float(str(valor).replace(",", "."))
 except:
 return 0
 
