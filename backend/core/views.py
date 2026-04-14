@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 import json
 
 from .models import (
-    Hotel, Passeio, ImagemPasseio, Hero,
-    Reserva, CambioTransacao, PasseioAgenda,
-    ConfiguracaoDivisao, Adiantamento,
+Hotel, Passeio, ImagemPasseio, Hero,
+Reserva, CambioTransacao, PasseioAgenda,
+ConfiguracaoDivisao, Adiantamento,
 )
 
 from rest_framework.decorators import api_view, permission_classes
@@ -19,878 +19,915 @@ from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 
 def to_float(valor):
-    try:
-        return float(str(valor).replace(",", "."))
-    except:
-        return 0
+try:
+return float(str(valor).replace(”,”, “.”))
+except:
+return 0
 
+def get_media_url(field):
+“””
+Retorna a URL de um campo de imagem de forma segura.
+Compatível com Cloudinary (URL já absoluta) e armazenamento local.
+“””
+if not field:
+return None
+try:
+url = field.url
+if url.startswith(‘http’):
+return url
+return f”https://conciergepro-manager.onrender.com{url}”
+except Exception:
+return None
 
 # =========================
+
 # HOME
+
 # =========================
+
 def home(request):
-    slug  = request.GET.get('hotel')
-    hotel = get_object_or_404(Hotel, slug=slug) if slug else None
-    return render(request, 'index.html', {'hotel': hotel})
-
+slug  = request.GET.get(‘hotel’)
+hotel = get_object_or_404(Hotel, slug=slug) if slug else None
+return render(request, ‘index.html’, {‘hotel’: hotel})
 
 # =========================
+
 # API PÚBLICA — HOTEL
+
 # =========================
-@api_view(['GET'])
+
+@api_view([‘GET’])
 @permission_classes([AllowAny])
 def detalhe_hotel(request, slug):
-    hotel = get_object_or_404(Hotel, slug=slug)
-    lang  = request.GET.get('lang', 'pt')
+hotel = get_object_or_404(Hotel, slug=slug)
+lang  = request.GET.get(‘lang’, ‘pt’)
 
-    if lang == 'en':
-        titulo    = hotel.titulo_hero_en or hotel.titulo_hero
-        subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
-    elif lang == 'es':
-        titulo    = hotel.titulo_hero_es or hotel.titulo_hero
-        subtitulo = hotel.subtitulo_hero_es or hotel.subtitulo_hero
-    elif lang == 'fr':
-        titulo    = hotel.titulo_hero_fr or hotel.titulo_hero
-        subtitulo = hotel.subtitulo_hero_fr or hotel.subtitulo_hero
-    else:
-        titulo    = hotel.titulo_hero
-        subtitulo = hotel.subtitulo_hero
+```
+if lang == 'en':
+    titulo    = hotel.titulo_hero_en or hotel.titulo_hero
+    subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
+elif lang == 'es':
+    titulo    = hotel.titulo_hero_es or hotel.titulo_hero
+    subtitulo = hotel.subtitulo_hero_es or hotel.subtitulo_hero
+elif lang == 'fr':
+    titulo    = hotel.titulo_hero_fr or hotel.titulo_hero
+    subtitulo = hotel.subtitulo_hero_fr or hotel.subtitulo_hero
+else:
+    titulo    = hotel.titulo_hero
+    subtitulo = hotel.subtitulo_hero
 
-    return Response({
-        "nome": hotel.nome,
-        "titulo_hero": titulo,
-        "subtitulo_hero": subtitulo,
-        "foto_capa": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
-        "whatsapp": hotel.whatsapp or "5521999999999",
-    })
-
+return Response({
+    "nome": hotel.nome,
+    "titulo_hero": titulo,
+    "subtitulo_hero": subtitulo,
+    "foto_capa": get_media_url(hotel.foto_capa),
+    "whatsapp": hotel.whatsapp or "5521999999999",
+})
+```
 
 # =========================
+
 # API PÚBLICA — PASSEIOS
+
 # =========================
-@api_view(['GET'])
+
+@api_view([‘GET’])
 @permission_classes([AllowAny])
 def listar_passeios(request, hotel_slug):
-    hotel    = get_object_or_404(Hotel, slug=hotel_slug)
-    lang     = request.GET.get('lang', 'pt')
-    passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related('fotos')
+hotel    = get_object_or_404(Hotel, slug=hotel_slug)
+lang     = request.GET.get(‘lang’, ‘pt’)
+passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related(‘fotos’)
 
-    resultado = []
+```
+resultado = []
 
-    for p in passeios:
-        if lang == 'en':
-            nome = p.nome_en or p.nome
-            descricao = p.descricao_en or p.descricao
-        elif lang == 'es':
-            nome = p.nome_es or p.nome
-            descricao = p.descricao_es or p.descricao
-        elif lang == 'fr':
-            nome = p.nome_fr or p.nome
-            descricao = p.descricao_fr or p.descricao
-        else:
-            nome = p.nome
-            descricao = p.descricao
+for p in passeios:
+    if lang == 'en':
+        nome = p.nome_en or p.nome
+        descricao = p.descricao_en or p.descricao
+    elif lang == 'es':
+        nome = p.nome_es or p.nome
+        descricao = p.descricao_es or p.descricao
+    elif lang == 'fr':
+        nome = p.nome_fr or p.nome
+        descricao = p.descricao_fr or p.descricao
+    else:
+        nome = p.nome
+        descricao = p.descricao
 
-        resultado.append({
-            "id": p.id,
-            "nome": nome,
-            "descricao": descricao,
-            "preco": float(p.preco) if p.preco else 0,
-            "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": request.build_absolute_uri(p.banner.url) if p.banner else None,
-            "fotos": [
-                {
-                    "id": f.id,
-                    "url": f.arquivo.url if f.arquivo else None
-                } for f in p.fotos.all()
-            ],
-        })
+    resultado.append({
+        "id": p.id,
+        "nome": nome,
+        "descricao": descricao,
+        "preco": float(p.preco) if p.preco else 0,
+        "preco_sob_consulta": p.preco_sob_consulta,
+        "preco_por_pessoa": p.preco_por_pessoa,
+        "banner": get_media_url(p.banner),
+        "fotos": [
+            {
+                "id": f.id,
+                "url": get_media_url(f.arquivo)
+            } for f in p.fotos.all()
+        ],
+    })
 
-    return Response(resultado)
-
+return Response(resultado)
+```
 
 # =========================
+
 # LOGIN / LOGOUT
-# =========================
-def login_view(request):
-    if request.method == "POST":
-        user = authenticate(request, username=request.POST.get("username"), password=request.POST.get("password"))
-        if user:
-            login(request, user)
-            if hasattr(user, 'perfil') and user.perfil.hotel:
-                return redirect(f'/{user.perfil.hotel.slug}/dashboard/')
-        return render(request, 'login.html', {'erro': 'Login inválido'})
-    return render(request, 'login.html')
 
+# =========================
+
+def login_view(request):
+if request.method == “POST”:
+user = authenticate(request, username=request.POST.get(“username”), password=request.POST.get(“password”))
+if user:
+login(request, user)
+if hasattr(user, ‘perfil’) and user.perfil.hotel:
+return redirect(f’/{user.perfil.hotel.slug}/dashboard/’)
+return render(request, ‘login.html’, {‘erro’: ‘Login inválido’})
+return render(request, ‘login.html’)
 
 def logout_view(request):
-    logout(request)
-    return redirect('login')
-
+logout(request)
+return redirect(‘login’)
 
 # =========================
+
 # DASHBOARD (PÁGINAS)
+
 # =========================
+
 @login_required
 def dashboard_home(request, hotel_slug):
-    return render(request, 'dashboard/dashboard_home.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/dashboard_home.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_criar(request, hotel_slug):
-    return render(request, "dashboard/criar_passeios.html", {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, “dashboard/criar_passeios.html”, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_listar(request, hotel_slug):
-    return render(request, 'dashboard/gerenciar_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/gerenciar_passeios.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_relatorios(request, hotel_slug):
-    return render(request, 'dashboard/relatorios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/relatorios.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_config(request, hotel_slug):
-    return render(request, 'dashboard/configuracoes.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/configuracoes.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_agenda(request, hotel_slug):
-    return render(request, 'dashboard/agenda_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/agenda_passeios.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_reservas(request, hotel_slug):
-    return render(request, 'dashboard/reservas.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+return render(request, ‘dashboard/reservas.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_cambio(request, hotel_slug):
-    return render(request, 'dashboard/cambio.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
-
+return render(request, ‘dashboard/cambio.html’, {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
 
 # =========================
+
 # PASSEIOS CRUD (ADMIN)
+
 # =========================
+
 @csrf_exempt
 @login_required
 def api_passeios(request, hotel_slug, passeio_id=None):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    if request.method == "GET":
-        if passeio_id:
-            p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
-            return JsonResponse({
-                "id": p.id, "nome": p.nome, "descricao": p.descricao,
-                "preco": str(p.preco) if p.preco else "",
-                "preco_sob_consulta": p.preco_sob_consulta,
-                "preco_por_pessoa": p.preco_por_pessoa,
-                "banner": request.build_absolute_uri(p.banner.url) if p.banner else None,
-                "fotos": [{"id": f.id, "url": request.build_absolute_uri(f.arquivo.url)} for f in p.fotos.all()],
-            })
-        passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
-        return JsonResponse([{
+```
+if request.method == "GET":
+    if passeio_id:
+        p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+        return JsonResponse({
             "id": p.id, "nome": p.nome, "descricao": p.descricao,
-            "preco": float(p.preco) if p.preco else 0,
+            "preco": str(p.preco) if p.preco else "",
             "preco_sob_consulta": p.preco_sob_consulta,
             "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": request.build_absolute_uri(p.banner.url) if p.banner else None,
-            "fotos": [{"id": f.id, "url": request.build_absolute_uri(f.arquivo.url)} for f in p.fotos.all()],
-        } for p in passeios], safe=False)
+            "banner": get_media_url(p.banner),
+            "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
+        })
+    passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
+    return JsonResponse([{
+        "id": p.id, "nome": p.nome, "descricao": p.descricao,
+        "preco": float(p.preco) if p.preco else 0,
+        "preco_sob_consulta": p.preco_sob_consulta,
+        "preco_por_pessoa": p.preco_por_pessoa,
+        "banner": get_media_url(p.banner),
+        "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
+    } for p in passeios], safe=False)
 
-    if request.method == "POST":
-        passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel) if passeio_id else Passeio(hotel=hotel)
-        passeio.nome               = request.POST.get("nome")
-        passeio.descricao          = request.POST.get("descricao")
-        passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
-        passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
-        if passeio.preco_sob_consulta:
-            passeio.preco = None
-        else:
-            try: passeio.preco = float(request.POST.get("preco") or 0)
-            except (ValueError, TypeError): passeio.preco = 0
-        banner = request.FILES.get('banner')
-        if banner: passeio.banner = banner
-        passeio.save()
-        for f in request.FILES.getlist('imagens'):
-            ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
-        return JsonResponse({"status": "ok", "id": passeio.id})
+if request.method == "POST":
+    passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel) if passeio_id else Passeio(hotel=hotel)
+    passeio.nome               = request.POST.get("nome")
+    passeio.descricao          = request.POST.get("descricao")
+    passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
+    passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
+    if passeio.preco_sob_consulta:
+        passeio.preco = None
+    else:
+        try: passeio.preco = float(request.POST.get("preco") or 0)
+        except (ValueError, TypeError): passeio.preco = 0
+    banner = request.FILES.get('banner')
+    if banner: passeio.banner = banner
+    passeio.save()
+    for f in request.FILES.getlist('imagens'):
+        ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
+    return JsonResponse({"status": "ok", "id": passeio.id})
 
-    if request.method == "DELETE":
-        get_object_or_404(Passeio, id=passeio_id, hotel=hotel).delete()
-        return JsonResponse({"status": "removido"})
+if request.method == "DELETE":
+    get_object_or_404(Passeio, id=passeio_id, hotel=hotel).delete()
+    return JsonResponse({"status": "removido"})
 
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
 
 # =========================
+
 # CÂMBIO — listagem e criação
-# Suporta campo valor_recebido (repasse real após a operação)
+
 # =========================
+
 @csrf_exempt
 @login_required
 def api_cambio(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    if request.method == "GET":
-        ano = request.GET.get("ano", "")
-        mes = request.GET.get("mes", "")
-        qs  = CambioTransacao.objects.filter(hotel=hotel).order_by('-data')
-        if ano:
-            qs = qs.filter(data__year=ano)
-        if mes:
-            qs = qs.filter(data__month=mes)
-        dados = []
-        for t in qs:
-            # cotacao_compra e cotacao_venda podem existir ou não no model legado
-            cotacao_compra = str(getattr(t, 'cotacao_compra', t.cotacao_usada) or t.cotacao_usada)
-            cotacao_venda  = str(getattr(t, 'cotacao_venda', 0) or 0)
-            valor_recebido = str(getattr(t, 'valor_recebido', 0) or 0)
-            dados.append({
-                "id":             t.id,
-                "moeda":          t.moeda,
-                "valor":          str(t.valor),
-                "cotacao_compra": cotacao_compra,
-                "cotacao_venda":  cotacao_venda,
-                "cotacao_usada":  str(t.cotacao_usada),
-                "valor_reais":    str(t.valor_reais),
-                "valor_recebido": valor_recebido,
-                "lucro":          str(t.lucro),
-                "data":           t.data.strftime('%Y-%m-%d') if t.data else "",
-            })
-        return JsonResponse(dados, safe=False)
+```
+if request.method == "GET":
+    ano = request.GET.get("ano", "")
+    mes = request.GET.get("mes", "")
+    qs  = CambioTransacao.objects.filter(hotel=hotel).order_by('-data')
+    if ano:
+        qs = qs.filter(data__year=ano)
+    if mes:
+        qs = qs.filter(data__month=mes)
+    dados = []
+    for t in qs:
+        cotacao_compra = str(getattr(t, 'cotacao_compra', t.cotacao_usada) or t.cotacao_usada)
+        cotacao_venda  = str(getattr(t, 'cotacao_venda', 0) or 0)
+        valor_recebido = str(getattr(t, 'valor_recebido', 0) or 0)
+        dados.append({
+            "id":             t.id,
+            "moeda":          t.moeda,
+            "valor":          str(t.valor),
+            "cotacao_compra": cotacao_compra,
+            "cotacao_venda":  cotacao_venda,
+            "cotacao_usada":  str(t.cotacao_usada),
+            "valor_reais":    str(t.valor_reais),
+            "valor_recebido": valor_recebido,
+            "lucro":          str(t.lucro),
+            "data":           t.data.strftime('%Y-%m-%d') if t.data else "",
+        })
+    return JsonResponse(dados, safe=False)
 
-    if request.method == "POST":
-        try:
-            moeda          = request.POST.get("moeda")
-            valor          = float(request.POST.get("valor") or 0)
-            cotacao_compra = float(request.POST.get("cotacao_compra") or request.POST.get("cotacao") or 0)
-            cotacao_venda  = float(request.POST.get("cotacao_venda")  or 0)
-            valor_recebido = float(request.POST.get("valor_recebido") or 0)
-            valor_pago = valor * cotacao_compra
-
-            # prioridade: valor recebido manual
-            if valor_recebido > 0:
-                lucro = valor_recebido - valor_pago
-            else:
-                if cotacao_venda > 0:
-                    valor_recebido = valor * cotacao_venda
-                    lucro = valor_recebido - valor_pago
-                else:
-                    valor_recebido = 0
-                    lucro = 0
-            valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
-            lucro          = valor_recebido_calc - valor_pago
-
-            t = CambioTransacao(
-                hotel=hotel, moeda=moeda, valor=valor,
-                cotacao_usada=cotacao_compra, valor_reais=valor_pago, lucro=lucro,
-            )
-            # Salva campos extras se o model os tiver
-            if hasattr(t, 'cotacao_compra'): t.cotacao_compra = cotacao_compra
-            if hasattr(t, 'cotacao_venda'):  t.cotacao_venda  = cotacao_venda
-            if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido
-            t.save()
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
-
-    return JsonResponse({"erro": "Método inválido"}, status=400)
-
-
-# =========================
-# CÂMBIO — detalhe (PUT / DELETE)
-# =========================
-@csrf_exempt
-@login_required
-def api_cambio_detail(request, hotel_slug, transacao_id):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
-
-    transacao = get_object_or_404(CambioTransacao, id=transacao_id, hotel=hotel)
-
-    if request.method == "PUT":
-        try:
-            # LER O CORPO DA REQUISIÇÃO JSON
-            data = json.loads(request.body)
-            
-            # Pegar os valores do JSON ou manter os atuais
-            moeda          = data.get("moeda", transacao.moeda)
-            valor          = float(data.get("valor") or transacao.valor)
-            cotacao_compra = float(data.get("cotacao_compra") or transacao.cotacao_usada)
-            cotacao_venda  = float(data.get("cotacao_venda") or 0)
-            valor_recebido = float(data.get("valor_recebido") or 0)
-
-            valor_pago = valor * cotacao_compra
-
-            # Cálculo do lucro baseado no que foi recebido
-            if valor_recebido > 0:
-                lucro = valor_recebido - valor_pago
-            else:
-                lucro = 0
-
-            # Atualizar o objeto
-            transacao.moeda         = moeda
-            transacao.valor         = valor
-            transacao.cotacao_usada = cotacao_compra
-            transacao.valor_reais   = valor_pago
-            transacao.lucro         = lucro
-
-            # Salvar campos extras se existirem no Model
-            if hasattr(transacao, 'cotacao_compra'): transacao.cotacao_compra = cotacao_compra
-            if hasattr(transacao, 'cotacao_venda'):  transacao.cotacao_venda  = cotacao_venda
-            if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido
-
-            transacao.save()
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
-
-    if request.method == "DELETE":
-        transacao.delete()
-        return JsonResponse({"status": "removido"})
-
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
-
-# =========================
-# DELETAR IMAGEM
-# =========================
-@csrf_exempt
-@login_required
-def deletar_imagem(request, id):
-    if request.method != "DELETE":
-        return JsonResponse({"erro": "Método inválido"}, status=400)
+if request.method == "POST":
     try:
-        imagem = get_object_or_404(ImagemPasseio, id=id)
-        if request.user.perfil.hotel != imagem.passeio.hotel:
-            return JsonResponse({"erro": "Sem permissão"}, status=403)
-        imagem.delete()
+        moeda          = request.POST.get("moeda")
+        valor          = float(request.POST.get("valor") or 0)
+        cotacao_compra = float(request.POST.get("cotacao_compra") or request.POST.get("cotacao") or 0)
+        cotacao_venda  = float(request.POST.get("cotacao_venda")  or 0)
+        valor_recebido = float(request.POST.get("valor_recebido") or 0)
+        valor_pago = valor * cotacao_compra
+
+        if valor_recebido > 0:
+            lucro = valor_recebido - valor_pago
+        else:
+            if cotacao_venda > 0:
+                valor_recebido = valor * cotacao_venda
+                lucro = valor_recebido - valor_pago
+            else:
+                valor_recebido = 0
+                lucro = 0
+        valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
+        lucro          = valor_recebido_calc - valor_pago
+
+        t = CambioTransacao(
+            hotel=hotel, moeda=moeda, valor=valor,
+            cotacao_usada=cotacao_compra, valor_reais=valor_pago, lucro=lucro,
+        )
+        if hasattr(t, 'cotacao_compra'): t.cotacao_compra = cotacao_compra
+        if hasattr(t, 'cotacao_venda'):  t.cotacao_venda  = cotacao_venda
+        if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido
+        t.save()
         return JsonResponse({"status": "ok"})
     except Exception as e:
         return JsonResponse({"erro": str(e)}, status=500)
 
+return JsonResponse({"erro": "Método inválido"}, status=400)
+```
 
 # =========================
-# RESERVAS (PÚBLICO)
+
+# CÂMBIO — detalhe (PUT / DELETE)
+
 # =========================
-@api_view(['POST'])
+
+@csrf_exempt
+@login_required
+def api_cambio_detail(request, hotel_slug, transacao_id):
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
+
+```
+transacao = get_object_or_404(CambioTransacao, id=transacao_id, hotel=hotel)
+
+if request.method == "PUT":
+    try:
+        data = json.loads(request.body)
+
+        moeda          = data.get("moeda", transacao.moeda)
+        valor          = float(data.get("valor") or transacao.valor)
+        cotacao_compra = float(data.get("cotacao_compra") or transacao.cotacao_usada)
+        cotacao_venda  = float(data.get("cotacao_venda") or 0)
+        valor_recebido = float(data.get("valor_recebido") or 0)
+
+        valor_pago = valor * cotacao_compra
+
+        if valor_recebido > 0:
+            lucro = valor_recebido - valor_pago
+        else:
+            lucro = 0
+
+        transacao.moeda         = moeda
+        transacao.valor         = valor
+        transacao.cotacao_usada = cotacao_compra
+        transacao.valor_reais   = valor_pago
+        transacao.lucro         = lucro
+
+        if hasattr(transacao, 'cotacao_compra'): transacao.cotacao_compra = cotacao_compra
+        if hasattr(transacao, 'cotacao_venda'):  transacao.cotacao_venda  = cotacao_venda
+        if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido
+
+        transacao.save()
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
+
+if request.method == "DELETE":
+    transacao.delete()
+    return JsonResponse({"status": "removido"})
+
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
+
+# =========================
+
+# DELETAR IMAGEM
+
+# =========================
+
+@csrf_exempt
+@login_required
+def deletar_imagem(request, id):
+if request.method != “DELETE”:
+return JsonResponse({“erro”: “Método inválido”}, status=400)
+try:
+imagem = get_object_or_404(ImagemPasseio, id=id)
+if request.user.perfil.hotel != imagem.passeio.hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
+imagem.delete()
+return JsonResponse({“status”: “ok”})
+except Exception as e:
+return JsonResponse({“erro”: str(e)}, status=500)
+
+# =========================
+
+# RESERVAS (PÚBLICO)
+
+# =========================
+
+@api_view([‘POST’])
 @permission_classes([AllowAny])
 def criar_reserva(request, hotel_slug):
-    try:
-        hotel = Hotel.objects.get(slug=hotel_slug)
+try:
+hotel = Hotel.objects.get(slug=hotel_slug)
 
-        agenda_id = request.data.get("agenda_id")
-        nome      = request.data.get("nome")
-        telefone  = request.data.get("telefone")
-        qtd       = int(request.data.get("qtd_pessoas", 1))
+```
+    agenda_id = request.data.get("agenda_id")
+    nome      = request.data.get("nome")
+    telefone  = request.data.get("telefone")
+    qtd       = int(request.data.get("qtd_pessoas", 1))
 
-        # 🔥 NOVOS CAMPOS
-        comissao_recepcao = float(str(request.data.get("comissao_recepcao", 0)).replace(",", "."))
-        comissao_agencia  = float(str(request.data.get("comissao_agencia", 0)).replace(",", "."))
-        recepcionista     = request.data.get("recepcionista", "")
-        forma_pagamento   = request.data.get("forma_pagamento", "pendente")
+    comissao_recepcao = float(str(request.data.get("comissao_recepcao", 0)).replace(",", "."))
+    comissao_agencia  = float(str(request.data.get("comissao_agencia", 0)).replace(",", "."))
+    recepcionista     = request.data.get("recepcionista", "")
+    forma_pagamento   = request.data.get("forma_pagamento", "pendente")
 
-        agenda  = PasseioAgenda.objects.get(id=agenda_id)
-        passeio = agenda.passeio
+    agenda  = PasseioAgenda.objects.get(id=agenda_id)
+    passeio = agenda.passeio
 
-        if passeio.preco_sob_consulta:
-            valor_total = 0
-        else:
-            preco = passeio.preco or 0
-            valor_total = float(preco) * qtd if passeio.preco_por_pessoa else float(preco)
+    if passeio.preco_sob_consulta:
+        valor_total = 0
+    else:
+        preco = passeio.preco or 0
+        valor_total = float(preco) * qtd if passeio.preco_por_pessoa else float(preco)
 
-        Reserva.objects.create(
-            hotel=hotel,
-            passeio_agenda=agenda,
+    Reserva.objects.create(
+        hotel=hotel,
+        passeio_agenda=agenda,
+        nome_cliente=nome,
+        telefone=telefone,
+        num_pessoas=qtd,
+        valor_bruto=valor_total,
+        comissao_recepcao=comissao_recepcao,
+        comissao_agencia=comissao_agencia,
+        recepcionista=recepcionista,
+        forma_pagamento=forma_pagamento,
+    )
 
-            nome_cliente=nome,
-            telefone=telefone,
-            num_pessoas=qtd,
+    return Response({
+        "status": "ok",
+        "valor_total": float(valor_total)
+    })
 
-            valor_bruto=valor_total,
-
-            # SALVA
-            comissao_recepcao=comissao_recepcao,
-            comissao_agencia=comissao_agencia,
-            recepcionista=recepcionista,
-            forma_pagamento=forma_pagamento,
-        )
-
-        return Response({
-            "status": "ok",
-            "valor_total": float(valor_total)
-        })
-
-    except Exception as e:
-        return Response({"erro": str(e)}, status=500)
-
+except Exception as e:
+    return Response({"erro": str(e)}, status=500)
+```
 
 # =========================
+
 # RESERVAS (ADMIN)
+
 # =========================
+
 @csrf_exempt
 @login_required
 def api_reservas(request, hotel_slug, reserva_id=None):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    # ── GET ──────────────────────────────────────────
-    if request.method == "GET":
-        qs = Reserva.objects.filter(hotel=hotel).order_by('-data_reserva')
-        if request.GET.get('status'):
-            qs = qs.filter(status=request.GET.get('status'))
+```
+# ── GET ──────────────────────────────────────────
+if request.method == "GET":
+    qs = Reserva.objects.filter(hotel=hotel).order_by('-data_reserva')
+    if request.GET.get('status'):
+        qs = qs.filter(status=request.GET.get('status'))
 
-        dados = []
-        for r in qs:
-            if r.passeio:
-                passeio_nome = r.passeio.nome
-                passeio_id   = r.passeio.id
-            elif r.passeio_agenda:
-                passeio_nome = r.passeio_agenda.passeio.nome
-                passeio_id   = r.passeio_agenda.passeio.id
-            else:
-                passeio_nome = '—'
-                passeio_id   = None
+    dados = []
+    for r in qs:
+        if r.passeio:
+            passeio_nome = r.passeio.nome
+            passeio_id   = r.passeio.id
+        elif r.passeio_agenda:
+            passeio_nome = r.passeio_agenda.passeio.nome
+            passeio_id   = r.passeio_agenda.passeio.id
+        else:
+            passeio_nome = '—'
+            passeio_id   = None
 
-            if r.data_passeio:
-                data = r.data_passeio.strftime('%d/%m/%Y')
-            elif r.passeio_agenda and r.passeio_agenda.data:
-                data = r.passeio_agenda.data.strftime('%d/%m/%Y')
-            else:
-                data = '—'
+        if r.data_passeio:
+            data = r.data_passeio.strftime('%d/%m/%Y')
+        elif r.passeio_agenda and r.passeio_agenda.data:
+            data = r.passeio_agenda.data.strftime('%d/%m/%Y')
+        else:
+            data = '—'
 
-            horario = str(r.horario)[:5] if r.horario else '—'
+        horario = str(r.horario)[:5] if r.horario else '—'
 
-            dados.append({
-                "id":                r.id,
-                "nome_cliente":      r.nome_cliente,
-                "telefone":          r.telefone,
-                "email":             r.email,
-                "num_pessoas":       r.num_pessoas,
-                "valor_bruto":       str(r.valor_bruto),
-                "comissao_agencia":  str(r.comissao_agencia),
-                "comissao_recepcao": str(r.comissao_recepcao),
-                "recepcionista":     r.recepcionista,
-                "forma_pagamento":   r.forma_pagamento,
-                "status":            r.status,
-                "data_reserva":      r.data_reserva.strftime('%d/%m/%Y %H:%M') if r.data_reserva else '—',
-                "passeio_nome":      passeio_nome,
-                "passeio_id":        passeio_id,
-                "data":              data,
-                "horario":           horario,
-                "observacoes":       r.observacoes,
-                "data_pagamento":    str(r.data_pagamento) if r.data_pagamento else '',
-                "mes_referencia":    r.mes_referencia or '',
-                "pix_recebimentos":  r.pix_recebimentos or '[]',
-            })
-        return JsonResponse(dados, safe=False)
+        dados.append({
+            "id":                r.id,
+            "nome_cliente":      r.nome_cliente,
+            "telefone":          r.telefone,
+            "email":             r.email,
+            "num_pessoas":       r.num_pessoas,
+            "valor_bruto":       str(r.valor_bruto),
+            "comissao_agencia":  str(r.comissao_agencia),
+            "comissao_recepcao": str(r.comissao_recepcao),
+            "recepcionista":     r.recepcionista,
+            "forma_pagamento":   r.forma_pagamento,
+            "status":            r.status,
+            "data_reserva":      r.data_reserva.strftime('%d/%m/%Y %H:%M') if r.data_reserva else '—',
+            "passeio_nome":      passeio_nome,
+            "passeio_id":        passeio_id,
+            "data":              data,
+            "horario":           horario,
+            "observacoes":       r.observacoes,
+            "data_pagamento":    str(r.data_pagamento) if r.data_pagamento else '',
+            "mes_referencia":    r.mes_referencia or '',
+            "pix_recebimentos":  r.pix_recebimentos or '[]',
+        })
+    return JsonResponse(dados, safe=False)
 
-    # ── POST (criar) ──────────────────────────────────
-    if request.method == "POST":
-        try:
-            passeio_id       = request.POST.get("passeio_id")
-            nome             = request.POST.get("nome_cliente", "").strip()
-            telefone         = request.POST.get("telefone", "").strip()
-            email            = request.POST.get("email", "")
-            data_pass        = request.POST.get("data_passeio") or None
-            horario          = request.POST.get("horario") or None
-            num_pessoas      = int(request.POST.get("num_pessoas") or 1)
-            valor_bruto      = to_float(request.POST.get("valor_bruto"))
-            comissao_agencia = to_float(request.POST.get("comissao_agencia"))
-            forma_pagamento  = request.POST.get("forma_pagamento", "pendente")
-            status           = request.POST.get("status", "pendente")
-            obs              = request.POST.get("observacoes", "")
-            data_pagamento   = request.POST.get("data_pagamento") or None
-            mes_referencia   = request.POST.get("mes_referencia", "")
-            pix_recebimentos = request.POST.get("pix_recebimentos", "[]")
+# ── POST (criar) ──────────────────────────────────
+if request.method == "POST":
+    try:
+        passeio_id       = request.POST.get("passeio_id")
+        nome             = request.POST.get("nome_cliente", "").strip()
+        telefone         = request.POST.get("telefone", "").strip()
+        email            = request.POST.get("email", "")
+        data_pass        = request.POST.get("data_passeio") or None
+        horario          = request.POST.get("horario") or None
+        num_pessoas      = int(request.POST.get("num_pessoas") or 1)
+        valor_bruto      = to_float(request.POST.get("valor_bruto"))
+        comissao_agencia = to_float(request.POST.get("comissao_agencia"))
+        forma_pagamento  = request.POST.get("forma_pagamento", "pendente")
+        status           = request.POST.get("status", "pendente")
+        obs              = request.POST.get("observacoes", "")
+        data_pagamento   = request.POST.get("data_pagamento") or None
+        mes_referencia   = request.POST.get("mes_referencia", "")
+        pix_recebimentos = request.POST.get("pix_recebimentos", "[]")
 
-            recepcionistas_json = request.POST.get("recepcionistas_json", "")
-            recepcionista_str   = request.POST.get("recepcionista", "")
+        recepcionistas_json = request.POST.get("recepcionistas_json", "")
+        recepcionista_str   = request.POST.get("recepcionista", "")
 
-            if recepcionistas_json:
-                try:
-                    lista_recs = json.loads(recepcionistas_json)
-                    recepcionista_final = ", ".join(lista_recs) if isinstance(lista_recs, list) else recepcionista_str
-                except (json.JSONDecodeError, TypeError):
-                    recepcionista_final = recepcionista_str
-            else:
+        if recepcionistas_json:
+            try:
+                lista_recs = json.loads(recepcionistas_json)
+                recepcionista_final = ", ".join(lista_recs) if isinstance(lista_recs, list) else recepcionista_str
+            except (json.JSONDecodeError, TypeError):
                 recepcionista_final = recepcionista_str
+        else:
+            recepcionista_final = recepcionista_str
 
-            comissao_recepcao = to_float(request.POST.get("comissao_recepcao"))
+        comissao_recepcao = to_float(request.POST.get("comissao_recepcao"))
 
-            # ✅ VALIDAÇÃO (COLOCA AQUI)
-            if comissao_recepcao <= 0:
-                return JsonResponse({"erro": "Comissão da recepção inválida"}, status=400)
+        if comissao_recepcao <= 0:
+            return JsonResponse({"erro": "Comissão da recepção inválida"}, status=400)
 
-            if comissao_recepcao > valor_bruto:
-                return JsonResponse({"erro": "Comissão maior que valor bruto"}, status=400)
+        if comissao_recepcao > valor_bruto:
+            return JsonResponse({"erro": "Comissão maior que valor bruto"}, status=400)
 
-            if not all([passeio_id, nome, telefone, data_pass]):
-                return JsonResponse({"erro": "Campos obrigatórios faltando"}, status=400)
+        if not all([passeio_id, nome, telefone, data_pass]):
+            return JsonResponse({"erro": "Campos obrigatórios faltando"}, status=400)
 
-            passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+        passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
 
-            if not mes_referencia and data_pagamento:
-                mes_referencia = data_pagamento[:7]
+        if not mes_referencia and data_pagamento:
+            mes_referencia = data_pagamento[:7]
 
-            Reserva.objects.create(
-                hotel=hotel,
-                passeio=passeio,
-                nome_cliente=nome,
-                telefone=telefone,
-                email=email,
-                data_passeio=data_pass,
-                horario=horario or None,
-                num_pessoas=num_pessoas,
-                valor_bruto=valor_bruto,
-                comissao_agencia=comissao_agencia,
-                comissao_recepcao=comissao_recepcao,
-                recepcionista=recepcionista_final,
-                forma_pagamento=forma_pagamento,
-                status=status,
-                data_pagamento=data_pagamento,
-                mes_referencia=mes_referencia,
-                pix_recebimentos=pix_recebimentos,
-                observacoes=obs,
-            )
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
-
-    # ── PATCH (atualizar campos — suporta edição completa) ───────────────
-    if request.method == "PATCH" and reserva_id:
-        try:
-            reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
-            body    = json.loads(request.body)
-
-            campos_update = []
-
-            # ─ Status
-            novo_status = body.get("status")
-            if novo_status and novo_status in ['pendente', 'confirmada', 'realizado', 'pago', 'cancelada']:
-                reserva.status = novo_status
-                campos_update.append('status')
-                if novo_status == 'pago' and not reserva.data_pagamento:
-                    from datetime import date
-                    reserva.data_pagamento = date.today()
-                    reserva.mes_referencia = str(date.today())[:7]
-                    campos_update += ['data_pagamento', 'mes_referencia']
-
-            # ─ Forma de pagamento
-            forma = body.get("forma_pagamento")
-            if forma and forma in ['pix', 'dinheiro', 'pendente']:
-                reserva.forma_pagamento = forma
-                campos_update.append('forma_pagamento')
-
-            # ─ Data de pagamento
-            data_pgto = body.get("data_pagamento")
-            if data_pgto is not None:
-                reserva.data_pagamento = data_pgto or None
-                campos_update.append('data_pagamento')
-
-            # ─ Mês referência
-            mes_ref = body.get("mes_referencia")
-            if mes_ref is not None:
-                reserva.mes_referencia = mes_ref or ''
-                campos_update.append('mes_referencia')
-
-            # ─ Pix recebimentos
-            pix = body.get("pix_recebimentos")
-            if pix is not None:
-                reserva.pix_recebimentos = pix if isinstance(pix, str) else json.dumps(pix)
-                campos_update.append('pix_recebimentos')
-
-            # ─ Recepcionista
-            rec = body.get("recepcionista")
-            if rec is not None:
-                reserva.recepcionista = rec
-                campos_update.append('recepcionista')
-
-            # ─ EDIÇÃO COMPLETA — campos principais
-            if 'nome_cliente' in body:
-                reserva.nome_cliente = body['nome_cliente']
-                campos_update.append('nome_cliente')
-
-            if 'telefone' in body:
-                reserva.telefone = body['telefone']
-                campos_update.append('telefone')
-
-            if 'email' in body:
-                reserva.email = body.get('email', '')
-                campos_update.append('email')
-
-            if 'data_passeio' in body:
-                reserva.data_passeio = body['data_passeio'] or None
-                campos_update.append('data_passeio')
-
-            if 'horario' in body:
-                reserva.horario = body.get('horario') or None
-                campos_update.append('horario')
-
-            if 'num_pessoas' in body:
-                reserva.num_pessoas = int(body.get('num_pessoas') or 1)
-                campos_update.append('num_pessoas')
-
-            if 'valor_bruto' in body:
-                reserva.valor_bruto = float(body.get('valor_bruto') or 0)
-                campos_update.append('valor_bruto')
-
-            if 'comissao_agencia' in body:
-                reserva.comissao_agencia = float(body.get('comissao_agencia') or 0)
-                campos_update.append('comissao_agencia')
-
-            if 'comissao_recepcao' in body:
-                reserva.comissao_recepcao = float(body.get('comissao_recepcao') or 0)
-                campos_update.append('comissao_recepcao')
-            elif 'valor_bruto' in body or 'comissao_agencia' in body:
-                # Recalcula automaticamente se valor_bruto ou comissao_agencia mudaram
-                reserva.comissao_recepcao = max(
-                    float(reserva.valor_bruto) - float(reserva.comissao_agencia), 0
-                )
-                campos_update.append('comissao_recepcao')
-
-            if 'observacoes' in body:
-                reserva.observacoes = body.get('observacoes', '')
-                campos_update.append('observacoes')
-
-            # ─ Passeio (edição)
-            if 'passeio_id' in body and body['passeio_id']:
-                try:
-                    novo_passeio = Passeio.objects.get(id=body['passeio_id'], hotel=hotel)
-                    reserva.passeio = novo_passeio
-                    campos_update.append('passeio')
-                except Passeio.DoesNotExist:
-                    pass
-
-            if campos_update:
-                reserva.save(update_fields=list(set(campos_update)))
-
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
-        
-    if request.method == "DELETE" and reserva_id:
-        reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
-        reserva.delete()
+        Reserva.objects.create(
+            hotel=hotel,
+            passeio=passeio,
+            nome_cliente=nome,
+            telefone=telefone,
+            email=email,
+            data_passeio=data_pass,
+            horario=horario or None,
+            num_pessoas=num_pessoas,
+            valor_bruto=valor_bruto,
+            comissao_agencia=comissao_agencia,
+            comissao_recepcao=comissao_recepcao,
+            recepcionista=recepcionista_final,
+            forma_pagamento=forma_pagamento,
+            status=status,
+            data_pagamento=data_pagamento,
+            mes_referencia=mes_referencia,
+            pix_recebimentos=pix_recebimentos,
+            observacoes=obs,
+        )
         return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
 
-    return JsonResponse({"erro": "Método inválido"}, status=405)
+# ── PATCH (atualizar) ─────────────────────────────
+if request.method == "PATCH" and reserva_id:
+    try:
+        reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+        body    = json.loads(request.body)
 
+        campos_update = []
+
+        novo_status = body.get("status")
+        if novo_status and novo_status in ['pendente', 'confirmada', 'realizado', 'pago', 'cancelada']:
+            reserva.status = novo_status
+            campos_update.append('status')
+            if novo_status == 'pago' and not reserva.data_pagamento:
+                from datetime import date
+                reserva.data_pagamento = date.today()
+                reserva.mes_referencia = str(date.today())[:7]
+                campos_update += ['data_pagamento', 'mes_referencia']
+
+        forma = body.get("forma_pagamento")
+        if forma and forma in ['pix', 'dinheiro', 'pendente']:
+            reserva.forma_pagamento = forma
+            campos_update.append('forma_pagamento')
+
+        data_pgto = body.get("data_pagamento")
+        if data_pgto is not None:
+            reserva.data_pagamento = data_pgto or None
+            campos_update.append('data_pagamento')
+
+        mes_ref = body.get("mes_referencia")
+        if mes_ref is not None:
+            reserva.mes_referencia = mes_ref or ''
+            campos_update.append('mes_referencia')
+
+        pix = body.get("pix_recebimentos")
+        if pix is not None:
+            reserva.pix_recebimentos = pix if isinstance(pix, str) else json.dumps(pix)
+            campos_update.append('pix_recebimentos')
+
+        rec = body.get("recepcionista")
+        if rec is not None:
+            reserva.recepcionista = rec
+            campos_update.append('recepcionista')
+
+        if 'nome_cliente' in body:
+            reserva.nome_cliente = body['nome_cliente']
+            campos_update.append('nome_cliente')
+
+        if 'telefone' in body:
+            reserva.telefone = body['telefone']
+            campos_update.append('telefone')
+
+        if 'email' in body:
+            reserva.email = body.get('email', '')
+            campos_update.append('email')
+
+        if 'data_passeio' in body:
+            reserva.data_passeio = body['data_passeio'] or None
+            campos_update.append('data_passeio')
+
+        if 'horario' in body:
+            reserva.horario = body.get('horario') or None
+            campos_update.append('horario')
+
+        if 'num_pessoas' in body:
+            reserva.num_pessoas = int(body.get('num_pessoas') or 1)
+            campos_update.append('num_pessoas')
+
+        if 'valor_bruto' in body:
+            reserva.valor_bruto = float(body.get('valor_bruto') or 0)
+            campos_update.append('valor_bruto')
+
+        if 'comissao_agencia' in body:
+            reserva.comissao_agencia = float(body.get('comissao_agencia') or 0)
+            campos_update.append('comissao_agencia')
+
+        if 'comissao_recepcao' in body:
+            reserva.comissao_recepcao = float(body.get('comissao_recepcao') or 0)
+            campos_update.append('comissao_recepcao')
+        elif 'valor_bruto' in body or 'comissao_agencia' in body:
+            reserva.comissao_recepcao = max(
+                float(reserva.valor_bruto) - float(reserva.comissao_agencia), 0
+            )
+            campos_update.append('comissao_recepcao')
+
+        if 'observacoes' in body:
+            reserva.observacoes = body.get('observacoes', '')
+            campos_update.append('observacoes')
+
+        if 'passeio_id' in body and body['passeio_id']:
+            try:
+                novo_passeio = Passeio.objects.get(id=body['passeio_id'], hotel=hotel)
+                reserva.passeio = novo_passeio
+                campos_update.append('passeio')
+            except Passeio.DoesNotExist:
+                pass
+
+        if campos_update:
+            reserva.save(update_fields=list(set(campos_update)))
+
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
+
+if request.method == "DELETE" and reserva_id:
+    reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+    reserva.delete()
+    return JsonResponse({"status": "ok"})
+
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
 
 # =========================
+
 # RELATÓRIOS
+
 # =========================
+
 @login_required
 def relatorio_mensal(request, hotel_slug):
-    dados = Reserva.objects.filter(
-        hotel__slug=hotel_slug, status='pago', data_reserva__isnull=False
-    ).annotate(mes=TruncMonth('data_reserva')).values('mes').annotate(
-        total=Count('id'), faturamento=Sum('comissao_recepcao')
-    ).order_by('mes')
-    return JsonResponse(list(dados), safe=False)
+dados = Reserva.objects.filter(
+hotel__slug=hotel_slug, status=‘pago’, data_reserva__isnull=False
+).annotate(mes=TruncMonth(‘data_reserva’)).values(‘mes’).annotate(
+total=Count(‘id’), faturamento=Sum(‘comissao_recepcao’)
+).order_by(‘mes’)
+return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_passeios(request, hotel_slug):
-    dados = Reserva.objects.filter(
-        passeio__hotel__slug=hotel_slug, status='pago'
-    ).values(nome=F('passeio__nome')).annotate(
-        total_vendas=Count('id'), faturamento=Sum('comissao_recepcao')
-    ).order_by('-total_vendas')
-    return JsonResponse(list(dados), safe=False)
+dados = Reserva.objects.filter(
+passeio__hotel__slug=hotel_slug, status=‘pago’
+).values(nome=F(‘passeio__nome’)).annotate(
+total_vendas=Count(‘id’), faturamento=Sum(‘comissao_recepcao’)
+).order_by(’-total_vendas’)
+return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_comissoes(request, hotel_slug):
-    dados = Reserva.objects.filter(
-        hotel__slug=hotel_slug, status='pago', comissao_recepcao__gt=0
-    ).values('recepcionista').annotate(
-        total_comissao=Sum('comissao_recepcao'), qtd_reservas=Count('id')
-    ).order_by('-total_comissao')
-    return JsonResponse(list(dados), safe=False)
+dados = Reserva.objects.filter(
+hotel__slug=hotel_slug, status=‘pago’, comissao_recepcao__gt=0
+).values(‘recepcionista’).annotate(
+total_comissao=Sum(‘comissao_recepcao’), qtd_reservas=Count(‘id’)
+).order_by(’-total_comissao’)
+return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_cambio(request, hotel_slug):
-    """
-    Retorna lucro por moeda. O lucro é recalculado a partir de cotacao_compra e cotacao_venda
-    quando disponíveis, caso contrário usa o campo lucro salvo.
-    """
-    qs    = CambioTransacao.objects.filter(hotel__slug=hotel_slug)
-    total_lucro = qs.aggregate(total=Sum('lucro'))['total'] or 0
-    total_recebido = qs.aggregate(total=Sum('valor_recebido'))['total'] or 0
-    total_pago = qs.aggregate(total=Sum('valor_reais'))['total'] or 0
-    dados = qs.values('moeda').annotate(total=Sum('lucro'))
-    return JsonResponse({
-    "resumo": {
-        "total_lucro": float(total_lucro),
-        "total_recebido": float(total_recebido),
-        "total_pago": float(total_pago),
-    },
-    "dados": list(dados)
+qs    = CambioTransacao.objects.filter(hotel__slug=hotel_slug)
+total_lucro    = qs.aggregate(total=Sum(‘lucro’))[‘total’] or 0
+total_recebido = qs.aggregate(total=Sum(‘valor_recebido’))[‘total’] or 0
+total_pago     = qs.aggregate(total=Sum(‘valor_reais’))[‘total’] or 0
+dados = qs.values(‘moeda’).annotate(total=Sum(‘lucro’))
+return JsonResponse({
+“resumo”: {
+“total_lucro”:     float(total_lucro),
+“total_recebido”:  float(total_recebido),
+“total_pago”:      float(total_pago),
+},
+“dados”: list(dados)
 })
 
+# =========================
+
+# DIVISÃO DE LUCROS
 
 # =========================
-# DIVISÃO DE LUCROS
-# =========================
+
 @csrf_exempt
 @login_required
 def api_divisao(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    if request.method == "GET":
-        try:
-            cfg = hotel.divisao
-            return JsonResponse({"percentual_hotel": str(cfg.percentual_hotel), "nomes": cfg.get_nomes()})
-        except Exception:
-            return JsonResponse({"percentual_hotel": "0", "nomes": []})
+```
+if request.method == "GET":
+    try:
+        cfg = hotel.divisao
+        return JsonResponse({"percentual_hotel": str(cfg.percentual_hotel), "nomes": cfg.get_nomes()})
+    except Exception:
+        return JsonResponse({"percentual_hotel": "0", "nomes": []})
 
-    if request.method == "POST":
-        try:
-            body      = json.loads(request.body)
-            pct_hotel = float(body.get("percentual_hotel", 0))
-            nomes     = body.get("nomes", [])
-            cfg, _    = ConfiguracaoDivisao.objects.get_or_create(hotel=hotel)
-            cfg.percentual_hotel = pct_hotel
-            cfg.set_nomes(nomes)
-            cfg.save()
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
+if request.method == "POST":
+    try:
+        body      = json.loads(request.body)
+        pct_hotel = float(body.get("percentual_hotel", 0))
+        nomes     = body.get("nomes", [])
+        cfg, _    = ConfiguracaoDivisao.objects.get_or_create(hotel=hotel)
+        cfg.percentual_hotel = pct_hotel
+        cfg.set_nomes(nomes)
+        cfg.save()
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
 
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
 
 # =========================
+
 # ADIANTAMENTOS
+
 # =========================
+
 @csrf_exempt
 @login_required
 def api_adiantamentos(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    if request.method == "GET":
-        mes = request.GET.get("mes_referencia", "")
-        qs  = Adiantamento.objects.filter(hotel=hotel)
-        if mes:
-            qs = qs.filter(mes_referencia=mes)
-        dados = [
-            {"id": a.id, "rec": a.recepcionista, "valor": str(a.valor),
-             "data": str(a.data) if a.data else "", "mes_referencia": a.mes_referencia,
-             "observacao": a.observacao}
-            for a in qs.order_by('-criado_em')
-        ]
-        return JsonResponse({"adiantamentos": dados})
+```
+if request.method == "GET":
+    mes = request.GET.get("mes_referencia", "")
+    qs  = Adiantamento.objects.filter(hotel=hotel)
+    if mes:
+        qs = qs.filter(mes_referencia=mes)
+    dados = [
+        {"id": a.id, "rec": a.recepcionista, "valor": str(a.valor),
+         "data": str(a.data) if a.data else "", "mes_referencia": a.mes_referencia,
+         "observacao": a.observacao}
+        for a in qs.order_by('-criado_em')
+    ]
+    return JsonResponse({"adiantamentos": dados})
 
-    if request.method == "POST":
-        try:
-            body          = json.loads(request.body)
-            adiantamentos = body.get("adiantamentos", [])
-            mes_ref       = body.get("mes_referencia", "")
+if request.method == "POST":
+    try:
+        body          = json.loads(request.body)
+        adiantamentos = body.get("adiantamentos", [])
+        mes_ref       = body.get("mes_referencia", "")
 
-            qs = Adiantamento.objects.filter(hotel=hotel)
-            if mes_ref:
-                qs = qs.filter(mes_referencia=mes_ref)
-            qs.delete()
+        qs = Adiantamento.objects.filter(hotel=hotel)
+        if mes_ref:
+            qs = qs.filter(mes_referencia=mes_ref)
+        qs.delete()
 
-            criados = []
-            for a in adiantamentos:
-                rec   = (a.get("rec") or "").strip()
-                valor = float(a.get("valor") or 0)
-                data  = a.get("data") or None
-                obs   = a.get("obs") or a.get("observacao") or ""
-                mr    = a.get("mes_referencia") or (data[:7] if data else mes_ref)
-                if rec and valor > 0:
-                    obj = Adiantamento.objects.create(
-                        hotel=hotel, recepcionista=rec, valor=valor,
-                        data=data, mes_referencia=mr, observacao=obs,
-                    )
-                    criados.append(obj.id)
+        criados = []
+        for a in adiantamentos:
+            rec   = (a.get("rec") or "").strip()
+            valor = float(a.get("valor") or 0)
+            data  = a.get("data") or None
+            obs   = a.get("obs") or a.get("observacao") or ""
+            mr    = a.get("mes_referencia") or (data[:7] if data else mes_ref)
+            if rec and valor > 0:
+                obj = Adiantamento.objects.create(
+                    hotel=hotel, recepcionista=rec, valor=valor,
+                    data=data, mes_referencia=mr, observacao=obs,
+                )
+                criados.append(obj.id)
 
-            return JsonResponse({"status": "ok", "criados": len(criados)})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
+        return JsonResponse({"status": "ok", "criados": len(criados)})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
 
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
 
 # =========================
+
 # AGENDA
+
 # =========================
+
 @csrf_exempt
 @login_required
 def api_agenda(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.user.perfil.hotel != hotel:
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.user.perfil.hotel != hotel:
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-    if request.method == "GET":
-        passeio_id = request.GET.get('passeio_id')
-        qs = PasseioAgenda.objects.filter(passeio__hotel=hotel).order_by('data', 'horario')
-        if passeio_id:
-            qs = qs.filter(passeio_id=passeio_id)
-        dados = [{
-            "id": a.id, "passeio": a.passeio_id, "passeio_id": a.passeio_id,
-            "passeio__nome": a.passeio.nome,
-            "data": str(a.data) if a.data else None,
-            "horario": str(a.horario) if a.horario else None,
-            "vagas": a.vagas, "vagas_disponiveis": a.vagas_disponiveis,
-        } for a in qs]
-        return JsonResponse(dados, safe=False)
+```
+if request.method == "GET":
+    passeio_id = request.GET.get('passeio_id')
+    qs = PasseioAgenda.objects.filter(passeio__hotel=hotel).order_by('data', 'horario')
+    if passeio_id:
+        qs = qs.filter(passeio_id=passeio_id)
+    dados = [{
+        "id": a.id, "passeio": a.passeio_id, "passeio_id": a.passeio_id,
+        "passeio__nome": a.passeio.nome,
+        "data": str(a.data) if a.data else None,
+        "horario": str(a.horario) if a.horario else None,
+        "vagas": a.vagas, "vagas_disponiveis": a.vagas_disponiveis,
+    } for a in qs]
+    return JsonResponse(dados, safe=False)
 
-    if request.method == "POST":
-        try:
-            PasseioAgenda.objects.create(
-                passeio_id=request.POST.get("passeio_id"),
-                data=request.POST.get("data") or None,
-                horario=request.POST.get("horario") or None,
-                vagas=int(request.POST.get("vagas") or 0),
-            )
-            return JsonResponse({"status": "ok"})
-        except Exception as e:
-            return JsonResponse({"erro": str(e)}, status=500)
+if request.method == "POST":
+    try:
+        PasseioAgenda.objects.create(
+            passeio_id=request.POST.get("passeio_id"),
+            data=request.POST.get("data") or None,
+            horario=request.POST.get("horario") or None,
+            vagas=int(request.POST.get("vagas") or 0),
+        )
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
 
-    if request.method == "DELETE":
-        agenda_id = request.GET.get('id') or request.POST.get('id')
-        if agenda_id:
-            get_object_or_404(PasseioAgenda, id=agenda_id, passeio__hotel=hotel).delete()
-            return JsonResponse({"status": "ok"})
+if request.method == "DELETE":
+    agenda_id = request.GET.get('id') or request.POST.get('id')
+    if agenda_id:
+        get_object_or_404(PasseioAgenda, id=agenda_id, passeio__hotel=hotel).delete()
+        return JsonResponse({"status": "ok"})
 
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
+return JsonResponse({"erro": "Método inválido"}, status=405)
+```
 
 # =========================
+
 # HERO (ADMIN)
+
 # =========================
+
 @csrf_exempt
 @login_required
 def salvar_hero(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    if request.method == "POST":
-        titulo    = request.POST.get("titulo")
-        subtitulo = request.POST.get("subtitulo")
-        whatsapp  = request.POST.get("whatsapp")
-        banner    = request.FILES.get('banner')
-        if titulo    is not None: hotel.titulo_hero    = titulo
-        if subtitulo is not None: hotel.subtitulo_hero = subtitulo
-        if whatsapp:              hotel.whatsapp       = whatsapp
-        if banner:                hotel.foto_capa      = banner
-        hotel.save()
-        return JsonResponse({"status": "ok"})
-    return JsonResponse({"erro": "Método inválido"}, status=405)
-
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+if request.method == “POST”:
+titulo    = request.POST.get(“titulo”)
+subtitulo = request.POST.get(“subtitulo”)
+whatsapp  = request.POST.get(“whatsapp”)
+banner    = request.FILES.get(‘banner’)
+if titulo    is not None: hotel.titulo_hero    = titulo
+if subtitulo is not None: hotel.subtitulo_hero = subtitulo
+if whatsapp:              hotel.whatsapp       = whatsapp
+if banner:                hotel.foto_capa      = banner
+hotel.save()
+return JsonResponse({“status”: “ok”})
+return JsonResponse({“erro”: “Método inválido”}, status=405)
 
 @login_required
 def obter_hero(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    return JsonResponse({
-        "titulo": hotel.titulo_hero,
-        "subtitulo": hotel.subtitulo_hero,
-        "banner": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
-        "whatsapp": hotel.whatsapp,
-    })
+hotel = get_object_or_404(Hotel, slug=hotel_slug)
+return JsonResponse({
+“titulo”:    hotel.titulo_hero,
+“subtitulo”: hotel.subtitulo_hero,
+“banner”:    get_media_url(hotel.foto_capa),
+“whatsapp”:  hotel.whatsapp,
+})
