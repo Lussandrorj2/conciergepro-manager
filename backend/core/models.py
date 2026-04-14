@@ -51,42 +51,50 @@ class Hotel(models.Model):
         return self.nome
 
     def save(self, *args, **kwargs):
+        # ✅ FIX: busca o original ANTES do super().save()
+        # Antes estava depois, então original.titulo_hero == self.titulo_hero sempre
+        titulo_mudou    = True
+        subtitulo_mudou = True
+
+        if self.pk:
+            try:
+                original = Hotel.objects.get(pk=self.pk)
+                titulo_mudou    = original.titulo_hero    != self.titulo_hero
+                subtitulo_mudou = original.subtitulo_hero != self.subtitulo_hero
+            except Hotel.DoesNotExist:
+                pass
+
         super().save(*args, **kwargs)
+
+        # Só traduz se algo realmente mudou
+        if not (titulo_mudou or subtitulo_mudou):
+            return
+
+        titulo_atual    = self.titulo_hero
+        subtitulo_atual = self.subtitulo_hero
+        pk              = self.pk
 
         def traduzir():
             try:
-                original = Hotel.objects.filter(pk=self.pk).first()
+                campos = {}
 
-                if original and original.titulo_hero == self.titulo_hero:
-                    return
+                if titulo_mudou and titulo_atual:
+                    campos['titulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(titulo_atual)
+                    campos['titulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(titulo_atual)
+                    campos['titulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(titulo_atual)
 
-                if self.titulo_hero:
-                    titulo_en = GoogleTranslator(source='pt', target='en').translate(self.titulo_hero)
-                    titulo_es = GoogleTranslator(source='pt', target='es').translate(self.titulo_hero)
-                    titulo_fr = GoogleTranslator(source='pt', target='fr').translate(self.titulo_hero)
-                else:
-                    titulo_en = titulo_es = titulo_fr = None
+                if subtitulo_mudou and subtitulo_atual:
+                    campos['subtitulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(subtitulo_atual)
+                    campos['subtitulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(subtitulo_atual)
+                    campos['subtitulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(subtitulo_atual)
 
-                if self.subtitulo_hero:
-                    subtitulo_en = GoogleTranslator(source='pt', target='en').translate(self.subtitulo_hero)
-                    subtitulo_es = GoogleTranslator(source='pt', target='es').translate(self.subtitulo_hero)
-                    subtitulo_fr = GoogleTranslator(source='pt', target='fr').translate(self.subtitulo_hero)
-                else:
-                    subtitulo_en = subtitulo_es = subtitulo_fr = None
-
-                Hotel.objects.filter(pk=self.pk).update(
-                    titulo_hero_en=titulo_en,
-                    titulo_hero_es=titulo_es,
-                    titulo_hero_fr=titulo_fr,
-                    subtitulo_hero_en=subtitulo_en,
-                    subtitulo_hero_es=subtitulo_es,
-                    subtitulo_hero_fr=subtitulo_fr,
-                )
+                if campos:
+                    Hotel.objects.filter(pk=pk).update(**campos)
+                    print(f"[Tradução Hotel] OK: {list(campos.keys())}")
 
             except Exception as e:
-                print("Erro na tradução:", e)
+                print(f"[Tradução Hotel] Erro: {e}")
 
-        import threading
         threading.Thread(target=traduzir, daemon=True).start()
 
 
@@ -204,14 +212,9 @@ class Reserva(models.Model):
     recepcionista     = models.CharField(max_length=100, blank=True, default='')
     forma_pagamento   = models.CharField(max_length=20, choices=FormaPagamento.choices, default=FormaPagamento.PENDENTE)
 
-    # ── CAMPOS NOVOS ──────────────────────────────────
-    # Data em que o pagamento foi confirmado (para o caixa)
     data_pagamento   = models.DateField(null=True, blank=True)
-    # Mês de referência para agrupamento nos relatórios (YYYY-MM)
     mes_referencia   = models.CharField(max_length=7, blank=True, default='')
-    # JSON armazenando recebimentos via Pix: [{"nome": "Fulano", "valor": 50.00}, ...]
     pix_recebimentos = models.TextField(blank=True, default='')
-    # ──────────────────────────────────────────────────
 
     status       = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDENTE)
     observacoes  = models.TextField(blank=True, default='')
@@ -240,16 +243,13 @@ class CambioTransacao(models.Model):
     moeda = models.CharField(max_length=10)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
 
-    cotacao_usada = models.DecimalField(max_digits=10, decimal_places=4)
-    valor_reais = models.DecimalField(max_digits=10, decimal_places=2)
-
-    # 🔥 AQUI
+    cotacao_usada  = models.DecimalField(max_digits=10, decimal_places=4)
+    valor_reais    = models.DecimalField(max_digits=10, decimal_places=2)
     cotacao_compra = models.DecimalField(max_digits=10, decimal_places=4, default=0)
-    cotacao_venda = models.DecimalField(max_digits=10, decimal_places=4, default=0)
+    cotacao_venda  = models.DecimalField(max_digits=10, decimal_places=4, default=0)
     valor_recebido = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    lucro = models.DecimalField(max_digits=10, decimal_places=2)
-    data = models.DateTimeField(auto_now_add=True)
+    lucro          = models.DecimalField(max_digits=10, decimal_places=2)
+    data           = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.hotel} — {self.moeda} {self.valor}"
@@ -295,7 +295,7 @@ class Hero(models.Model):
 class ConfiguracaoDivisao(models.Model):
     hotel                = models.OneToOneField(Hotel, on_delete=models.CASCADE, related_name='divisao')
     percentual_hotel     = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    nomes_recepcionistas = models.TextField(blank=True, default='')   # JSON string
+    nomes_recepcionistas = models.TextField(blank=True, default='')
     atualizado_em        = models.DateTimeField(auto_now=True)
 
     def get_nomes(self):
@@ -321,7 +321,7 @@ class Adiantamento(models.Model):
     recepcionista  = models.CharField(max_length=100)
     valor          = models.DecimalField(max_digits=10, decimal_places=2)
     data           = models.DateField(null=True, blank=True)
-    mes_referencia = models.CharField(max_length=7, blank=True, default='')  # YYYY-MM
+    mes_referencia = models.CharField(max_length=7, blank=True, default='')
     observacao     = models.TextField(blank=True, default='')
     criado_em      = models.DateTimeField(auto_now_add=True)
 

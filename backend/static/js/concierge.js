@@ -8,7 +8,6 @@ function getImageUrl(img) {
     return '';
 }
 
-// Lê o slug do window (injetado pelo Django) ou do query param da URL como fallback.
 const hotelSlug = (
     window.hotelSlug ||
     new URLSearchParams(window.location.search).get('hotel') ||
@@ -204,63 +203,67 @@ function t(key) {
 
 // ==========================================
 // HOTEL (HERO)
+// ✅ FIX: verifica múltiplos campos de imagem do Cloudinary
+// e garante que o texto do hero é sempre atualizado
 // ==========================================
 async function carregarHotel(lang) {
     if (!hotelSlug) return;
 
     try {
         const res = await fetch(`${API_BASE}/hotel/${hotelSlug}/?lang=${lang}`);
-        if (!res.ok) return;
-
-        const data = await res.json();
-        console.log("HOTEL:", data);
-
-        // =========================
-        // 📱 WHATSAPP
-        // =========================
-        if (data.whatsapp) {
-            whatsappAtual = data.whatsapp;
-            const wppLink = document.getElementById("wpp-main");
-            if (wppLink) {
-                wppLink.href = `https://wa.me/${data.whatsapp}`;
-            }
+        if (!res.ok) {
+            console.warn('[carregarHotel] HTTP', res.status);
+            return;
         }
 
-        // =========================
-        // 🖼️ IMAGEM (BANNER)
-        // =========================
+        const data = await res.json();
+        console.log('[carregarHotel]', data);
+
+        // --- WHATSAPP ---
+        if (data.whatsapp) {
+            whatsappAtual = data.whatsapp;
+            const wppLink = document.getElementById('wpp-main');
+            if (wppLink) wppLink.href = `https://wa.me/${data.whatsapp}`;
+        }
+
+        // --- BANNER / FOTO DE CAPA ---
+        // ✅ FIX: tenta todos os possíveis nomes de campo retornados pela API
         const fotoCapa = getImageUrl(
-            data.foto_capa ||
-            data.foto_hero ||
-            data.imagem_capa ||
-            data.capa
+            data.foto_capa    ||
+            data.banner       ||
+            data.foto_hero    ||
+            data.imagem_capa  ||
+            data.capa         ||
+            ''
         );
 
         if (fotoCapa) {
-            const heroBg = document.getElementById("hero-bg");
+            const heroBg = document.getElementById('hero-bg');
             if (heroBg) {
                 heroBg.style.backgroundImage = `url('${fotoCapa}')`;
+                heroBg.style.opacity = '1';
+                console.log('[carregarHotel] Banner carregado:', fotoCapa);
             }
+        } else {
+            console.warn('[carregarHotel] Nenhuma foto de capa encontrada na resposta');
         }
 
-        // =========================
-        // 🌍 TEXOS (AQUI ESTAVA O BUG)
-        // =========================
-        const titulo = document.getElementById("txt-hero-title");
-        const subtitulo = document.getElementById("txt-hero-subtitle");
+        // --- TEXTOS ---
+        // ✅ FIX: sempre atualiza os textos, mesmo que já estejam preenchidos pelo Django
+        const tituloEl    = document.getElementById('txt-hero-title');
+        const subtituloEl = document.getElementById('txt-hero-subtitle');
 
-        if (titulo && data.titulo_hero) {
-            titulo.innerText = data.titulo_hero;
+        if (tituloEl && data.titulo_hero) {
+            tituloEl.innerText = data.titulo_hero;
+        }
+        if (subtituloEl && data.subtitulo_hero) {
+            subtituloEl.innerText = data.subtitulo_hero;
         }
 
-        if (subtitulo && data.subtitulo_hero) {
-            subtitulo.innerText = data.subtitulo_hero;
-        }
-
-        } catch (error) {
-            console.error("Erro ao carregar hotel:", error);
-        }
+    } catch (error) {
+        console.error('[carregarHotel] Erro:', error);
     }
+}
 
 // ==========================================
 // CARROSSEL PRINCIPAL
@@ -286,7 +289,7 @@ function carrosselAtualizar() {
         dotsEl.innerHTML = '';
         const numDots = Math.max(1, carrTotal - carrVisiveis + 1);
         for (let i = 0; i < numDots; i++) {
-            const d = document.createElement('button');
+            const d     = document.createElement('button');
             d.className = 'carr-dot' + (i === carrIndex ? ' active' : '');
             d.onclick   = () => { carrIndex = i; carrosselAtualizar(); };
             dotsEl.appendChild(d);
@@ -313,7 +316,7 @@ function initCarrosselDrag() {
 
     const onStart = e => {
         isDragging = true;
-        startX = (e.touches ? e.touches[0].clientX : e.clientX);
+        startX     = (e.touches ? e.touches[0].clientX : e.clientX);
         el.classList.add('dragging');
     };
     const onEnd = e => {
@@ -369,15 +372,15 @@ async function carregarPasseios(lang) {
             return;
         }
 
-        track.innerHTML   = listaPasseios.map(p => renderCard(p)).join('');
-        carrTotal         = listaPasseios.length;
-        carrIndex         = 0;
-        carrVisiveis      = carrosselCalcularVisiveis();
+        track.innerHTML = listaPasseios.map(p => renderCard(p)).join('');
+        carrTotal       = listaPasseios.length;
+        carrIndex       = 0;
+        carrVisiveis    = carrosselCalcularVisiveis();
         carrosselAtualizar();
         initCarrosselDrag();
 
     } catch (e) {
-        console.error('Erro passeios:', e);
+        console.error('[carregarPasseios]', e);
         track.innerHTML = `
             <div class="estado-erro" style="flex:1">
                 <span class="icon">⚠️</span>
@@ -396,16 +399,15 @@ function renderCard(p) {
 
     const precoSub = p.preco_por_pessoa && !p.preco_sob_consulta ? t('por_pessoa') : '';
 
-    // Tenta todas as possíveis fontes de imagem — banner, fotos[], imagem, etc.
     const primeiraFoto = (p.fotos && p.fotos.length)
         ? (typeof p.fotos[0] === 'string' ? p.fotos[0] : p.fotos[0].url || '')
         : '';
     const imgSrc = getImageUrl(
-        p.banner   ||
-        p.imagem   ||
-        p.foto     ||
+        p.banner    ||
+        p.imagem    ||
+        p.foto      ||
         p.foto_capa ||
-        p.image    ||
+        p.image     ||
         primeiraFoto
     );
 
@@ -467,7 +469,7 @@ function detFotoRender() {
 
     if (!detFotos.length) {
         track.innerHTML = `<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>`;
-        if (thumbs)  thumbs.innerHTML  = '';
+        if (thumbs)  thumbs.innerHTML    = '';
         if (counter) counter.textContent = '';
         if (btnPrev) btnPrev.style.display = 'none';
         if (btnNext) btnNext.style.display = 'none';
@@ -540,8 +542,8 @@ function abrirDetalhe(passeioId) {
 
     const descEl = document.getElementById('det-desc');
     if (descEl) {
-        descEl.innerHTML = p.descricao_completa || p.descricao || '';
-        descEl.style.display = descEl.innerHTML.trim() ? '' : 'none';
+        descEl.innerHTML      = p.descricao_completa || p.descricao || '';
+        descEl.style.display  = descEl.innerHTML.trim() ? '' : 'none';
     }
 
     const chipsEl = document.getElementById('det-chips');
@@ -553,7 +555,7 @@ function abrirDetalhe(passeioId) {
         if (p.saida)     chips.push(`📍 <span>${p.saida}</span>`);
         if (p.idade_min) chips.push(`👤 <span>A partir de ${p.idade_min} anos</span>`);
         if (p.idiomas)   chips.push(`🌐 <span>${p.idiomas}</span>`);
-        chipsEl.innerHTML    = chips.map(c => `<div class="det-chip">${c}</div>`).join('');
+        chipsEl.innerHTML     = chips.map(c => `<div class="det-chip">${c}</div>`).join('');
         chipsEl.style.display = chips.length ? '' : 'none';
     }
 
@@ -626,7 +628,12 @@ function abrirModalReserva() {
     if (btnVoltar) btnVoltar.textContent = t('btn_voltar').replace('← ', '');
 
     const avisoEl = document.getElementById('modal-aviso-wpp');
-    if (avisoEl) avisoEl.lastChild.textContent = ' ' + t('aviso_wpp');
+    if (avisoEl) {
+        const lastChild = avisoEl.lastChild;
+        if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
+            lastChild.textContent = ' ' + t('aviso_wpp');
+        }
+    }
 
     document.getElementById('res-nome').value    = '';
     document.getElementById('res-tel').value     = '';
@@ -657,7 +664,7 @@ function fecharModalReserva() {
 }
 
 function abrirModal(passeioId) { abrirDetalhe(passeioId); }
-function fecharModal() { fecharDetalhe(); fecharModalReserva(); }
+function fecharModal()         { fecharDetalhe(); fecharModalReserva(); }
 
 // ==========================================
 // CALCULAR TOTAL
@@ -672,8 +679,8 @@ function calcularTotal() {
     if (passeioAtual.preco_sob_consulta) {
         totalStr = t('sob_consulta');
     } else {
-        const preco = Number(passeioAtual.preco || 0);
-        const total = passeioAtual.preco_por_pessoa ? preco * qtd : preco;
+        const preco  = Number(passeioAtual.preco || 0);
+        const total  = passeioAtual.preco_por_pessoa ? preco * qtd : preco;
         totalStr = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     }
 
@@ -687,11 +694,11 @@ function calcularTotal() {
 // CONFIRMAR → WHATSAPP
 // ==========================================
 function confirmarReserva() {
-    const nome     = document.getElementById('res-nome').value.trim();
+    const nome    = document.getElementById('res-nome').value.trim();
     const telefone = document.getElementById('res-tel').value.trim();
-    const qtd      = parseInt(document.getElementById('res-qtd').value) || 1;
-    const dataVal  = document.getElementById('res-data').value;
-    const horario  = document.getElementById('res-horario').value;
+    const qtd     = parseInt(document.getElementById('res-qtd').value) || 1;
+    const dataVal = document.getElementById('res-data').value;
+    const horario = document.getElementById('res-horario').value;
 
     if (!nome || !telefone) {
         mostrarToast(t('campos_obrigatorios'), 'error');
@@ -731,7 +738,7 @@ function mostrarToast(msg, tipo = '') {
 }
 
 // ==========================================
-// CSRF (usado nas páginas de admin via concierge, se necessário)
+// CSRF (admin)
 // ==========================================
 function getCookie(name) {
     for (const c of document.cookie.split(';')) {
@@ -748,12 +755,11 @@ async function trocarIdioma(lang) {
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
 
-    // FIX: sempre atualiza qual botão está marcado como ativo
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
 
-    // Atualiza textos estáticos da UI imediatamente (sem esperar a API)
+    // Atualiza textos estáticos imediatamente
     const scrollEl    = document.getElementById('txt-scroll');
     const labelSecao  = document.getElementById('label-secao');
     const tituloSecao = document.getElementById('titulo-secao');
@@ -763,14 +769,13 @@ async function trocarIdioma(lang) {
     if (labelSecao)  labelSecao.innerText  = t('secao_label');
     if (tituloSecao) tituloSecao.innerText = t('secao_titulo');
 
-    // Atualiza o count se já tiver passeios carregados
     if (countEl && listaPasseios.length) {
         countEl.innerText = `${listaPasseios.length} ${t('secao_label').toLowerCase()}`;
     }
 
     atualizarTextosMapa();
 
-    // Busca dados da API no idioma selecionado em paralelo
+    // Recarrega dados da API no novo idioma
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
@@ -943,7 +948,7 @@ function renderLugarCards() {
     }
 
     grid.innerHTML = lista.map(lugar => {
-        const tipoLabel    = lugar.tipo === 'restaurante' ? t('mapa_restaurantes') : t('mapa_compras');
+        const tipoLabel     = lugar.tipo === 'restaurante' ? t('mapa_restaurantes') : t('mapa_compras');
         const estrelasCheias = Math.round(lugar.estrelas);
         const estrelasVazias = 5 - estrelasCheias;
         const estrelasHTML   = '★'.repeat(estrelasCheias) + '☆'.repeat(estrelasVazias);
@@ -1018,11 +1023,9 @@ function initMapa() {
 
 // ==========================================
 // INIT
-// FIX: marca o botão do idioma salvo como ativo ANTES de qualquer chamada
-// e só então dispara trocarIdioma (que recarrega hotel + passeios)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Marca o botão correto imediatamente, sem esperar a API
+    // Marca o botão do idioma salvo como ativo imediatamente
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === idiomaAtual);
     });
