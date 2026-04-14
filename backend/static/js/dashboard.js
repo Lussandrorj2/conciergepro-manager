@@ -6,6 +6,20 @@ const params = new URLSearchParams(window.location.search);
 const passeioId = params.get('id');
 
 // ==========================
+// CSRF HELPER
+// Necessário para todas as requisições POST/DELETE com Django
+// ==========================
+function getCsrfToken() {
+    const value = `; ${document.cookie}`;
+    const parts = value.split('; csrftoken=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+
+    // Fallback: tenta ler do meta tag se existir
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
+// ==========================
 // INIT
 // ==========================
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================
 async function carregarPasseio(id) {
     try {
-        const res = await fetch(`/api/admin/${hotelSlug}/passeios/${id}/`);
+        const res = await fetch(`/api/admin/${hotelSlug}/passeios/${id}/`, {
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const p = await res.json();
 
         document.getElementById('nome').value = p.nome || '';
@@ -48,7 +69,7 @@ async function carregarPasseio(id) {
             if (container) {
                 container.innerHTML = p.fotos.map(f => `
                     <div class="foto-item" id="foto-${f.id}">
-                        <img src="${f.url}" alt="foto">
+                        <img src="${f.url}" alt="foto" onerror="this.style.display='none'">
                         <button class="foto-del" onclick="deletarFoto(${f.id})" title="Remover">✕</button>
                     </div>
                 `).join('');
@@ -68,11 +89,21 @@ async function deletarFoto(id) {
     if (!confirm('Remover esta foto?')) return;
 
     try {
-        await fetch(`/api/admin/imagem/${id}/`, { method: 'DELETE' });
+        const res = await fetch(`/api/admin/imagem/${id}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const el = document.getElementById(`foto-${id}`);
         if (el) el.remove();
         mostrarToast('Foto removida');
     } catch (e) {
+        console.error(e);
         mostrarToast('Erro ao remover foto', 'error');
     }
 }
@@ -105,9 +136,23 @@ async function validarCriacao() {
     btn.innerText = 'Salvando...';
 
     try {
-        const res = await fetch(url, { method: 'POST', body: form });
-        const data = await res.json();
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                // Não defina Content-Type aqui — o navegador define automaticamente
+                // com o boundary correto quando o body é FormData
+                'X-CSRFToken': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+            body: form,
+        });
 
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text}`);
+        }
+
+        const data = await res.json();
         if (data.erro) throw new Error(data.erro);
 
         mostrarToast('Passeio salvo com sucesso! 🚀');
@@ -116,6 +161,7 @@ async function validarCriacao() {
         }, 1200);
 
     } catch (err) {
+        console.error(err);
         mostrarToast(err.message || 'Erro ao salvar', 'error');
     } finally {
         btn.disabled = false;

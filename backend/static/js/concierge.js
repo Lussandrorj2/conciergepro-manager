@@ -9,7 +9,6 @@ function getImageUrl(img) {
 }
 
 // Lê o slug do window (injetado pelo Django) ou do query param da URL como fallback.
-// Isso garante que a página funciona mesmo quando hotel=None no template.
 const hotelSlug = (
     window.hotelSlug ||
     new URLSearchParams(window.location.search).get('hotel') ||
@@ -231,10 +230,16 @@ async function carregarHotel(lang) {
             if (heroBg) heroBg.style.backgroundImage = `url('${fotoCapa}')`;
         }
 
+        // Só sobrescreve o título/subtítulo se a API retornar valor,
+        // evitando apagar o que já está renderizado pelo Django template
         const elTitle = document.getElementById('txt-hero-title');
         const elSub   = document.getElementById('txt-hero-subtitle');
-        if (elTitle && (data.titulo_hero || data.titulo)) elTitle.innerText = data.titulo_hero || data.titulo;
-        if (elSub   && (data.subtitulo_hero || data.subtitulo)) elSub.innerText = data.subtitulo_hero || data.subtitulo;
+        if (elTitle && (data.titulo_hero || data.titulo)) {
+            elTitle.innerText = data.titulo_hero || data.titulo;
+        }
+        if (elSub && (data.subtitulo_hero || data.subtitulo)) {
+            elSub.innerText = data.subtitulo_hero || data.subtitulo;
+        }
 
     } catch (e) {
         console.error('Erro hotel:', e);
@@ -321,7 +326,6 @@ async function carregarPasseios(lang) {
     const track = document.getElementById('passeios-track');
     if (!track) return;
 
-    // Sem slug não há nada a carregar
     if (!hotelSlug) {
         track.innerHTML = `
             <div class="estado-vazio" style="flex:1">
@@ -376,6 +380,7 @@ function renderCard(p) {
 
     const precoSub = p.preco_por_pessoa && !p.preco_sob_consulta ? t('por_pessoa') : '';
 
+    // Tenta todas as possíveis fontes de imagem — banner, fotos[], imagem, etc.
     const primeiraFoto = (p.fotos && p.fotos.length)
         ? (typeof p.fotos[0] === 'string' ? p.fotos[0] : p.fotos[0].url || '')
         : '';
@@ -710,7 +715,7 @@ function mostrarToast(msg, tipo = '') {
 }
 
 // ==========================================
-// CSRF
+// CSRF (usado nas páginas de admin via concierge, se necessário)
 // ==========================================
 function getCookie(name) {
     for (const c of document.cookie.split(';')) {
@@ -727,20 +732,29 @@ async function trocarIdioma(lang) {
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
 
+    // FIX: sempre atualiza qual botão está marcado como ativo
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
 
+    // Atualiza textos estáticos da UI imediatamente (sem esperar a API)
     const scrollEl    = document.getElementById('txt-scroll');
     const labelSecao  = document.getElementById('label-secao');
     const tituloSecao = document.getElementById('titulo-secao');
+    const countEl     = document.getElementById('count-passeios');
 
     if (scrollEl)    scrollEl.innerText    = t('explorar');
     if (labelSecao)  labelSecao.innerText  = t('secao_label');
     if (tituloSecao) tituloSecao.innerText = t('secao_titulo');
 
+    // Atualiza o count se já tiver passeios carregados
+    if (countEl && listaPasseios.length) {
+        countEl.innerText = `${listaPasseios.length} ${t('secao_label').toLowerCase()}`;
+    }
+
     atualizarTextosMapa();
 
+    // Busca dados da API no idioma selecionado em paralelo
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
@@ -988,8 +1002,15 @@ function initMapa() {
 
 // ==========================================
 // INIT
+// FIX: marca o botão do idioma salvo como ativo ANTES de qualquer chamada
+// e só então dispara trocarIdioma (que recarrega hotel + passeios)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Marca o botão correto imediatamente, sem esperar a API
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === idiomaAtual);
+    });
+
     trocarIdioma(idiomaAtual);
     initMapa();
 });

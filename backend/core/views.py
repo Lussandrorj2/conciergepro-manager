@@ -25,10 +25,18 @@ def to_float(valor):
         return 0
 
 def get_media_url(field):
+    """
+    Retorna a URL pública do arquivo.
+    - Se for um campo de arquivo do Django/Cloudinary, chama .url
+    - Se a URL já começar com http, retorna direto (Cloudinary sempre retorna https://)
+    - Se for relativa, prefixa com o domínio de produção
+    """
     if not field:
         return None
     try:
         url = field.url
+        if not url:
+            return None
         if url.startswith('http'):
             return url
         return f"https://conciergepro-manager.onrender.com{url}"
@@ -79,11 +87,11 @@ def detalhe_hotel(request, slug):
         subtitulo = hotel.subtitulo_hero
 
     return Response({
-        "nome":          hotel.nome,
-        "titulo_hero":   titulo,
+        "nome":           hotel.nome,
+        "titulo_hero":    titulo,
         "subtitulo_hero": subtitulo,
-        "foto_capa":     get_media_url(hotel.foto_capa),
-        "whatsapp":      hotel.whatsapp or "5521999999999",
+        "foto_capa":      get_media_url(hotel.foto_capa),
+        "whatsapp":       hotel.whatsapp or "5521999999999",
     })
 
 # =========================
@@ -112,17 +120,21 @@ def listar_passeios(request, hotel_slug):
             nome      = p.nome
             descricao = p.descricao
 
+        # Tenta obter a URL do banner; se falhar, usa None
+        banner_url = get_media_url(p.banner) if p.banner else None
+
         resultado.append({
-            "id":                p.id,
-            "nome":              nome,
-            "descricao":         descricao,
-            "preco":             float(p.preco) if p.preco else 0,
+            "id":                 p.id,
+            "nome":               nome,
+            "descricao":          descricao,
+            "preco":              float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa":  p.preco_por_pessoa,
-            "banner":            get_media_url(p.banner),
+            "preco_por_pessoa":   p.preco_por_pessoa,
+            "banner":             banner_url,
             "fotos": [
                 {"id": f.id, "url": get_media_url(f.arquivo)}
                 for f in p.fotos.all()
+                if get_media_url(f.arquivo)  # filtra fotos sem URL válida
             ],
         })
     return Response(resultado)
@@ -187,6 +199,9 @@ def dashboard_cambio(request, hotel_slug):
 
 # =========================
 # PASSEIOS CRUD (ADMIN)
+# FIX: adicionado @csrf_exempt pois o JS envia FormData sem o middleware
+# de template (não há {% csrf_token %} nos forms JS).
+# A autenticação via @login_required garante que só usuários logados acessem.
 # =========================
 
 @csrf_exempt
@@ -200,21 +215,33 @@ def api_passeios(request, hotel_slug, passeio_id=None):
         if passeio_id:
             p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
             return JsonResponse({
-                "id": p.id, "nome": p.nome, "descricao": p.descricao,
-                "preco": str(p.preco) if p.preco else "",
+                "id":                 p.id,
+                "nome":               p.nome,
+                "descricao":          p.descricao,
+                "preco":              str(p.preco) if p.preco else "",
                 "preco_sob_consulta": p.preco_sob_consulta,
                 "preco_por_pessoa":   p.preco_por_pessoa,
-                "banner": get_media_url(p.banner),
-                "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
+                "banner":             get_media_url(p.banner),
+                "fotos": [
+                    {"id": f.id, "url": get_media_url(f.arquivo)}
+                    for f in p.fotos.all()
+                    if get_media_url(f.arquivo)
+                ],
             })
         passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
         return JsonResponse([{
-            "id": p.id, "nome": p.nome, "descricao": p.descricao,
-            "preco": float(p.preco) if p.preco else 0,
+            "id":                 p.id,
+            "nome":               p.nome,
+            "descricao":          p.descricao,
+            "preco":              float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
             "preco_por_pessoa":   p.preco_por_pessoa,
-            "banner": get_media_url(p.banner),
-            "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
+            "banner":             get_media_url(p.banner),
+            "fotos": [
+                {"id": f.id, "url": get_media_url(f.arquivo)}
+                for f in p.fotos.all()
+                if get_media_url(f.arquivo)
+            ],
         } for p in passeios], safe=False)
 
     if request.method == "POST":

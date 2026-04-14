@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +28,7 @@ INSTALLED_APPS = [
 
     # terceiros
     'rest_framework',
-    'cloudinary',
+    'cloudinary',           # deve vir antes do cloudinary_storage
     'cloudinary_storage',
 
     # seus apps
@@ -112,16 +113,27 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # -----------------------
 # MEDIA (Cloudinary)
+# IMPORTANTE: use CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+# no painel do Render — evita colisão com variáveis genéricas do sistema.
 # -----------------------
 MEDIA_URL = '/media/'
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUD_NAME'),
-    'API_KEY':    os.getenv('API_KEY'),
-    'API_SECRET': os.getenv('API_SECRET'),
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
+
+# Inicialização explícita do Cloudinary (garante funcionamento mesmo sem
+# a variável CLOUDINARY_URL estar definida)
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    secure=True,
+)
 
 
 # -----------------------
@@ -135,7 +147,6 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # Permite que o iframe do Google Maps seja exibido corretamente.
-# SAMEORIGIN bloquearia iframes de outros domínios na página.
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 
