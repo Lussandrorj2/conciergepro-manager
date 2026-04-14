@@ -917,7 +917,6 @@ if request.method == "POST":
     return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
 
 @login_required
 def obter_hero(request, hotel_slug):
