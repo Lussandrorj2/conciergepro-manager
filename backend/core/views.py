@@ -31,18 +31,8 @@ def get_media_url(field):
     if not field:
         return None
     try:
-        name = getattr(field, 'name', None)
-        if not name:
-            return None
-        url = field.url
-        if not url or not url.strip():
-            return None
-        if url.startswith('http'):
-            return url
-        return f"https://conciergepro-manager.onrender.com{url}"
-    except Exception as e:
-        # Log detalhado para debug no Render
-        print(f"[get_media_url] ERRO: {e} | field type: {type(field)} | name: {getattr(field, 'name', 'N/A')}")
+        return field.url
+    except Exception:
         return None
 
 
@@ -81,29 +71,28 @@ def home(request):
 @permission_classes([AllowAny])
 def detalhe_hotel(request, slug):
     hotel = get_object_or_404(Hotel, slug=slug)
-    lang  = request.GET.get('lang', 'pt')
+    lang = request.GET.get('lang', 'pt')
 
     if lang == 'en':
-        titulo    = hotel.titulo_hero_en    or hotel.titulo_hero
+        titulo = hotel.titulo_hero_en or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
     elif lang == 'es':
-        titulo    = hotel.titulo_hero_es    or hotel.titulo_hero
+        titulo = hotel.titulo_hero_es or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_es or hotel.subtitulo_hero
     elif lang == 'fr':
-        titulo    = hotel.titulo_hero_fr    or hotel.titulo_hero
+        titulo = hotel.titulo_hero_fr or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_fr or hotel.subtitulo_hero
     else:
-        titulo    = hotel.titulo_hero
+        titulo = hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero
 
     return Response({
-        "nome":           hotel.nome,
-        "titulo_hero":    titulo,
+        "nome": hotel.nome,
+        "titulo_hero": titulo,
         "subtitulo_hero": subtitulo,
-        "foto_capa":      get_media_url(hotel.foto_capa),
-        "whatsapp":       hotel.whatsapp or "5521999999999",
+        "foto_capa": get_media_url(hotel.foto_capa),
+        "whatsapp": hotel.whatsapp
     })
-
 
 # =========================
 # API PÚBLICA — PASSEIOS
@@ -221,67 +210,65 @@ def dashboard_cambio(request, hotel_slug):
 
 @csrf_exempt
 def api_passeios(request, hotel_slug, passeio_id=None):
-    if not request.user.is_authenticated:
-        return JsonResponse({"erro": "Não autenticado"}, status=401)
-
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
 
     if request.method == "GET":
         if passeio_id:
             p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
-            banner_url = get_media_url(p.banner) if p.banner else None
             return JsonResponse({
-                "id":                 p.id,
-                "nome":               p.nome,
-                "descricao":          p.descricao,
-                "preco":              str(p.preco) if p.preco else "",
+                "id": p.id,
+                "nome": p.nome,
+                "descricao": p.descricao,
+                "preco": str(p.preco) if p.preco else "",
                 "preco_sob_consulta": p.preco_sob_consulta,
-                "preco_por_pessoa":   p.preco_por_pessoa,
-                "banner":             banner_url,   # <-- estava faltando a verificação
+                "preco_por_pessoa": p.preco_por_pessoa,
+                "banner": p.banner.url if p.banner else None,
                 "fotos": [
-                    {"id": f.id, "url": get_media_url(f.arquivo)}
+                    {"id": f.id, "url": f.arquivo.url}
                     for f in p.fotos.all()
-                    if get_media_url(f.arquivo)
+                    if f.arquivo
                 ],
             })
+
         passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
+
         return JsonResponse([{
-            "id":                 p.id,
-            "nome":               p.nome,
-            "descricao":          p.descricao,
-            "preco":              float(p.preco) if p.preco else 0,
+            "id": p.id,
+            "nome": p.nome,
+            "descricao": p.descricao,
+            "preco": float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa":   p.preco_por_pessoa,
-            "banner":             get_media_url(p.banner),
+            "preco_por_pessoa": p.preco_por_pessoa,
+            "banner": p.banner.url if p.banner else None,
             "fotos": [
-                {"id": f.id, "url": get_media_url(f.arquivo)}
+                {"id": f.id, "url": f.arquivo.url}
                 for f in p.fotos.all()
-                if get_media_url(f.arquivo)
+                if f.arquivo
             ],
         } for p in passeios], safe=False)
 
     if request.method == "POST":
         passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel) if passeio_id else Passeio(hotel=hotel)
-        passeio.nome               = request.POST.get("nome", "").strip()
-        passeio.descricao          = request.POST.get("descricao", "")
+
+        passeio.nome = request.POST.get("nome", "")
+        passeio.descricao = request.POST.get("descricao", "")
         passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
-        passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
+        passeio.preco_por_pessoa = request.POST.get("preco_por_pessoa") == "true"
 
         if passeio.preco_sob_consulta:
             passeio.preco = None
         else:
             try:
                 passeio.preco = float(request.POST.get("preco") or 0)
-            except (ValueError, TypeError):
+            except:
                 passeio.preco = 0
 
-        banner = request.FILES.get('banner')
-        if banner:
-            passeio.banner = banner
+        if request.FILES.get("banner"):
+            passeio.banner = request.FILES.get("banner")
 
         passeio.save()
 
-        for f in request.FILES.getlist('imagens'):
+        for f in request.FILES.getlist("imagens"):
             ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
 
         return JsonResponse({"status": "ok", "id": passeio.id})

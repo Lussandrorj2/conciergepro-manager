@@ -228,14 +228,15 @@ async function carregarHotel(lang) {
 
         // --- BANNER / FOTO DE CAPA ---
         // ✅ FIX: tenta todos os possíveis nomes de campo retornados pela API
-        const fotoCapa = getImageUrl(
-            data.foto_capa    ||
-            data.banner       ||
-            data.foto_hero    ||
-            data.imagem_capa  ||
-            data.capa         ||
-            ''
-        );
+        // --- BANNER / FOTO DE CAPA ---
+        const fotoCapa = data.foto_capa;
+
+        if (fotoCapa) {
+            const heroBg = document.getElementById('hero-bg');
+            if (heroBg) {
+                heroBg.style.backgroundImage = `url('${fotoCapa}')`;
+            }
+        }
 
         if (fotoCapa) {
             const heroBg = document.getElementById('hero-bg');
@@ -355,7 +356,7 @@ async function carregarPasseios(lang) {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/?lang=${lang}`);
+        const res = await fetch(`${API_BASE}/passeios/${hotelSlug}/`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         listaPasseios = await res.json();

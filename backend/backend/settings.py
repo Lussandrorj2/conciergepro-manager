@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 import dj_database_url
-import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,11 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SEGURANÇA
 # -----------------------
 DEBUG = False
-
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
-
-ALLOWED_HOSTS = ["conciergepro-manager.onrender.com"]
-
+ALLOWED_HOSTS = ["*"]
 
 # -----------------------
 # APLICATIVOS
@@ -26,15 +22,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # terceiros
     'rest_framework',
-    'cloudinary',           # deve vir antes do cloudinary_storage
-    'cloudinary_storage',
 
-    # seus apps
     'core',
 ]
-
 
 # -----------------------
 # MIDDLEWARE
@@ -50,13 +41,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-# -----------------------
-# URLS / WSGI
-# -----------------------
 ROOT_URLCONF = 'backend.urls'
 WSGI_APPLICATION = 'backend.wsgi.application'
-
 
 # -----------------------
 # TEMPLATES
@@ -76,9 +62,8 @@ TEMPLATES = [
     },
 ]
 
-
 # -----------------------
-# BANCO (Aiven / Render)
+# BANCO
 # -----------------------
 DATABASES = {
     'default': dj_database_url.config(
@@ -86,7 +71,6 @@ DATABASES = {
         conn_max_age=600,
     )
 }
-
 
 # -----------------------
 # INTERNACIONALIZAÇÃO
@@ -96,95 +80,27 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-
 # -----------------------
-# STATIC FILES (WhiteNoise)
+# STATIC
 # -----------------------
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 # -----------------------
-# MEDIA (Cloudinary)
-# IMPORTANTE: use CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
-# no painel do Render — evita colisão com variáveis genéricas do sistema.
+# MEDIA (SIMPLES)
 # -----------------------
 MEDIA_URL = '/media/'
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-}
-
-# Inicialização explícita do Cloudinary (garante funcionamento mesmo sem
-# a variável CLOUDINARY_URL estar definida)
-cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
-    secure=True,
-)
-
-
-
-CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # -----------------------
-# SEGURANÇA PRODUÇÃO (Render)
+# SEGURANÇA RENDER
 # -----------------------
 CSRF_TRUSTED_ORIGINS = ["https://conciergepro-manager.onrender.com"]
-
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# Permite que o iframe do Google Maps seja exibido corretamente.
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-
-# -----------------------
-# PADRÃO DJANGO
-# -----------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
-
-
-# -----------------------
-# PERFORMANCE
-# -----------------------
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-    }
-}
-
-# ─── SESSÃO / CSRF (crítico no Render com HTTPS) ───
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE    = 'Lax'
-SESSION_COOKIE_HTTPONLY = True
-
-# Garante que o Cloudinary URL seja lido corretamente
-# (cloudinary_storage precisa dessa variável OU das 3 separadas)
-# Você já tem as 3 separadas no settings — mas adicione o fallback:
-if not os.getenv('CLOUDINARY_URL') and all([
-    os.getenv('CLOUDINARY_CLOUD_NAME'),
-    os.getenv('CLOUDINARY_API_KEY'),
-    os.getenv('CLOUDINARY_API_SECRET'),
-]):
-    os.environ['CLOUDINARY_URL'] = (
-        f"cloudinary://{os.getenv('CLOUDINARY_API_KEY')}:"
-        f"{os.getenv('CLOUDINARY_API_SECRET')}@"
-        f"{os.getenv('CLOUDINARY_CLOUD_NAME')}"
-    )

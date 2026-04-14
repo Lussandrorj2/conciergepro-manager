@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
-from deep_translator import GoogleTranslator
 
 
 def _traduzir_em_background(instance_pk, model_class, campos):
@@ -73,29 +72,6 @@ class Hotel(models.Model):
         titulo_atual    = self.titulo_hero
         subtitulo_atual = self.subtitulo_hero
         pk              = self.pk
-
-        def traduzir():
-            try:
-                campos = {}
-
-                if titulo_mudou and titulo_atual:
-                    campos['titulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(titulo_atual)
-                    campos['titulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(titulo_atual)
-                    campos['titulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(titulo_atual)
-
-                if subtitulo_mudou and subtitulo_atual:
-                    campos['subtitulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(subtitulo_atual)
-                    campos['subtitulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(subtitulo_atual)
-                    campos['subtitulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(subtitulo_atual)
-
-                if campos:
-                    Hotel.objects.filter(pk=pk).update(**campos)
-                    print(f"[Tradução Hotel] OK: {list(campos.keys())}")
-
-            except Exception as e:
-                print(f"[Tradução Hotel] Erro: {e}")
-
-        threading.Thread(target=traduzir, daemon=True).start()
 
 
 # ==========================================
