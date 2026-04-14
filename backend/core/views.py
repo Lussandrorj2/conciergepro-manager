@@ -98,7 +98,7 @@ def listar_passeios(request, hotel_slug):
             "preco": float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
             "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": p.banner.url if p.banner else None,
+            "banner": request.build_absolute_uri(p.banner.url) if p.banner else None,
             "fotos": [
                 {
                     "id": f.id,
@@ -891,6 +891,6 @@ def obter_hero(request, hotel_slug):
     return JsonResponse({
         "titulo": hotel.titulo_hero,
         "subtitulo": hotel.subtitulo_hero,
-        "banner": hotel.foto_capa.url if hotel.foto_capa else None,
+        "banner": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
         "whatsapp": hotel.whatsapp,
     })
