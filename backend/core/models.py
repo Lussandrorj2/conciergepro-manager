@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
+from deep_translator import GoogleTranslator
 
 
 def _traduzir_em_background(instance_pk, model_class, campos):
@@ -50,26 +51,43 @@ class Hotel(models.Model):
         return self.nome
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            try:
-                original = Hotel.objects.get(pk=self.pk)
-                if (original.titulo_hero != self.titulo_hero or
-                        original.subtitulo_hero != self.subtitulo_hero):
-                    self.titulo_hero_en = self.subtitulo_hero_en = ""
-                    self.titulo_hero_es = self.subtitulo_hero_es = ""
-                    self.titulo_hero_fr = self.subtitulo_hero_fr = ""
-            except Hotel.DoesNotExist:
-                pass
         super().save(*args, **kwargs)
-        campos = [
-            ('titulo_hero', 'titulo_hero_en', 'en'),
-            ('subtitulo_hero', 'subtitulo_hero_en', 'en'),
-            ('titulo_hero', 'titulo_hero_es', 'es'),
-            ('subtitulo_hero', 'subtitulo_hero_es', 'es'),
-            ('titulo_hero', 'titulo_hero_fr', 'fr'),
-            ('subtitulo_hero', 'subtitulo_hero_fr', 'fr'),
-        ]
-        _traduzir_em_background(self.pk, Hotel, campos)
+
+        def traduzir():
+            try:
+                original = Hotel.objects.filter(pk=self.pk).first()
+
+                if original and original.titulo_hero == self.titulo_hero:
+                    return
+
+                if self.titulo_hero:
+                    titulo_en = GoogleTranslator(source='pt', target='en').translate(self.titulo_hero)
+                    titulo_es = GoogleTranslator(source='pt', target='es').translate(self.titulo_hero)
+                    titulo_fr = GoogleTranslator(source='pt', target='fr').translate(self.titulo_hero)
+                else:
+                    titulo_en = titulo_es = titulo_fr = None
+
+                if self.subtitulo_hero:
+                    subtitulo_en = GoogleTranslator(source='pt', target='en').translate(self.subtitulo_hero)
+                    subtitulo_es = GoogleTranslator(source='pt', target='es').translate(self.subtitulo_hero)
+                    subtitulo_fr = GoogleTranslator(source='pt', target='fr').translate(self.subtitulo_hero)
+                else:
+                    subtitulo_en = subtitulo_es = subtitulo_fr = None
+
+                Hotel.objects.filter(pk=self.pk).update(
+                    titulo_hero_en=titulo_en,
+                    titulo_hero_es=titulo_es,
+                    titulo_hero_fr=titulo_fr,
+                    subtitulo_hero_en=subtitulo_en,
+                    subtitulo_hero_es=subtitulo_es,
+                    subtitulo_hero_fr=subtitulo_fr,
+                )
+
+            except Exception as e:
+                print("Erro na tradução:", e)
+
+        import threading
+        threading.Thread(target=traduzir, daemon=True).start()
 
 
 # ==========================================
