@@ -207,17 +207,28 @@ function t(key) {
 // ==========================================
 async function carregarHotel(lang) {
     if (!hotelSlug) return;
+
     try {
         const res = await fetch(`${API_BASE}/hotel/${hotelSlug}/?lang=${lang}`);
         if (!res.ok) return;
-        const data = await res.json();
 
+        const data = await res.json();
+        console.log("HOTEL:", data);
+
+        // =========================
+        // 📱 WHATSAPP
+        // =========================
         if (data.whatsapp) {
             whatsappAtual = data.whatsapp;
-            const wppLink = document.getElementById('wpp-main');
-            if (wppLink) wppLink.href = `https://wa.me/${data.whatsapp}`;
+            const wppLink = document.getElementById("wpp-main");
+            if (wppLink) {
+                wppLink.href = `https://wa.me/${data.whatsapp}`;
+            }
         }
 
+        // =========================
+        // 🖼️ IMAGEM (BANNER)
+        // =========================
         const fotoCapa = getImageUrl(
             data.foto_capa ||
             data.foto_hero ||
@@ -226,25 +237,30 @@ async function carregarHotel(lang) {
         );
 
         if (fotoCapa) {
-            const heroBg = document.getElementById('hero-bg');
-            if (heroBg) heroBg.style.backgroundImage = `url('${fotoCapa}')`;
+            const heroBg = document.getElementById("hero-bg");
+            if (heroBg) {
+                heroBg.style.backgroundImage = `url('${fotoCapa}')`;
+            }
         }
 
-        // Só sobrescreve o título/subtítulo se a API retornar valor,
-        // evitando apagar o que já está renderizado pelo Django template
-        const elTitle = document.getElementById('txt-hero-title');
-        const elSub   = document.getElementById('txt-hero-subtitle');
-        if (elTitle && (data.titulo_hero || data.titulo)) {
-            elTitle.innerText = data.titulo_hero || data.titulo;
-        }
-        if (elSub && (data.subtitulo_hero || data.subtitulo)) {
-            elSub.innerText = data.subtitulo_hero || data.subtitulo;
+        // =========================
+        // 🌍 TEXOS (AQUI ESTAVA O BUG)
+        // =========================
+        const titulo = document.getElementById("txt-hero-title");
+        const subtitulo = document.getElementById("txt-hero-subtitle");
+
+        if (titulo && data.titulo_hero) {
+            titulo.innerText = data.titulo_hero;
         }
 
-    } catch (e) {
-        console.error('Erro hotel:', e);
+        if (subtitulo && data.subtitulo_hero) {
+            subtitulo.innerText = data.subtitulo_hero;
+        }
+
+        } catch (error) {
+            console.error("Erro ao carregar hotel:", error);
+        }
     }
-}
 
 // ==========================================
 // CARROSSEL PRINCIPAL
