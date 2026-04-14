@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 # -----------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # essencial no Render
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,7 +119,7 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUD_NAME'),
-    'API_KEY': os.getenv('API_KEY'),
+    'API_KEY':    os.getenv('API_KEY'),
     'API_SECRET': os.getenv('API_SECRET'),
 }
 
@@ -134,6 +134,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+# Permite que o iframe do Google Maps seja exibido corretamente.
+# SAMEORIGIN bloquearia iframes de outros domínios na página.
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 
 # -----------------------
 # PADRÃO DJANGO
@@ -143,7 +147,7 @@ LOGIN_URL = '/login/'
 
 
 # -----------------------
-# PERFORMANCE (opcional, mas ajuda)
+# PERFORMANCE
 # -----------------------
 CACHES = {
     "default": {

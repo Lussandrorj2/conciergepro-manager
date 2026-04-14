@@ -8,10 +8,17 @@ function getImageUrl(img) {
     return '';
 }
 
-const hotelSlug = window.hotelSlug || '';
-const API_BASE  = '/api';
+// Lê o slug do window (injetado pelo Django) ou do query param da URL como fallback.
+// Isso garante que a página funciona mesmo quando hotel=None no template.
+const hotelSlug = (
+    window.hotelSlug ||
+    new URLSearchParams(window.location.search).get('hotel') ||
+    ''
+);
 
-let idiomaAtual  = localStorage.getItem('lang') || 'pt';
+const API_BASE = '/api';
+
+let idiomaAtual   = localStorage.getItem('lang') || 'pt';
 let whatsappAtual = '5521999999999';
 let passeioAtual  = null;
 let listaPasseios = [];
@@ -54,7 +61,6 @@ const i18n = {
         },
         aviso_wpp: 'Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.',
         campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
-        // Mapa
         mapa_label: 'Nos arredores',
         mapa_titulo: 'Restaurantes & Centros Comerciais',
         mapa_todos: 'Todos',
@@ -97,7 +103,6 @@ const i18n = {
         },
         aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
         campos_obrigatorios: 'Please fill in your name and phone number.',
-        // Map
         mapa_label: 'Nearby',
         mapa_titulo: 'Restaurants & Shopping',
         mapa_todos: 'All',
@@ -140,7 +145,6 @@ const i18n = {
         },
         aviso_wpp: 'Será redirigido al WhatsApp del hotel para confirmar su reserva.',
         campos_obrigatorios: 'Por favor, complete su nombre y teléfono.',
-        // Mapa
         mapa_label: 'Alrededores',
         mapa_titulo: 'Restaurantes & Centros Comerciales',
         mapa_todos: 'Todos',
@@ -183,7 +187,6 @@ const i18n = {
         },
         aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
         campos_obrigatorios: 'Veuillez remplir votre nom et numéro de téléphone.',
-        // Carte
         mapa_label: 'Aux alentours',
         mapa_titulo: 'Restaurants & Centres Commerciaux',
         mapa_todos: 'Tous',
@@ -204,6 +207,7 @@ function t(key) {
 // HOTEL (HERO)
 // ==========================================
 async function carregarHotel(lang) {
+    if (!hotelSlug) return;
     try {
         const res = await fetch(`${API_BASE}/hotel/${hotelSlug}/?lang=${lang}`);
         if (!res.ok) return;
@@ -221,12 +225,12 @@ async function carregarHotel(lang) {
             data.imagem_capa ||
             data.capa
         );
-        
+
         if (fotoCapa) {
             const heroBg = document.getElementById('hero-bg');
             if (heroBg) heroBg.style.backgroundImage = `url('${fotoCapa}')`;
         }
-        
+
         const elTitle = document.getElementById('txt-hero-title');
         const elSub   = document.getElementById('txt-hero-subtitle');
         if (elTitle && (data.titulo_hero || data.titulo)) elTitle.innerText = data.titulo_hero || data.titulo;
@@ -317,6 +321,16 @@ async function carregarPasseios(lang) {
     const track = document.getElementById('passeios-track');
     if (!track) return;
 
+    // Sem slug não há nada a carregar
+    if (!hotelSlug) {
+        track.innerHTML = `
+            <div class="estado-vazio" style="flex:1">
+                <span class="icon">🏖️</span>
+                <p>${t('vazio')}</p>
+            </div>`;
+        return;
+    }
+
     try {
         const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/?lang=${lang}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -366,14 +380,14 @@ function renderCard(p) {
         ? (typeof p.fotos[0] === 'string' ? p.fotos[0] : p.fotos[0].url || '')
         : '';
     const imgSrc = getImageUrl(
-        p.banner ||
-        p.imagem ||
-        p.foto ||
+        p.banner   ||
+        p.imagem   ||
+        p.foto     ||
         p.foto_capa ||
-        p.image ||
+        p.image    ||
         primeiraFoto
     );
-    
+
     const imgHTML = imgSrc
         ? `<img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-img-empty\\'>🌊</div>'">`
         : `<div class="card-img-empty">🌊</div>`;
@@ -414,7 +428,6 @@ function coletarFotos(p) {
     if (principal) fotos.push(principal);
 
     const extras = p.fotos || [];
-
     extras.forEach(f => {
         const src = getImageUrl(f);
         if (src && src !== principal) fotos.push(src);
@@ -513,13 +526,13 @@ function abrirDetalhe(passeioId) {
     const chipsEl = document.getElementById('det-chips');
     if (chipsEl) {
         const chips = [];
-        if (p.duracao)     chips.push(`⏱ <span>${p.duracao}</span>`);
-        if (p.nivel)       chips.push(`🎯 <span>${p.nivel}</span>`);
-        if (p.inclui)      chips.push(`✅ <span>${p.inclui}</span>`);
-        if (p.saida)       chips.push(`📍 <span>${p.saida}</span>`);
-        if (p.idade_min)   chips.push(`👤 <span>A partir de ${p.idade_min} anos</span>`);
-        if (p.idiomas)     chips.push(`🌐 <span>${p.idiomas}</span>`);
-        chipsEl.innerHTML = chips.map(c => `<div class="det-chip">${c}</div>`).join('');
+        if (p.duracao)   chips.push(`⏱ <span>${p.duracao}</span>`);
+        if (p.nivel)     chips.push(`🎯 <span>${p.nivel}</span>`);
+        if (p.inclui)    chips.push(`✅ <span>${p.inclui}</span>`);
+        if (p.saida)     chips.push(`📍 <span>${p.saida}</span>`);
+        if (p.idade_min) chips.push(`👤 <span>A partir de ${p.idade_min} anos</span>`);
+        if (p.idiomas)   chips.push(`🌐 <span>${p.idiomas}</span>`);
+        chipsEl.innerHTML    = chips.map(c => `<div class="det-chip">${c}</div>`).join('');
         chipsEl.style.display = chips.length ? '' : 'none';
     }
 
@@ -726,7 +739,6 @@ async function trocarIdioma(lang) {
     if (labelSecao)  labelSecao.innerText  = t('secao_label');
     if (tituloSecao) tituloSecao.innerText = t('secao_titulo');
 
-    // Atualiza textos do mapa
     atualizarTextosMapa();
 
     await Promise.all([
@@ -758,36 +770,12 @@ document.getElementById('modalReserva')?.addEventListener('click', function(e) {
 
 
 // ==========================================
-// ==========================================
 // MAPA TURÍSTICO
 // ==========================================
-// ==========================================
-
-// ------------------------------------------
-// CONFIGURAÇÃO DE LUGARES
-// ------------------------------------------
-// Edite este array com os lugares reais próximos ao seu hotel.
-//
-// Como obter o mapaSrc (embed do Google Maps):
-//   1. Acesse maps.google.com e pesquise o lugar
-//   2. Clique em "Compartilhar" → aba "Incorporar um mapa"
-//   3. Copie o valor do atributo src do <iframe> gerado
-//   4. Cole no campo mapaSrc abaixo
-//
-// Como obter o mapaLink (link direto):
-//   1. Pesquise o lugar em maps.google.com
-//   2. Copie a URL da barra de endereços do navegador
-//
-// O campo mapaSrc do MAPA_GERAL_SRC é o mapa da região do hotel,
-// sem um lugar específico selecionado. Obtenha-o centralizando o mapa
-// no bairro/rua do hotel e usando a opção "Incorporar um mapa".
-// ------------------------------------------
 
 const MAPA_GERAL_SRC = 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14907!2d-43.0!3d-22.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr';
-// ↑ Substitua pelo embed real da região do seu hotel
 
 const LUGARES = [
-    // ── RESTAURANTES ───────────────────────
     {
         id: 1,
         tipo: 'restaurante',
@@ -795,9 +783,7 @@ const LUGARES = [
         descricao: 'Frutos do mar frescos com vista para o oceano',
         estrelas: 4.8,
         distancia: '200m',
-        // Substitua pelo src real do embed do Google Maps:
         mapaSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675!2d-43.0!3d-22.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDU0JzAwLjAiUyA0M8KwMDAnMDAuMCJX!5e0!3m2!1spt-BR!2sbr!4v1700000000001',
-        // Substitua pelo link real do Google Maps:
         mapaLink: 'https://www.google.com/maps/search/Restaurante+Vista+Mar',
     },
     {
@@ -830,7 +816,6 @@ const LUGARES = [
         mapaSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3675!2d-43.015!3d-22.915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDU0JzU0LjAiUyA0M8KwMDAnNTQuMCJX!5e0!3m2!1spt-BR!2sbr!4v1700000000004',
         mapaLink: 'https://www.google.com/maps/search/Cantina+della+Nonna',
     },
-    // ── SHOPPING / COMPRAS ──────────────────
     {
         id: 5,
         tipo: 'shopping',
@@ -873,13 +858,9 @@ const LUGARES = [
     },
 ];
 
-// Estado do mapa
-let lugarFiltroAtivo = 'todos';
+let lugarFiltroAtivo   = 'todos';
 let lugarSelecionadoId = null;
 
-// ------------------------------------------
-// Atualiza textos do mapa conforme idioma
-// ------------------------------------------
 function atualizarTextosMapa() {
     const labelEl  = document.getElementById('label-mapa');
     const tituloEl = document.getElementById('titulo-mapa');
@@ -895,15 +876,11 @@ function atualizarTextosMapa() {
     if (btnRest)  btnRest.innerText  = t('mapa_restaurantes');
     if (btnShop)  btnShop.innerText  = t('mapa_compras');
 
-    // Re-renderiza cards com novos textos
     if (document.getElementById('mapa-cards-grid')) {
         renderLugarCards();
     }
 }
 
-// ------------------------------------------
-// Filtro
-// ------------------------------------------
 function filtrarMapa(tipo) {
     lugarFiltroAtivo = tipo;
 
@@ -911,7 +888,6 @@ function filtrarMapa(tipo) {
         btn.classList.toggle('active', btn.dataset.tipo === tipo);
     });
 
-    // Se o lugar selecionado não está no filtro, deseleciona
     if (lugarSelecionadoId !== null) {
         const lugar = LUGARES.find(l => l.id === lugarSelecionadoId);
         if (lugar && tipo !== 'todos' && lugar.tipo !== tipo) {
@@ -923,9 +899,6 @@ function filtrarMapa(tipo) {
     renderLugarCards();
 }
 
-// ------------------------------------------
-// Renderiza os cards de lugares
-// ------------------------------------------
 function renderLugarCards() {
     const grid = document.getElementById('mapa-cards-grid');
     if (!grid) return;
@@ -940,16 +913,11 @@ function renderLugarCards() {
     }
 
     grid.innerHTML = lista.map(lugar => {
-        const tipoLabel = lugar.tipo === 'restaurante'
-            ? t('mapa_restaurantes')
-            : t('mapa_compras');
-
-        // Estrelas (arredondadas)
+        const tipoLabel    = lugar.tipo === 'restaurante' ? t('mapa_restaurantes') : t('mapa_compras');
         const estrelasCheias = Math.round(lugar.estrelas);
         const estrelasVazias = 5 - estrelasCheias;
-        const estrelasHTML = '★'.repeat(estrelasCheias) + '☆'.repeat(estrelasVazias);
-
-        const selecionado = lugarSelecionadoId === lugar.id ? ' selecionado' : '';
+        const estrelasHTML   = '★'.repeat(estrelasCheias) + '☆'.repeat(estrelasVazias);
+        const selecionado    = lugarSelecionadoId === lugar.id ? ' selecionado' : '';
 
         return `
         <div class="lugar-card${selecionado}" onclick="selecionarLugar(${lugar.id})" role="button" tabindex="0" aria-label="${lugar.nome}">
@@ -970,7 +938,6 @@ function renderLugarCards() {
         </div>`;
     }).join('');
 
-    // Teclado: Enter seleciona
     grid.querySelectorAll('.lugar-card').forEach(card => {
         card.addEventListener('keydown', e => {
             if (e.key === 'Enter') card.click();
@@ -978,9 +945,6 @@ function renderLugarCards() {
     });
 }
 
-// ------------------------------------------
-// Selecionar lugar → atualiza mapa
-// ------------------------------------------
 function selecionarLugar(id) {
     lugarSelecionadoId = id;
     const lugar = LUGARES.find(l => l.id === id);
@@ -990,9 +954,6 @@ function selecionarLugar(id) {
     carregarMapaIframe(lugar.mapaSrc);
 }
 
-// ------------------------------------------
-// Carrega src no iframe com loading state
-// ------------------------------------------
 function carregarMapaIframe(src) {
     const iframe  = document.getElementById('mapa-iframe');
     const loading = document.getElementById('mapa-loading');
@@ -1008,25 +969,18 @@ function carregarMapaIframe(src) {
         if (loading) loading.classList.add('oculto');
     };
 
-    // Só atualiza o src se for diferente (evita reload desnecessário)
     if (iframe.src !== src) {
         iframe.src = src;
     } else {
-        // Mesmo src, esconde loading imediatamente
         if (loading) loading.classList.add('oculto');
     }
 }
 
-// ------------------------------------------
-// Inicializa seção do mapa
-// ------------------------------------------
 function initMapa() {
     atualizarTextosMapa();
     renderLugarCards();
-    // Carrega o mapa geral da região ao iniciar
     carregarMapaIframe(MAPA_GERAL_SRC);
 
-    // Seleciona automaticamente o primeiro lugar após 600ms
     if (LUGARES.length) {
         setTimeout(() => selecionarLugar(LUGARES[0].id), 600);
     }

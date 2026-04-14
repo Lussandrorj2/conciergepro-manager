@@ -40,8 +40,19 @@ def get_media_url(field):
 # =========================
 
 def home(request):
-    slug = request.GET.get('hotel')
-    hotel = get_object_or_404(Hotel, slug=slug) if slug else None
+    """
+    Página pública do concierge digital.
+    Aceita ?hotel=<slug> na query string.
+    Se o slug não for fornecido ou não existir, renderiza sem hotel
+    (o JS vai tratar o estado vazio).
+    """
+    slug  = request.GET.get('hotel', '').strip()
+    hotel = None
+    if slug:
+        try:
+            hotel = Hotel.objects.get(slug=slug)
+        except Hotel.DoesNotExist:
+            hotel = None
     return render(request, 'index.html', {'hotel': hotel})
 
 # =========================
@@ -68,11 +79,11 @@ def detalhe_hotel(request, slug):
         subtitulo = hotel.subtitulo_hero
 
     return Response({
-        "nome": hotel.nome,
-        "titulo_hero": titulo,
+        "nome":          hotel.nome,
+        "titulo_hero":   titulo,
         "subtitulo_hero": subtitulo,
-        "foto_capa": get_media_url(hotel.foto_capa),
-        "whatsapp": hotel.whatsapp or "5521999999999",
+        "foto_capa":     get_media_url(hotel.foto_capa),
+        "whatsapp":      hotel.whatsapp or "5521999999999",
     })
 
 # =========================
@@ -102,13 +113,13 @@ def listar_passeios(request, hotel_slug):
             descricao = p.descricao
 
         resultado.append({
-            "id": p.id,
-            "nome": nome,
-            "descricao": descricao,
-            "preco": float(p.preco) if p.preco else 0,
+            "id":                p.id,
+            "nome":              nome,
+            "descricao":         descricao,
+            "preco":             float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": get_media_url(p.banner),
+            "preco_por_pessoa":  p.preco_por_pessoa,
+            "banner":            get_media_url(p.banner),
             "fotos": [
                 {"id": f.id, "url": get_media_url(f.arquivo)}
                 for f in p.fotos.all()
@@ -192,7 +203,7 @@ def api_passeios(request, hotel_slug, passeio_id=None):
                 "id": p.id, "nome": p.nome, "descricao": p.descricao,
                 "preco": str(p.preco) if p.preco else "",
                 "preco_sob_consulta": p.preco_sob_consulta,
-                "preco_por_pessoa": p.preco_por_pessoa,
+                "preco_por_pessoa":   p.preco_por_pessoa,
                 "banner": get_media_url(p.banner),
                 "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
             })
@@ -201,7 +212,7 @@ def api_passeios(request, hotel_slug, passeio_id=None):
             "id": p.id, "nome": p.nome, "descricao": p.descricao,
             "preco": float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa": p.preco_por_pessoa,
+            "preco_por_pessoa":   p.preco_por_pessoa,
             "banner": get_media_url(p.banner),
             "fotos": [{"id": f.id, "url": get_media_url(f.arquivo)} for f in p.fotos.all()],
         } for p in passeios], safe=False)
@@ -369,7 +380,7 @@ def deletar_imagem(request, id):
 @permission_classes([AllowAny])
 def criar_reserva(request, hotel_slug):
     try:
-        hotel = Hotel.objects.get(slug=hotel_slug)
+        hotel     = Hotel.objects.get(slug=hotel_slug)
         agenda_id = request.data.get("agenda_id")
         nome      = request.data.get("nome")
         telefone  = request.data.get("telefone")
@@ -484,7 +495,6 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             mes_referencia   = request.POST.get("mes_referencia", "")
             pix_recebimentos = request.POST.get("pix_recebimentos", "[]")
             recepcionista_str = request.POST.get("recepcionista", "")
-
             comissao_recepcao = to_float(request.POST.get("comissao_recepcao"))
 
             if not all([passeio_id, nome, telefone, data_pass]):
@@ -706,9 +716,9 @@ def api_agenda(request, hotel_slug):
 def salvar_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if request.method == "POST":
-        hotel.titulo_hero = request.POST.get("titulo")
-        hotel.subtitulo_hero = request.POST.get("subtitulo")
-        hotel.whatsapp = request.POST.get("whatsapp")
+        hotel.titulo_hero    = request.POST.get("titulo", hotel.titulo_hero)
+        hotel.subtitulo_hero = request.POST.get("subtitulo", hotel.subtitulo_hero)
+        hotel.whatsapp       = request.POST.get("whatsapp", hotel.whatsapp)
         banner = request.FILES.get('banner')
         if banner:
             hotel.foto_capa = banner
