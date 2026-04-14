@@ -42,21 +42,25 @@ def home(request):
 def detalhe_hotel(request, slug):
     hotel = get_object_or_404(Hotel, slug=slug)
     lang  = request.GET.get('lang', 'pt')
+
     if lang == 'en':
-        titulo    = hotel.titulo_hero_en    or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_en or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
     elif lang == 'es':
-        titulo    = hotel.titulo_hero_es    or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_es or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_es or hotel.subtitulo_hero
     elif lang == 'fr':
-        titulo    = hotel.titulo_hero_fr    or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_fr or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_fr or hotel.subtitulo_hero
     else:
         titulo    = hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero
+
     return Response({
-        "nome": hotel.nome, "titulo_hero": titulo, "subtitulo_hero": subtitulo,
-        "foto_capa": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
+        "nome": hotel.nome,
+        "titulo_hero": titulo,
+        "subtitulo_hero": subtitulo,
+        "foto_capa": hotel.foto_capa.url if hotel.foto_capa else None,
         "whatsapp": hotel.whatsapp or "5521999999999",
     })
 
@@ -70,28 +74,39 @@ def listar_passeios(request, hotel_slug):
     hotel    = get_object_or_404(Hotel, slug=hotel_slug)
     lang     = request.GET.get('lang', 'pt')
     passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related('fotos')
+
     resultado = []
+
     for p in passeios:
         if lang == 'en':
-            nome = p.nome_en or p.nome; descricao = p.descricao_en or p.descricao
+            nome = p.nome_en or p.nome
+            descricao = p.descricao_en or p.descricao
         elif lang == 'es':
-            nome = p.nome_es or p.nome; descricao = p.descricao_es or p.descricao
+            nome = p.nome_es or p.nome
+            descricao = p.descricao_es or p.descricao
         elif lang == 'fr':
-            nome = p.nome_fr or p.nome; descricao = p.descricao_fr or p.descricao
+            nome = p.nome_fr or p.nome
+            descricao = p.descricao_fr or p.descricao
         else:
-            nome = p.nome; descricao = p.descricao
-        banner_url = None
-        if p.banner:
-            try: banner_url = request.build_absolute_uri(p.banner.url)
-            except Exception: pass
+            nome = p.nome
+            descricao = p.descricao
+
         resultado.append({
-            "id": p.id, "nome": nome, "descricao": descricao,
+            "id": p.id,
+            "nome": nome,
+            "descricao": descricao,
             "preco": float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
             "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": banner_url,
-            "fotos": [{"id": f.id, "url": request.build_absolute_uri(f.arquivo.url)} for f in p.fotos.all()],
+            "banner": p.banner.url if p.banner else None,
+            "fotos": [
+                {
+                    "id": f.id,
+                    "url": f.arquivo.url if f.arquivo else None
+                } for f in p.fotos.all()
+            ],
         })
+
     return Response(resultado)
 
 
