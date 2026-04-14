@@ -889,7 +889,8 @@ def salvar_hero(request, hotel_slug):
 def obter_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     return JsonResponse({
-        "titulo": hotel.titulo_hero, "subtitulo": hotel.subtitulo_hero,
-        "banner": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
+        "titulo": hotel.titulo_hero,
+        "subtitulo": hotel.subtitulo_hero,
+        "banner": hotel.foto_capa.url if hotel.foto_capa else None,
         "whatsapp": hotel.whatsapp,
     })
