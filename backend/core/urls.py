@@ -31,6 +31,7 @@ urlpatterns = [
     # =========================
     path('api/hotel/<slug:slug>/', views.detalhe_hotel, name='detalhe_hotel'),
     path('api/<slug:hotel_slug>/passeios/', views.listar_passeios, name='listar_passeios_publico'),
+    path('api/admin/<slug:hotel_slug>/traduzir/', views.forcar_traducao_hotel, name='forcar_traducao'),
 
     # =========================
     # HERO (ADMIN)

@@ -169,3 +169,22 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
+
+# ─── SESSÃO / CSRF (crítico no Render com HTTPS) ───
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE    = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
+
+# Garante que o Cloudinary URL seja lido corretamente
+# (cloudinary_storage precisa dessa variável OU das 3 separadas)
+# Você já tem as 3 separadas no settings — mas adicione o fallback:
+if not os.getenv('CLOUDINARY_URL') and all([
+    os.getenv('CLOUDINARY_CLOUD_NAME'),
+    os.getenv('CLOUDINARY_API_KEY'),
+    os.getenv('CLOUDINARY_API_SECRET'),
+]):
+    os.environ['CLOUDINARY_URL'] = (
+        f"cloudinary://{os.getenv('CLOUDINARY_API_KEY')}:"
+        f"{os.getenv('CLOUDINARY_API_SECRET')}@"
+        f"{os.getenv('CLOUDINARY_CLOUD_NAME')}"
+    )

@@ -17,6 +17,7 @@ from rest_framework.response import Response
 
 from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
+from deep_translator import GoogleTranslator
 
 
 def to_float(valor):
@@ -27,31 +28,21 @@ def to_float(valor):
 
 
 def get_media_url(field):
-    """
-    Retorna a URL pública do arquivo (Cloudinary ou local).
-    Robusto contra campos None, vazios e exceções do storage.
-    """
     if not field:
         return None
     try:
-        # Cloudinary fields têm .name e .url
-        # Campos vazios têm name == '' ou None
         name = getattr(field, 'name', None)
         if not name:
             return None
-
-        url = field.url  # pode lançar exceção se o storage falhar
+        url = field.url
         if not url or not url.strip():
             return None
-
         if url.startswith('http'):
             return url
-
-        # URL relativa — prefixa com domínio de produção
         return f"https://conciergepro-manager.onrender.com{url}"
-
     except Exception as e:
-        print(f"[get_media_url] Erro ao obter URL: {e}")
+        # Log detalhado para debug no Render
+        print(f"[get_media_url] ERRO: {e} | field type: {type(field)} | name: {getattr(field, 'name', 'N/A')}")
         return None
 
 
@@ -229,17 +220,16 @@ def dashboard_cambio(request, hotel_slug):
 # =========================
 
 @csrf_exempt
-@login_required
 def api_passeios(request, hotel_slug, passeio_id=None):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    if not request.user.is_authenticated:
+        return JsonResponse({"erro": "Não autenticado"}, status=401)
 
-    # ✅ FIX: protege acesso ao perfil com try/except
-    if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
 
     if request.method == "GET":
         if passeio_id:
             p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+            banner_url = get_media_url(p.banner) if p.banner else None
             return JsonResponse({
                 "id":                 p.id,
                 "nome":               p.nome,
@@ -247,7 +237,7 @@ def api_passeios(request, hotel_slug, passeio_id=None):
                 "preco":              str(p.preco) if p.preco else "",
                 "preco_sob_consulta": p.preco_sob_consulta,
                 "preco_por_pessoa":   p.preco_por_pessoa,
-                "banner":             get_media_url(p.banner),
+                "banner":             banner_url,   # <-- estava faltando a verificação
                 "fotos": [
                     {"id": f.id, "url": get_media_url(f.arquivo)}
                     for f in p.fotos.all()
@@ -817,3 +807,27 @@ def obter_hero(request, hotel_slug):
         "banner":    get_media_url(hotel.foto_capa),
         "whatsapp":  hotel.whatsapp or "",
     })
+
+@csrf_exempt
+@login_required
+def forcar_traducao_hotel(request, hotel_slug):
+    """Força re-tradução síncrona (sem thread) para debug/recuperação."""
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    if not _get_hotel_do_usuario(request, hotel):
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
+
+    try:
+        campos = {}
+        if hotel.titulo_hero:
+            campos['titulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(hotel.titulo_hero)
+            campos['titulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(hotel.titulo_hero)
+            campos['titulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(hotel.titulo_hero)
+        if hotel.subtitulo_hero:
+            campos['subtitulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(hotel.subtitulo_hero)
+            campos['subtitulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(hotel.subtitulo_hero)
+            campos['subtitulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(hotel.subtitulo_hero)
+
+        Hotel.objects.filter(pk=hotel.pk).update(**campos)
+        return JsonResponse({"status": "ok", "traduzido": list(campos.keys())})
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
