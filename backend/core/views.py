@@ -60,7 +60,7 @@ def detalhe_hotel(request, slug):
         "nome": hotel.nome,
         "titulo_hero": titulo,
         "subtitulo_hero": subtitulo,
-        "foto_capa": hotel.foto_capa.url if hotel.foto_capa else None,
+        "foto_capa": request.build_absolute_uri(hotel.foto_capa.url) if hotel.foto_capa else None,
         "whatsapp": hotel.whatsapp or "5521999999999",
     })
 
