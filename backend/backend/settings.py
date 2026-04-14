@@ -2,11 +2,11 @@ from pathlib import Path
 import os
 import dj_database_url
 
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- SEGURANÇA ---
+# -----------------------
+# SEGURANÇA
+# -----------------------
 DEBUG = False
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
@@ -14,7 +14,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 ALLOWED_HOSTS = ["conciergepro-manager.onrender.com"]
 
 
-# --- APLICATIVOS ---
+# -----------------------
+# APLICATIVOS
+# -----------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,14 +24,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # terceiros
+    'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
+
+    # seus apps
     'core',
-    'rest_framework'
 ]
 
-# --- MIDDLEWARE (Ordem Vital para Unificação e Produção) ---
+
+# -----------------------
+# MIDDLEWARE
+# -----------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # DEVE vir logo após o SecurityMiddleware para servir CSS/JS
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # essencial no Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -38,27 +49,21 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# --- CONFIGURAÇÕES DE ESTÁTICOS E MÍDIA (Ajustado para raiz do Backend) ---
-# Onde o Django busca arquivos durante o desenvolvimento
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'), 
-]
 
-# Onde o Django guardará os arquivos para o Render servir em produção
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# -----------------------
+# URLS / WSGI
+# -----------------------
+ROOT_URLCONF = 'backend.urls'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Configuração de Armazenamento do WhiteNoise (Comprime arquivos para carregar rápido)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# --- TEMPLATES (Ajustado para raiz do Backend) ---
+# -----------------------
+# TEMPLATES
+# -----------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], # Procura index.html na raiz
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,28 +75,47 @@ TEMPLATES = [
     },
 ]
 
-# --- BANCO DE DADOS ---
+
+# -----------------------
+# BANCO (Aiven / Render)
+# -----------------------
 DATABASES = {
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
+    'default': dj_database_url.config(
+        default=os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
+        conn_max_age=600,
+    )
 }
 
-# --- OUTRAS CONFIGURAÇÕES ---
-ROOT_URLCONF = 'backend.urls'
-WSGI_APPLICATION = 'backend.wsgi.application'
+
+# -----------------------
+# INTERNACIONALIZAÇÃO
+# -----------------------
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = '/login/'
-
-# Como agora é um deploy único, você pode simplificar o CORS
-CSRF_TRUSTED_ORIGINS = ["https://conciergepro-manager.onrender.com"]
 
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# -----------------------
+# STATIC FILES (WhiteNoise)
+# -----------------------
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# -----------------------
+# MEDIA (Cloudinary)
+# -----------------------
+MEDIA_URL = '/media/'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUD_NAME'),
@@ -99,4 +123,30 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# -----------------------
+# SEGURANÇA PRODUÇÃO (Render)
+# -----------------------
+CSRF_TRUSTED_ORIGINS = ["https://conciergepro-manager.onrender.com"]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
+# -----------------------
+# PADRÃO DJANGO
+# -----------------------
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/login/'
+
+
+# -----------------------
+# PERFORMANCE (opcional, mas ajuda)
+# -----------------------
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
