@@ -23,6 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'cloudinary',
+    'cloudinary_storage',
 
     'core',
 ]
@@ -81,7 +83,7 @@ USE_I18N = True
 USE_TZ = True
 
 # -----------------------
-# STATIC
+# STATIC (WhiteNoise — não muda)
 # -----------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -89,15 +91,29 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # -----------------------
-# MEDIA (SIMPLES)
+# MEDIA — Cloudinary
 # -----------------------
-MEDIA_URL = '/media/'
+# Credenciais lidas das variáveis de ambiente no Render.
+# No .env local, defina as mesmas variáveis para desenvolvimento.
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# MEDIA_URL não é usada com Cloudinary (cada arquivo tem URL própria),
+# mas definimos para evitar erros em código legado.
+MEDIA_URL  = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # -----------------------
 # SEGURANÇA RENDER
 # -----------------------
-CSRF_TRUSTED_ORIGINS = ["https://conciergepro-manager.onrender.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://conciergepro-manager.onrender.com",
+]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
+import traceback
 
 from .models import (
     Hotel, Passeio, ImagemPasseio, Hero,
@@ -28,9 +29,14 @@ def to_float(valor):
 
 
 def get_media_url(field):
+    """
+    Retorna a URL pública de um campo de arquivo.
+    Funciona tanto com armazenamento local quanto com S3/R2.
+    """
     if not field:
         return None
     try:
+        # .url já retorna a URL correta seja local ou S3
         return field.url
     except Exception:
         return None
@@ -38,9 +44,7 @@ def get_media_url(field):
 
 def _get_hotel_do_usuario(request, hotel):
     """
-    Verifica se o usuário logado tem perfil e se o hotel do perfil
-    bate com o hotel solicitado. Retorna True se autorizado.
-    Protege contra RelatedObjectDoesNotExist quando o perfil não existe.
+    Verifica se o usuário logado pertence ao hotel solicitado.
     """
     try:
         return request.user.perfil.hotel == hotel
@@ -71,28 +75,29 @@ def home(request):
 @permission_classes([AllowAny])
 def detalhe_hotel(request, slug):
     hotel = get_object_or_404(Hotel, slug=slug)
-    lang = request.GET.get('lang', 'pt')
+    lang  = request.GET.get('lang', 'pt')
 
     if lang == 'en':
-        titulo = hotel.titulo_hero_en or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_en    or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
     elif lang == 'es':
-        titulo = hotel.titulo_hero_es or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_es    or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_es or hotel.subtitulo_hero
     elif lang == 'fr':
-        titulo = hotel.titulo_hero_fr or hotel.titulo_hero
+        titulo    = hotel.titulo_hero_fr    or hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero_fr or hotel.subtitulo_hero
     else:
-        titulo = hotel.titulo_hero
+        titulo    = hotel.titulo_hero
         subtitulo = hotel.subtitulo_hero
 
     return Response({
-        "nome": hotel.nome,
-        "titulo_hero": titulo,
+        "nome":         hotel.nome,
+        "titulo_hero":  titulo,
         "subtitulo_hero": subtitulo,
-        "foto_capa": get_media_url(hotel.foto_capa),
-        "whatsapp": hotel.whatsapp
+        "foto_capa":    get_media_url(hotel.foto_capa),
+        "whatsapp":     hotel.whatsapp,
     })
+
 
 # =========================
 # API PÚBLICA — PASSEIOS
@@ -120,8 +125,6 @@ def listar_passeios(request, hotel_slug):
             nome      = p.nome
             descricao = p.descricao
 
-        banner_url = get_media_url(p.banner) if p.banner else None
-
         resultado.append({
             "id":                 p.id,
             "nome":               nome,
@@ -129,7 +132,7 @@ def listar_passeios(request, hotel_slug):
             "preco":              float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
             "preco_por_pessoa":   p.preco_por_pessoa,
-            "banner":             banner_url,
+            "banner":             get_media_url(p.banner),
             "fotos": [
                 {"id": f.id, "url": get_media_url(f.arquivo)}
                 for f in p.fotos.all()
@@ -148,7 +151,7 @@ def login_view(request):
         user = authenticate(
             request,
             username=request.POST.get("username"),
-            password=request.POST.get("password")
+            password=request.POST.get("password"),
         )
         if user:
             login(request, user)
@@ -209,69 +212,83 @@ def dashboard_cambio(request, hotel_slug):
 # =========================
 
 @csrf_exempt
+@login_required
 def api_passeios(request, hotel_slug, passeio_id=None):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
+
+    # Garante que apenas usuários do hotel acessam
+    if not _get_hotel_do_usuario(request, hotel):
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
     if request.method == "GET":
         if passeio_id:
             p = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
             return JsonResponse({
-                "id": p.id,
-                "nome": p.nome,
-                "descricao": p.descricao,
-                "preco": str(p.preco) if p.preco else "",
+                "id":                 p.id,
+                "nome":               p.nome,
+                "descricao":          p.descricao,
+                "preco":              str(p.preco) if p.preco else "",
                 "preco_sob_consulta": p.preco_sob_consulta,
-                "preco_por_pessoa": p.preco_por_pessoa,
-                "banner": p.banner.url if p.banner else None,
+                "preco_por_pessoa":   p.preco_por_pessoa,
+                "banner":             get_media_url(p.banner),
                 "fotos": [
-                    {"id": f.id, "url": f.arquivo.url}
+                    {"id": f.id, "url": get_media_url(f.arquivo)}
                     for f in p.fotos.all()
-                    if f.arquivo
+                    if get_media_url(f.arquivo)
                 ],
             })
 
         passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
-
         return JsonResponse([{
-            "id": p.id,
-            "nome": p.nome,
-            "descricao": p.descricao,
-            "preco": float(p.preco) if p.preco else 0,
+            "id":                 p.id,
+            "nome":               p.nome,
+            "descricao":          p.descricao,
+            "preco":              float(p.preco) if p.preco else 0,
             "preco_sob_consulta": p.preco_sob_consulta,
-            "preco_por_pessoa": p.preco_por_pessoa,
-            "banner": p.banner.url if p.banner else None,
+            "preco_por_pessoa":   p.preco_por_pessoa,
+            "banner":             get_media_url(p.banner),
             "fotos": [
-                {"id": f.id, "url": f.arquivo.url}
+                {"id": f.id, "url": get_media_url(f.arquivo)}
                 for f in p.fotos.all()
-                if f.arquivo
+                if get_media_url(f.arquivo)
             ],
         } for p in passeios], safe=False)
 
     if request.method == "POST":
-        passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel) if passeio_id else Passeio(hotel=hotel)
+        try:
+            if passeio_id:
+                passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+            else:
+                passeio = Passeio(hotel=hotel)
 
-        passeio.nome = request.POST.get("nome", "")
-        passeio.descricao = request.POST.get("descricao", "")
-        passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
-        passeio.preco_por_pessoa = request.POST.get("preco_por_pessoa") == "true"
+            passeio.nome               = request.POST.get("nome", "").strip()
+            passeio.descricao          = request.POST.get("descricao", "").strip()
+            passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
+            passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
 
-        if passeio.preco_sob_consulta:
-            passeio.preco = None
-        else:
-            try:
-                passeio.preco = float(request.POST.get("preco") or 0)
-            except:
-                passeio.preco = 0
+            if passeio.preco_sob_consulta:
+                passeio.preco = None
+            else:
+                try:
+                    passeio.preco = float(request.POST.get("preco") or 0)
+                except (ValueError, TypeError):
+                    passeio.preco = 0
 
-        if request.FILES.get("banner"):
-            passeio.banner = request.FILES.get("banner")
+            if request.FILES.get("banner"):
+                passeio.banner = request.FILES.get("banner")
 
-        passeio.save()
+            passeio.save()
 
-        for f in request.FILES.getlist("imagens"):
-            ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
+            # Salva imagens adicionais da galeria
+            for f in request.FILES.getlist("imagens"):
+                ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
 
-        return JsonResponse({"status": "ok", "id": passeio.id})
+            return JsonResponse({"status": "ok", "id": passeio.id})
+
+        except Exception as e:
+            print("[api_passeios POST] Erro:")
+            print(traceback.format_exc())
+            return JsonResponse({"erro": str(e)}, status=500)
 
     if request.method == "DELETE":
         get_object_or_404(Passeio, id=passeio_id, hotel=hotel).delete()
@@ -299,6 +316,7 @@ def api_cambio(request, hotel_slug):
             qs = qs.filter(data__year=ano)
         if mes:
             qs = qs.filter(data__month=mes)
+
         dados = []
         for t in qs:
             cotacao_compra = str(getattr(t, 'cotacao_compra', t.cotacao_usada) or t.cotacao_usada)
@@ -340,6 +358,7 @@ def api_cambio(request, hotel_slug):
             t.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     return JsonResponse({"erro": "Método inválido"}, status=400)
@@ -360,7 +379,7 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
 
     if request.method == "PUT":
         try:
-            data = json.loads(request.body)
+            data           = json.loads(request.body)
             moeda          = data.get("moeda", transacao.moeda)
             valor          = float(data.get("valor") or transacao.valor)
             cotacao_compra = float(data.get("cotacao_compra") or transacao.cotacao_usada)
@@ -383,6 +402,7 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
             transacao.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     if request.method == "DELETE":
@@ -408,6 +428,7 @@ def deletar_imagem(request, id):
         imagem.delete()
         return JsonResponse({"status": "ok"})
     except Exception as e:
+        print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
 
 
@@ -453,6 +474,7 @@ def criar_reserva(request, hotel_slug):
         )
         return Response({"status": "ok", "valor_total": float(valor_total)})
     except Exception as e:
+        print(traceback.format_exc())
         return Response({"erro": str(e)}, status=500)
 
 
@@ -554,6 +576,7 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             )
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     if request.method == "PATCH" and reserva_id:
@@ -566,6 +589,7 @@ def api_reservas(request, hotel_slug, reserva_id=None):
             reserva.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     if request.method == "DELETE" and reserva_id:
@@ -622,7 +646,7 @@ def relatorio_cambio(request, hotel_slug):
             "total_recebido": float(total_recebido),
             "total_pago":     float(total_pago),
         },
-        "dados": list(dados)
+        "dados": list(dados),
     })
 
 
@@ -655,6 +679,7 @@ def api_divisao(request, hotel_slug):
             cfg.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     return JsonResponse({"erro": "Método inválido"}, status=405)
@@ -678,9 +703,12 @@ def api_adiantamentos(request, hotel_slug):
             qs = qs.filter(mes_referencia=mes)
         dados = [
             {
-                "id": a.id, "rec": a.recepcionista, "valor": str(a.valor),
-                "data": str(a.data) if a.data else "", "mes_referencia": a.mes_referencia,
-                "observacao": a.observacao,
+                "id":            a.id,
+                "rec":           a.recepcionista,
+                "valor":         str(a.valor),
+                "data":          str(a.data) if a.data else "",
+                "mes_referencia": a.mes_referencia,
+                "observacao":    a.observacao,
             }
             for a in qs.order_by('-criado_em')
         ]
@@ -710,6 +738,7 @@ def api_adiantamentos(request, hotel_slug):
                     )
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     return JsonResponse({"erro": "Método inválido"}, status=405)
@@ -729,9 +758,13 @@ def api_agenda(request, hotel_slug):
     if request.method == "GET":
         qs = PasseioAgenda.objects.filter(passeio__hotel=hotel).order_by('data', 'horario')
         dados = [{
-            "id": a.id, "passeio_id": a.passeio_id, "passeio__nome": a.passeio.nome,
-            "data": str(a.data), "horario": str(a.horario),
-            "vagas": a.vagas, "vagas_disponiveis": a.vagas_disponiveis,
+            "id":               a.id,
+            "passeio_id":       a.passeio_id,
+            "passeio__nome":    a.passeio.nome,
+            "data":             str(a.data),
+            "horario":          str(a.horario),
+            "vagas":            a.vagas,
+            "vagas_disponiveis": a.vagas_disponiveis,
         } for a in qs]
         return JsonResponse(dados, safe=False)
 
@@ -745,6 +778,7 @@ def api_agenda(request, hotel_slug):
             )
             return JsonResponse({"status": "ok"})
         except Exception as e:
+            print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
 
     if request.method == "DELETE":
@@ -764,6 +798,9 @@ def api_agenda(request, hotel_slug):
 @login_required
 def salvar_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    if not _get_hotel_do_usuario(request, hotel):
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
+
     if request.method == "POST":
         titulo    = request.POST.get("titulo", "").strip()
         subtitulo = request.POST.get("subtitulo", "").strip()
@@ -795,10 +832,11 @@ def obter_hero(request, hotel_slug):
         "whatsapp":  hotel.whatsapp or "",
     })
 
+
 @csrf_exempt
 @login_required
 def forcar_traducao_hotel(request, hotel_slug):
-    """Força re-tradução síncrona (sem thread) para debug/recuperação."""
+    """Força re-tradução síncrona para recuperação/debug."""
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
         return JsonResponse({"erro": "Sem permissão"}, status=403)
@@ -817,4 +855,5 @@ def forcar_traducao_hotel(request, hotel_slug):
         Hotel.objects.filter(pk=hotel.pk).update(**campos)
         return JsonResponse({"status": "ok", "traduzido": list(campos.keys())})
     except Exception as e:
+        print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
