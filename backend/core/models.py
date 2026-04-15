@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
+from cloudinary.models import CloudinaryField
 
 
 def _traduzir_em_background(instance_pk, model_class, campos):
@@ -37,7 +38,7 @@ def _traduzir_em_background(instance_pk, model_class, campos):
 class Hotel(models.Model):
     nome      = models.CharField(max_length=255)
     slug      = models.SlugField(unique=True)
-    foto_capa = models.ImageField(upload_to='hoteis/capas/', null=True, blank=True)
+    foto_capa = CloudinaryField('image', null=True, blank=True)
 
     titulo_hero    = models.CharField(max_length=255, default="Experiências Exclusivas")
     subtitulo_hero = models.CharField(max_length=255, default="Selecione seu próximo destino")
@@ -269,7 +270,7 @@ class CambioTransacao(models.Model):
 # ==========================================
 class ImagemPasseio(models.Model):
     passeio   = models.ForeignKey(Passeio, on_delete=models.CASCADE, related_name='fotos')
-    arquivo   = models.ImageField(upload_to='passeios/galeria/')
+    arquivo = CloudinaryField('image')
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -292,7 +293,7 @@ class Hero(models.Model):
     hotel     = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='heroes', null=True, blank=True)
     titulo    = models.CharField(max_length=255)
     subtitulo = models.CharField(max_length=255, blank=True)
-    banner    = models.ImageField(upload_to='hero/', null=True, blank=True)
+    banner = CloudinaryField('image', null=True, blank=True)
 
     def __str__(self):
         return f"Hero — {self.hotel.nome if self.hotel else 'sem hotel'}"

@@ -8,11 +8,16 @@ function getImageUrl(img) {
     return '';
 }
 
-const hotelSlug = (
+const urlParams = new URLSearchParams(window.location.search);
+
+const hotelSlug =
     window.hotelSlug ||
-    new URLSearchParams(window.location.search).get('hotel') ||
-    ''
-);
+    urlParams.get('hotel');
+
+if (!hotelSlug) {
+    console.error("❌ Hotel slug não definido");
+    throw new Error("Hotel não identificado");
+}
 
 const API_BASE = '/api';
 

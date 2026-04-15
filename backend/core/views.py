@@ -106,7 +106,7 @@ def detalhe_hotel(request, slug):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_passeios(request, hotel_slug):
-    hotel    = get_object_or_404(Hotel, slug=hotel_slug)
+    hotel = Hotel.objects.filter(slug=hotel_slug).first()
     lang     = request.GET.get('lang', 'pt')
     passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related('fotos')
 
