@@ -17,9 +17,7 @@ def _traduzir_em_background(instance_pk, model_class, campos):
             campos_atualizados = []
             for attr_pt, attr_lang, lang_dest in campos:
                 texto = getattr(obj, attr_pt, None)
-                destino_atual = getattr(obj, attr_lang, None)
-                # Só traduz se o campo de destino estiver vazio
-                if texto and not destino_atual:
+                if texto:
                     traduzido = GoogleTranslator(
                         source='pt', target=lang_dest
                     ).translate(texto)
