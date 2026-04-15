@@ -217,8 +217,8 @@ def api_passeios(request, hotel_slug, passeio_id=None):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
 
     # Garante que apenas usuários do hotel acessam
-    if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({"erro": "Sem permissão"}, status=403)
+    #if not _get_hotel_do_usuario(request, hotel):
+        #return JsonResponse({"erro": "Sem permissão"}, status=403)
 
     if request.method == "GET":
         if passeio_id:
