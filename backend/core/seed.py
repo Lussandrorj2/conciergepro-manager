@@ -1,4 +1,4 @@
-import os
+'''import os
 import re
 from core.models import PasseioGlobal
 
@@ -67,4 +67,4 @@ def seed_passeios():
             }
         )
 
-    print(f"✅ {len(tours)} passeios importados com sucesso!")
+    print(f"✅ {len(tours)} passeios importados com sucesso!")'''
