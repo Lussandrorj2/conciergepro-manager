@@ -179,14 +179,14 @@
 <!-- ══════════════════════════════ SIDEBAR ══════════════════════════════ -->
 <aside class="sidebar">
   <div class="sidebar-logo">Concierge <span>Digital</span></div>
-  <nav class="sidebar-nav">
-    <a href="/dashboard/" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-    <a href="/dashboard/passeios/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Passeios</a>
-    <a href="/dashboard/reservas/" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
-    <a href="/dashboard/relatorios/" class="nav-item"><i class="fa-solid fa-chart-bar"></i> Relatórios</a>
-    <a href="/dashboard/cambio/" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Câmbio</a>
-    <a href="/dashboard/configuracoes/" class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</a>
-  </nav>
+    <nav class="sidebar-nav">
+        <a href="/{{ hotel.slug }}/dashboard/" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Passeios</a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="nav-item"><i class="fa-solid fa-chart-bar"></i> Relatórios</a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Câmbio</a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</a>
+    </nav>
   <div class="sidebar-footer">
     <a href="/logout/">Sair <i class="fa-solid fa-right-from-bracket"></i></a>
   </div>
@@ -316,6 +316,10 @@
         <div class="form-group">
           <label>Data do Passeio *</label>
           <input type="date" id="f-data"/>
+        </div>
+        <div class="form-group">
+            <label>Horário</label>
+            <input type="time" id="f-horario"/>
         </div>
         <div class="form-group">
           <label>Nº de Pessoas</label>
@@ -483,7 +487,7 @@
       const sel = document.getElementById('f-passeio');
       sel.innerHTML = '<option value="">Selecionar passeio…</option>';
       passeiosCache.forEach(p => {
-        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${p.titulo}</option>`);
+        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${p.nome}</option>`);
       });
     } catch(e) {
       console.warn('[carregarPasseios]', e);
@@ -638,6 +642,7 @@
   function editarReserva(id) {
     const r = todasReservas.find(x => x.id === id);
     if (!r) return;
+    document.getElementById('f-horario').value = r.horario || '';
     document.getElementById('modal-titulo').textContent = 'Editar Reserva';
     document.getElementById('f-id').value               = r.id;
     document.getElementById('f-cliente').value          = r.nome_cliente || '';
@@ -711,6 +716,7 @@
       status:             document.getElementById('f-status').value,
       passeio:            document.getElementById('f-passeio').value || null,
       data:               document.getElementById('f-data').value || null,
+      horario:            document.getElementById('f-horario').value || null,
       numero_pessoas:     parseInt(document.getElementById('f-pessoas').value) || 1,
       valor_por_pessoa:   document.getElementById('f-valor-pessoa').value    || null,
       valor_bruto:        document.getElementById('f-valor-bruto').value     || null,

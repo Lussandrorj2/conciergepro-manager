@@ -547,28 +547,44 @@ def api_reservas(request, hotel_slug, reserva_id=None):
 
     if request.method == "POST":
         try:
-            passeio_id        = request.POST.get("passeio_id")
-            nome              = request.POST.get("nome_cliente", "").strip()
-            telefone          = request.POST.get("telefone", "").strip()
-            email             = request.POST.get("email", "")
-            data_pass         = request.POST.get("data_passeio") or None
-            horario           = request.POST.get("horario") or None
-            num_pessoas       = int(request.POST.get("num_pessoas") or 1)
-            valor_bruto       = to_float(request.POST.get("valor_bruto"))
-            comissao_agencia  = to_float(request.POST.get("comissao_agencia"))
-            forma_pagamento   = request.POST.get("forma_pagamento", "pendente")
-            status            = request.POST.get("status", "pendente")
-            obs               = request.POST.get("observacoes", "")
-            data_pagamento    = request.POST.get("data_pagamento") or None
-            mes_referencia    = request.POST.get("mes_referencia", "")
-            pix_recebimentos  = request.POST.get("pix_recebimentos", "[]")
-            recepcionista_str = request.POST.get("recepcionista", "")
-            comissao_recepcao = to_float(request.POST.get("comissao_recepcao"))
+            # Aceita tanto JSON quanto form-data
+            if request.content_type and 'application/json' in request.content_type:
+                body = json.loads(request.body)
+                get = lambda k, d='': body.get(k, d)
+            else:
+                get = lambda k, d='': request.POST.get(k, d)
 
-            if not all([passeio_id, nome, telefone, data_pass]):
-                return JsonResponse({"erro": "Campos obrigatórios faltando"}, status=400)
+            passeio_id        = get("passeio") or get("passeio_id")
+            nome              = (get("nome_cliente") or "").strip()
+            telefone          = (get("telefone") or get("whatsapp") or "").strip()
+            email             = get("email", "")
+            data_pass         = get("data") or get("data_passeio") or None
+            horario           = get("horario") or None
+            num_pessoas       = int(get("numero_pessoas") or get("num_pessoas") or 1)
+            valor_bruto       = to_float(get("valor_bruto"))
+            comissao_agencia  = to_float(get("comissao_agencia"))
+            forma_pagamento   = get("forma_pagamento", "pendente")
+            status            = get("status", "pendente")
+            obs               = get("observacoes", "")
+            data_pagamento    = get("data_pagamento") or None
+            mes_referencia    = get("mes_referencia", "")
+            pix_recebimentos  = get("pix_recebimentos", "")
+            recepcionista_str = get("recepcionista", "")
+            comissao_recepcao = to_float(get("comissao_recepcao"))
 
-            passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+            if not nome:
+                return JsonResponse({"erro": "Nome do cliente obrigatório"}, status=400)
+
+            passeio = None
+            if passeio_id:
+                try:
+                    passeio = Passeio.objects.get(id=passeio_id, hotel=hotel)
+                except Passeio.DoesNotExist:
+                    pass
+
+            # gera mes_referencia automaticamente se não vier
+            if not mes_referencia and data_pagamento:
+                mes_referencia = data_pagamento[:7]
 
             Reserva.objects.create(
                 hotel=hotel, passeio=passeio, nome_cliente=nome, telefone=telefone,
@@ -580,6 +596,30 @@ def api_reservas(request, hotel_slug, reserva_id=None):
                 mes_referencia=mes_referencia, pix_recebimentos=pix_recebimentos,
                 observacoes=obs,
             )
+            return JsonResponse({"status": "ok"})
+        except Exception as e:
+            print(traceback.format_exc())
+            return JsonResponse({"erro": str(e)}, status=500)
+    
+    if request.method == "PUT" and reserva_id:
+        try:
+            reserva = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+            body    = json.loads(request.body)
+            campos  = ['nome_cliente','telefone','email','status','data_passeio','horario',
+                    'num_pessoas','valor_bruto','comissao_agencia','comissao_recepcao',
+                    'recepcionista','forma_pagamento','data_pagamento','mes_referencia',
+                    'pix_recebimentos','observacoes']
+            for campo in campos:
+                if campo in body and hasattr(reserva, campo):
+                    setattr(reserva, campo, body[campo])
+            if 'passeio' in body and body['passeio']:
+                try:
+                    reserva.passeio = Passeio.objects.get(id=body['passeio'], hotel=hotel)
+                except Passeio.DoesNotExist:
+                    pass
+            if not reserva.mes_referencia and reserva.data_pagamento:
+                reserva.mes_referencia = str(reserva.data_pagamento)[:7]
+            reserva.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())

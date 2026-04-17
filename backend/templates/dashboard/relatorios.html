@@ -682,7 +682,16 @@ function parsePix(raw) {
     if (!raw) return [];
     try {
         const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        return Array.isArray(p) ? p.map(x => ({nome:x.nome||'',valor:parseFloat(x.valor)||0})) : [];
+        if (Array.isArray(p)) {
+            return p.map(x => ({nome: x.nome||'', valor: parseFloat(x.valor)||0}));
+        }
+        if (typeof p === 'object' && p !== null) {
+            // formato {nome: valor}
+            return Object.entries(p).map(([nome, valor]) => ({
+                nome, valor: parseFloat(valor)||0
+            }));
+        }
+        return [];
     } catch { return []; }
 }
 function parseRecs(s) { return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : []; }
@@ -1037,8 +1046,9 @@ function renderDivisao() {
     const inputs = [...document.querySelectorAll('.rec-nome-input')];
     const nomes  = inputs.map((inp,i) => inp.value.trim() || `Rec ${i+1}`);
     const n      = nomes.length;
-    const parte  = n > 0 ? totalComissao / n : 0;
-    document.getElementById('div-total').textContent = 'R$ ' + fmt(totalComissao);
+    const totalParaDividir = totalComissao + totalCambio;
+    const parte = n > 0 ? totalParaDividir / n : 0;
+    document.getElementById('div-total').textContent = `R$ ${fmt(totalParaDividir)} (passeios R$ ${fmt(totalComissao)} + câmbio R$ ${fmt(totalCambio)})`;
     const adiantPorRec = {};
     adiantamentos.forEach(a => {
         const nome = (a.rec||'').trim();
