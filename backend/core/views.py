@@ -863,8 +863,15 @@ def salvar_hero(request, hotel_slug):
         if banner:
             hotel.foto_capa = banner
 
-        hotel.save()
+        try:
+            hotel.save()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # aparece nos logs do Render
+            return JsonResponse({"erro": str(e)}, status=500)
+
         return JsonResponse({"status": "ok"})
+
     return JsonResponse({"erro": "Método inválido"}, status=405)
 
 

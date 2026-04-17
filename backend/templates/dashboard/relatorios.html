@@ -1179,8 +1179,11 @@ async function carregarPaginaAdiantamentos() {
     const {ano, mes} = getMesRefAd();
     document.getElementById('periodo-ativo-ad').textContent = labelPeriodo(ano,mes);
 
-    const resRv = await fetch(`/api/admin/${hotelSlug}/reservas/`);
+    // ── Reservas pagas no período ──
+    const resRv   = await fetch(`/api/admin/${hotelSlug}/reservas/`);
     const todasRv = await resRv.json();
+    if (!Array.isArray(todasRv)) return;
+
     const pagas = todasRv.filter(r => {
         if (r.status !== 'pago') return false;
         const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.slice(0,7) : '');
@@ -1189,7 +1192,34 @@ async function carregarPaginaAdiantamentos() {
         return true;
     });
 
-    const comissaoTotal = pagas.reduce((s,r) => s+parseFloat(r.comissao_recepcao||0),0);
+    const comissaoTotal = pagas.reduce((s,r) => s + parseFloat(r.comissao_recepcao||0), 0);
+
+    // ── Lucro câmbio no período ──
+    let lucroCambio = 0;
+    try {
+        let urlC = `/api/admin/${hotelSlug}/cambio/`;
+        const p  = [];
+        if (ano) p.push(`ano=${ano}`);
+        if (mes) p.push(`mes=${parseInt(mes)}`);
+        if (p.length) urlC += '?' + p.join('&');
+        const resC   = await fetch(urlC);
+        const listaC = await resC.json();
+        if (Array.isArray(listaC)) {
+            listaC.forEach(t => {
+                const compra    = parseFloat(t.valor_reais    || 0);
+                const repasse   = parseFloat(t.valor_recebido || 0);
+                const v         = parseFloat(t.valor          || 0);
+                const cv        = parseFloat(t.cotacao_venda  || 0);
+                const repasseR  = repasse > 0 ? repasse : (cv > 0 ? v * cv : 0);
+                lucroCambio    += repasseR > 0 ? repasseR - compra : parseFloat(t.lucro || 0);
+            });
+        }
+    } catch(e) { console.warn('câmbio/adiantamentos:', e); }
+
+    // ── Total a dividir = passeios + câmbio ──
+    const totalParaDividir = comissaoTotal + lucroCambio;
+
+    // ── PIX por recepcionista ──
     let pixGlobal = 0;
     const pixDetalhe = {};
     pagas.forEach(r => {
@@ -1197,28 +1227,34 @@ async function carregarPaginaAdiantamentos() {
             if (!p.nome || p.valor <= 0) return;
             pixGlobal += p.valor;
             if (!pixDetalhe[p.nome]) pixDetalhe[p.nome] = [];
-            pixDetalhe[p.nome].push({data: r.data_pagamento||'', valor: p.valor});
+            pixDetalhe[p.nome].push({ data: r.data_pagamento || '', valor: p.valor });
         });
     });
 
-    const mesRef = ano && mes ? `${ano}-${mes}` : '';
-    const urlAd  = `/api/admin/${hotelSlug}/adiantamentos/` + (mesRef ? `?mes_referencia=${mesRef}` : '');
-    const resAd  = await fetch(urlAd);
-    const dAd    = await resAd.json();
+    // ── Adiantamentos no período ──
+    const mesRef  = ano && mes ? `${ano}-${mes}` : '';
+    const urlAd   = `/api/admin/${hotelSlug}/adiantamentos/` + (mesRef ? `?mes_referencia=${mesRef}` : '');
+    const resAd   = await fetch(urlAd);
+    const dAd     = await resAd.json();
     const valesDetalhe = {};
     let valesGlobal = 0;
-    (dAd.adiantamentos||[]).forEach(a => {
+    (dAd.adiantamentos || []).forEach(a => {
         if (!a.rec) return;
-        valesGlobal += parseFloat(a.valor)||0;
+        valesGlobal += parseFloat(a.valor) || 0;
         if (!valesDetalhe[a.rec]) valesDetalhe[a.rec] = [];
-        valesDetalhe[a.rec].push({data:a.data||'', valor:parseFloat(a.valor)||0});
+        valesDetalhe[a.rec].push({ data: a.data || '', valor: parseFloat(a.valor) || 0 });
     });
 
+    // ── KPIs ──
     document.getElementById('ad-kpi-pix').textContent      = 'R$ ' + fmt(pixGlobal);
     document.getElementById('ad-kpi-vales').textContent    = 'R$ ' + fmt(valesGlobal);
-    document.getElementById('ad-kpi-comissao').textContent = 'R$ ' + fmt(comissaoTotal);
+    document.getElementById('ad-kpi-comissao').textContent = 'R$ ' + fmt(totalParaDividir);
 
-    let nomesList = [...new Set([
+    // ── Lista de recepcionistas ──
+    const n = nomesDiv.length || 1;
+    const parteComissao = totalParaDividir / n;
+
+    const nomesList = [...new Set([
         ...Object.keys(pixDetalhe),
         ...Object.keys(valesDetalhe),
         ...nomesDiv
@@ -1226,44 +1262,53 @@ async function carregarPaginaAdiantamentos() {
 
     document.getElementById('ad-badge-recs').textContent = `${nomesList.length} recepcionista(s)`;
 
-    const n = nomesDiv.length || 1;
-    const parteComissao = comissaoTotal / n;
-
-    // Salva dados para uso no PDF
-    _adDados = { nomesList, pixDetalhe, valesDetalhe, parteComissao, nomesDiv, comissaoTotal, pixGlobal, valesGlobal, periodo: labelPeriodo(ano,mes) };
+    // Salva para uso no PDF
+    _adDados = {
+        nomesList, pixDetalhe, valesDetalhe, parteComissao,
+        nomesDiv: nomesDiv, comissaoTotal, lucroCambio,
+        totalParaDividir, pixGlobal, valesGlobal,
+        periodo: labelPeriodo(ano, mes)
+    };
 
     if (!nomesList.length) {
-        document.getElementById('adiant-page-grid').innerHTML = '<div class="loading">Nenhum dado no período.</div>';
+        document.getElementById('adiant-page-grid').innerHTML =
+            '<div class="loading">Nenhum dado no período.</div>';
         return;
     }
 
     document.getElementById('adiant-page-grid').innerHTML = nomesList.map(nome => {
         const pixItens    = pixDetalhe[nome]   || [];
         const valesItens  = valesDetalhe[nome] || [];
-        const totalPixRec = pixItens.reduce((s,x)=>s+x.valor,0);
-        const totalValesRec = valesItens.reduce((s,x)=>s+x.valor,0);
+        const totalPixRec = pixItens.reduce((s,x) => s + x.valor, 0);
+        const totalValesR = valesItens.reduce((s,x) => s + x.valor, 0);
         const parteRec    = nomesDiv.includes(nome) ? parteComissao : 0;
-        const saldo       = parteRec - totalPixRec - totalValesRec;
+        const saldo       = parteRec - totalPixRec - totalValesR;
         const saldoPos    = saldo >= 0;
 
+        const subLabel = lucroCambio > 0
+            ? `Passeios R$ ${fmt(comissaoTotal/n)} + Câmbio R$ ${fmt(lucroCambio/n)}`
+            : `Comissão base: R$ ${fmt(parteRec)}`;
+
         const pixHTML = pixItens.length
-            ? pixItens.map(x => `<div class="adiant-rec-linha-item">
-                <div>
-                    <span style="color:#e2e8f0;font-size:10px;">Pix</span>
-                    ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
-                </div>
-                <span class="adiant-rec-linha-val pix">R$ ${fmt(x.valor)}</span>
-              </div>`).join('')
+            ? pixItens.map(x => `
+                <div class="adiant-rec-linha-item">
+                    <div>
+                        <span style="color:#e2e8f0;font-size:10px;">Pix</span>
+                        ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
+                    </div>
+                    <span class="adiant-rec-linha-val pix">R$ ${fmt(x.valor)}</span>
+                </div>`).join('')
             : `<div class="adiant-empty">Nenhum pix registrado</div>`;
 
         const valesHTML = valesItens.length
-            ? valesItens.map(x => `<div class="adiant-rec-linha-item">
-                <div>
-                    <span style="color:#e2e8f0;font-size:10px;">Vale</span>
-                    ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
-                </div>
-                <span class="adiant-rec-linha-val vale">R$ ${fmt(x.valor)}</span>
-              </div>`).join('')
+            ? valesItens.map(x => `
+                <div class="adiant-rec-linha-item">
+                    <div>
+                        <span style="color:#e2e8f0;font-size:10px;">Vale</span>
+                        ${x.data ? `<span class="adiant-rec-linha-data"> · ${x.data}</span>` : ''}
+                    </div>
+                    <span class="adiant-rec-linha-val vale">R$ ${fmt(x.valor)}</span>
+                </div>`).join('')
             : `<div class="adiant-empty">Nenhum vale registrado</div>`;
 
         return `<div class="adiant-rec-card">
@@ -1271,7 +1316,7 @@ async function carregarPaginaAdiantamentos() {
                 <div class="adiant-rec-avatar">${nome.charAt(0).toUpperCase()}</div>
                 <div>
                     <div class="adiant-rec-nome">${nome}</div>
-                    <div class="adiant-rec-sub">Comissão base: R$ ${fmt(parteRec)}</div>
+                    <div class="adiant-rec-sub">${subLabel}</div>
                 </div>
             </div>
             <div class="adiant-rec-body">
@@ -1283,11 +1328,13 @@ async function carregarPaginaAdiantamentos() {
                 <div class="adiant-rec-section-title vale" style="margin-top:10px;">💸 Vales / Adiantamentos</div>
                 ${valesHTML}
                 <div style="text-align:right;font-size:11px;color:#f59e0b;font-weight:600;margin-top:4px;">
-                    Total: R$ ${fmt(totalValesRec)}
+                    Total: R$ ${fmt(totalValesR)}
                 </div>
-                <div class="adiant-rec-saldo-box ${saldoPos?'positivo':'negativo'}">
+                <div class="adiant-rec-saldo-box ${saldoPos ? 'positivo' : 'negativo'}">
                     <span class="adiant-rec-saldo-label">${saldoPos ? '✅ A Receber' : '⚠️ Devendo'}</span>
-                    <span class="adiant-rec-saldo-val ${saldoPos?'positivo':'negativo'}">R$ ${fmt(Math.abs(saldo))}</span>
+                    <span class="adiant-rec-saldo-val ${saldoPos ? 'positivo' : 'negativo'}">
+                        R$ ${fmt(Math.abs(saldo))}
+                    </span>
                 </div>
             </div>
         </div>`;
