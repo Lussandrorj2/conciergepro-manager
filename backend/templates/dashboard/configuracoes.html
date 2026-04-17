@@ -331,65 +331,96 @@
         }
     }
 
+    function compressImage(file, quality = 0.7, maxWidth = 1920) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.readAsDataURL(file);
+        reader.onload = (e) => img.src = e.target.result;
+
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+
+            // evita aumentar imagem pequena
+            const scale = Math.min(1, maxWidth / img.width);
+
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, "image/jpeg", quality);
+        };
+    });
+}
+
     // ── Salvar aparência (hero) ────────────────────────────────────────
     async function salvarHero() {
-        const btn = document.getElementById("btn-salvar-hero");
-        const errEl = document.getElementById("hero-error");
-        errEl.classList.remove("visible");
+    const btn = document.getElementById("btn-salvar-hero");
+    const errEl = document.getElementById("hero-error");
+    errEl.classList.remove("visible");
 
-        btn.disabled = true;
-        btn.classList.add("loading");
-        btn.textContent = "Salvando";
+    btn.disabled = true;
+    btn.classList.add("loading");
+    btn.textContent = "Salvando";
 
-        try {
-            const form = new FormData();
-            form.append("titulo",    document.getElementById("titulo").value);
-            form.append("subtitulo", document.getElementById("subtitulo").value);
+    try {
+        const form = new FormData();
+        form.append("titulo", document.getElementById("titulo").value);
+        form.append("subtitulo", document.getElementById("subtitulo").value);
 
-            const file = bannerInput.files[0];
-            if (file) form.append("banner", file);
+        const file = bannerInput.files[0];
 
-            const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
-                method:  "POST",
-                headers: { "X-CSRFToken": csrfToken },
-                body:    form
-            });
+        // 🔥 AQUI ESTÁ A MÁGICA
+        if (file) {
+            const compressed = await compressImage(file);
+            form.append("banner", compressed, "banner.jpg");
+        }
 
-            if (!res.ok) {
-                let msg = `Erro ${res.status}`;
-                try {
-                    const data = await res.json();
-                    msg = data.erro || data.detail || data.error || msg;
-                } catch {}
-                errEl.textContent = "❌ " + msg;
-                errEl.classList.add("visible");
-                toast("❌ Erro ao salvar aparência", "err");
-                return;
-            }
+        const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: form
+        });
 
-            // Verifica se resposta tem campo de erro mesmo com status 200
+        if (!res.ok) {
+            let msg = `Erro ${res.status}`;
             try {
                 const data = await res.json();
-                if (data.erro || data.error) {
-                    errEl.textContent = "❌ " + (data.erro || data.error);
-                    errEl.classList.add("visible");
-                    toast("❌ " + (data.erro || data.error), "err");
-                    return;
-                }
+                msg = data.erro || data.detail || data.error || msg;
             } catch {}
-
-            toast("✔ Aparência salva com sucesso", "ok");
-
-        } catch(e) {
-            errEl.textContent = "❌ Erro de conexão: " + e.message;
+            errEl.textContent = "❌ " + msg;
             errEl.classList.add("visible");
-            toast("❌ Erro de conexão", "err");
-        } finally {
-            btn.disabled = false;
-            btn.classList.remove("loading");
-            btn.textContent = "Salvar";
+            toast("❌ Erro ao salvar aparência", "err");
+            return;
         }
+
+        try {
+            const data = await res.json();
+            if (data.erro || data.error) {
+                errEl.textContent = "❌ " + (data.erro || data.error);
+                errEl.classList.add("visible");
+                toast("❌ " + (data.erro || data.error), "err");
+                return;
+            }
+        } catch {}
+
+        toast("✔ Aparência salva com sucesso", "ok");
+
+    } catch (e) {
+        errEl.textContent = "❌ Erro de conexão: " + e.message;
+        errEl.classList.add("visible");
+        toast("❌ Erro de conexão", "err");
+    } finally {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        btn.textContent = "Salvar";
     }
+}
 
     // ── Salvar contato ─────────────────────────────────────────────────
     async function salvarContato() {
