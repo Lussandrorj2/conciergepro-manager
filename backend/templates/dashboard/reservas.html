@@ -123,7 +123,7 @@
     .modal-overlay.open { display: flex; }
     .modal {
       background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+      width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
       box-shadow: 0 24px 60px rgba(0,0,0,.5);
     }
     .modal-header {
@@ -151,12 +151,40 @@
     .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
     .section-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
 
-    /* PIX list */
+    /* ── PIX rows no modal principal ── */
+    .f-pix-row {
+      display: grid; grid-template-columns: 1fr 130px 32px;
+      gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .f-pix-row select,
+    .f-pix-row input[type="number"] {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; outline: none;
+    }
+    .f-pix-row select:focus, .f-pix-row input:focus { border-color: var(--accent); }
+    .btn-rm-pix {
+      background: rgba(239,68,68,.15); border: 1px solid var(--red); border-radius: 8px;
+      color: var(--red); cursor: pointer; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .2s;
+    }
+    .btn-rm-pix:hover { background: var(--red); color: #fff; }
+    .pix-col-labels {
+      display: grid; grid-template-columns: 1fr 130px 32px;
+      gap: 8px; margin-bottom: 6px;
+    }
+    .pix-col-labels span { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    /* PIX list no modal de pagamento */
     #pix-list .pix-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
-    #pix-list .pix-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; }
+    #pix-list .pix-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; outline: none; }
 
     /* mes_referencia badge */
-    #mes-ref-badge { display: none; background: rgba(108,99,255,.15); color: var(--accent); border-radius: 6px; padding: 4px 10px; font-size: .78rem; font-weight: 600; width: fit-content; margin-top: 6px; }
+    #mes-ref-badge {
+      display: none; background: rgba(108,99,255,.15); color: var(--accent);
+      border-radius: 6px; padding: 4px 10px; font-size: .78rem; font-weight: 600;
+      width: fit-content; margin-top: 6px;
+    }
 
     /* empty state */
     .empty { text-align: center; padding: 52px 20px; color: var(--muted); }
@@ -171,6 +199,7 @@
       .stats-row { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .form-grid .full { grid-column: 1; }
+      .f-pix-row { grid-template-columns: 1fr 100px 32px; }
     }
   </style>
 </head>
@@ -179,14 +208,14 @@
 <!-- ══════════════════════════════ SIDEBAR ══════════════════════════════ -->
 <aside class="sidebar">
   <div class="sidebar-logo">Concierge <span>Digital</span></div>
-    <nav class="sidebar-nav">
-        <a href="/{{ hotel.slug }}/dashboard/" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a href="/{{ hotel.slug }}/dashboard/listar/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Passeios</a>
-        <a href="/{{ hotel.slug }}/dashboard/reservas/" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
-        <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="nav-item"><i class="fa-solid fa-chart-bar"></i> Relatórios</a>
-        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Câmbio</a>
-        <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</a>
-    </nav>
+  <nav class="sidebar-nav">
+    <a href="/{{ hotel.slug }}/dashboard/" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/{{ hotel.slug }}/dashboard/listar/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Passeios</a>
+    <a href="/{{ hotel.slug }}/dashboard/reservas/" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+    <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="nav-item"><i class="fa-solid fa-chart-bar"></i> Relatórios</a>
+    <a href="/{{ hotel.slug }}/dashboard/cambio/" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Câmbio</a>
+    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</a>
+  </nav>
   <div class="sidebar-footer">
     <a href="/logout/">Sair <i class="fa-solid fa-right-from-bracket"></i></a>
   </div>
@@ -268,7 +297,9 @@
       <div id="empty-state" class="empty" style="display:none">
         <i class="fa-solid fa-calendar-xmark"></i>
         <p>Nenhuma reserva encontrada.</p>
-        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()"><i class="fa-solid fa-plus"></i> Criar Reserva</button>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()">
+          <i class="fa-solid fa-plus"></i> Criar Reserva
+        </button>
       </div>
     </div>
 
@@ -285,6 +316,7 @@
     <div class="modal-body">
       <input type="hidden" id="f-id"/>
 
+      <!-- DADOS DO CLIENTE -->
       <p class="section-title">Dados do Cliente</p>
       <div class="form-grid">
         <div class="form-group full">
@@ -307,6 +339,8 @@
       </div>
 
       <hr class="divider"/>
+
+      <!-- PASSEIO & DATA -->
       <p class="section-title">Passeio & Data</p>
       <div class="form-grid">
         <div class="form-group full">
@@ -318,8 +352,8 @@
           <input type="date" id="f-data"/>
         </div>
         <div class="form-group">
-            <label>Horário</label>
-            <input type="time" id="f-horario"/>
+          <label>Horário</label>
+          <input type="time" id="f-horario"/>
         </div>
         <div class="form-group">
           <label>Nº de Pessoas</label>
@@ -328,6 +362,8 @@
       </div>
 
       <hr class="divider"/>
+
+      <!-- VALORES & COMISSÃO -->
       <p class="section-title">Valores & Comissão</p>
       <div class="form-grid">
         <div class="form-group">
@@ -351,28 +387,54 @@
       </div>
 
       <hr class="divider"/>
-      <p class="section-title">Recepcionista & Pagamento</p>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Recepcionista</label>
-          <select id="f-recepcionista"><option value="">Selecionar…</option></select>
-        </div>
-        <div class="form-group">
-          <label>Data de Pagamento</label>
-          <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
-          <div id="mes-ref-badge"></div>
-        </div>
+
+      <!-- ── RECEPCIONISTA (quem atendeu) ── -->
+      <p class="section-title">Recepcionista</p>
+      <div class="form-group">
+        <label>Responsável pelo Atendimento</label>
+        <select id="f-recepcionista">
+          <option value="">Nenhum / Não definido</option>
+        </select>
       </div>
 
       <hr class="divider"/>
+
+      <!-- ── PAGAMENTO PIX (opcional) ── -->
+      <p class="section-title">
+        Pagamento PIX
+        <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;font-size:.72rem">
+          &nbsp;— opcional
+        </span>
+      </p>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Data de Pagamento</label>
+        <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
+        <div id="mes-ref-badge"></div>
+      </div>
+      <div class="pix-col-labels">
+        <span>Recepcionista que recebeu</span>
+        <span>Valor PIX (R$)</span>
+        <span></span>
+      </div>
+      <div id="f-pix-list"></div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addModalPixRow()" style="margin-top:6px">
+        <i class="fa-solid fa-plus"></i> Adicionar recepcionista
+      </button>
+
+      <hr class="divider"/>
+
+      <!-- OBSERVAÇÕES -->
       <p class="section-title">Observações</p>
       <div class="form-group">
         <textarea id="f-obs" placeholder="Observações opcionais…"></textarea>
       </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarReserva()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+      <button class="btn btn-primary" onclick="salvarReserva()">
+        <i class="fa-solid fa-floppy-disk"></i> Salvar
+      </button>
     </div>
   </div>
 </div>
@@ -391,15 +453,21 @@
         <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
         <div id="mes-ref-badge-pg" style="display:none;background:rgba(108,99,255,.15);color:var(--accent);border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:600;width:fit-content;margin-top:6px;"></div>
       </div>
-
       <hr class="divider"/>
-      <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--accent);font-size:.85rem;font-weight:700;"></span></p>
+      <p class="section-title">
+        Distribuição PIX
+        <span id="pg-total-label" style="color:var(--accent);font-size:.85rem;font-weight:700;"></span>
+      </p>
       <div id="pix-list"></div>
-      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px"><i class="fa-solid fa-plus"></i> Adicionar recepcionista</button>
+      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">
+        <i class="fa-solid fa-plus"></i> Adicionar recepcionista
+      </button>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
-      <button class="btn btn-success" onclick="confirmarPagamento()"><i class="fa-solid fa-circle-check"></i> Confirmar Pagamento</button>
+      <button class="btn btn-success" onclick="confirmarPagamento()">
+        <i class="fa-solid fa-circle-check"></i> Confirmar Pagamento
+      </button>
     </div>
   </div>
 </div>
@@ -412,11 +480,16 @@
       <button class="modal-close" onclick="fecharModal('modal-delete')">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--muted);font-size:.9rem">Tem certeza que deseja excluir a reserva de <strong id="del-nome"></strong>? Esta ação não pode ser desfeita.</p>
+      <p style="color:var(--muted);font-size:.9rem">
+        Tem certeza que deseja excluir a reserva de <strong id="del-nome"></strong>?
+        Esta ação não pode ser desfeita.
+      </p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-delete')">Cancelar</button>
-      <button class="btn btn-danger" onclick="executarDelete()"><i class="fa-solid fa-trash"></i> Excluir</button>
+      <button class="btn btn-danger" onclick="executarDelete()">
+        <i class="fa-solid fa-trash"></i> Excluir
+      </button>
     </div>
   </div>
 </div>
@@ -424,13 +497,13 @@
 <!-- ═══════════════════════════════ JS ═══════════════════════════════ -->
 <script>
   // ── Config ──────────────────────────────────────────────────────────
-  const API_BASE   = '/api/admin';
-  const hotelSlug  = '{{ hotel.slug }}';
-  const csrfToken  = '{{ csrf_token }}';
+  const API_BASE  = '/api/admin';
+  const hotelSlug = '{{ hotel.slug }}';
+  const csrfToken = '{{ csrf_token }}';
 
-  let todasReservas   = [];
-  let passeiosCache   = [];
-  let recepcionistas  = [];
+  let todasReservas    = [];
+  let passeiosCache    = [];
+  let recepcionistas   = [];
   let deleteIdPendente = null;
 
   // ── Init ─────────────────────────────────────────────────────────────
@@ -438,6 +511,21 @@
     document.getElementById('hotel-nome-top').textContent = '{{ hotel.nome }}';
     await Promise.all([carregarPasseios(), carregarRecepcionistas(), carregarReservas()]);
   });
+
+  // ── parsePix ─────────────────────────────────────────────────────────
+  function parsePix(raw) {
+    if (!raw) return [];
+    try {
+      const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (Array.isArray(p)) {
+        return p.map(x => ({ nome: x.nome || '', valor: parseFloat(x.valor) || 0 }));
+      }
+      if (typeof p === 'object' && p !== null) {
+        return Object.entries(p).map(([nome, valor]) => ({ nome, valor: parseFloat(valor) || 0 }));
+      }
+      return [];
+    } catch { return []; }
+  }
 
   // ── Recepcionistas (via divisão) ─────────────────────────────────────
   async function carregarRecepcionistas() {
@@ -447,26 +535,32 @@
       });
       if (!res.ok) return;
       const data = await res.json();
-      // data pode ser lista ou objeto com nomes_recepcionistas
       let nomes = [];
-      if (Array.isArray(data)) {
+
+      // Aceita tanto {nomes: [...]} quanto {nomes_recepcionistas: "..."}
+      if (data.nomes && Array.isArray(data.nomes)) {
+        nomes = data.nomes;
+      } else if (data.nomes_recepcionistas) {
+        try {
+          const p = typeof data.nomes_recepcionistas === 'string'
+            ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas;
+          if (Array.isArray(p)) nomes = p;
+        } catch(e) {}
+      } else if (Array.isArray(data)) {
         data.forEach(d => {
           if (d.nomes_recepcionistas) {
             try {
-              const parsed = typeof d.nomes_recepcionistas === 'string'
+              const p = typeof d.nomes_recepcionistas === 'string'
                 ? JSON.parse(d.nomes_recepcionistas) : d.nomes_recepcionistas;
-              if (Array.isArray(parsed)) nomes = nomes.concat(parsed);
+              if (Array.isArray(p)) nomes = nomes.concat(p);
             } catch(e) {}
           }
         });
-      } else if (data.nomes_recepcionistas) {
-        try {
-          const parsed = typeof data.nomes_recepcionistas === 'string'
-            ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas;
-          if (Array.isArray(parsed)) nomes = parsed;
-        } catch(e) {}
       }
-      recepcionistas = [...new Set(nomes)];
+
+      recepcionistas = [...new Set(nomes)].filter(Boolean);
+
+      // Popular dropdown principal
       const sel = document.getElementById('f-recepcionista');
       sel.innerHTML = '<option value="">Nenhum / Não definido</option>';
       recepcionistas.forEach(n => {
@@ -487,7 +581,9 @@
       const sel = document.getElementById('f-passeio');
       sel.innerHTML = '<option value="">Selecionar passeio…</option>';
       passeiosCache.forEach(p => {
-        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${p.nome}</option>`);
+        const nome = p.nome || p.titulo || String(p.id);
+        sel.insertAdjacentHTML('beforeend',
+          `<option value="${p.id}" data-preco="${p.preco || 0}">${nome}</option>`);
       });
     } catch(e) {
       console.warn('[carregarPasseios]', e);
@@ -514,16 +610,20 @@
 
   // ── Filtro de meses ───────────────────────────────────────────────────
   function popularFiltroMes() {
-    const meses = [...new Set(todasReservas
-      .map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : null))
-      .filter(Boolean)
+    const meses = [...new Set(
+      todasReservas
+        .map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0, 7) : null))
+        .filter(Boolean)
     )].sort().reverse();
+
     const sel = document.getElementById('filtro-mes');
     sel.innerHTML = '<option value="">Todos os meses</option>';
+    const nomesM = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     meses.forEach(m => {
-      const [ano, mes] = m.split('-');
-      const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      sel.insertAdjacentHTML('beforeend', `<option value="${m}">${nomes[parseInt(mes,10)-1]}/${ano}</option>`);
+      const parts = m.split('-');
+      if (parts.length < 2) return;
+      const label = (nomesM[parseInt(parts[1], 10) - 1] || parts[1]) + '/' + parts[0];
+      sel.insertAdjacentHTML('beforeend', `<option value="${m}">${label}</option>`);
     });
   }
 
@@ -550,11 +650,12 @@
     let lista = todasReservas.filter(r => {
       if (filtroStatus && r.status !== filtroStatus) return false;
       if (filtroMes) {
-        const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : '');
+        const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0, 7) : '');
         if (ref !== filtroMes) return false;
       }
       if (busca) {
-        const haystack = `${r.nome_cliente||''} ${r.passeio_titulo||''}`.toLowerCase();
+        const passeioNome = r.passeio_nome || r.passeio_titulo || '';
+        const haystack = `${r.nome_cliente || ''} ${passeioNome}`.toLowerCase();
         if (!haystack.includes(busca)) return false;
       }
       return true;
@@ -576,6 +677,11 @@
           pago: 'badge-pago', cancelado: 'badge-cancelado'
         }[r.status] || 'badge-pendente';
 
+        // Aceita data_passeio ou data como nome do campo da data do passeio
+        const dataPasseio = r.data_passeio || r.data || null;
+        // Aceita passeio_nome, passeio_titulo ou passeio como nome do passeio
+        const passeioNome = r.passeio_nome || r.passeio_titulo || '–';
+
         tbody.insertAdjacentHTML('beforeend', `
           <tr>
             <td><span class="badge ${badgeClass}">${r.status}</span></td>
@@ -583,8 +689,8 @@
               <div style="font-weight:600">${r.nome_cliente || '–'}</div>
               ${r.whatsapp ? `<div style="font-size:.75rem;color:var(--muted)">${r.whatsapp}</div>` : ''}
             </td>
-            <td>${r.passeio_titulo || r.passeio || '–'}</td>
-            <td>${r.data ? formatarData(r.data) : '–'}</td>
+            <td>${passeioNome}</td>
+            <td>${dataPasseio ? formatarData(dataPasseio) : '–'}</td>
             <td>${r.numero_pessoas || 1}</td>
             <td>R$ ${valB}</td>
             <td style="color:var(--green);font-weight:600">R$ ${comR}</td>
@@ -598,8 +704,13 @@
             </td>
             <td>
               <div class="actions">
-                <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn btn-danger btn-sm" onclick="confirmarDelete(${r.id}, '${(r.nome_cliente||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="btn btn-danger btn-sm"
+                  onclick="confirmarDelete(${r.id}, '${(r.nome_cliente || '').replace(/'/g, "\\'")}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
               </div>
             </td>
           </tr>`);
@@ -609,32 +720,62 @@
 
   function formatarData(iso) {
     if (!iso) return '–';
-    const [y,m,d] = iso.substring(0,10).split('-');
-    return `${d}/${m}/${y}`;
+    const s = String(iso).substring(0, 10);
+    const parts = s.split('-');
+    if (parts.length < 3) return iso;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
 
   // ── Modal helpers ─────────────────────────────────────────────────────
   function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
   function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 
+  // ── PIX rows no modal principal ───────────────────────────────────────
+  function addModalPixRow(nome = '', valor = '') {
+    const list = document.getElementById('f-pix-list');
+    const row  = document.createElement('div');
+    row.className = 'f-pix-row';
+
+    const opts = recepcionistas.length
+      ? recepcionistas.map(n => `<option value="${n}">${n}</option>`).join('')
+      : '';
+
+    row.innerHTML = `
+      <select>
+        <option value="">Selecionar recepcionista…</option>
+        ${opts}
+      </select>
+      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" value="${valor !== '' ? valor : ''}">
+      <button type="button" class="btn-rm-pix" onclick="this.parentElement.remove()">
+        <i class="fa-solid fa-xmark" style="font-size:.75rem"></i>
+      </button>`;
+
+    list.appendChild(row);
+    if (nome) row.querySelector('select').value = nome;
+  }
+
   // ── Nova reserva ──────────────────────────────────────────────────────
   function abrirModalNova() {
-    document.getElementById('modal-titulo').textContent = 'Nova Reserva';
-    document.getElementById('f-id').value = '';
-    document.getElementById('f-cliente').value    = '';
-    document.getElementById('f-whatsapp').value   = '';
-    document.getElementById('f-status').value     = 'pendente';
-    document.getElementById('f-passeio').value    = '';
-    document.getElementById('f-data').value       = '';
-    document.getElementById('f-pessoas').value    = 1;
-    document.getElementById('f-valor-pessoa').value     = '';
-    document.getElementById('f-valor-bruto').value      = '';
-    document.getElementById('f-comissao-agencia').value = '';
-    document.getElementById('f-comissao-recepcao').value= '';
-    document.getElementById('f-recepcionista').value    = '';
-    document.getElementById('f-data-pagamento').value   = '';
-    document.getElementById('f-obs').value              = '';
-    document.getElementById('mes-ref-badge').style.display = 'none';
+    document.getElementById('modal-titulo').textContent        = 'Nova Reserva';
+    document.getElementById('f-id').value                     = '';
+    document.getElementById('f-cliente').value                = '';
+    document.getElementById('f-whatsapp').value               = '';
+    document.getElementById('f-status').value                 = 'pendente';
+    document.getElementById('f-passeio').value                = '';
+    document.getElementById('f-data').value                   = '';
+    document.getElementById('f-horario').value                = '';
+    document.getElementById('f-pessoas').value                = 1;
+    document.getElementById('f-valor-pessoa').value           = '';
+    document.getElementById('f-valor-bruto').value            = '';
+    document.getElementById('f-comissao-agencia').value       = '';
+    document.getElementById('f-comissao-recepcao').value      = '';
+    document.getElementById('f-recepcionista').value          = '';
+    document.getElementById('f-data-pagamento').value         = '';
+    document.getElementById('f-obs').value                    = '';
+    document.getElementById('mes-ref-badge').style.display    = 'none';
+    // PIX: uma linha vazia
+    document.getElementById('f-pix-list').innerHTML = '';
+    addModalPixRow();
     abrirModal('modal-reserva');
   }
 
@@ -642,23 +783,35 @@
   function editarReserva(id) {
     const r = todasReservas.find(x => x.id === id);
     if (!r) return;
-    document.getElementById('f-horario').value = r.horario || '';
-    document.getElementById('modal-titulo').textContent = 'Editar Reserva';
-    document.getElementById('f-id').value               = r.id;
-    document.getElementById('f-cliente').value          = r.nome_cliente || '';
-    document.getElementById('f-whatsapp').value         = r.whatsapp || '';
-    document.getElementById('f-status').value           = r.status || 'pendente';
-    document.getElementById('f-passeio').value          = r.passeio || '';
-    document.getElementById('f-data').value             = r.data || '';
-    document.getElementById('f-pessoas').value          = r.numero_pessoas || 1;
-    document.getElementById('f-valor-pessoa').value     = r.valor_por_pessoa || '';
-    document.getElementById('f-valor-bruto').value      = r.valor_bruto || '';
-    document.getElementById('f-comissao-agencia').value = r.comissao_agencia || '';
-    document.getElementById('f-comissao-recepcao').value= r.comissao_recepcao || '';
-    document.getElementById('f-recepcionista').value    = r.recepcionista || '';
-    document.getElementById('f-data-pagamento').value   = r.data_pagamento || '';
-    document.getElementById('f-obs').value              = r.observacoes || '';
+
+    document.getElementById('modal-titulo').textContent       = 'Editar Reserva';
+    document.getElementById('f-id').value                    = r.id;
+    document.getElementById('f-cliente').value               = r.nome_cliente || '';
+    document.getElementById('f-whatsapp').value              = r.whatsapp || '';
+    document.getElementById('f-status').value                = r.status || 'pendente';
+    document.getElementById('f-passeio').value               = r.passeio || r.passeio_id || '';
+    // Aceita data_passeio ou data
+    document.getElementById('f-data').value                  = r.data_passeio || r.data || '';
+    document.getElementById('f-horario').value               = r.horario || '';
+    document.getElementById('f-pessoas').value               = r.numero_pessoas || 1;
+    document.getElementById('f-valor-pessoa').value          = r.valor_por_pessoa || '';
+    document.getElementById('f-valor-bruto').value           = r.valor_bruto || '';
+    document.getElementById('f-comissao-agencia').value      = r.comissao_agencia || '';
+    document.getElementById('f-comissao-recepcao').value     = r.comissao_recepcao || '';
+    document.getElementById('f-recepcionista').value         = r.recepcionista || '';
+    document.getElementById('f-data-pagamento').value        = r.data_pagamento || '';
+    document.getElementById('f-obs').value                   = r.observacoes || '';
     atualizarMesRef();
+
+    // Popular PIX rows
+    document.getElementById('f-pix-list').innerHTML = '';
+    const pixEntries = parsePix(r.pix_recebimentos);
+    if (pixEntries.length) {
+      pixEntries.forEach(p => addModalPixRow(p.nome, p.valor > 0 ? p.valor : ''));
+    } else {
+      addModalPixRow();
+    }
+
     abrirModal('modal-reserva');
   }
 
@@ -666,15 +819,12 @@
   function calcularValorBruto() {
     const pessoas = parseFloat(document.getElementById('f-pessoas').value) || 1;
     const vpp     = parseFloat(document.getElementById('f-valor-pessoa').value) || 0;
-    if (vpp > 0) {
-      document.getElementById('f-valor-bruto').value = (pessoas * vpp).toFixed(2);
-    }
+    if (vpp > 0) document.getElementById('f-valor-bruto').value = (pessoas * vpp).toFixed(2);
     sugerirComissao();
   }
 
-  // Quando seleciona passeio, preenche valor por pessoa
   document.getElementById('f-passeio').addEventListener('change', function() {
-    const opt = this.options[this.selectedIndex];
+    const opt   = this.options[this.selectedIndex];
     const preco = parseFloat(opt.dataset.preco) || 0;
     if (preco > 0) {
       document.getElementById('f-valor-pessoa').value = preco.toFixed(2);
@@ -683,14 +833,11 @@
   });
 
   function sugerirComissao() {
-    const bruto    = parseFloat(document.getElementById('f-valor-bruto').value)      || 0;
-    const agencia  = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
-    const recep    = document.getElementById('f-comissao-recepcao');
-    // só sugere se o campo ainda estiver vazio ou igual ao valor calculado anteriormente
-    const sugestao = Math.max(0, bruto - agencia).toFixed(2);
-    if (!recep.value || parseFloat(recep.value) === 0) {
-      recep.value = sugestao;
-    }
+    const bruto   = parseFloat(document.getElementById('f-valor-bruto').value)      || 0;
+    const agencia = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
+    const recep   = document.getElementById('f-comissao-recepcao');
+    const sugest  = Math.max(0, bruto - agencia).toFixed(2);
+    if (!recep.value || parseFloat(recep.value) === 0) recep.value = sugest;
   }
 
   function atualizarMesRef() {
@@ -699,7 +846,7 @@
     if (val) {
       const [ano, mes] = val.split('-');
       const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent  = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+      badge.textContent   = `Mês referência: ${nomes[parseInt(mes, 10) - 1]}/${ano}`;
       badge.style.display = '';
     } else {
       badge.style.display = 'none';
@@ -710,31 +857,44 @@
   async function salvarReserva() {
     const id = document.getElementById('f-id').value;
 
+    // Coletar distribuição PIX do modal
+    const pixRows = document.querySelectorAll('#f-pix-list .f-pix-row');
+    const pixObj  = {};
+    pixRows.forEach(row => {
+      const nome = row.querySelector('select')?.value?.trim();
+      const val  = parseFloat(row.querySelector('input[type="number"]')?.value) || 0;
+      if (nome && val > 0) pixObj[nome] = val;
+    });
+
+    const dataPag = document.getElementById('f-data-pagamento').value || null;
+    const dataVal = document.getElementById('f-data').value || null;
+
     const payload = {
-      nome_cliente:       document.getElementById('f-cliente').value.trim(),
-      whatsapp:           document.getElementById('f-whatsapp').value.trim(),
-      status:             document.getElementById('f-status').value,
-      passeio:            document.getElementById('f-passeio').value || null,
-      data:               document.getElementById('f-data').value || null,
-      horario:            document.getElementById('f-horario').value || null,
-      numero_pessoas:     parseInt(document.getElementById('f-pessoas').value) || 1,
-      valor_por_pessoa:   document.getElementById('f-valor-pessoa').value    || null,
-      valor_bruto:        document.getElementById('f-valor-bruto').value     || null,
-      comissao_agencia:   document.getElementById('f-comissao-agencia').value|| null,
-      comissao_recepcao:  document.getElementById('f-comissao-recepcao').value|| null,
-      recepcionista:      document.getElementById('f-recepcionista').value   || '',
-      data_pagamento:     document.getElementById('f-data-pagamento').value  || null,
-      observacoes:        document.getElementById('f-obs').value,
+      nome_cliente:      document.getElementById('f-cliente').value.trim(),
+      whatsapp:          document.getElementById('f-whatsapp').value.trim(),
+      status:            document.getElementById('f-status').value,
+      passeio:           document.getElementById('f-passeio').value || null,
+      data_passeio:      dataVal,
+      data:              dataVal,
+      horario:           document.getElementById('f-horario').value || null,
+      numero_pessoas:    parseInt(document.getElementById('f-pessoas').value) || 1,
+      valor_por_pessoa:  document.getElementById('f-valor-pessoa').value    || null,
+      valor_bruto:       document.getElementById('f-valor-bruto').value     || null,
+      comissao_agencia:  document.getElementById('f-comissao-agencia').value|| null,
+      comissao_recepcao: document.getElementById('f-comissao-recepcao').value|| null,
+      recepcionista:     document.getElementById('f-recepcionista').value   || '',
+      data_pagamento:    dataPag,
+      observacoes:       document.getElementById('f-obs').value,
     };
 
-    // mes_referencia automático
-    if (payload.data_pagamento) {
-      payload.mes_referencia = payload.data_pagamento.substring(0, 7);
-    }
+    if (dataPag) payload.mes_referencia = dataPag.substring(0, 7);
+    if (Object.keys(pixObj).length > 0) payload.pix_recebimentos = JSON.stringify(pixObj);
 
     if (!payload.nome_cliente) { alert('Informe o nome do cliente.'); return; }
 
-    const url    = id ? `${API_BASE}/${hotelSlug}/reservas/${id}/` : `${API_BASE}/${hotelSlug}/reservas/`;
+    const url    = id
+      ? `${API_BASE}/${hotelSlug}/reservas/${id}/`
+      : `${API_BASE}/${hotelSlug}/reservas/`;
     const method = id ? 'PUT' : 'POST';
 
     try {
@@ -743,7 +903,11 @@
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) { const e = await res.json(); alert(e.erro || e.detail || 'Erro ao salvar.'); return; }
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.erro || e.detail || `Erro ${res.status} ao salvar.`);
+        return;
+      }
       fecharModal('modal-reserva');
       await carregarReservas();
     } catch(e) {
@@ -752,32 +916,42 @@
     }
   }
 
-  // ── Pagamento ─────────────────────────────────────────────────────────
+  // ── Pagamento (modal separado — botão "Pagar" na tabela) ──────────────
   function abrirPagamento(id) {
     const r = todasReservas.find(x => x.id === id);
     if (!r) return;
     document.getElementById('pg-id').value = id;
-    document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
+    document.getElementById('pg-data').value = new Date().toISOString().substring(0, 10);
     document.getElementById('pg-total-label').textContent =
-      `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
+      `— Total: R$ ${parseFloat(r.valor_bruto || 0).toFixed(2).replace('.', ',')}`;
     atualizarMesRefPg();
-    // Montar linhas de PIX
+
     const pixList = document.getElementById('pix-list');
     pixList.innerHTML = '';
-    const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
+    const nomes = recepcionistas.length
+      ? recepcionistas
+      : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
     nomes.forEach(nome => addPixRow(nome));
     abrirModal('modal-pagamento');
   }
 
-  function addPixRow(nome='') {
+  function addPixRow(nome = '') {
     const list = document.getElementById('pix-list');
     const row  = document.createElement('div');
     row.className = 'pix-row';
+
+    const opts = recepcionistas.length
+      ? recepcionistas.map(n => `<option value="${n}" ${n === nome ? 'selected' : ''}>${n}</option>`).join('')
+      : `<option value="${nome}">${nome || 'Recepção'}</option>`;
+
     row.innerHTML = `
-      <input type="text" placeholder="Nome recepcionista" value="${nome}" class="pix-nome"/>
-      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor" style="width:120px"/>
-    `;
+      <select style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.85rem;width:100%;outline:none;">
+        <option value="">Selecionar…</option>${opts}
+      </select>
+      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.85rem;width:120px;outline:none;"/>`;
     list.appendChild(row);
+    if (nome) row.querySelector('select').value = nome;
   }
 
   function atualizarMesRefPg() {
@@ -786,7 +960,7 @@
     if (val) {
       const [ano, mes] = val.split('-');
       const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent  = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+      badge.textContent   = `Mês referência: ${nomes[parseInt(mes, 10) - 1]}/${ano}`;
       badge.style.display = '';
     } else {
       badge.style.display = 'none';
@@ -794,16 +968,15 @@
   }
 
   async function confirmarPagamento() {
-    const id          = document.getElementById('pg-id').value;
-    const dataPag     = document.getElementById('pg-data').value;
+    const id      = document.getElementById('pg-id').value;
+    const dataPag = document.getElementById('pg-data').value;
     if (!dataPag) { alert('Informe a data de pagamento.'); return; }
 
-    // coletar pix
-    const pixRows    = document.querySelectorAll('#pix-list .pix-row');
+    const pixRows = document.querySelectorAll('#pix-list .pix-row');
     const pixRecebimentos = {};
     pixRows.forEach(row => {
-      const nome = row.querySelector('.pix-nome').value.trim();
-      const val  = parseFloat(row.querySelector('.pix-valor').value) || 0;
+      const nome = row.querySelector('select')?.value?.trim();
+      const val  = parseFloat(row.querySelector('.pix-valor')?.value) || 0;
       if (nome) pixRecebimentos[nome] = val;
     });
 
@@ -818,7 +991,11 @@
           pix_recebimentos: JSON.stringify(pixRecebimentos)
         })
       });
-      if (!res.ok) { const e = await res.json(); alert(e.erro || 'Erro ao confirmar pagamento.'); return; }
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`);
+        return;
+      }
       fecharModal('modal-pagamento');
       await carregarReservas();
     } catch(e) {
@@ -853,7 +1030,9 @@
 
   // Fechar modal ao clicar fora
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
   });
 </script>
 </body>
