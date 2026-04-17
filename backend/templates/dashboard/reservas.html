@@ -4,125 +4,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reservas – Concierge Digital</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <title>Reservas — {{ hotel.nome }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --surface2:  #22263a;
-      --accent:    #6c63ff;
-      --accent2:   #ff6584;
-      --green:     #22c55e;
-      --yellow:    #f59e0b;
-      --red:       #ef4444;
-      --text:      #e2e8f0;
-      --muted:     #94a3b8;
-      --border:    #2d3149;
-      --sidebar-w: 240px;
+      --bg-main:    #0b0f19;
+      --bg-sidebar: #0f1626;
+      --bg-card:    #121a2b;
+      --bg-hover:   #1a2438;
+      --border:     #1f2a40;
+      --border-light: #2a3754;
+      --text-main:  #e6edf3;
+      --text-muted: #9fb0c7;
+      --text-soft:  #6b7a90;
+      --gold:       #c9a96e;
+      --primary:    #22c55e;
+      --accent:     #6c63ff;
+      --green:      #22c55e;
+      --yellow:     #f59e0b;
+      --red:        #ef4444;
+      --sidebar-w:  240px;
     }
 
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; }
+    body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
 
     /* ── SIDEBAR ── */
     .sidebar {
-      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+      width: var(--sidebar-w); background: var(--bg-sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
+      padding: 24px 16px; z-index: 1000;
     }
     .sidebar-logo {
-      padding: 24px 20px 16px; font-size: 1.15rem; font-weight: 700; color: var(--accent);
-      border-bottom: 1px solid var(--border); letter-spacing: .5px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 12px 30px; font-size: 18px; font-weight: 700; color: var(--text-main);
     }
-    .sidebar-logo span { color: var(--text); font-weight: 400; }
-    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 11px 20px;
-      color: var(--muted); text-decoration: none; font-size: .88rem; transition: all .2s;
+    nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    nav a {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      color: var(--text-muted); font-size: 14px; text-decoration: none;
+      border-radius: 10px; transition: .2s;
     }
-    .nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); border-left: 3px solid var(--accent); padding-left: 17px; }
-    .nav-item i { width: 18px; text-align: center; }
-    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: .8rem; color: var(--muted); }
-    .sidebar-footer a { color: var(--accent2); text-decoration: none; }
+    nav a:hover { background: var(--bg-hover); color: var(--text-main); }
+    nav a.active { background: rgba(201,169,110,0.1); color: var(--gold); font-weight: 600; }
+    nav hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
 
     /* ── MAIN ── */
-    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); display: flex; flex-direction: column; min-height: 100vh; }
 
     .topbar {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 28px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 5;
     }
-    .topbar h1 { font-size: 1.2rem; font-weight: 600; }
-    .topbar-right { display: flex; align-items: center; gap: 12px; font-size: .85rem; color: var(--muted); }
+    .topbar-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
     .hotel-badge {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-      padding: 5px 12px; font-size: .8rem; color: var(--text);
+      display: flex; align-items: center; gap: 8px; font-size: 13px;
+      color: var(--text-muted); background: var(--bg-hover); padding: 6px 12px; border-radius: 8px;
     }
+    .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
 
-    .content { padding: 24px 28px; flex: 1; }
+    .content { padding: 28px; flex: 1; }
 
     /* ── STATS ── */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
     .stat-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
       padding: 18px 20px; display: flex; align-items: center; gap: 16px;
     }
-    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .stat-icon.blue   { background: rgba(108,99,255,.15); color: var(--accent); }
-    .stat-icon.green  { background: rgba(34,197,94,.15);  color: var(--green); }
-    .stat-icon.yellow { background: rgba(245,158,11,.15); color: var(--yellow); }
-    .stat-icon.red    { background: rgba(239,68,68,.15);  color: var(--red); }
+    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .stat-icon.blue   { background: rgba(108,99,255,.12); }
+    .stat-icon.green  { background: rgba(34,197,94,.12); }
+    .stat-icon.yellow { background: rgba(245,158,11,.12); }
+    .stat-icon.red    { background: rgba(239,68,68,.12); }
     .stat-body { min-width: 0; }
-    .stat-label { font-size: .75rem; color: var(--muted); margin-bottom: 4px; }
-    .stat-value { font-size: 1.4rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stat-label { font-size: 12px; color: var(--text-soft); margin-bottom: 4px; }
+    .stat-value { font-size: 22px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ── FILTER BAR ── */
     .filter-bar {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
       padding: 14px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
     }
     .filter-bar select, .filter-bar input {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text); padding: 8px 12px; font-size: .85rem; outline: none;
+      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-main); padding: 8px 12px; font-size: 13px; outline: none; font-family: 'Inter', sans-serif;
     }
-    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--accent); }
+    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--gold); }
     .filter-bar input { flex: 1; min-width: 160px; }
-    .btn { border: none; border-radius: 8px; padding: 9px 18px; font-size: .85rem; font-weight: 600; cursor: pointer; transition: opacity .2s; display: inline-flex; align-items: center; gap: 7px; }
+    .btn {
+      border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'Inter', sans-serif;
+    }
     .btn:hover { opacity: .85; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-success { background: var(--green); color: #fff; }
-    .btn-danger  { background: var(--red);   color: #fff; }
-    .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .btn-sm { padding: 5px 11px; font-size: .78rem; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-danger  { background: var(--red); color: #fff; }
+    .btn-ghost   { background: var(--bg-hover); color: var(--text-main); border: 1px solid var(--border); }
+    .btn-sm { padding: 5px 11px; font-size: 12px; }
 
     /* ── TABLE ── */
-    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .table-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .table-head h2 { font-size: .95rem; font-weight: 600; }
-    table { width: 100%; border-collapse: collapse; font-size: .83rem; }
-    thead tr { background: var(--surface2); }
-    th { padding: 11px 14px; text-align: left; color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
-    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .table-head {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-head h2 { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--bg-hover); }
+    th { padding: 11px 14px; text-align: left; color: var(--text-soft); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-muted); }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,.02); }
+    tr:hover td { background: rgba(255,255,255,.015); }
 
-    .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: .72rem; font-weight: 600; }
-    .badge-pendente   { background: rgba(245,158,11,.15); color: var(--yellow); }
-    .badge-confirmado { background: rgba(108,99,255,.15); color: var(--accent); }
-    .badge-pago       { background: rgba(34,197,94,.15);  color: var(--green); }
-    .badge-cancelado  { background: rgba(239,68,68,.15);  color: var(--red); }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-pendente   { background: rgba(245,158,11,.12); color: var(--yellow); }
+    .badge-confirmado { background: rgba(108,99,255,.12); color: #a5a0ff; }
+    .badge-pago       { background: rgba(34,197,94,.12);  color: var(--green); }
+    .badge-cancelado  { background: rgba(239,68,68,.12);  color: var(--red); }
 
     .actions { display: flex; gap: 6px; }
 
     /* ── MODAL ── */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
       z-index: 200; align-items: center; justify-content: center; padding: 20px;
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px;
       width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
       box-shadow: 0 24px 60px rgba(0,0,0,.5);
     }
@@ -130,65 +142,61 @@
       padding: 20px 24px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .modal-header h3 { font-size: 1rem; font-weight: 600; }
-    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
-    .modal-close:hover { color: var(--text); }
+    .modal-header h3 { font-size: 15px; font-weight: 600; color: var(--text-main); }
+    .modal-close { background: none; border: none; color: var(--text-soft); font-size: 20px; cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--text-main); }
     .modal-body { padding: 24px; }
     .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-grid .full { grid-column: 1 / -1; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: .78rem; color: var(--muted); font-weight: 600; }
+    .form-group label { font-size: 11px; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
     .form-group input, .form-group select, .form-group textarea {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text); padding: 9px 12px; font-size: .87rem; outline: none; width: 100%;
+      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-main); padding: 9px 12px; font-size: 13px; outline: none; width: 100%;
+      font-family: 'Inter', sans-serif;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
     .form-group textarea { min-height: 72px; resize: vertical; }
-    .form-hint { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .form-hint { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
-    .section-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+    .section-title { font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
 
-    /* ── PIX rows no modal principal ── */
     .f-pix-row {
       display: grid; grid-template-columns: 1fr 130px 32px;
       gap: 8px; align-items: center; margin-bottom: 8px;
     }
     .f-pix-row select,
     .f-pix-row input[type="number"] {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; outline: none;
+      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-main); padding: 8px 10px; font-size: 13px; width: 100%; outline: none; font-family: 'Inter', sans-serif;
     }
-    .f-pix-row select:focus, .f-pix-row input:focus { border-color: var(--accent); }
+    .f-pix-row select:focus, .f-pix-row input:focus { border-color: var(--gold); }
     .btn-rm-pix {
-      background: rgba(239,68,68,.15); border: 1px solid var(--red); border-radius: 8px;
+      background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3); border-radius: 8px;
       color: var(--red); cursor: pointer; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      transition: all .2s;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s;
     }
     .btn-rm-pix:hover { background: var(--red); color: #fff; }
-    .pix-col-labels {
-      display: grid; grid-template-columns: 1fr 130px 32px;
-      gap: 8px; margin-bottom: 6px;
-    }
-    .pix-col-labels span { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .pix-col-labels { display: grid; grid-template-columns: 1fr 130px 32px; gap: 8px; margin-bottom: 6px; }
+    .pix-col-labels span { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; }
 
-    /* PIX list no modal de pagamento */
     #pix-list .pix-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
-    #pix-list .pix-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; outline: none; }
+    #pix-list .pix-row input {
+      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-main); padding: 8px 10px; font-size: 13px; width: 100%; outline: none; font-family: 'Inter', sans-serif;
+    }
 
-    /* mes_referencia badge */
     #mes-ref-badge {
-      display: none; background: rgba(108,99,255,.15); color: var(--accent);
-      border-radius: 6px; padding: 4px 10px; font-size: .78rem; font-weight: 600;
+      display: none; background: rgba(201,169,110,.12); color: var(--gold);
+      border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600;
       width: fit-content; margin-top: 6px;
     }
 
-    /* empty state */
-    .empty { text-align: center; padding: 52px 20px; color: var(--muted); }
-    .empty i { font-size: 2.4rem; margin-bottom: 12px; display: block; }
+    .empty { text-align: center; padding: 52px 20px; color: var(--text-soft); }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; display: block; }
 
     @media (max-width: 900px) {
       :root { --sidebar-w: 0px; }
@@ -205,57 +213,52 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════ SIDEBAR ══════════════════════════════ -->
 <aside class="sidebar">
-            <h2>🔔 Concierge</h2>
-            <nav>
-                <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-                <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-                <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-                <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-                <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-                <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-                <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-                <hr style="border-color:#1e293b;margin:12px 0;">
-                <a href="/logout/">↩ Sair</a>
-            </nav>
-        </aside>
+  <div class="sidebar-logo">🔔 Concierge</div>
+  <nav>
+    <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+    <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+    <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+    <a href="/{{ hotel.slug }}/dashboard/reservas/" class="active">📅 Reservas</a>
+    <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+    <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+    <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+    <hr>
+    <a href="/logout/">↩ Sair</a>
+  </nav>
+</aside>
 
-<!-- ══════════════════════════════ MAIN ══════════════════════════════ -->
 <div class="main">
 
-  <!-- TOPBAR -->
   <div class="topbar">
-    <h1><i class="fa-solid fa-calendar-check" style="color:var(--accent);margin-right:8px"></i>Reservas</h1>
-    <div class="topbar-right">
-      <span id="hotel-nome-top" class="hotel-badge"></span>
-      <span>{{ request.user.username }}</span>
+    <span class="topbar-title">📅 Reservas</span>
+    <div class="hotel-badge">
+      <div class="hotel-dot"></div>
+      <span id="hotel-nome-top">{{ hotel.nome }}</span>
     </div>
   </div>
 
   <div class="content">
 
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon blue"><i class="fa-solid fa-ticket"></i></div>
+        <div class="stat-icon blue">🎫</div>
         <div class="stat-body"><div class="stat-label">Total de Reservas</div><div class="stat-value" id="stat-total">0</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-icon yellow">⏳</div>
         <div class="stat-body"><div class="stat-label">Confirmadas</div><div class="stat-value" id="stat-confirmadas">0</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-icon green">✅</div>
         <div class="stat-body"><div class="stat-label">Pagas</div><div class="stat-value" id="stat-pagas">0</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon red"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="stat-icon red">💰</div>
         <div class="stat-body"><div class="stat-label">Comissão Recepção (pagas)</div><div class="stat-value" id="stat-comissao">R$ 0,00</div></div>
       </div>
     </div>
 
-    <!-- FILTER BAR -->
     <div class="filter-bar">
       <select id="filtro-status" onchange="renderTabela()">
         <option value="">Todos os status</option>
@@ -268,14 +271,13 @@
         <option value="">Todos os meses</option>
       </select>
       <input type="text" id="filtro-busca" placeholder="Buscar cliente ou passeio…" oninput="renderTabela()"/>
-      <button class="btn btn-primary" onclick="abrirModalNova()"><i class="fa-solid fa-plus"></i> Nova Reserva</button>
+      <button class="btn btn-primary" onclick="abrirModalNova()">➕ Nova Reserva</button>
     </div>
 
-    <!-- TABLE -->
     <div class="table-wrap">
       <div class="table-head">
         <h2>Lista de Reservas</h2>
-        <span id="count-label" style="font-size:.8rem;color:var(--muted)"></span>
+        <span id="count-label" style="font-size:12px;color:var(--text-soft)"></span>
       </div>
       <table id="tabela-reservas">
         <thead>
@@ -295,18 +297,16 @@
         <tbody id="tbody"></tbody>
       </table>
       <div id="empty-state" class="empty" style="display:none">
-        <i class="fa-solid fa-calendar-xmark"></i>
-        <p>Nenhuma reserva encontrada.</p>
-        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()">
-          <i class="fa-solid fa-plus"></i> Criar Reserva
-        </button>
+        <span class="empty-icon">📅</span>
+        <p style="color:var(--text-soft)">Nenhuma reserva encontrada.</p>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()">➕ Criar Reserva</button>
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
+  </div>
+</div>
 
-<!-- ═══════════════════ MODAL: NOVA / EDITAR RESERVA ═══════════════════ -->
+<!-- MODAL: NOVA / EDITAR -->
 <div class="modal-overlay" id="modal-reserva">
   <div class="modal">
     <div class="modal-header">
@@ -315,20 +315,11 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="f-id"/>
-
-      <!-- DADOS DO CLIENTE -->
       <p class="section-title">Dados do Cliente</p>
       <div class="form-grid">
-        <div class="form-group full">
-          <label>Nome do Cliente *</label>
-          <input type="text" id="f-cliente" placeholder="Nome completo"/>
-        </div>
-        <div class="form-group">
-          <label>WhatsApp</label>
-          <input type="text" id="f-whatsapp" placeholder="+55 11 99999-9999"/>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
+        <div class="form-group full"><label>Nome do Cliente *</label><input type="text" id="f-cliente" placeholder="Nome completo"/></div>
+        <div class="form-group"><label>WhatsApp</label><input type="text" id="f-whatsapp" placeholder="+55 11 99999-9999"/></div>
+        <div class="form-group"><label>Status</label>
           <select id="f-status">
             <option value="pendente">Pendente</option>
             <option value="confirmado">Confirmado</option>
@@ -337,75 +328,27 @@
           </select>
         </div>
       </div>
-
       <hr class="divider"/>
-
-      <!-- PASSEIO & DATA -->
       <p class="section-title">Passeio & Data</p>
       <div class="form-grid">
-        <div class="form-group full">
-          <label>Passeio *</label>
-          <select id="f-passeio"><option value="">Carregando…</option></select>
-        </div>
-        <div class="form-group">
-          <label>Data do Passeio *</label>
-          <input type="date" id="f-data"/>
-        </div>
-        <div class="form-group">
-          <label>Horário</label>
-          <input type="time" id="f-horario"/>
-        </div>
-        <div class="form-group">
-          <label>Nº de Pessoas</label>
-          <input type="number" id="f-pessoas" value="1" min="1" oninput="calcularValorBruto()"/>
-        </div>
+        <div class="form-group full"><label>Passeio *</label><select id="f-passeio"><option value="">Carregando…</option></select></div>
+        <div class="form-group"><label>Data do Passeio *</label><input type="date" id="f-data"/></div>
+        <div class="form-group"><label>Horário</label><input type="time" id="f-horario"/></div>
+        <div class="form-group"><label>Nº de Pessoas</label><input type="number" id="f-pessoas" value="1" min="1" oninput="calcularValorBruto()"/></div>
       </div>
-
       <hr class="divider"/>
-
-      <!-- VALORES & COMISSÃO -->
       <p class="section-title">Valores & Comissão</p>
       <div class="form-grid">
-        <div class="form-group">
-          <label>Valor por Pessoa (R$)</label>
-          <input type="number" id="f-valor-pessoa" step="0.01" placeholder="0.00" oninput="calcularValorBruto()"/>
-        </div>
-        <div class="form-group">
-          <label>Valor Bruto (R$)</label>
-          <input type="number" id="f-valor-bruto" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
-          <span class="form-hint">Calculado automaticamente</span>
-        </div>
-        <div class="form-group">
-          <label>Comissão Agência (R$)</label>
-          <input type="number" id="f-comissao-agencia" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
-        </div>
-        <div class="form-group">
-          <label>★ Comissão Recepção (R$)</label>
-          <input type="number" id="f-comissao-recepcao" step="0.01" placeholder="0.00"/>
-          <span class="form-hint">Vai para o relatório de comissões</span>
-        </div>
+        <div class="form-group"><label>Valor por Pessoa (R$)</label><input type="number" id="f-valor-pessoa" step="0.01" placeholder="0.00" oninput="calcularValorBruto()"/></div>
+        <div class="form-group"><label>Valor Bruto (R$)</label><input type="number" id="f-valor-bruto" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/><span class="form-hint">Calculado automaticamente</span></div>
+        <div class="form-group"><label>Comissão Agência (R$)</label><input type="number" id="f-comissao-agencia" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/></div>
+        <div class="form-group"><label>★ Comissão Recepção (R$)</label><input type="number" id="f-comissao-recepcao" step="0.01" placeholder="0.00"/><span class="form-hint">Vai para o relatório</span></div>
       </div>
-
       <hr class="divider"/>
-
-      <!-- ── RECEPCIONISTA (quem atendeu) ── -->
       <p class="section-title">Recepcionista</p>
-      <div class="form-group">
-        <label>Responsável pelo Atendimento</label>
-        <select id="f-recepcionista">
-          <option value="">Nenhum / Não definido</option>
-        </select>
-      </div>
-
+      <div class="form-group"><label>Responsável pelo Atendimento</label><select id="f-recepcionista"><option value="">Nenhum / Não definido</option></select></div>
       <hr class="divider"/>
-
-      <!-- ── PAGAMENTO PIX (opcional) ── -->
-      <p class="section-title">
-        Pagamento PIX
-        <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;font-size:.72rem">
-          &nbsp;— opcional
-        </span>
-      </p>
+      <p class="section-title">Pagamento PIX <span style="font-weight:400;color:var(--text-soft);text-transform:none;font-size:11px">— opcional</span></p>
       <div class="form-group" style="margin-bottom:16px">
         <label>Data de Pagamento</label>
         <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
@@ -417,29 +360,19 @@
         <span></span>
       </div>
       <div id="f-pix-list"></div>
-      <button type="button" class="btn btn-ghost btn-sm" onclick="addModalPixRow()" style="margin-top:6px">
-        <i class="fa-solid fa-plus"></i> Adicionar recepcionista
-      </button>
-
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addModalPixRow()" style="margin-top:6px">➕ Adicionar recepcionista</button>
       <hr class="divider"/>
-
-      <!-- OBSERVAÇÕES -->
       <p class="section-title">Observações</p>
-      <div class="form-group">
-        <textarea id="f-obs" placeholder="Observações opcionais…"></textarea>
-      </div>
-
+      <div class="form-group"><textarea id="f-obs" placeholder="Observações opcionais…"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarReserva()">
-        <i class="fa-solid fa-floppy-disk"></i> Salvar
-      </button>
+      <button class="btn btn-primary" onclick="salvarReserva()">💾 Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════ MODAL: REGISTRAR PAGAMENTO ═══════════════════ -->
+<!-- MODAL: PAGAMENTO -->
 <div class="modal-overlay" id="modal-pagamento">
   <div class="modal">
     <div class="modal-header">
@@ -451,28 +384,21 @@
       <div class="form-group" style="margin-bottom:14px">
         <label>Data de Pagamento *</label>
         <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
-        <div id="mes-ref-badge-pg" style="display:none;background:rgba(108,99,255,.15);color:var(--accent);border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:600;width:fit-content;margin-top:6px;"></div>
+        <div id="mes-ref-badge-pg" style="display:none;background:rgba(201,169,110,.12);color:var(--gold);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;width:fit-content;margin-top:6px;"></div>
       </div>
       <hr class="divider"/>
-      <p class="section-title">
-        Distribuição PIX
-        <span id="pg-total-label" style="color:var(--accent);font-size:.85rem;font-weight:700;"></span>
-      </p>
+      <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
       <div id="pix-list"></div>
-      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">
-        <i class="fa-solid fa-plus"></i> Adicionar recepcionista
-      </button>
+      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
-      <button class="btn btn-success" onclick="confirmarPagamento()">
-        <i class="fa-solid fa-circle-check"></i> Confirmar Pagamento
-      </button>
+      <button class="btn btn-success" onclick="confirmarPagamento()">✅ Confirmar Pagamento</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════ MODAL: CONFIRMAR DELETE ═══════════════════ -->
+<!-- MODAL: DELETE -->
 <div class="modal-overlay" id="modal-delete">
   <div class="modal" style="max-width:420px">
     <div class="modal-header">
@@ -480,23 +406,19 @@
       <button class="modal-close" onclick="fecharModal('modal-delete')">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--muted);font-size:.9rem">
-        Tem certeza que deseja excluir a reserva de <strong id="del-nome"></strong>?
+      <p style="color:var(--text-muted);font-size:13px">
+        Tem certeza que deseja excluir a reserva de <strong id="del-nome" style="color:var(--text-main)"></strong>?
         Esta ação não pode ser desfeita.
       </p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modal-delete')">Cancelar</button>
-      <button class="btn btn-danger" onclick="executarDelete()">
-        <i class="fa-solid fa-trash"></i> Excluir
-      </button>
+      <button class="btn btn-danger" onclick="executarDelete()">🗑️ Excluir</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ JS ═══════════════════════════════ -->
 <script>
-  // ── Config ──────────────────────────────────────────────────────────
   const API_BASE  = '/api/admin';
   const hotelSlug = '{{ hotel.slug }}';
   const csrfToken = '{{ csrf_token }}';
@@ -506,72 +428,38 @@
   let recepcionistas   = [];
   let deleteIdPendente = null;
 
-  // ── Init ─────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('hotel-nome-top').textContent = '{{ hotel.nome }}';
     await Promise.all([carregarPasseios(), carregarRecepcionistas(), carregarReservas()]);
   });
 
-  // ── parsePix ─────────────────────────────────────────────────────────
   function parsePix(raw) {
     if (!raw) return [];
     try {
       const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (Array.isArray(p)) {
-        return p.map(x => ({ nome: x.nome || '', valor: parseFloat(x.valor) || 0 }));
-      }
-      if (typeof p === 'object' && p !== null) {
-        return Object.entries(p).map(([nome, valor]) => ({ nome, valor: parseFloat(valor) || 0 }));
-      }
+      if (Array.isArray(p)) return p.map(x => ({ nome: x.nome || '', valor: parseFloat(x.valor) || 0 }));
+      if (typeof p === 'object' && p !== null) return Object.entries(p).map(([nome, valor]) => ({ nome, valor: parseFloat(valor) || 0 }));
       return [];
     } catch { return []; }
   }
 
-  // ── Recepcionistas (via divisão) ─────────────────────────────────────
   async function carregarRecepcionistas() {
     try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/divisao/`, {
-        headers: { 'X-CSRFToken': csrfToken }
-      });
+      const res = await fetch(`${API_BASE}/${hotelSlug}/divisao/`, { headers: { 'X-CSRFToken': csrfToken } });
       if (!res.ok) return;
       const data = await res.json();
       let nomes = [];
-
-      // Aceita tanto {nomes: [...]} quanto {nomes_recepcionistas: "..."}
       if (data.nomes && Array.isArray(data.nomes)) {
         nomes = data.nomes;
       } else if (data.nomes_recepcionistas) {
-        try {
-          const p = typeof data.nomes_recepcionistas === 'string'
-            ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas;
-          if (Array.isArray(p)) nomes = p;
-        } catch(e) {}
-      } else if (Array.isArray(data)) {
-        data.forEach(d => {
-          if (d.nomes_recepcionistas) {
-            try {
-              const p = typeof d.nomes_recepcionistas === 'string'
-                ? JSON.parse(d.nomes_recepcionistas) : d.nomes_recepcionistas;
-              if (Array.isArray(p)) nomes = nomes.concat(p);
-            } catch(e) {}
-          }
-        });
+        try { const p = typeof data.nomes_recepcionistas === 'string' ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas; if (Array.isArray(p)) nomes = p; } catch(e) {}
       }
-
       recepcionistas = [...new Set(nomes)].filter(Boolean);
-
-      // Popular dropdown principal
       const sel = document.getElementById('f-recepcionista');
       sel.innerHTML = '<option value="">Nenhum / Não definido</option>';
-      recepcionistas.forEach(n => {
-        sel.insertAdjacentHTML('beforeend', `<option value="${n}">${n}</option>`);
-      });
-    } catch(e) {
-      console.warn('[carregarRecepcionistas]', e);
-    }
+      recepcionistas.forEach(n => sel.insertAdjacentHTML('beforeend', `<option value="${n}">${n}</option>`));
+    } catch(e) { console.warn('[carregarRecepcionistas]', e); }
   }
 
-  // ── Passeios ─────────────────────────────────────────────────────────
   async function carregarPasseios() {
     try {
       const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/`);
@@ -582,20 +470,14 @@
       sel.innerHTML = '<option value="">Selecionar passeio…</option>';
       passeiosCache.forEach(p => {
         const nome = p.nome || p.titulo || String(p.id);
-        sel.insertAdjacentHTML('beforeend',
-          `<option value="${p.id}" data-preco="${p.preco || 0}">${nome}</option>`);
+        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${nome}</option>`);
       });
-    } catch(e) {
-      console.warn('[carregarPasseios]', e);
-    }
+    } catch(e) { console.warn('[carregarPasseios]', e); }
   }
 
-  // ── Reservas ─────────────────────────────────────────────────────────
   async function carregarReservas() {
     try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/`, {
-        headers: { 'X-CSRFToken': csrfToken }
-      });
+      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/`, { headers: { 'X-CSRFToken': csrfToken } });
       if (!res.ok) { console.warn('[carregarReservas] HTTP', res.status); return; }
       const data = await res.json();
       if (!Array.isArray(data)) { console.warn('[carregarReservas] resposta inválida:', data); return; }
@@ -603,194 +485,125 @@
       popularFiltroMes();
       atualizarStats();
       renderTabela();
-    } catch(e) {
-      console.error('[carregarReservas]', e);
-    }
+    } catch(e) { console.error('[carregarReservas]', e); }
   }
 
-  // ── Filtro de meses ───────────────────────────────────────────────────
   function popularFiltroMes() {
     const meses = [...new Set(
-      todasReservas
-        .map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0, 7) : null))
-        .filter(Boolean)
+      todasReservas.map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : null)).filter(Boolean)
     )].sort().reverse();
-
     const sel = document.getElementById('filtro-mes');
     sel.innerHTML = '<option value="">Todos os meses</option>';
     const nomesM = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     meses.forEach(m => {
       const parts = m.split('-');
       if (parts.length < 2) return;
-      const label = (nomesM[parseInt(parts[1], 10) - 1] || parts[1]) + '/' + parts[0];
+      const label = (nomesM[parseInt(parts[1],10)-1]||parts[1]) + '/' + parts[0];
       sel.insertAdjacentHTML('beforeend', `<option value="${m}">${label}</option>`);
     });
   }
 
-  // ── Stats ─────────────────────────────────────────────────────────────
   function atualizarStats() {
     const total       = todasReservas.length;
     const confirmadas = todasReservas.filter(r => r.status === 'confirmado').length;
     const pagas       = todasReservas.filter(r => r.status === 'pago').length;
-    const comissao    = todasReservas
-      .filter(r => r.status === 'pago')
-      .reduce((s, r) => s + parseFloat(r.comissao_recepcao || 0), 0);
+    const comissao    = todasReservas.filter(r => r.status === 'pago').reduce((s,r) => s + parseFloat(r.comissao_recepcao||0), 0);
     document.getElementById('stat-total').textContent       = total;
     document.getElementById('stat-confirmadas').textContent = confirmadas;
     document.getElementById('stat-pagas').textContent       = pagas;
-    document.getElementById('stat-comissao').textContent    = 'R$ ' + comissao.toFixed(2).replace('.', ',');
+    document.getElementById('stat-comissao').textContent    = 'R$ ' + comissao.toFixed(2).replace('.',',');
   }
 
-  // ── Render tabela ─────────────────────────────────────────────────────
   function renderTabela() {
     const filtroStatus = document.getElementById('filtro-status').value;
     const filtroMes    = document.getElementById('filtro-mes').value;
     const busca        = document.getElementById('filtro-busca').value.toLowerCase();
-
     let lista = todasReservas.filter(r => {
       if (filtroStatus && r.status !== filtroStatus) return false;
-      if (filtroMes) {
-        const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0, 7) : '');
-        if (ref !== filtroMes) return false;
-      }
-      if (busca) {
-        const passeioNome = r.passeio_nome || r.passeio_titulo || '';
-        const haystack = `${r.nome_cliente || ''} ${passeioNome}`.toLowerCase();
-        if (!haystack.includes(busca)) return false;
-      }
+      if (filtroMes) { const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : ''); if (ref !== filtroMes) return false; }
+      if (busca) { const hay = `${r.nome_cliente||''} ${r.passeio_nome||r.passeio_titulo||''}`.toLowerCase(); if (!hay.includes(busca)) return false; }
       return true;
     });
-
     const tbody = document.getElementById('tbody');
     tbody.innerHTML = '';
     document.getElementById('count-label').textContent = `${lista.length} registros`;
-
-    if (lista.length === 0) {
-      document.getElementById('empty-state').style.display = '';
-    } else {
-      document.getElementById('empty-state').style.display = 'none';
-      lista.forEach(r => {
-        const comR  = parseFloat(r.comissao_recepcao || 0).toFixed(2).replace('.', ',');
-        const valB  = parseFloat(r.valor_bruto || 0).toFixed(2).replace('.', ',');
-        const badgeClass = {
-          pendente: 'badge-pendente', confirmado: 'badge-confirmado',
-          pago: 'badge-pago', cancelado: 'badge-cancelado'
-        }[r.status] || 'badge-pendente';
-
-        // Aceita data_passeio ou data como nome do campo da data do passeio
-        const dataPasseio = r.data_passeio || r.data || null;
-        // Aceita passeio_nome, passeio_titulo ou passeio como nome do passeio
-        const passeioNome = r.passeio_nome || r.passeio_titulo || '–';
-
-        tbody.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td><span class="badge ${badgeClass}">${r.status}</span></td>
-            <td>
-              <div style="font-weight:600">${r.nome_cliente || '–'}</div>
-              ${r.whatsapp ? `<div style="font-size:.75rem;color:var(--muted)">${r.whatsapp}</div>` : ''}
-            </td>
-            <td>${passeioNome}</td>
-            <td>${dataPasseio ? formatarData(dataPasseio) : '–'}</td>
-            <td>${r.numero_pessoas || 1}</td>
-            <td>R$ ${valB}</td>
-            <td style="color:var(--green);font-weight:600">R$ ${comR}</td>
-            <td>${r.recepcionista || '<span style="color:var(--muted)">–</span>'}</td>
-            <td>
-              ${r.data_pagamento
-                ? `<span style="font-size:.78rem;color:var(--green)">${formatarData(r.data_pagamento)}</span>`
-                : (r.status !== 'cancelado' && r.status !== 'pago'
-                  ? `<button class="btn btn-success btn-sm" onclick="abrirPagamento(${r.id})"><i class="fa-solid fa-dollar-sign"></i> Pagar</button>`
-                  : '<span style="color:var(--muted);font-size:.78rem">–</span>')}
-            </td>
-            <td>
-              <div class="actions">
-                <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <button class="btn btn-danger btn-sm"
-                  onclick="confirmarDelete(${r.id}, '${(r.nome_cliente || '').replace(/'/g, "\\'")}')">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>`);
-      });
-    }
+    if (!lista.length) { document.getElementById('empty-state').style.display = ''; return; }
+    document.getElementById('empty-state').style.display = 'none';
+    lista.forEach(r => {
+      const comR  = parseFloat(r.comissao_recepcao||0).toFixed(2).replace('.',',');
+      const valB  = parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',');
+      const badgeClass = { pendente:'badge-pendente', confirmado:'badge-confirmado', pago:'badge-pago', cancelado:'badge-cancelado' }[r.status] || 'badge-pendente';
+      const dataPasseio = r.data_passeio || r.data || null;
+      const passeioNome = r.passeio_nome || r.passeio_titulo || '–';
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td><span class="badge ${badgeClass}">${r.status}</span></td>
+          <td><div style="font-weight:500;color:var(--text-main)">${r.nome_cliente||'–'}</div>${r.whatsapp?`<div style="font-size:11px;color:var(--text-soft)">${r.whatsapp}</div>`:''}</td>
+          <td>${passeioNome}</td>
+          <td>${dataPasseio ? formatarData(dataPasseio) : '–'}</td>
+          <td>${r.numero_pessoas||1}</td>
+          <td>R$ ${valB}</td>
+          <td style="color:var(--primary);font-weight:600">R$ ${comR}</td>
+          <td>${r.recepcionista||'<span style="color:var(--text-soft)">–</span>'}</td>
+          <td>${r.data_pagamento
+            ? `<span style="font-size:12px;color:var(--primary)">${formatarData(r.data_pagamento)}</span>`
+            : (r.status !== 'cancelado' && r.status !== 'pago'
+              ? `<button class="btn btn-success btn-sm" onclick="abrirPagamento(${r.id})">💰 Pagar</button>`
+              : '<span style="color:var(--text-soft);font-size:12px">–</span>')}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="confirmarDelete(${r.id}, '${(r.nome_cliente||'').replace(/'/g,"\\'")}')">🗑️</button>
+            </div>
+          </td>
+        </tr>`);
+    });
   }
 
   function formatarData(iso) {
     if (!iso) return '–';
-    const s = String(iso).substring(0, 10);
+    const s = String(iso).substring(0,10);
     const parts = s.split('-');
     if (parts.length < 3) return iso;
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
 
-  // ── Modal helpers ─────────────────────────────────────────────────────
   function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
   function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  // ── PIX rows no modal principal ───────────────────────────────────────
-  function addModalPixRow(nome = '', valor = '') {
+  function addModalPixRow(nome='', valor='') {
     const list = document.getElementById('f-pix-list');
     const row  = document.createElement('div');
     row.className = 'f-pix-row';
-
-    const opts = recepcionistas.length
-      ? recepcionistas.map(n => `<option value="${n}">${n}</option>`).join('')
-      : '';
-
+    const opts = recepcionistas.length ? recepcionistas.map(n=>`<option value="${n}">${n}</option>`).join('') : '';
     row.innerHTML = `
-      <select>
-        <option value="">Selecionar recepcionista…</option>
-        ${opts}
-      </select>
-      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" value="${valor !== '' ? valor : ''}">
-      <button type="button" class="btn-rm-pix" onclick="this.parentElement.remove()">
-        <i class="fa-solid fa-xmark" style="font-size:.75rem"></i>
-      </button>`;
-
+      <select><option value="">Selecionar recepcionista…</option>${opts}</select>
+      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" value="${valor!==''?valor:''}">
+      <button type="button" class="btn-rm-pix" onclick="this.parentElement.remove()">✕</button>`;
     list.appendChild(row);
     if (nome) row.querySelector('select').value = nome;
   }
 
-  // ── Nova reserva ──────────────────────────────────────────────────────
   function abrirModalNova() {
-    document.getElementById('modal-titulo').textContent        = 'Nova Reserva';
-    document.getElementById('f-id').value                     = '';
-    document.getElementById('f-cliente').value                = '';
-    document.getElementById('f-whatsapp').value               = '';
-    document.getElementById('f-status').value                 = 'pendente';
-    document.getElementById('f-passeio').value                = '';
-    document.getElementById('f-data').value                   = '';
-    document.getElementById('f-horario').value                = '';
-    document.getElementById('f-pessoas').value                = 1;
-    document.getElementById('f-valor-pessoa').value           = '';
-    document.getElementById('f-valor-bruto').value            = '';
-    document.getElementById('f-comissao-agencia').value       = '';
-    document.getElementById('f-comissao-recepcao').value      = '';
-    document.getElementById('f-recepcionista').value          = '';
-    document.getElementById('f-data-pagamento').value         = '';
-    document.getElementById('f-obs').value                    = '';
-    document.getElementById('mes-ref-badge').style.display    = 'none';
-    // PIX: uma linha vazia
+    document.getElementById('modal-titulo').textContent = 'Nova Reserva';
+    ['f-id','f-cliente','f-whatsapp','f-passeio','f-data','f-horario','f-valor-pessoa','f-valor-bruto','f-comissao-agencia','f-comissao-recepcao','f-recepcionista','f-data-pagamento','f-obs'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('f-status').value = 'pendente';
+    document.getElementById('f-pessoas').value = 1;
+    document.getElementById('mes-ref-badge').style.display = 'none';
     document.getElementById('f-pix-list').innerHTML = '';
     addModalPixRow();
     abrirModal('modal-reserva');
   }
 
-  // ── Editar reserva ────────────────────────────────────────────────────
   function editarReserva(id) {
     const r = todasReservas.find(x => x.id === id);
     if (!r) return;
-
     document.getElementById('modal-titulo').textContent       = 'Editar Reserva';
     document.getElementById('f-id').value                    = r.id;
     document.getElementById('f-cliente').value               = r.nome_cliente || '';
     document.getElementById('f-whatsapp').value              = r.whatsapp || '';
     document.getElementById('f-status').value                = r.status || 'pendente';
     document.getElementById('f-passeio').value               = r.passeio || r.passeio_id || '';
-    // Aceita data_passeio ou data
     document.getElementById('f-data').value                  = r.data_passeio || r.data || '';
     document.getElementById('f-horario').value               = r.horario || '';
     document.getElementById('f-pessoas').value               = r.numero_pessoas || 1;
@@ -802,20 +615,13 @@
     document.getElementById('f-data-pagamento').value        = r.data_pagamento || '';
     document.getElementById('f-obs').value                   = r.observacoes || '';
     atualizarMesRef();
-
-    // Popular PIX rows
     document.getElementById('f-pix-list').innerHTML = '';
     const pixEntries = parsePix(r.pix_recebimentos);
-    if (pixEntries.length) {
-      pixEntries.forEach(p => addModalPixRow(p.nome, p.valor > 0 ? p.valor : ''));
-    } else {
-      addModalPixRow();
-    }
-
+    if (pixEntries.length) pixEntries.forEach(p => addModalPixRow(p.nome, p.valor > 0 ? p.valor : ''));
+    else addModalPixRow();
     abrirModal('modal-reserva');
   }
 
-  // ── Cálculo automático ─────────────────────────────────────────────────
   function calcularValorBruto() {
     const pessoas = parseFloat(document.getElementById('f-pessoas').value) || 1;
     const vpp     = parseFloat(document.getElementById('f-valor-pessoa').value) || 0;
@@ -824,154 +630,113 @@
   }
 
   document.getElementById('f-passeio').addEventListener('change', function() {
-    const opt   = this.options[this.selectedIndex];
+    const opt = this.options[this.selectedIndex];
     const preco = parseFloat(opt.dataset.preco) || 0;
-    if (preco > 0) {
-      document.getElementById('f-valor-pessoa').value = preco.toFixed(2);
-      calcularValorBruto();
-    }
+    if (preco > 0) { document.getElementById('f-valor-pessoa').value = preco.toFixed(2); calcularValorBruto(); }
   });
 
   function sugerirComissao() {
-    const bruto   = parseFloat(document.getElementById('f-valor-bruto').value)      || 0;
+    const bruto   = parseFloat(document.getElementById('f-valor-bruto').value) || 0;
     const agencia = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
     const recep   = document.getElementById('f-comissao-recepcao');
-    const sugest  = Math.max(0, bruto - agencia).toFixed(2);
-    if (!recep.value || parseFloat(recep.value) === 0) recep.value = sugest;
+    if (!recep.value || parseFloat(recep.value) === 0) recep.value = Math.max(0, bruto - agencia).toFixed(2);
   }
 
   function atualizarMesRef() {
-    const val   = document.getElementById('f-data-pagamento').value;
+    const val = document.getElementById('f-data-pagamento').value;
     const badge = document.getElementById('mes-ref-badge');
     if (val) {
       const [ano, mes] = val.split('-');
       const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent   = `Mês referência: ${nomes[parseInt(mes, 10) - 1]}/${ano}`;
+      badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
       badge.style.display = '';
-    } else {
-      badge.style.display = 'none';
-    }
+    } else { badge.style.display = 'none'; }
   }
 
-  // ── Salvar reserva ────────────────────────────────────────────────────
   async function salvarReserva() {
     const id = document.getElementById('f-id').value;
-
-    // Coletar distribuição PIX do modal
     const pixRows = document.querySelectorAll('#f-pix-list .f-pix-row');
-    const pixObj  = {};
+    const pixObj = {};
     pixRows.forEach(row => {
       const nome = row.querySelector('select')?.value?.trim();
       const val  = parseFloat(row.querySelector('input[type="number"]')?.value) || 0;
       if (nome && val > 0) pixObj[nome] = val;
     });
-
     const dataPag = document.getElementById('f-data-pagamento').value || null;
     const dataVal = document.getElementById('f-data').value || null;
-
     const payload = {
-      nome_cliente:      document.getElementById('f-cliente').value.trim(),
-      whatsapp:          document.getElementById('f-whatsapp').value.trim(),
-      status:            document.getElementById('f-status').value,
-      passeio:           document.getElementById('f-passeio').value || null,
-      data_passeio:      dataVal,
-      data:              dataVal,
-      horario:           document.getElementById('f-horario').value || null,
-      numero_pessoas:    parseInt(document.getElementById('f-pessoas').value) || 1,
-      valor_por_pessoa:  document.getElementById('f-valor-pessoa').value    || null,
-      valor_bruto:       document.getElementById('f-valor-bruto').value     || null,
-      comissao_agencia:  document.getElementById('f-comissao-agencia').value|| null,
-      comissao_recepcao: document.getElementById('f-comissao-recepcao').value|| null,
-      recepcionista:     document.getElementById('f-recepcionista').value   || '',
-      data_pagamento:    dataPag,
-      observacoes:       document.getElementById('f-obs').value,
+      nome_cliente: document.getElementById('f-cliente').value.trim(),
+      whatsapp: document.getElementById('f-whatsapp').value.trim(),
+      status: document.getElementById('f-status').value,
+      passeio: document.getElementById('f-passeio').value || null,
+      data_passeio: dataVal, data: dataVal,
+      horario: document.getElementById('f-horario').value || null,
+      numero_pessoas: parseInt(document.getElementById('f-pessoas').value) || 1,
+      valor_por_pessoa: document.getElementById('f-valor-pessoa').value || null,
+      valor_bruto: document.getElementById('f-valor-bruto').value || null,
+      comissao_agencia: document.getElementById('f-comissao-agencia').value || null,
+      comissao_recepcao: document.getElementById('f-comissao-recepcao').value || null,
+      recepcionista: document.getElementById('f-recepcionista').value || '',
+      data_pagamento: dataPag,
+      observacoes: document.getElementById('f-obs').value,
     };
-
-    if (dataPag) payload.mes_referencia = dataPag.substring(0, 7);
+    if (dataPag) payload.mes_referencia = dataPag.substring(0,7);
     if (Object.keys(pixObj).length > 0) payload.pix_recebimentos = JSON.stringify(pixObj);
-
     if (!payload.nome_cliente) { alert('Informe o nome do cliente.'); return; }
-
-    const url    = id
-      ? `${API_BASE}/${hotelSlug}/reservas/${id}/`
-      : `${API_BASE}/${hotelSlug}/reservas/`;
+    const url    = id ? `${API_BASE}/${hotelSlug}/reservas/${id}/` : `${API_BASE}/${hotelSlug}/reservas/`;
     const method = id ? 'PUT' : 'POST';
-
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        alert(e.erro || e.detail || `Erro ${res.status} ao salvar.`);
-        return;
-      }
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }, body: JSON.stringify(payload) });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || e.detail || `Erro ${res.status} ao salvar.`); return; }
       fecharModal('modal-reserva');
       await carregarReservas();
-    } catch(e) {
-      console.error('[salvarReserva]', e);
-      alert('Erro de conexão.');
-    }
+    } catch(e) { console.error('[salvarReserva]', e); alert('Erro de conexão.'); }
   }
 
-  // ── Pagamento (modal separado — botão "Pagar" na tabela) ──────────────
   function abrirPagamento(id) {
     const r = todasReservas.find(x => x.id === id);
     if (!r) return;
     document.getElementById('pg-id').value = id;
-    document.getElementById('pg-data').value = new Date().toISOString().substring(0, 10);
-    document.getElementById('pg-total-label').textContent =
-      `— Total: R$ ${parseFloat(r.valor_bruto || 0).toFixed(2).replace('.', ',')}`;
+    document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
+    document.getElementById('pg-total-label').textContent = `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
     atualizarMesRefPg();
-
     const pixList = document.getElementById('pix-list');
     pixList.innerHTML = '';
-    const nomes = recepcionistas.length
-      ? recepcionistas
-      : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
+    const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
     nomes.forEach(nome => addPixRow(nome));
     abrirModal('modal-pagamento');
   }
 
-  function addPixRow(nome = '') {
+  function addPixRow(nome='') {
     const list = document.getElementById('pix-list');
     const row  = document.createElement('div');
     row.className = 'pix-row';
-
-    const opts = recepcionistas.length
-      ? recepcionistas.map(n => `<option value="${n}" ${n === nome ? 'selected' : ''}>${n}</option>`).join('')
-      : `<option value="${nome}">${nome || 'Recepção'}</option>`;
-
+    const opts = recepcionistas.length ? recepcionistas.map(n=>`<option value="${n}" ${n===nome?'selected':''}>${n}</option>`).join('') : `<option value="${nome}">${nome||'Recepção'}</option>`;
     row.innerHTML = `
-      <select style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.85rem;width:100%;outline:none;">
+      <select style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:100%;outline:none;font-family:'Inter',sans-serif;">
         <option value="">Selecionar…</option>${opts}
       </select>
       <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.85rem;width:120px;outline:none;"/>`;
+        style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:120px;outline:none;font-family:'Inter',sans-serif;"/>`;
     list.appendChild(row);
     if (nome) row.querySelector('select').value = nome;
   }
 
   function atualizarMesRefPg() {
-    const val   = document.getElementById('pg-data').value;
+    const val = document.getElementById('pg-data').value;
     const badge = document.getElementById('mes-ref-badge-pg');
     if (val) {
       const [ano, mes] = val.split('-');
       const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent   = `Mês referência: ${nomes[parseInt(mes, 10) - 1]}/${ano}`;
+      badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
       badge.style.display = '';
-    } else {
-      badge.style.display = 'none';
-    }
+    } else { badge.style.display = 'none'; }
   }
 
   async function confirmarPagamento() {
-    const id      = document.getElementById('pg-id').value;
+    const id = document.getElementById('pg-id').value;
     const dataPag = document.getElementById('pg-data').value;
     if (!dataPag) { alert('Informe a data de pagamento.'); return; }
-
     const pixRows = document.querySelectorAll('#pix-list .pix-row');
     const pixRecebimentos = {};
     pixRows.forEach(row => {
@@ -979,32 +744,18 @@
       const val  = parseFloat(row.querySelector('.pix-valor')?.value) || 0;
       if (nome) pixRecebimentos[nome] = val;
     });
-
     try {
       const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-        body: JSON.stringify({
-          status:           'pago',
-          data_pagamento:   dataPag,
-          mes_referencia:   dataPag.substring(0, 7),
-          pix_recebimentos: JSON.stringify(pixRecebimentos)
-        })
+        body: JSON.stringify({ status:'pago', data_pagamento:dataPag, mes_referencia:dataPag.substring(0,7), pix_recebimentos:JSON.stringify(pixRecebimentos) })
       });
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`);
-        return;
-      }
+      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`); return; }
       fecharModal('modal-pagamento');
       await carregarReservas();
-    } catch(e) {
-      console.error('[confirmarPagamento]', e);
-      alert('Erro de conexão.');
-    }
+    } catch(e) { console.error('[confirmarPagamento]', e); alert('Erro de conexão.'); }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────
   function confirmarDelete(id, nome) {
     deleteIdPendente = id;
     document.getElementById('del-nome').textContent = nome;
@@ -1014,25 +765,16 @@
   async function executarDelete() {
     if (!deleteIdPendente) return;
     try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${deleteIdPendente}/`, {
-        method: 'DELETE',
-        headers: { 'X-CSRFToken': csrfToken }
-      });
+      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${deleteIdPendente}/`, { method:'DELETE', headers:{ 'X-CSRFToken':csrfToken } });
       if (!res.ok && res.status !== 204) { alert('Erro ao excluir.'); return; }
       fecharModal('modal-delete');
       deleteIdPendente = null;
       await carregarReservas();
-    } catch(e) {
-      console.error('[executarDelete]', e);
-      alert('Erro de conexão.');
-    }
+    } catch(e) { console.error('[executarDelete]', e); alert('Erro de conexão.'); }
   }
 
-  // Fechar modal ao clicar fora
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.classList.remove('open');
-    });
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
   });
 </script>
 </body>
