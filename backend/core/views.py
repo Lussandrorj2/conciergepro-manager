@@ -44,8 +44,14 @@ def get_media_url(field):
 
 def _get_hotel_do_usuario(request, hotel):
     """
-    Verifica se o usuário logado pertence ao hotel solicitado.
+    Retorna True se o usuário tem acesso ao hotel.
+    Superusers e staff têm acesso irrestrito.
     """
+    if not request.user.is_authenticated:
+        return False
+    # ✅ FIX: superusers e staff (criados pelo Django Admin) têm acesso total
+    if request.user.is_superuser or request.user.is_staff:
+        return True
     try:
         return request.user.perfil.hotel == hotel
     except Exception:

@@ -222,7 +222,6 @@ async function carregarHotel(lang) {
         }
 
         const data = await res.json();
-        console.log('[carregarHotel]', data);
 
         // --- WHATSAPP ---
         if (data.whatsapp) {
@@ -232,39 +231,22 @@ async function carregarHotel(lang) {
         }
 
         // --- BANNER / FOTO DE CAPA ---
-        // ✅ FIX: tenta todos os possíveis nomes de campo retornados pela API
-        // --- BANNER / FOTO DE CAPA ---
-        const fotoCapa = data.foto_capa;
-
-        if (fotoCapa) {
-            const heroBg = document.getElementById('hero-bg');
-            if (heroBg) {
-                heroBg.style.backgroundImage = `url('${fotoCapa}')`;
-            }
-        }
-
-        if (fotoCapa) {
-            const heroBg = document.getElementById('hero-bg');
-            if (heroBg) {
-                heroBg.style.backgroundImage = `url('${fotoCapa}')`;
+        const heroBg = document.getElementById('hero-bg');
+        if (heroBg) {
+            if (data.foto_capa) {
+                heroBg.style.backgroundImage = `url('${data.foto_capa}')`;
                 heroBg.style.opacity = '1';
-                console.log('[carregarHotel] Banner carregado:', fotoCapa);
+            } else {
+                console.warn('[carregarHotel] Sem foto de capa cadastrada nas configurações.');
             }
-        } else {
-            console.warn('[carregarHotel] Nenhuma foto de capa encontrada na resposta');
         }
 
         // --- TEXTOS ---
-        // ✅ FIX: sempre atualiza os textos, mesmo que já estejam preenchidos pelo Django
         const tituloEl    = document.getElementById('txt-hero-title');
         const subtituloEl = document.getElementById('txt-hero-subtitle');
 
-        if (tituloEl && data.titulo_hero) {
-            tituloEl.innerText = data.titulo_hero;
-        }
-        if (subtituloEl && data.subtitulo_hero) {
-            subtituloEl.innerText = data.subtitulo_hero;
-        }
+        if (tituloEl && data.titulo_hero)       tituloEl.innerText    = data.titulo_hero;
+        if (subtituloEl && data.subtitulo_hero) subtituloEl.innerText = data.subtitulo_hero;
 
     } catch (error) {
         console.error('[carregarHotel] Erro:', error);
@@ -361,7 +343,7 @@ async function carregarPasseios(lang) {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/passeios/${hotelSlug}/`)
+        const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/?lang=${lang}`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         listaPasseios = await res.json();

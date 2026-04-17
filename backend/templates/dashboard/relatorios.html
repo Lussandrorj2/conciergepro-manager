@@ -737,6 +737,10 @@ async function carregarReservas() {
     try {
         const res   = await fetch(`/api/admin/${hotelSlug}/reservas/`);
         const todas = await res.json();
+            if (!Array.isArray(todas)) {
+                console.warn('[carregarReservas] API retornou erro (sem permissão?):', todas);
+                return; // sai sem quebrar o fluxo
+            }
         const {ano, mes} = getMesRef();
 
         const pagas = todas.filter(r => {
@@ -792,6 +796,10 @@ async function carregarCambio() {
 
         const res   = await fetch(url);
         const lista = await res.json();
+            if (!Array.isArray(lista)) {
+                console.warn('[carregarCambio] API retornou erro (sem permissão?):', lista);
+                return;
+            }
 
         totalCambio    = 0;
         totalCompra    = 0;

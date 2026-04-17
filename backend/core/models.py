@@ -127,7 +127,7 @@ class Passeio(models.Model):
 
     titulo    = models.CharField(max_length=255, blank=True)
     subtitulo = models.CharField(max_length=255, blank=True)
-    banner    = models.ImageField(upload_to='passeios/banner/', null=True, blank=True)
+    banner = CloudinaryField('image', null=True, blank=True)
 
     ativo     = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)

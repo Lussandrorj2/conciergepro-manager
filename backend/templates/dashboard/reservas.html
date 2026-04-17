@@ -1,2626 +1,854 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Reservas — {{ hotel.nome }}</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-
-        /* 1. AS CORES TÊM QUE SER AS MESMAS (VARIÁVEIS) */
-        :root {
-            --bg-main: #0b0f19;
-            --bg-sidebar: #0f1626;
-            --bg-card: #121a2b;
-            --bg-hover: #1a2438;
-            --border: #1f2a40;
-            --border-light: #2a3754;
-            --text-main: #e6edf3;
-            --text-muted: #9fb0c7;
-            --text-soft: #6b7a90;
-            --gold: #c9a96e;
-            --primary: #22c55e;
-        }
-
-        /* 2. BASE IGUAL EM TUDO */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-        }
-
-        /* 3. SIDEBAR PADRÃO (O MESMO DO PRINT) */
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 24px 16px;
-            z-index: 1000;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 12px 30px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        nav {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-        }
-
-        nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            font-size: 14px;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: .2s;
-        }
-
-        nav a:hover {
-            background: var(--bg-hover);
-            color: var(--text-main);
-        }
-
-        nav a.active {
-            background: rgba(201, 169, 110, 0.1);
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        /* Ajuste para o conteúdo não ficar embaixo da sidebar */
-        .main {
-            margin-left: 240px;
-            width: calc(100% - 240px);
-        }
-
-        /* 4. SEUS CARDS E FOTOS (MANTENDO SEU DESIGN) */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 220px;
-            background: #111827;
-            border-right: 1px solid #1e293b;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 10;
-        }
-
-        .sidebar h2 {
-            padding: 20px 18px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #f1f5f9;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        nav {
-            display: flex;
-            flex-direction: column;
-            padding: 12px 0;
-            flex: 1;
-        }
-
-        nav a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 18px;
-            font-size: 13.5px;
-            color: #94a3b8;
-            text-decoration: none;
-            border-left: 2px solid transparent;
-            transition: .15s;
-        }
-
-        nav a:hover {
-            color: #e2e8f0;
-            background: #1e293b;
-        }
-
-        nav a.active {
-            color: #f1f5f9;
-            background: #1e293b;
-            border-left-color: #059669;
-            font-weight: 500;
-        }
-
-        .main {
-            flex: 1;
-            margin-left: 220px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 28px;
-            background: #111827;
-            border-bottom: 1px solid #1e293b;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-        }
-
-        .topbar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-
-        .hotel-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-            background: #1e293b;
-            padding: 6px 12px;
-            border-radius: 8px;
-        }
-
-        .hotel-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #10b981;
-        }
-
-        .content {
-            padding: 24px 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .reserva-layout {
-            display: grid;
-            grid-template-columns: 460px 1fr;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .panel {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            border-bottom: 1px solid #263348;
-        }
-
-        .panel-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .form-body {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            font-size: 10px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            font-weight: 500;
-        }
-
-        .form-group label .opc {
-            color: #475569;
-            font-size: 9px;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 9px 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #e2e8f0;
-            font-size: 13px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: border-color .2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #059669;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 52px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .passeio-info {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: none;
-        }
-
-        .passeio-info.show {
-            display: block;
-        }
-
-        .passeio-info-nome {
-            font-size: 12px;
-            font-weight: 600;
-            color: #e2e8f0;
-            margin-bottom: 2px;
-        }
-
-        .passeio-info-preco {
-            font-size: 15px;
-            font-weight: 700;
-            color: #10b981;
-        }
-
-        .bloco {
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .bloco-valores {
-            background: rgba(16, 185, 129, .04);
-            border: 1px solid rgba(16, 185, 129, .2);
-        }
-
-        .bloco-recepcao {
-            background: rgba(16, 185, 129, .04);
-            border: 1px solid rgba(16, 185, 129, .2);
-        }
-
-        .bloco-status {
-            background: rgba(139, 92, 246, .04);
-            border: 1px solid rgba(139, 92, 246, .2);
-        }
-
-        .bloco-pgto {
-            background: rgba(245, 158, 11, .04);
-            border: 1px solid rgba(245, 158, 11, .2);
-        }
-
-        .bloco-pix {
-            background: rgba(56, 189, 248, .06);
-            border: 1px solid rgba(56, 189, 248, .25);
-        }
-
-        .bloco-title {
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .bloco-valores .bloco-title {
-            color: #10b981;
-        }
-
-        .bloco-recepcao .bloco-title {
-            color: #10b981;
-        }
-
-        .bloco-status .bloco-title {
-            color: #a78bfa;
-        }
-
-        .bloco-pgto .bloco-title {
-            color: #f59e0b;
-        }
-
-        .bloco-pix .bloco-title {
-            color: #38bdf8;
-        }
-
-        /* ── PAINEL DE CÁLCULO DE VALORES ── */
-        .calc-panel {
-            background: #0a1628;
-            border: 1px solid #1e3a5f;
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .calc-panel-title {
-            font-size: 10px;
-            color: #38bdf8;
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .calc-row {
-            display: grid;
-            grid-template-columns: 1fr 80px 140px;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .calc-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .calc-label {
-            font-size: 11px;
-            color: #64748b;
-        }
-
-        .calc-input-wrap input {
-            width: 80px;
-            padding: 6px 8px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #e2e8f0;
-            font-size: 12px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            text-align: right;
-        }
-
-        .calc-input-wrap input:focus {
-            border-color: #38bdf8;
-        }
-
-        .calc-result {
-            font-size: 13px;
-            font-weight: 700;
-            text-align: right;
-            padding: 5px 10px;
-            border-radius: 6px;
-            background: #1e293b;
-        }
-
-        .calc-result.verde {
-            color: #10b981;
-            background: rgba(16, 185, 129, .1);
-            border: 1px solid rgba(16, 185, 129, .2);
-        }
-
-        .calc-result.azul {
-            color: #38bdf8;
-            background: rgba(56, 189, 248, .08);
-            border: 1px solid rgba(56, 189, 248, .2);
-        }
-
-        .calc-result.amber {
-            color: #f59e0b;
-            background: rgba(245, 158, 11, .08);
-            border: 1px solid rgba(245, 158, 11, .2);
-        }
-
-        .calc-result.roxo {
-            color: #a78bfa;
-            background: rgba(139, 92, 246, .08);
-            border: 1px solid rgba(139, 92, 246, .2);
-        }
-
-        .calc-divider {
-            height: 1px;
-            background: #1e3a5f;
-            margin: 8px 0;
-        }
-
-        .calc-total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-            padding-top: 10px;
-            border-top: 1px solid #1e3a5f;
-        }
-
-        .calc-total-label {
-            font-size: 11px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .calc-total-val {
-            font-size: 16px;
-            font-weight: 700;
-            color: #10b981;
-        }
-
-        .calc-equacao {
-            margin-top: 10px;
-            padding: 10px 12px;
-            background: rgba(16, 185, 129, .06);
-            border: 1px solid rgba(16, 185, 129, .15);
-            border-radius: 8px;
-            font-size: 11px;
-            color: #6ee7b7;
-            text-align: center;
-            letter-spacing: .3px;
-            display: none;
-        }
-
-        .calc-equacao.show {
-            display: block;
-        }
-
-        .calc-equacao span {
-            color: #94a3b8;
-        }
-
-        /* Comissão input com destaque */
-        .comissao-wrap {
-            position: relative;
-        }
-
-        .comissao-wrap input {
-            border-color: #10b981 !important;
-            background: rgba(16, 185, 129, .05) !important;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .comissao-wrap input:focus {
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, .2);
-        }
-
-        .comissao-hint {
-            font-size: 10px;
-            color: #475569;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* ── PIX SECTION MELHORADO ── */
-        .pix-header-cols {
-            display: grid;
-            grid-template-columns: 1fr 160px 34px;
-            gap: 6px;
-            margin-bottom: 6px;
-            padding: 0 2px;
-        }
-
-        .pix-col-label {
-            font-size: 9px;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        .pix-linhas {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .pix-linha {
-            display: grid;
-            grid-template-columns: 1fr 160px 34px;
-            gap: 6px;
-            align-items: center;
-            background: rgba(56, 189, 248, .04);
-            border: 1px solid rgba(56, 189, 248, .15);
-            border-radius: 8px;
-            padding: 8px 10px;
-        }
-
-        .pix-linha select,
-        .pix-linha input {
-            padding: 7px 10px;
-            background: #0a1628;
-            border: 1px solid #1e3a5f;
-            border-radius: 6px;
-            color: #e2e8f0;
-            font-size: 12px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-        }
-
-        .pix-linha select:focus,
-        .pix-linha input:focus {
-            border-color: #38bdf8;
-        }
-
-        /* Input de valor Pix em moeda BR */
-        .pix-linha .pix-valor-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .pix-linha .pix-valor-prefix {
-            position: absolute;
-            left: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #38bdf8;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .pix-linha input[type=text].pix-rec-valor {
-            font-weight: 600;
-            color: #38bdf8;
-            text-align: right;
-            padding-left: 8px;
-        }
-
-        .btn-rm-pix {
-            width: 34px;
-            height: 34px;
-            background: rgba(239, 68, 68, .08);
-            border: 1px solid rgba(239, 68, 68, .3);
-            border-radius: 8px;
-            color: #f87171;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all .15s;
-        }
-
-        .btn-rm-pix:hover {
-            background: #ef4444;
-            color: #fff;
-            border-color: #ef4444;
-        }
-
-        .pix-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .btn-add-pix {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(56, 189, 248, .08);
-            border: 1px solid rgba(56, 189, 248, .3);
-            color: #38bdf8;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-            letter-spacing: .3px;
-        }
-
-        .btn-add-pix:hover {
-            background: rgba(56, 189, 248, .18);
-            border-color: #38bdf8;
-        }
-
-        .btn-save-pix-all {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(16, 185, 129, .08);
-            border: 1px solid rgba(16, 185, 129, .3);
-            color: #10b981;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-        }
-
-        .btn-save-pix-all:hover {
-            background: rgba(16, 185, 129, .2);
-            border-color: #10b981;
-        }
-
-        .pix-total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: rgba(56, 189, 248, .06);
-            border: 1px solid rgba(56, 189, 248, .15);
-            border-radius: 8px;
-        }
-
-        .pix-total-label {
-            font-size: 11px;
-            color: #38bdf8;
-            font-weight: 500;
-        }
-
-        .pix-total-val {
-            font-size: 15px;
-            font-weight: 700;
-            color: #38bdf8;
-        }
-
-        /* Recepcionistas */
-        .rec-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .rec-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(16, 185, 129, .12);
-            border: 1px solid rgba(16, 185, 129, .3);
-            color: #6ee7b7;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .15s;
-        }
-
-        .rec-tag:hover {
-            background: rgba(16, 185, 129, .25);
-        }
-
-        .rec-tag.selected {
-            background: rgba(16, 185, 129, .3);
-            border-color: #10b981;
-        }
-
-        .rec-hint {
-            font-size: 10px;
-            color: #475569;
-            margin-top: 4px;
-        }
-
-        .rec-selecionados {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .rec-badge-sel {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #064e3b44;
-            border: 1px solid #059669;
-            color: #6ee7b7;
-            padding: 3px 9px;
-            border-radius: 20px;
-            font-size: 11px;
-        }
-
-        .rec-badge-sel button {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 11px;
-            padding: 0;
-            line-height: 1;
-        }
-
-        .pago-check {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .pago-check input[type=checkbox] {
-            width: 16px;
-            height: 16px;
-            accent-color: #10b981;
-            cursor: pointer;
-        }
-
-        .pago-check label {
-            font-size: 11px;
-            color: #94a3b8;
-            cursor: pointer;
-        }
-
-        .pago-check.is-pago label {
-            color: #6ee7b7;
-            font-weight: 500;
-        }
-
-        .data-pgto-input {
-            background: none;
-            border: 1px solid #263348;
-            border-radius: 6px;
-            color: #64748b;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            padding: 3px 6px;
-            outline: none;
-            width: 100%;
-            transition: border-color .2s;
-        }
-
-        .data-pgto-input.preenchido {
-            border-color: #10b981;
-            color: #6ee7b7;
-        }
-
-        .data-pgto-input:focus {
-            border-color: #059669;
-        }
-
-        .btn-registrar {
-            width: 100%;
-            background: #059669;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: background .2s;
-        }
-
-        .btn-registrar:hover {
-            background: #047857;
-        }
-
-        .btn-cancelar-edicao {
-            width: 100%;
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-        }
-
-        .btn-cancelar-edicao:hover {
-            border-color: #475569;
-            color: #e2e8f0;
-        }
-
-        .edit-banner {
-            background: rgba(245, 158, 11, .08);
-            border: 1px solid rgba(245, 158, 11, .3);
-            border-radius: 8px;
-            padding: 10px 14px;
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .edit-banner.show {
-            display: flex;
-        }
-
-        .edit-banner-text {
-            font-size: 12px;
-            color: #f59e0b;
-            font-weight: 500;
-        }
-
-        .edit-banner-id {
-            font-size: 10px;
-            color: #92400e;
-        }
-
-        /* CAIXA */
-        .caixa-header {
-            padding: 14px 18px;
-            border-bottom: 1px solid #263348;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .caixa-label {
-            font-size: 10px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            margin-bottom: 3px;
-        }
-
-        .caixa-sub {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .caixa-filtros {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .caixa-filtros select,
-        .caixa-filtros input[type=date] {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #e2e8f0;
-            padding: 7px 10px;
-            font-size: 12px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-        }
-
-        .caixa-filtros label {
-            font-size: 10px;
-            color: #64748b;
-            white-space: nowrap;
-        }
-
-        .caixa-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background: #263348;
-        }
-
-        .caixa-item {
-            background: #1e293b;
-            padding: 14px 16px;
-        }
-
-        .caixa-item-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: .8px;
-            color: #64748b;
-            margin-bottom: 5px;
-        }
-
-        .caixa-item-valor {
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        .verde {
-            color: #10b981;
-        }
-
-        .azul {
-            color: #38bdf8;
-        }
-
-        .amber {
-            color: #f59e0b;
-        }
-
-        .branco {
-            color: #e2e8f0;
-        }
-
-        /* BUSCA */
-        .busca-bar {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 12px;
-            padding: 12px 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .busca-wrap {
-            flex: 1;
-            min-width: 140px;
-            position: relative;
-        }
-
-        .busca-wrap input {
-            width: 100%;
-            padding: 8px 12px 8px 28px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #e2e8f0;
-            font-size: 12px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-        }
-
-        .busca-wrap input:focus {
-            border-color: #059669;
-        }
-
-        .busca-icon {
-            position: absolute;
-            left: 9px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #475569;
-            font-size: 12px;
-        }
-
-        .busca-bar select,
-        .busca-bar input[type=date] {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: #e2e8f0;
-            padding: 8px 10px;
-            font-size: 12px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-        }
-
-        .btn-limpar {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-        }
-
-        .btn-limpar:hover {
-            border-color: #475569;
-            color: #e2e8f0;
-        }
-
-        /* TABELA */
-        .tabela-wrap {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .tabela-header {
-            padding: 12px 18px;
-            border-bottom: 1px solid #263348;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tabela-header h3 {
-            font-size: 13px;
-            color: #e2e8f0;
-            font-weight: 500;
-        }
-
-        .tabela-scroll {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11.5px;
-            min-width: 1100px;
-        }
-
-        thead th {
-            text-align: left;
-            padding: 9px 12px;
-            color: #64748b;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-            border-bottom: 1px solid #263348;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #1a2538;
-            transition: background .1s;
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:hover {
-            background: #243040;
-        }
-
-        tbody td {
-            padding: 9px 12px;
-            color: #94a3b8;
-            vertical-align: middle;
-        }
-
-        .empty {
-            padding: 36px;
-            text-align: center;
-            color: #475569;
-            font-size: 13px;
-        }
-
-        .status-sel {
-            background: none;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #94a3b8;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            padding: 3px 7px;
-            cursor: pointer;
-            outline: none;
-            width: 100%;
-        }
-
-        .status-sel.confirmada {
-            border-color: #059669;
-            color: #34d399;
-        }
-
-        .status-sel.pendente {
-            border-color: #d97706;
-            color: #fbbf24;
-        }
-
-        .status-sel.cancelada {
-            border-color: #dc2626;
-            color: #f87171;
-        }
-
-        .status-sel.realizado {
-            border-color: #3b82f6;
-            color: #93c5fd;
-        }
-
-        .pgto-sel {
-            background: none;
-            border: 1px solid #263348;
-            border-radius: 6px;
-            color: #64748b;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            padding: 3px 7px;
-            cursor: pointer;
-            outline: none;
-            width: 100%;
-        }
-
-        .pgto-sel.pix {
-            border-color: #38bdf8;
-            color: #38bdf8;
-        }
-
-        .pgto-sel.dinheiro {
-            border-color: #10b981;
-            color: #10b981;
-        }
-
-        .pago-check input[type=checkbox] {
-            width: 16px;
-            height: 16px;
-            accent-color: #10b981;
-            cursor: pointer;
-        }
-
-        .btn-edit-row {
-            background: rgba(245, 158, 11, .08);
-            border: 1px solid rgba(245, 158, 11, .3);
-            color: #f59e0b;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 10px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-            white-space: nowrap;
-        }
-
-        .btn-edit-row:hover {
-            background: rgba(245, 158, 11, .2);
-        }
-
-        /* PIX INLINE na tabela */
-        .pix-inline-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 220px;
-        }
-
-        .pix-inline-linha {
-            display: grid;
-            grid-template-columns: 1fr 90px 18px;
-            gap: 3px;
-            align-items: center;
-            background: rgba(56, 189, 248, .04);
-            border: 1px solid rgba(56, 189, 248, .12);
-            border-radius: 5px;
-            padding: 4px 6px;
-        }
-
-        .pix-inline-input {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            padding: 0;
-            outline: none;
-            width: 100%;
-        }
-
-        .pix-inline-input:focus {
-            color: #e2e8f0;
-        }
-
-        .pix-inline-val {
-            font-size: 10px;
-            font-weight: 600;
-            color: #38bdf8;
-            text-align: right;
-        }
-
-        .pix-inline-select {
-            background: none;
-            border: none;
-            color: #64748b;
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            padding: 0;
-            outline: none;
-            width: 100%;
-        }
-
-        .pix-inline-select:focus {
-            color: #94a3b8;
-        }
-
-        /* Valor inline moeda BR */
-        .pix-inline-val-wrap {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .pix-inline-prefix {
-            font-size: 9px;
-            color: #38bdf8;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .pix-inline-valor-input {
-            background: none;
-            border: none;
-            color: #38bdf8;
-            font-size: 10px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            padding: 0;
-            outline: none;
-            width: 70px;
-            text-align: right;
-        }
-
-        .pix-inline-valor-input:focus {
-            color: #7dd3fc;
-        }
-
-        .btn-rm-pix-inline {
-            width: 16px;
-            height: 16px;
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 10px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: .6;
-        }
-
-        .btn-rm-pix-inline:hover {
-            opacity: 1;
-        }
-
-        .pix-inline-actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 3px;
-        }
-
-        .btn-add-pix-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(56, 189, 248, .08);
-            border: 1px solid rgba(56, 189, 248, .25);
-            color: #38bdf8;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 9px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-        }
-
-        .btn-add-pix-inline:hover {
-            background: rgba(56, 189, 248, .18);
-        }
-
-        .btn-save-pix-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(16, 185, 129, .08);
-            border: 1px solid rgba(16, 185, 129, .25);
-            color: #10b981;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 9px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: all .15s;
-        }
-
-        .btn-save-pix-inline:hover {
-            background: rgba(16, 185, 129, .18);
-        }
-
-        .recs-inline {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 3px;
-        }
-
-        .rec-tag-mini {
-            font-size: 9px;
-            background: rgba(16, 185, 129, .1);
-            border: 1px solid rgba(16, 185, 129, .25);
-            color: #6ee7b7;
-            padding: 2px 7px;
-            border-radius: 10px;
-            white-space: nowrap;
-        }
-
-        .val-verde {
-            color: #10b981;
-            font-weight: 600;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 12px;
-            z-index: 9999;
-            animation: fadeUp .2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .toast.ok {
-            background: #059669;
-            color: #fff;
-        }
-
-        .toast.err {
-            background: #ef4444;
-            color: #fff;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media(max-width:1200px) {
-            .reserva-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media(max-width:900px) {
-            .caixa-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reservas – Concierge Digital</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #22263a;
+      --accent:    #6c63ff;
+      --accent2:   #ff6584;
+      --green:     #22c55e;
+      --yellow:    #f59e0b;
+      --red:       #ef4444;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --border:    #2d3149;
+      --sidebar-w: 240px;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 16px; font-size: 1.15rem; font-weight: 700; color: var(--accent);
+      border-bottom: 1px solid var(--border); letter-spacing: .5px;
+    }
+    .sidebar-logo span { color: var(--text); font-weight: 400; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+      color: var(--muted); text-decoration: none; font-size: .88rem; transition: all .2s;
+    }
+    .nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); border-left: 3px solid var(--accent); padding-left: 17px; }
+    .nav-item i { width: 18px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: .8rem; color: var(--muted); }
+    .sidebar-footer a { color: var(--accent2); text-decoration: none; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar h1 { font-size: 1.2rem; font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; font-size: .85rem; color: var(--muted); }
+    .hotel-badge {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 12px; font-size: .8rem; color: var(--text);
+    }
+
+    .content { padding: 24px 28px; flex: 1; }
+
+    /* ── STATS ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 20px; display: flex; align-items: center; gap: 16px;
+    }
+    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .stat-icon.blue   { background: rgba(108,99,255,.15); color: var(--accent); }
+    .stat-icon.green  { background: rgba(34,197,94,.15);  color: var(--green); }
+    .stat-icon.yellow { background: rgba(245,158,11,.15); color: var(--yellow); }
+    .stat-icon.red    { background: rgba(239,68,68,.15);  color: var(--red); }
+    .stat-body { min-width: 0; }
+    .stat-label { font-size: .75rem; color: var(--muted); margin-bottom: 4px; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .filter-bar select, .filter-bar input {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 8px 12px; font-size: .85rem; outline: none;
+    }
+    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--accent); }
+    .filter-bar input { flex: 1; min-width: 160px; }
+    .btn { border: none; border-radius: 8px; padding: 9px 18px; font-size: .85rem; font-weight: 600; cursor: pointer; transition: opacity .2s; display: inline-flex; align-items: center; gap: 7px; }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-danger  { background: var(--red);   color: #fff; }
+    .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-sm { padding: 5px 11px; font-size: .78rem; }
+
+    /* ── TABLE ── */
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .table-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .table-head h2 { font-size: .95rem; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    thead tr { background: var(--surface2); }
+    th { padding: 11px 14px; text-align: left; color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: .72rem; font-weight: 600; }
+    .badge-pendente   { background: rgba(245,158,11,.15); color: var(--yellow); }
+    .badge-confirmado { background: rgba(108,99,255,.15); color: var(--accent); }
+    .badge-pago       { background: rgba(34,197,94,.15);  color: var(--green); }
+    .badge-cancelado  { background: rgba(239,68,68,.15);  color: var(--red); }
+
+    .actions { display: flex; gap: 6px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
+      z-index: 200; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+    .modal-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 600; }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: .78rem; color: var(--muted); font-weight: 600; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 9px 12px; font-size: .87rem; outline: none; width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 72px; resize: vertical; }
+    .form-hint { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+    .section-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+
+    /* PIX list */
+    #pix-list .pix-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
+    #pix-list .pix-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 10px; font-size: .85rem; width: 100%; }
+
+    /* mes_referencia badge */
+    #mes-ref-badge { display: none; background: rgba(108,99,255,.15); color: var(--accent); border-radius: 6px; padding: 4px 10px; font-size: .78rem; font-weight: 600; width: fit-content; margin-top: 6px; }
+
+    /* empty state */
+    .empty { text-align: center; padding: 52px 20px; color: var(--muted); }
+    .empty i { font-size: 2.4rem; margin-bottom: 12px; display: block; }
+
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { display: none; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: 1; }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="layout">
 
-        <aside class="sidebar">
-            <h2>🔔 Concierge</h2>
-            <nav>
-                <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-                <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-                <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-                <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-                <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-                <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-                <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-                <hr style="border-color:#1e293b;margin:12px 0;">
-                <a href="/logout/">↩ Sair</a>
-            </nav>
-        </aside>
+<!-- ══════════════════════════════ SIDEBAR ══════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Concierge <span>Digital</span></div>
+  <nav class="sidebar-nav">
+    <a href="/dashboard/" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a href="/dashboard/passeios/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Passeios</a>
+    <a href="/dashboard/reservas/" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+    <a href="/dashboard/relatorios/" class="nav-item"><i class="fa-solid fa-chart-bar"></i> Relatórios</a>
+    <a href="/dashboard/cambio/" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Câmbio</a>
+    <a href="/dashboard/configuracoes/" class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="/logout/">Sair <i class="fa-solid fa-right-from-bracket"></i></a>
+  </div>
+</aside>
 
-        <main class="main">
-            <div class="topbar">
-                <span class="topbar-title">📅 Reservas</span>
-                <div class="hotel-badge">
-                    <div class="hotel-dot"></div>{{ hotel.nome }}
-                </div>
-            </div>
+<!-- ══════════════════════════════ MAIN ══════════════════════════════ -->
+<div class="main">
 
-            <div class="content">
-                <div class="reserva-layout">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <h1><i class="fa-solid fa-calendar-check" style="color:var(--accent);margin-right:8px"></i>Reservas</h1>
+    <div class="topbar-right">
+      <span id="hotel-nome-top" class="hotel-badge"></span>
+      <span>{{ request.user.username }}</span>
+    </div>
+  </div>
 
-                    <!-- ════ FORMULÁRIO ════ -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <span class="panel-title" id="form-titulo">📝 Nova Reserva</span>
-                        </div>
-                        <div class="form-body">
+  <div class="content">
 
-                            <div class="edit-banner" id="edit-banner">
-                                <div>
-                                    <div class="edit-banner-text">✏️ Modo edição</div>
-                                    <div class="edit-banner-id" id="edit-banner-id"></div>
-                                </div>
-                                <button class="btn-limpar" onclick="cancelarEdicao()" style="font-size:11px;">✕
-                                    Cancelar</button>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Passeio *</label>
-                                <select id="passeio-select" onchange="onPasseioChange()">
-                                    <option value="">Carregando...</option>
-                                </select>
-                                <div class="passeio-info" id="passeio-info">
-                                    <div class="passeio-info-nome" id="info-nome"></div>
-                                    <div class="passeio-info-preco" id="info-preco"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Nome do cliente *</label>
-                                <input type="text" id="nome-cliente" placeholder="Nome completo">
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Telefone *</label>
-                                    <input type="text" id="telefone" placeholder="(21) 99999-9999">
-                                </div>
-                                <div class="form-group">
-                                    <label>E-mail <span class="opc">(opcional)</span></label>
-                                    <input type="email" id="email" placeholder="email@exemplo.com">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Data do passeio *</label>
-                                    <input type="date" id="data-passeio">
-                                </div>
-                                <div class="form-group">
-                                    <label>Horário <span class="opc">(opcional)</span></label>
-                                    <input type="time" id="horario-passeio">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Nº de pessoas</label>
-                                <input type="number" id="num-pessoas" min="1" value="1" oninput="calcularValores()">
-                            </div>
-
-                            <!-- ════ CALCULADORA DE VALORES ════ -->
-                            <div class="bloco bloco-valores">
-                                <div class="bloco-title">💵 Valores da Reserva</div>
-
-                                <!-- Painel de cálculo visual -->
-                                <div class="calc-panel">
-                                    <div class="calc-panel-title">🧮 Calculadora (referência)</div>
-
-                                    <div class="calc-row">
-                                        <span class="calc-label">Preço por pessoa</span>
-                                        <div class="calc-input-wrap">
-                                            <input type="number" id="preco-unitario" placeholder="0,00" step="0.01"
-                                                min="0" oninput="calcularValores()" value="">
-                                        </div>
-                                        <div class="calc-result azul" id="res-unitario">R$ 0,00</div>
-                                    </div>
-
-                                    <div class="calc-row">
-                                        <span class="calc-label">× Nº de pessoas</span>
-                                        <div style="font-size:14px;font-weight:700;color:#64748b;text-align:right;"
-                                            id="res-pessoas">× 1</div>
-                                        <div class="calc-result verde" id="res-bruto">R$ 0,00</div>
-                                    </div>
-
-                                    <div class="calc-divider"></div>
-
-                                    <div class="calc-row">
-                                        <span class="calc-label">Comissão agência (R$)</span>
-                                        <div class="calc-input-wrap">
-                                            <input type="number" id="comissao-agencia" placeholder="0,00" step="0.01"
-                                                min="0" oninput="calcularValores()" value="0">
-                                        </div>
-                                        <div class="calc-result amber" id="res-agencia">R$ 0,00</div>
-                                    </div>
-
-                                    <div class="calc-total-row">
-                                        <span class="calc-total-label">✅ Sugestão Comissão Recepção =</span>
-                                        <span class="calc-total-val" id="res-recepcao-calc">R$ 0,00</span>
-                                    </div>
-
-                                    <div class="calc-equacao" id="calc-equacao">
-                                        <span id="eq-texto"></span>
-                                    </div>
-                                </div>
-
-                                <!-- Campo real de comissão recepção — SEMPRE zerado ao iniciar -->
-                                <div class="form-group">
-                                    <label>Comissão Recepção (R$) — informe o valor manualmente *</label>
-                                    <div class="comissao-wrap">
-                                        <input type="number" id="comissao-recepcao" placeholder="0,00" step="0.01"
-                                            min="0">
-                                    </div>
-                                    <div class="comissao-hint">
-                                        <span>💡</span> Use a calculadora acima como referência e preencha o valor aqui.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- RECEPCIONISTAS -->
-                            <div class="bloco bloco-recepcao">
-                                <div class="bloco-title">🤝 Recepcionistas (quem fez a reserva)</div>
-                                <div id="rec-tags-container">
-                                    <div class="rec-tags" id="rec-tags-lista"></div>
-                                    <div class="rec-hint" id="rec-hint">Carregando recepcionistas...</div>
-                                </div>
-                                <div class="rec-selecionados" id="rec-selecionados"></div>
-                            </div>
-
-                            <!-- STATUS -->
-                            <div class="bloco bloco-status">
-                                <div class="bloco-title">📋 Status da Reserva</div>
-                                <div class="form-group">
-                                    <label>Status</label>
-                                    <select id="status">
-                                        <option value="pendente">⏳ Pendente</option>
-                                        <option value="confirmada">✓ Confirmada</option>
-                                        <option value="realizado">🏁 Passeio Realizado</option>
-                                        <option value="cancelada">✕ Cancelada</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- PAGAMENTO -->
-                            <div class="bloco bloco-pgto">
-                                <div class="bloco-title">💳 Pagamento</div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Forma de pagamento</label>
-                                        <select id="forma-pagamento" onchange="togglePixForm()">
-                                            <option value="pendente">⏳ Pendente</option>
-                                            <option value="dinheiro">💵 Dinheiro</option>
-                                            <option value="pix">📱 Pix</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Data de pagamento</label>
-                                        <input type="date" id="data-pagamento">
-                                    </div>
-                                </div>
-                                <div style="margin-top:8px;">
-                                    <div class="pago-check" id="pago-check-wrap">
-                                        <input type="checkbox" id="chk-pago" onchange="togglePago()">
-                                        <label for="chk-pago">Marcar como PAGO (confirma recebimento)</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PIX — MELHORADO com valor em moeda BR -->
-                            <div class="bloco bloco-pix" id="bloco-pix-form" style="display:none;">
-                                <div class="bloco-title">📱 Pix recebido por recepcionista</div>
-                                <div class="pix-header-cols">
-                                    <span class="pix-col-label">Recepcionista</span>
-                                    <span class="pix-col-label">Valor recebido (R$)</span>
-                                    <span></span>
-                                </div>
-                                <div class="pix-linhas" id="pix-linhas-form"></div>
-                                <div class="pix-actions">
-                                    <button type="button" class="btn-add-pix" onclick="adicionarLinhaPix()">＋ Adicionar
-                                        linha</button>
-                                </div>
-                                <div class="pix-total-row" id="pix-total-row" style="display:none;">
-                                    <span class="pix-total-label">📊 Total recebido via Pix</span>
-                                    <span class="pix-total-val" id="pix-total-form">R$ 0,00</span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Observações <span class="opc">(opcional)</span></label>
-                                <textarea id="obs" placeholder="Informações adicionais..."></textarea>
-                            </div>
-
-                            <button class="btn-registrar" id="btn-submit" onclick="submeterReserva()">💾 Registrar
-                                Reserva</button>
-                            <button class="btn-cancelar-edicao" id="btn-cancelar" style="display:none;"
-                                onclick="cancelarEdicao()">✕ Cancelar edição</button>
-                        </div>
-                    </div>
-
-                    <!-- ════ PAINEL DIREITA ════ -->
-                    <div style="display:flex;flex-direction:column;gap:16px;">
-
-                        <!-- CAIXA -->
-                        <div class="panel">
-                            <div class="caixa-header">
-                                <div>
-                                    <div class="caixa-label">Controle de Caixa</div>
-                                    <div class="caixa-sub">Resumo de Entradas Pagas</div>
-                                </div>
-                                <div class="caixa-filtros">
-                                    <label>Filtrar por:</label>
-                                    <select id="caixa-modo" onchange="onMudaModo()">
-                                        <option value="dia">Dia</option>
-                                        <option value="mes">Mês</option>
-                                        <option value="todos">Todos</option>
-                                    </select>
-                                    <input type="date" id="filtro-caixa-data" onchange="atualizarCaixa()">
-                                    <select id="filtro-caixa-mes" style="display:none;" onchange="atualizarCaixa()">
-                                        <option value="01">Janeiro</option>
-                                        <option value="02">Fevereiro</option>
-                                        <option value="03">Março</option>
-                                        <option value="04">Abril</option>
-                                        <option value="05">Maio</option>
-                                        <option value="06">Junho</option>
-                                        <option value="07">Julho</option>
-                                        <option value="08">Agosto</option>
-                                        <option value="09">Setembro</option>
-                                        <option value="10">Outubro</option>
-                                        <option value="11">Novembro</option>
-                                        <option value="12">Dezembro</option>
-                                    </select>
-                                    <select id="filtro-caixa-ano" style="display:none;"
-                                        onchange="atualizarCaixa()"></select>
-                                </div>
-                            </div>
-                            <div class="caixa-grid">
-                                <div class="caixa-item">
-                                    <div class="caixa-item-label">Comissão Recepção</div>
-                                    <div class="caixa-item-valor verde" id="caixa-recepcao">R$ 0,00</div>
-                                </div>
-                                <div class="caixa-item">
-                                    <div class="caixa-item-label">Total Pix Recebido</div>
-                                    <div class="caixa-item-valor azul" id="caixa-pix">R$ 0,00</div>
-                                </div>
-                                <div class="caixa-item">
-                                    <div class="caixa-item-label">Pago em Dinheiro</div>
-                                    <div class="caixa-item-valor amber" id="caixa-dinheiro">R$ 0,00</div>
-                                </div>
-                                <div class="caixa-item">
-                                    <div class="caixa-item-label">Reservas Pagas</div>
-                                    <div class="caixa-item-valor branco" id="caixa-qtd">0</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- BUSCA -->
-                        <div class="busca-bar">
-                            <div class="busca-wrap">
-                                <span class="busca-icon">🔍</span>
-                                <input type="text" id="busca-texto" placeholder="Nome ou telefone..."
-                                    oninput="filtrarLocal()">
-                            </div>
-                            <input type="date" id="busca-data" onchange="filtrarLocal()" title="Data do passeio">
-                            <select id="busca-status" onchange="filtrarLocal()">
-                                <option value="">Todos os status</option>
-                                <option value="pendente">⏳ Pendente</option>
-                                <option value="confirmada">✓ Confirmada</option>
-                                <option value="realizado">🏁 Realizado</option>
-                                <option value="pago">💰 Pago</option>
-                                <option value="cancelada">✕ Cancelada</option>
-                            </select>
-                            <button class="btn-limpar" onclick="limparBusca()">✕ Limpar</button>
-                        </div>
-
-                        <!-- TABELA -->
-                        <div class="tabela-wrap">
-                            <div class="tabela-header">
-                                <h3>Todas as Reservas</h3>
-                                <span style="font-size:11px;color:#64748b;" id="badge-total">—</span>
-                            </div>
-                            <div class="tabela-scroll">
-                                <div id="lista-reservas">
-                                    <div class="empty">Carregando...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </main>
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-ticket"></i></div>
+        <div class="stat-body"><div class="stat-label">Total de Reservas</div><div class="stat-value" id="stat-total">0</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-body"><div class="stat-label">Confirmadas</div><div class="stat-value" id="stat-confirmadas">0</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-body"><div class="stat-label">Pagas</div><div class="stat-value" id="stat-pagas">0</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="stat-body"><div class="stat-label">Comissão Recepção (pagas)</div><div class="stat-value" id="stat-comissao">R$ 0,00</div></div>
+      </div>
     </div>
 
-    <script>
-        const hotelSlug = "{{ hotel.slug }}";
-        let passeiosCache = [];
-        let todasReservas = [];
-        let recepcionistasConfig = [];
-        let recsSelecionados = [];
-        let pixLinhasCount = 0;
-        let modoEdicao = false;
-        let reservaEditandoId = null;
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <select id="filtro-status" onchange="renderTabela()">
+        <option value="">Todos os status</option>
+        <option value="pendente">Pendente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="pago">Pago</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+      <select id="filtro-mes" onchange="renderTabela()">
+        <option value="">Todos os meses</option>
+      </select>
+      <input type="text" id="filtro-busca" placeholder="Buscar cliente ou passeio…" oninput="renderTabela()"/>
+      <button class="btn btn-primary" onclick="abrirModalNova()"><i class="fa-solid fa-plus"></i> Nova Reserva</button>
+    </div>
 
-        /* ══════════════════════════════════════
-           HELPERS DE MOEDA BR
-        ══════════════════════════════════════ */
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <div class="table-head">
+        <h2>Lista de Reservas</h2>
+        <span id="count-label" style="font-size:.8rem;color:var(--muted)"></span>
+      </div>
+      <table id="tabela-reservas">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Cliente</th>
+            <th>Passeio</th>
+            <th>Data</th>
+            <th>Pessoas</th>
+            <th>Valor Bruto</th>
+            <th>Com. Recepção</th>
+            <th>Recepcionista</th>
+            <th>Pagamento</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty-state" class="empty" style="display:none">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <p>Nenhuma reserva encontrada.</p>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()"><i class="fa-solid fa-plus"></i> Criar Reserva</button>
+      </div>
+    </div>
 
-        /**
-         * Converte string monetária BR ("1.234,56") para float
-         */
-        function parseMoedaBR(str) {
-            if (!str) return 0;
-            // Remove pontos de milhar e troca vírgula por ponto
-            const limpo = String(str).replace(/\./g, '').replace(',', '.');
-            return parseFloat(limpo) || 0;
-        }
+  </div><!-- /content -->
+</div><!-- /main -->
 
-        /**
-         * Formata float para string monetária BR sem símbolo ("1.234,56")
-         */
-        function formatMoedaBR(val) {
-            return parseFloat(val || 0).toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
+<!-- ═══════════════════ MODAL: NOVA / EDITAR RESERVA ═══════════════════ -->
+<div class="modal-overlay" id="modal-reserva">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-titulo">Nova Reserva</h3>
+      <button class="modal-close" onclick="fecharModal('modal-reserva')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-id"/>
 
-        /**
-         * Aplica máscara monetária BR em tempo real num input de texto.
-         * Usa apenas dígitos — remove tudo que não for número e formata.
-         */
-        function aplicarMascaraMoeda(input) {
-            let raw = input.value.replace(/\D/g, '');
-            if (!raw) { input.value = ''; return; }
-            const centavos = parseInt(raw, 10);
-            const reais = centavos / 100;
-            input.value = reais.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        /* ── CALCULADORA DE VALORES (apenas referência visual — não preenche comissão) ── */
-        function calcularValores() {
-            const p = passeiosCache.find(x => x.id == document.getElementById('passeio-select').value);
-            const numPessoas = parseInt(document.getElementById('num-pessoas').value) || 1;
-            let precoUnit = parseFloat(document.getElementById('preco-unitario').value) || 0;
-
-            if (p && p.preco && precoUnit === 0 && !document.getElementById('preco-unitario').value) {
-                precoUnit = parseFloat(p.preco) || 0;
-                document.getElementById('preco-unitario').value = precoUnit || '';
-            }
-
-            const valorBruto = precoUnit * numPessoas;
-            const comissaoAg = parseFloat(document.getElementById('comissao-agencia').value) || 0;
-            const comissaoRec = Math.max(valorBruto - comissaoAg, 0);
-
-            document.getElementById('res-unitario').textContent = 'R$ ' + fmtVal(precoUnit);
-            document.getElementById('res-pessoas').textContent = '× ' + numPessoas;
-            document.getElementById('res-bruto').textContent = 'R$ ' + fmtVal(valorBruto);
-            document.getElementById('res-agencia').textContent = 'R$ ' + fmtVal(comissaoAg);
-            document.getElementById('res-recepcao-calc').textContent = 'R$ ' + fmtVal(comissaoRec);
-
-            const eq = document.getElementById('calc-equacao');
-            if (valorBruto > 0) {
-                document.getElementById('eq-texto').innerHTML =
-                    `R$ ${fmtVal(valorBruto)} <span>(bruto)</span> − R$ ${fmtVal(comissaoAg)} <span>(agência)</span> = <strong>R$ ${fmtVal(comissaoRec)}</strong>`;
-                eq.classList.add('show');
-            } else {
-                eq.classList.remove('show');
-            }
-            // NÃO preenche o campo comissao-recepcao — o usuário digita manualmente
-        }
-
-        function onPasseioChange() {
-            mostrarInfoPasseio();
-            const p = passeiosCache.find(x => x.id == document.getElementById('passeio-select').value);
-            if (p && p.preco && !p.preco_sob_consulta) {
-                document.getElementById('preco-unitario').value = parseFloat(p.preco).toFixed(2);
-            } else {
-                document.getElementById('preco-unitario').value = '';
-            }
-            calcularValores();
-        }
-
-        /* ── RECEPCIONISTAS ── */
-        async function carregarRecepcionistas() {
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/divisao/`);
-                const d = await res.json();
-                recepcionistasConfig = d.nomes || [];
-                renderTagsRecepcionistas();
-            } catch (e) {
-                document.getElementById('rec-hint').textContent = 'Cadastre recepcionistas em Relatórios → Divisão de Comissão';
-            }
-        }
-
-        function renderTagsRecepcionistas() {
-            const container = document.getElementById('rec-tags-lista');
-            const hint = document.getElementById('rec-hint');
-            if (!recepcionistasConfig.length) {
-                container.innerHTML = '';
-                hint.textContent = 'Nenhum recepcionista cadastrado. Adicione em Relatórios → Divisão de Comissão.';
-                return;
-            }
-            hint.textContent = 'Clique para selecionar (pode escolher mais de um):';
-            container.innerHTML = recepcionistasConfig.map(nome => `
-        <span class="rec-tag" onclick="toggleRecepcionista('${nome}')" id="tag-${btoa(unescape(encodeURIComponent(nome))).replace(/[^a-zA-Z0-9]/g, '')}">
-            ${nome}
-        </span>`).join('');
-        }
-
-        function toggleRecepcionista(nome) {
-            const idx = recsSelecionados.indexOf(nome);
-            if (idx === -1) recsSelecionados.push(nome);
-            else recsSelecionados.splice(idx, 1);
-            atualizarTagsVisuais();
-            atualizarLinhasPixForm();
-        }
-
-        function atualizarTagsVisuais() {
-            recepcionistasConfig.forEach(nome => {
-                const key = btoa(unescape(encodeURIComponent(nome))).replace(/[^a-zA-Z0-9]/g, '');
-                const tag = document.getElementById(`tag-${key}`);
-                if (tag) tag.classList.toggle('selected', recsSelecionados.includes(nome));
-            });
-            const cont = document.getElementById('rec-selecionados');
-            cont.innerHTML = recsSelecionados.map(nome => `
-        <span class="rec-badge-sel">
-            ${nome}
-            <button onclick="toggleRecepcionista('${nome}')" title="Remover">✕</button>
-        </span>`).join('');
-        }
-
-        function atualizarLinhasPixForm() {
-            if (document.getElementById('forma-pagamento').value !== 'pix') return;
-            const container = document.getElementById('pix-linhas-form');
-            [...container.querySelectorAll('.pix-linha')].forEach(div => {
-                const sel = div.querySelector('select');
-                if (sel && !recsSelecionados.includes(sel.value)) div.remove();
-            });
-            recsSelecionados.forEach(nome => {
-                const jaExiste = [...container.querySelectorAll('select')].some(s => s.value === nome);
-                if (!jaExiste) adicionarLinhaPix(nome);
-            });
-            atualizarTotalPixForm();
-        }
-
-        /* ── CAIXA ── */
-        function onMudaModo() {
-            const modo = document.getElementById('caixa-modo').value;
-            document.getElementById('filtro-caixa-data').style.display = modo === 'dia' ? '' : 'none';
-            document.getElementById('filtro-caixa-mes').style.display = modo === 'mes' ? '' : 'none';
-            document.getElementById('filtro-caixa-ano').style.display = modo === 'mes' ? '' : 'none';
-            atualizarCaixa();
-        }
-
-        /* ── PIX LINHAS — com input em moeda BR ── */
-        function togglePixForm() {
-            const forma = document.getElementById('forma-pagamento').value;
-            const bloco = document.getElementById('bloco-pix-form');
-            bloco.style.display = forma === 'pix' ? 'block' : 'none';
-            if (forma === 'pix') {
-                const container = document.getElementById('pix-linhas-form');
-                if (!container.children.length) {
-                    recsSelecionados.forEach(nome => adicionarLinhaPix(nome));
-                    if (!recsSelecionados.length) adicionarLinhaPix();
-                }
-            } else {
-                document.getElementById('pix-linhas-form').innerHTML = '';
-                document.getElementById('pix-total-row').style.display = 'none';
-                pixLinhasCount = 0;
-            }
-        }
-
-        function togglePago() {
-            const chk = document.getElementById('chk-pago');
-            const wrap = document.getElementById('pago-check-wrap');
-            wrap.classList.toggle('is-pago', chk.checked);
-            if (chk.checked && !document.getElementById('data-pagamento').value) {
-                document.getElementById('data-pagamento').value = new Date().toISOString().split('T')[0];
-            }
-        }
-
-        function adicionarLinhaPix(nomePreSel = '') {
-            pixLinhasCount++;
-            const id = pixLinhasCount;
-            const container = document.getElementById('pix-linhas-form');
-            const div = document.createElement('div');
-            div.className = 'pix-linha';
-            div.id = `pix-linha-${id}`;
-            const opts = recepcionistasConfig.length
-                ? recepcionistasConfig.map(n => `<option value="${n}" ${nomePreSel === n ? 'selected' : ''}>${n}</option>`).join('')
-                : `<option value="${nomePreSel}">${nomePreSel || 'Recepcionista'}</option>`;
-            div.innerHTML = `
-        <select class="pix-rec-sel" onchange="atualizarTotalPixForm()">
-            <option value="">Selecione...</option>${opts}
-        </select>
-        <div class="pix-valor-wrap">
-            <span class="pix-valor-prefix">R$</span>
-            <input type="text" inputmode="numeric" class="pix-rec-valor"
-                placeholder="0,00"
-                oninput="aplicarMascaraMoeda(this); atualizarTotalPixForm()">
+      <p class="section-title">Dados do Cliente</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nome do Cliente *</label>
+          <input type="text" id="f-cliente" placeholder="Nome completo"/>
         </div>
-        <button type="button" class="btn-rm-pix" onclick="removerLinhaPix(${id})" title="Remover">✕</button>`;
-            container.appendChild(div);
-            atualizarTotalPixForm();
-        }
-
-        function removerLinhaPix(id) {
-            const el = document.getElementById(`pix-linha-${id}`);
-            if (el) el.remove();
-            atualizarTotalPixForm();
-        }
-
-        function atualizarTotalPixForm() {
-            const vals = [...document.querySelectorAll('.pix-rec-valor')].map(i => parseMoedaBR(i.value));
-            const total = vals.reduce((s, v) => s + v, 0);
-            const row = document.getElementById('pix-total-row');
-            row.style.display = vals.length ? 'flex' : 'none';
-            document.getElementById('pix-total-form').textContent = 'R$ ' + formatMoedaBR(total);
-        }
-
-        function getPixLinhas() {
-            return [...document.querySelectorAll('.pix-linha')].map(div => ({
-                nome: div.querySelector('.pix-rec-sel')?.value || '',
-                valor: parseMoedaBR(div.querySelector('.pix-rec-valor')?.value),
-            })).filter(p => p.nome && p.valor > 0);
-        }
-
-        /* ── PASSEIOS ── */
-        async function carregarPasseios() {
-            const sel = document.getElementById('passeio-select');
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/passeios/`);
-                passeiosCache = await res.json();
-                if (!passeiosCache.length) { sel.innerHTML = '<option value="">Nenhum passeio cadastrado</option>'; return; }
-                sel.innerHTML = '<option value="">Selecione um passeio...</option>' +
-                    passeiosCache.map(p => {
-                        const preco = p.preco_sob_consulta ? 'Sob consulta'
-                            : 'R$ ' + parseFloat(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                        return `<option value="${p.id}">${p.nome} — ${preco}</option>`;
-                    }).join('');
-            } catch (e) { sel.innerHTML = '<option value="">Erro ao carregar</option>'; }
-        }
-
-        function mostrarInfoPasseio() {
-            const sel = document.getElementById('passeio-select');
-            const box = document.getElementById('passeio-info');
-            if (!sel.value) { box.classList.remove('show'); return; }
-            const p = passeiosCache.find(x => x.id == sel.value);
-            if (!p) { box.classList.remove('show'); return; }
-            document.getElementById('info-nome').textContent = p.nome;
-            if (p.preco_sob_consulta) {
-                document.getElementById('info-preco').textContent = 'Sob consulta';
-                document.getElementById('info-preco').style.color = '#94a3b8';
-            } else {
-                const sufixo = p.preco_por_pessoa ? ' / pessoa' : ' (total)';
-                document.getElementById('info-preco').textContent =
-                    'R$ ' + parseFloat(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + sufixo;
-                document.getElementById('info-preco').style.color = '#10b981';
-            }
-            box.classList.add('show');
-        }
-
-        /* ── SUBMETER ── */
-        async function submeterReserva() {
-            if (modoEdicao && reservaEditandoId) {
-                await salvarEdicaoReserva();
-            } else {
-                await criarReserva();
-            }
-        }
-
-        async function criarReserva() {
-            const passeio = document.getElementById('passeio-select').value;
-            const nome = document.getElementById('nome-cliente').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
-            const data = document.getElementById('data-passeio').value;
-
-            // comissão manual
-            const comissaoRecInput = document.getElementById('comissao-recepcao').value;
-            const comissaoRecVal = parseFloat(comissaoRecInput) || 0;
-
-            // básicos
-            if (!passeio) return toast('Selecione um passeio', 'err');
-            if (!nome) return toast('Informe o nome do cliente', 'err');
-            if (!telefone) return toast('Informe o telefone', 'err');
-            if (!data) return toast('Informe a data do passeio', 'err');
-
-            if (comissaoRecVal <= 0) {
-                return toast('Informe a comissão da recepção', 'err');
-            }
-
-            // cálculos
-            const numPessoas = parseInt(document.getElementById('num-pessoas').value) || 1;
-            const precoUnit = parseFloat(document.getElementById('preco-unitario').value) || 0;
-            const valorBruto = precoUnit * numPessoas;
-            const comissaoAg = parseFloat(document.getElementById('comissao-agencia').value) || 0;
-
-            // 🔴 validações importantes
-            if (comissaoRecVal > valorBruto) {
-                return toast('Comissão não pode ser maior que o valor bruto', 'err');
-            }
-
-            if (comissaoAg > 0 && comissaoRecVal === valorBruto) {
-                toast('⚠️ Comissão da agência não foi descontada', 'err');
-            }
-
-            // pagamento
-            const isPago = document.getElementById('chk-pago').checked;
-            const dataPgto = document.getElementById('data-pagamento').value || '';
-            const mesRef = dataPgto ? dataPgto.slice(0, 7) : '';
-            const formaPgto = document.getElementById('forma-pagamento').value || 'pendente';
-            const pixLinhas = formaPgto === 'pix' ? getPixLinhas() : [];
-
-            const statusFinal = isPago ? 'pago' : document.getElementById('status').value;
-
-            // recepcionistas
-            const recepcionistasStr = recsSelecionados.join(', ');
-
-            // form
-            const form = new FormData();
-            form.append('passeio_id', passeio);
-            form.append('nome_cliente', nome);
-            form.append('telefone', telefone);
-            form.append('email', document.getElementById('email').value);
-            form.append('data_passeio', data);
-            form.append('horario', document.getElementById('horario-passeio').value);
-            form.append('num_pessoas', numPessoas);
-
-            // 🔥 CORREÇÃO PRINCIPAL
-            form.append('valor_bruto', valorBruto);
-            form.append('comissao_agencia', comissaoAg);
-            form.append('comissao_recepcao', comissaoRecVal);
-
-            form.append('recepcionista', recepcionistasStr);
-            form.append('recepcionistas_json', JSON.stringify(recsSelecionados));
-            form.append('forma_pagamento', formaPgto);
-            form.append('status', statusFinal);
-            form.append('data_pagamento', dataPgto);
-            form.append('mes_referencia', mesRef);
-            form.append('observacoes', document.getElementById('obs').value);
-            form.append('pix_recebimentos', JSON.stringify(pixLinhas));
-
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/`, {
-                    method: 'POST',
-                    body: form
-                });
-
-                const d = await res.json();
-                if (d.erro) throw new Error(d.erro);
-
-                toast('✔ Reserva registrada!', 'ok');
-                limparForm();
-                carregarReservas();
-
-            } catch (e) {
-                toast(e.message || 'Erro ao registrar', 'err');
-            }
-        }
-
-        /* ── EDIÇÃO ── */
-        function editarReserva(r) {
-            modoEdicao = true;
-            reservaEditandoId = r.id;
-
-            document.getElementById('form-titulo').textContent = '✏️ Editando Reserva';
-            document.getElementById('edit-banner').classList.add('show');
-            document.getElementById('edit-banner-id').textContent = `Reserva #${r.id} — ${r.nome_cliente}`;
-            document.getElementById('btn-submit').textContent = '💾 Salvar Alterações';
-            document.getElementById('btn-submit').style.background = '#d97706';
-            document.getElementById('btn-cancelar').style.display = 'block';
-
-            const passeioEl = document.getElementById('passeio-select');
-            const passeioOpt = [...passeioEl.options].find(o => {
-                const p = passeiosCache.find(p => p.id == o.value);
-                return p && p.nome === r.passeio_nome;
-            });
-            if (passeioOpt) { passeioEl.value = passeioOpt.value; mostrarInfoPasseio(); }
-
-            document.getElementById('nome-cliente').value = r.nome_cliente || '';
-            document.getElementById('telefone').value = r.telefone || '';
-            document.getElementById('email').value = r.email || '';
-
-            if (r.data && r.data !== '—') {
-                const partes = r.data.split('/');
-                if (partes.length === 3) {
-                    document.getElementById('data-passeio').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                }
-            }
-
-            document.getElementById('num-pessoas').value = r.num_pessoas || 1;
-
-            // Preenche comissão na edição (necessário para editar o valor existente)
-            const comissaoRec = parseFloat(r.comissao_recepcao) || parseFloat(r.valor_bruto) || 0;
-            const comissaoAg = parseFloat(r.comissao_agencia) || 0;
-            document.getElementById('comissao-recepcao').value = comissaoRec || '';
-            document.getElementById('comissao-agencia').value = comissaoAg || '';
-
-            calcularValores();
-
-            document.getElementById('obs').value = r.observacoes || '';
-            document.getElementById('data-pagamento').value = r.data_pagamento || '';
-
-            const statusSel = document.getElementById('status');
-            statusSel.value = r.status === 'pago' ? 'realizado' : (r.status || 'pendente');
-
-            const isPago = r.status === 'pago';
-            document.getElementById('chk-pago').checked = isPago;
-            document.getElementById('pago-check-wrap').classList.toggle('is-pago', isPago);
-
-            document.getElementById('forma-pagamento').value = r.forma_pagamento || 'pendente';
-            togglePixForm();
-
-            recsSelecionados = r.recepcionista ? r.recepcionista.split(',').map(s => s.trim()).filter(Boolean) : [];
-            atualizarTagsVisuais();
-
-            const pixLista = parsePix(r.pix_recebimentos);
-            if (pixLista.length && r.forma_pagamento === 'pix') {
-                const container = document.getElementById('pix-linhas-form');
-                container.innerHTML = '';
-                pixLinhasCount = 0;
-                pixLista.forEach(p => adicionarLinhaPix(p.nome));
-                setTimeout(() => {
-                    const inputs = container.querySelectorAll('.pix-rec-valor');
-                    pixLista.forEach((p, i) => {
-                        if (inputs[i]) inputs[i].value = formatMoedaBR(p.valor);
-                    });
-                    atualizarTotalPixForm();
-                }, 50);
-            }
-
-            document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        async function salvarEdicaoReserva() {
-            const nome = document.getElementById('nome-cliente').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
-            const data = document.getElementById('data-passeio').value;
-            const comissaoRec = parseFloat(document.getElementById('comissao-recepcao').value) || 0;
-            const comissaoAg = parseFloat(document.getElementById('comissao-agencia').value) || 0;
-            const valorBruto = (parseFloat(document.getElementById('preco-unitario').value) || 0) *
-                (parseInt(document.getElementById('num-pessoas').value) || 1);
-
-            if (!nome) return toast('Informe o nome do cliente', 'err');
-            if (!telefone) return toast('Informe o telefone', 'err');
-            if (!data) return toast('Informe a data do passeio', 'err');
-
-            const isPago = document.getElementById('chk-pago').checked;
-            const dataPgto = document.getElementById('data-pagamento').value || '';
-            const mesRef = dataPgto ? dataPgto.slice(0, 7) : '';
-            const formaPgto = document.getElementById('forma-pagamento').value || 'pendente';
-            const pixLinhas = formaPgto === 'pix' ? getPixLinhas() : [];
-            const statusFinal = isPago ? 'pago' : document.getElementById('status').value;
-            const passeio = document.getElementById('passeio-select').value;
-
-            const payload = {
-                passeio_id: passeio,
-                nome_cliente: nome,
-                telefone,
-                email: document.getElementById('email').value,
-                data_passeio: data,
-                horario: document.getElementById('horario-passeio').value || '',
-                num_pessoas: parseInt(document.getElementById('num-pessoas').value) || 1,
-                valor_bruto: valorBruto || comissaoRec,
-                comissao_agencia: comissaoAg,
-                comissao_recepcao: comissaoRec,
-                recepcionista: recsSelecionados.join(', '),
-                forma_pagamento: formaPgto,
-                status: statusFinal,
-                data_pagamento: dataPgto,
-                mes_referencia: mesRef,
-                observacoes: document.getElementById('obs').value,
-                pix_recebimentos: JSON.stringify(pixLinhas),
-            };
-
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/${reservaEditandoId}/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const d = await res.json();
-                if (d.erro) throw new Error(d.erro);
-                toast('✔ Reserva atualizada!', 'ok');
-                cancelarEdicao();
-                carregarReservas();
-            } catch (e) { toast(e.message || 'Erro ao atualizar', 'err'); }
-        }
-
-        function cancelarEdicao() {
-            modoEdicao = false;
-            reservaEditandoId = null;
-            document.getElementById('form-titulo').textContent = '📝 Nova Reserva';
-            document.getElementById('edit-banner').classList.remove('show');
-            document.getElementById('btn-submit').textContent = '💾 Registrar Reserva';
-            document.getElementById('btn-submit').style.background = '';
-            document.getElementById('btn-cancelar').style.display = 'none';
-            limparForm();
-        }
-
-        function limparForm() {
-            ['nome-cliente', 'telefone', 'email', 'data-passeio', 'horario-passeio',
-                'obs', 'comissao-recepcao', 'data-pagamento', 'preco-unitario'].forEach(id => {
-                    const el = document.getElementById(id); if (el) el.value = '';
-                });
-            document.getElementById('num-pessoas').value = '1';
-            document.getElementById('comissao-agencia').value = '0';
-            document.getElementById('status').value = 'pendente';
-            document.getElementById('forma-pagamento').value = 'pendente';
-            document.getElementById('passeio-select').value = '';
-            document.getElementById('chk-pago').checked = false;
-            document.getElementById('pago-check-wrap').classList.remove('is-pago');
-            document.getElementById('passeio-info').classList.remove('show');
-            document.getElementById('bloco-pix-form').style.display = 'none';
-            document.getElementById('pix-linhas-form').innerHTML = '';
-            document.getElementById('pix-total-row').style.display = 'none';
-            document.getElementById('calc-equacao').classList.remove('show');
-            document.getElementById('res-unitario').textContent = 'R$ 0,00';
-            document.getElementById('res-bruto').textContent = 'R$ 0,00';
-            document.getElementById('res-agencia').textContent = 'R$ 0,00';
-            document.getElementById('res-recepcao-calc').textContent = 'R$ 0,00';
-            document.getElementById('res-pessoas').textContent = '× 1';
-            pixLinhasCount = 0;
-            recsSelecionados = [];
-            atualizarTagsVisuais();
-        }
-
-        /* ── RESERVAS ── */
-        async function carregarReservas() {
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/`);
-                todasReservas = await res.json();
-                filtrarLocal();
-                atualizarCaixa();
-            } catch (e) {
-                document.getElementById('lista-reservas').innerHTML = '<div class="empty">Erro ao carregar reservas.</div>';
-            }
-        }
-
-        /* ── CAIXA ── */
-        function atualizarCaixa() {
-            const modo = document.getElementById('caixa-modo').value;
-            let pagas = todasReservas.filter(r => r.status === 'pago');
-            if (modo === 'dia') {
-                const dataFiltro = document.getElementById('filtro-caixa-data').value;
-                if (dataFiltro) pagas = pagas.filter(r => r.data_pagamento === dataFiltro);
-            } else if (modo === 'mes') {
-                const mes = document.getElementById('filtro-caixa-mes').value;
-                const ano = document.getElementById('filtro-caixa-ano').value;
-                pagas = pagas.filter(r => {
-                    const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.slice(0, 7) : '');
-                    if (ano && mes && ref !== `${ano}-${mes}`) return false;
-                    if (ano && !mes && !ref.startsWith(ano)) return false;
-                    if (!ano && mes && ref.slice(5, 7) !== mes) return false;
-                    return true;
-                });
-            }
-            const recepcao = pagas.reduce((s, r) => s + parseFloat(r.comissao_recepcao || 0), 0);
-            let totalPix = 0;
-            pagas.forEach(r => { parsePix(r.pix_recebimentos).forEach(p => { totalPix += p.valor; }); });
-            const dinheiro = pagas.filter(r => r.forma_pagamento === 'dinheiro')
-                .reduce((s, r) => s + parseFloat(r.comissao_recepcao || 0), 0);
-            document.getElementById('caixa-recepcao').textContent = 'R$ ' + fmtVal(recepcao);
-            document.getElementById('caixa-pix').textContent = 'R$ ' + fmtVal(totalPix);
-            document.getElementById('caixa-dinheiro').textContent = 'R$ ' + fmtVal(dinheiro);
-            document.getElementById('caixa-qtd').textContent = pagas.length;
-        }
-
-        /* ── FILTRO ── */
-        function filtrarLocal() {
-            const texto = (document.getElementById('busca-texto').value || '').toLowerCase().trim();
-            const data = document.getElementById('busca-data').value;
-            const status = document.getElementById('busca-status').value;
-            let lista = todasReservas;
-            if (texto) lista = lista.filter(r =>
-                (r.nome_cliente || '').toLowerCase().includes(texto) ||
-                (r.telefone || '').replace(/\D/g, '').includes(texto.replace(/\D/g, '')));
-            if (data) {
-                const [a, m, d] = data.split('-');
-                lista = lista.filter(r => (r.data || '').startsWith(`${d}/${m}/${a}`));
-            }
-            if (status) lista = lista.filter(r => r.status === status);
-            renderReservas(lista);
-        }
-
-        function limparBusca() {
-            ['busca-texto', 'busca-data'].forEach(id => { document.getElementById(id).value = ''; });
-            document.getElementById('busca-status').value = '';
-            filtrarLocal();
-        }
-
-        /* ── PIX INLINE na tabela — valor em moeda BR ── */
-        function buildPixInlineHTML(reservaId, lista) {
-            const optsRec = recepcionistasConfig.length
-                ? recepcionistasConfig.map(n => `<option value="${n}">${n}</option>`).join('')
-                : '';
-            const linhas = lista.map((p, i) => {
-                const optsSel = optsRec
-                    ? recepcionistasConfig.map(n => `<option value="${n}" ${n === p.nome ? 'selected' : ''}>${n}</option>`).join('')
-                    : `<option value="${p.nome}">${p.nome}</option>`;
-                return `<div class="pix-inline-linha">
-            <select class="pix-inline-select" data-field="nome" onchange="pixInlineChange(${reservaId})">
-                <option value="">Nome...</option>${optsSel}
-            </select>
-            <div class="pix-inline-val-wrap">
-                <span class="pix-inline-prefix">R$</span>
-                <input class="pix-inline-valor-input" type="text" inputmode="numeric"
-                    value="${formatMoedaBR(p.valor)}"
-                    placeholder="0,00"
-                    data-field="valor"
-                    oninput="aplicarMascaraMoeda(this); pixInlineChange(${reservaId})">
-            </div>
-            <button class="btn-rm-pix-inline" onclick="pixInlineRemove(${reservaId},${i})">✕</button>
-        </div>`;
-            }).join('');
-            return `<div class="pix-inline-wrap" id="pix-wrap-${reservaId}">
-        ${linhas}
-        <div class="pix-inline-actions">
-            <button class="btn-add-pix-inline" onclick="pixInlineAdd(${reservaId})">＋ Pix</button>
-            <button class="btn-save-pix-inline" onclick="pixInlineSave(${reservaId})">💾 Salvar</button>
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="text" id="f-whatsapp" placeholder="+55 11 99999-9999"/>
         </div>
-    </div>`;
-        }
+        <div class="form-group">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="pendente">Pendente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="pago">Pago</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
 
-        function getPixInlineLista(reservaId) {
-            const wrap = document.getElementById(`pix-wrap-${reservaId}`);
-            if (!wrap) return [];
-            return [...wrap.querySelectorAll('.pix-inline-linha')].map(div => ({
-                nome: div.querySelector('[data-field="nome"]')?.value || '',
-                valor: parseMoedaBR(div.querySelector('[data-field="valor"]')?.value),
-            })).filter(p => p.nome || p.valor > 0);
-        }
+      <hr class="divider"/>
+      <p class="section-title">Passeio & Data</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Passeio *</label>
+          <select id="f-passeio"><option value="">Carregando…</option></select>
+        </div>
+        <div class="form-group">
+          <label>Data do Passeio *</label>
+          <input type="date" id="f-data"/>
+        </div>
+        <div class="form-group">
+          <label>Nº de Pessoas</label>
+          <input type="number" id="f-pessoas" value="1" min="1" oninput="calcularValorBruto()"/>
+        </div>
+      </div>
 
-        function pixInlineChange(reservaId) { }
-        function pixInlineAdd(reservaId) {
-            const lista = getPixInlineLista(reservaId);
-            lista.push({ nome: '', valor: 0 });
-            rebuildPixInline(reservaId, lista);
-        }
-        function pixInlineRemove(reservaId, idx) {
-            const lista = getPixInlineLista(reservaId);
-            lista.splice(idx, 1);
-            rebuildPixInline(reservaId, lista);
-        }
-        function rebuildPixInline(reservaId, lista) {
-            const wrap = document.getElementById(`pix-wrap-${reservaId}`);
-            if (!wrap) return;
-            const tmp = document.createElement('div');
-            tmp.innerHTML = buildPixInlineHTML(reservaId, lista);
-            wrap.replaceWith(tmp.firstElementChild);
-        }
+      <hr class="divider"/>
+      <p class="section-title">Valores & Comissão</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Valor por Pessoa (R$)</label>
+          <input type="number" id="f-valor-pessoa" step="0.01" placeholder="0.00" oninput="calcularValorBruto()"/>
+        </div>
+        <div class="form-group">
+          <label>Valor Bruto (R$)</label>
+          <input type="number" id="f-valor-bruto" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
+          <span class="form-hint">Calculado automaticamente</span>
+        </div>
+        <div class="form-group">
+          <label>Comissão Agência (R$)</label>
+          <input type="number" id="f-comissao-agencia" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
+        </div>
+        <div class="form-group">
+          <label>★ Comissão Recepção (R$)</label>
+          <input type="number" id="f-comissao-recepcao" step="0.01" placeholder="0.00"/>
+          <span class="form-hint">Vai para o relatório de comissões</span>
+        </div>
+      </div>
 
-        async function pixInlineSave(reservaId) {
-            const lista = getPixInlineLista(reservaId);
+      <hr class="divider"/>
+      <p class="section-title">Recepcionista & Pagamento</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Recepcionista</label>
+          <select id="f-recepcionista"><option value="">Selecionar…</option></select>
+        </div>
+        <div class="form-group">
+          <label>Data de Pagamento</label>
+          <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
+          <div id="mes-ref-badge"></div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+      <p class="section-title">Observações</p>
+      <div class="form-group">
+        <textarea id="f-obs" placeholder="Observações opcionais…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarReserva()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL: REGISTRAR PAGAMENTO ═══════════════════ -->
+<div class="modal-overlay" id="modal-pagamento">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pagamento</h3>
+      <button class="modal-close" onclick="fecharModal('modal-pagamento')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pg-id"/>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Data de Pagamento *</label>
+        <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
+        <div id="mes-ref-badge-pg" style="display:none;background:rgba(108,99,255,.15);color:var(--accent);border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:600;width:fit-content;margin-top:6px;"></div>
+      </div>
+
+      <hr class="divider"/>
+      <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--accent);font-size:.85rem;font-weight:700;"></span></p>
+      <div id="pix-list"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px"><i class="fa-solid fa-plus"></i> Adicionar recepcionista</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
+      <button class="btn btn-success" onclick="confirmarPagamento()"><i class="fa-solid fa-circle-check"></i> Confirmar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL: CONFIRMAR DELETE ═══════════════════ -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h3>Excluir Reserva</h3>
+      <button class="modal-close" onclick="fecharModal('modal-delete')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--muted);font-size:.9rem">Tem certeza que deseja excluir a reserva de <strong id="del-nome"></strong>? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modal-delete')">Cancelar</button>
+      <button class="btn btn-danger" onclick="executarDelete()"><i class="fa-solid fa-trash"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ JS ═══════════════════════════════ -->
+<script>
+  // ── Config ──────────────────────────────────────────────────────────
+  const API_BASE   = '/api/admin';
+  const hotelSlug  = '{{ hotel.slug }}';
+  const csrfToken  = '{{ csrf_token }}';
+
+  let todasReservas   = [];
+  let passeiosCache   = [];
+  let recepcionistas  = [];
+  let deleteIdPendente = null;
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('hotel-nome-top').textContent = '{{ hotel.nome }}';
+    await Promise.all([carregarPasseios(), carregarRecepcionistas(), carregarReservas()]);
+  });
+
+  // ── Recepcionistas (via divisão) ─────────────────────────────────────
+  async function carregarRecepcionistas() {
+    try {
+      const res = await fetch(`${API_BASE}/${hotelSlug}/divisao/`, {
+        headers: { 'X-CSRFToken': csrfToken }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // data pode ser lista ou objeto com nomes_recepcionistas
+      let nomes = [];
+      if (Array.isArray(data)) {
+        data.forEach(d => {
+          if (d.nomes_recepcionistas) {
             try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/${reservaId}/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pix_recebimentos: JSON.stringify(lista) }),
-                });
-                const d = await res.json();
-                if (d.erro) throw new Error(d.erro);
-                const r = todasReservas.find(r => r.id === reservaId);
-                if (r) r.pix_recebimentos = JSON.stringify(lista);
-                atualizarCaixa();
-                toast('Pix salvo ✔', 'ok');
-            } catch (e) { toast(e.message || 'Erro', 'err'); }
-        }
-
-        /* ── RENDER TABELA ── */
-        function renderReservas(lista) {
-            document.getElementById('badge-total').textContent = `${lista.length} / ${todasReservas.length}`;
-            if (!lista.length) {
-                document.getElementById('lista-reservas').innerHTML = '<div class="empty">Nenhuma reserva encontrada.</div>';
-                return;
-            }
-            const statusOpts = cur => [
-                ['pendente', '⏳ Pendente'], ['confirmada', '✓ Confirmada'],
-                ['realizado', '🏁 Realizado'], ['cancelada', '✕ Cancelada'],
-            ].map(([v, l]) => `<option value="${v}" ${(cur === v || (cur === 'pago' && v === 'realizado')) ? 'selected' : ''}>${l}</option>`).join('');
-            const pgtoOpts = cur => [
-                ['pendente', '⏳ Pendente'], ['pix', '📱 Pix'], ['dinheiro', '💵 Dinheiro'],
-            ].map(([v, l]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${l}</option>`).join('');
-
-            document.getElementById('lista-reservas').innerHTML = `
-        <table>
-            <thead><tr>
-                <th>Cliente</th><th>Passeio / Data</th><th>Comissão</th>
-                <th>Recepcionista(s)</th><th>Status</th><th>Pagamento</th>
-                <th>Dt. Pgto</th><th>Pago?</th><th>Pix</th><th>Ações</th>
-            </tr></thead>
-            <tbody>
-                ${lista.map(r => {
-                const dataPgto = r.data_pagamento || '';
-                const recs = parseRecs(r.recepcionista);
-                const recsHTML = recs.length
-                    ? recs.map(n => `<span class="rec-tag-mini">${n}</span>`).join('')
-                    : '<span style="color:#475569;font-size:10px;">—</span>';
-                const isPago = r.status === 'pago';
-                const comissaoRec = parseFloat(r.comissao_recepcao || r.valor_bruto || 0);
-                return `<tr>
-                        <td>
-                            <strong style="color:#e2e8f0;font-size:12px;">${r.nome_cliente || '—'}</strong>
-                            <br><span style="font-size:10px;color:#475569;">${r.telefone || ''}</span>
-                        </td>
-                        <td style="font-size:11px;">
-                            ${r.passeio_nome || '—'}
-                            <br><span style="font-size:10px;color:#475569;">${r.data || '—'}</span>
-                        </td>
-                        <td class="val-verde" style="font-size:13px;font-weight:700;">R$ ${fmtVal(comissaoRec)}</td>
-                        <td><div class="recs-inline">${recsHTML}</div></td>
-                        <td>
-                            <select class="status-sel ${isPago ? 'realizado' : (r.status || 'pendente')}"
-                                onchange="atualizarCampo(${r.id},'status',this)">
-                                ${statusOpts(r.status)}
-                            </select>
-                        </td>
-                        <td>
-                            <select class="pgto-sel ${r.forma_pagamento || 'pendente'}"
-                                onchange="atualizarCampo(${r.id},'forma_pagamento',this)">
-                                ${pgtoOpts(r.forma_pagamento)}
-                            </select>
-                        </td>
-                        <td>
-                            <input type="date" class="data-pgto-input ${dataPgto ? 'preenchido' : ''}"
-                                value="${dataPgto}"
-                                onchange="atualizarCampo(${r.id},'data_pagamento',this)">
-                        </td>
-                        <td style="text-align:center;">
-                            <input type="checkbox" ${isPago ? 'checked' : ''} style="accent-color:#10b981;cursor:pointer;width:16px;height:16px;"
-                                onchange="marcarPago(${r.id},this)">
-                        </td>
-                        <td>${buildPixInlineHTML(r.id, parsePix(r.pix_recebimentos))}</td>
-                        <td>
-                            <button class="btn-edit-row" onclick="editarReserva(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-                                ✏️
-                            </button>
-
-                            <!-- 🔥 BOTÃO DELETE -->
-                            <button class="btn-edit-row"
-                                style="background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color:#ef4444;"
-                                onclick="deletarReserva(${r.id})">
-                                🗑️
-                            </button>
-                        </td>
-                    </tr>`;
-            }).join('')}
-            </tbody>
-        </table>`;
-        }
-
-        /* ── MARCAR PAGO ── */
-        async function marcarPago(id, el) {
-            const isPago = el.checked;
-            const payload = { status: isPago ? 'pago' : 'realizado' };
-            if (isPago) {
-                const r = todasReservas.find(r => r.id === id);
-                if (r && !r.data_pagamento) {
-                    const hoje = new Date().toISOString().split('T')[0];
-                    payload['data_pagamento'] = hoje;
-                    payload['mes_referencia'] = hoje.slice(0, 7);
-                }
-            }
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/${id}/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const d = await res.json();
-                if (d.erro) throw new Error(d.erro);
-                const r = todasReservas.find(r => r.id === id);
-                if (r) Object.assign(r, payload);
-                atualizarCaixa();
-                toast(isPago ? '💰 Marcado como pago!' : 'Status atualizado', 'ok');
-                carregarReservas();
-            } catch (e) { toast(e.message || 'Erro', 'err'); carregarReservas(); }
-        }
-
-        /* ── ATUALIZAR INLINE ── */
-        async function atualizarCampo(id, campo, el) {
-            const valor = el.value;
-            if (campo === 'status') el.className = `status-sel ${valor}`;
-            if (campo === 'forma_pagamento') el.className = `pgto-sel ${valor}`;
-            if (campo === 'data_pagamento') el.classList.toggle('preenchido', !!valor);
-            const payload = { [campo]: valor };
-            if (campo === 'data_pagamento') payload['mes_referencia'] = valor ? valor.slice(0, 7) : '';
-            try {
-                const res = await fetch(`/api/admin/${hotelSlug}/reservas/${id}/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const d = await res.json();
-                if (d.erro) throw new Error(d.erro);
-                const r = todasReservas.find(r => r.id === id);
-                if (r) Object.assign(r, payload);
-                atualizarCaixa();
-                toast('Salvo ✔', 'ok');
-            } catch (e) { toast(e.message || 'Erro ao salvar', 'err'); carregarReservas(); }
-        }
-
-        /* ── HELPERS ── */
-        function fmtVal(v) { return parseFloat(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
-        function parsePix(raw) {
-            if (!raw) return [];
-            try {
-                const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-                return Array.isArray(parsed) ? parsed.map(p => ({ nome: p.nome || '', valor: parseFloat(p.valor) || 0 })) : [];
-            } catch { return []; }
-        }
-        function parseRecs(recStr) {
-            if (!recStr) return [];
-            return recStr.split(',').map(s => s.trim()).filter(Boolean);
-        }
-        function popularAnosCaixa() {
-            const sel = document.getElementById('filtro-caixa-ano');
-            const anoAtual = new Date().getFullYear();
-            for (let a = anoAtual; a >= anoAtual - 4; a--) {
-                const opt = document.createElement('option');
-                opt.value = a; opt.textContent = a;
-                if (a === anoAtual) opt.selected = true;
-                sel.appendChild(opt);
-            }
-        }
-        function toast(msg, tipo = 'ok') {
-            const t = document.createElement('div');
-            t.className = `toast ${tipo}`; t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 2600);
-        }
-
-        function deletarReserva(id) {
-            if (!confirm("Deseja deletar essa reserva?")) return;
-
-            fetch(`/api/admin/${hotelSlug}/reservas/${id}/`, {
-                method: "DELETE"
-            })
-                .then(res => res.json())
-                .then(() => {
-                    toast("Reserva deletada!", "ok");
-                    carregarReservas();
-                })
-                .catch(() => toast("Erro ao deletar", "err"));
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const hoje = new Date();
-            document.getElementById('filtro-caixa-data').value = hoje.toISOString().split('T')[0];
-            document.getElementById('filtro-caixa-mes').value = String(hoje.getMonth() + 1).padStart(2, '0');
-            popularAnosCaixa();
-            await carregarRecepcionistas();
-            await carregarPasseios();
-            carregarReservas();
+              const parsed = typeof d.nomes_recepcionistas === 'string'
+                ? JSON.parse(d.nomes_recepcionistas) : d.nomes_recepcionistas;
+              if (Array.isArray(parsed)) nomes = nomes.concat(parsed);
+            } catch(e) {}
+          }
         });
-    </script>
-</body>
+      } else if (data.nomes_recepcionistas) {
+        try {
+          const parsed = typeof data.nomes_recepcionistas === 'string'
+            ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas;
+          if (Array.isArray(parsed)) nomes = parsed;
+        } catch(e) {}
+      }
+      recepcionistas = [...new Set(nomes)];
+      const sel = document.getElementById('f-recepcionista');
+      sel.innerHTML = '<option value="">Nenhum / Não definido</option>';
+      recepcionistas.forEach(n => {
+        sel.insertAdjacentHTML('beforeend', `<option value="${n}">${n}</option>`);
+      });
+    } catch(e) {
+      console.warn('[carregarRecepcionistas]', e);
+    }
+  }
 
+  // ── Passeios ─────────────────────────────────────────────────────────
+  async function carregarPasseios() {
+    try {
+      const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/`);
+      if (!res.ok) return;
+      const data = await res.json();
+      passeiosCache = Array.isArray(data) ? data : [];
+      const sel = document.getElementById('f-passeio');
+      sel.innerHTML = '<option value="">Selecionar passeio…</option>';
+      passeiosCache.forEach(p => {
+        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${p.titulo}</option>`);
+      });
+    } catch(e) {
+      console.warn('[carregarPasseios]', e);
+    }
+  }
+
+  // ── Reservas ─────────────────────────────────────────────────────────
+  async function carregarReservas() {
+    try {
+      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/`, {
+        headers: { 'X-CSRFToken': csrfToken }
+      });
+      if (!res.ok) { console.warn('[carregarReservas] HTTP', res.status); return; }
+      const data = await res.json();
+      if (!Array.isArray(data)) { console.warn('[carregarReservas] resposta inválida:', data); return; }
+      todasReservas = data;
+      popularFiltroMes();
+      atualizarStats();
+      renderTabela();
+    } catch(e) {
+      console.error('[carregarReservas]', e);
+    }
+  }
+
+  // ── Filtro de meses ───────────────────────────────────────────────────
+  function popularFiltroMes() {
+    const meses = [...new Set(todasReservas
+      .map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : null))
+      .filter(Boolean)
+    )].sort().reverse();
+    const sel = document.getElementById('filtro-mes');
+    sel.innerHTML = '<option value="">Todos os meses</option>';
+    meses.forEach(m => {
+      const [ano, mes] = m.split('-');
+      const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      sel.insertAdjacentHTML('beforeend', `<option value="${m}">${nomes[parseInt(mes,10)-1]}/${ano}</option>`);
+    });
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────
+  function atualizarStats() {
+    const total       = todasReservas.length;
+    const confirmadas = todasReservas.filter(r => r.status === 'confirmado').length;
+    const pagas       = todasReservas.filter(r => r.status === 'pago').length;
+    const comissao    = todasReservas
+      .filter(r => r.status === 'pago')
+      .reduce((s, r) => s + parseFloat(r.comissao_recepcao || 0), 0);
+    document.getElementById('stat-total').textContent       = total;
+    document.getElementById('stat-confirmadas').textContent = confirmadas;
+    document.getElementById('stat-pagas').textContent       = pagas;
+    document.getElementById('stat-comissao').textContent    = 'R$ ' + comissao.toFixed(2).replace('.', ',');
+  }
+
+  // ── Render tabela ─────────────────────────────────────────────────────
+  function renderTabela() {
+    const filtroStatus = document.getElementById('filtro-status').value;
+    const filtroMes    = document.getElementById('filtro-mes').value;
+    const busca        = document.getElementById('filtro-busca').value.toLowerCase();
+
+    let lista = todasReservas.filter(r => {
+      if (filtroStatus && r.status !== filtroStatus) return false;
+      if (filtroMes) {
+        const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : '');
+        if (ref !== filtroMes) return false;
+      }
+      if (busca) {
+        const haystack = `${r.nome_cliente||''} ${r.passeio_titulo||''}`.toLowerCase();
+        if (!haystack.includes(busca)) return false;
+      }
+      return true;
+    });
+
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+    document.getElementById('count-label').textContent = `${lista.length} registros`;
+
+    if (lista.length === 0) {
+      document.getElementById('empty-state').style.display = '';
+    } else {
+      document.getElementById('empty-state').style.display = 'none';
+      lista.forEach(r => {
+        const comR  = parseFloat(r.comissao_recepcao || 0).toFixed(2).replace('.', ',');
+        const valB  = parseFloat(r.valor_bruto || 0).toFixed(2).replace('.', ',');
+        const badgeClass = {
+          pendente: 'badge-pendente', confirmado: 'badge-confirmado',
+          pago: 'badge-pago', cancelado: 'badge-cancelado'
+        }[r.status] || 'badge-pendente';
+
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><span class="badge ${badgeClass}">${r.status}</span></td>
+            <td>
+              <div style="font-weight:600">${r.nome_cliente || '–'}</div>
+              ${r.whatsapp ? `<div style="font-size:.75rem;color:var(--muted)">${r.whatsapp}</div>` : ''}
+            </td>
+            <td>${r.passeio_titulo || r.passeio || '–'}</td>
+            <td>${r.data ? formatarData(r.data) : '–'}</td>
+            <td>${r.numero_pessoas || 1}</td>
+            <td>R$ ${valB}</td>
+            <td style="color:var(--green);font-weight:600">R$ ${comR}</td>
+            <td>${r.recepcionista || '<span style="color:var(--muted)">–</span>'}</td>
+            <td>
+              ${r.data_pagamento
+                ? `<span style="font-size:.78rem;color:var(--green)">${formatarData(r.data_pagamento)}</span>`
+                : (r.status !== 'cancelado' && r.status !== 'pago'
+                  ? `<button class="btn btn-success btn-sm" onclick="abrirPagamento(${r.id})"><i class="fa-solid fa-dollar-sign"></i> Pagar</button>`
+                  : '<span style="color:var(--muted);font-size:.78rem">–</span>')}
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="confirmarDelete(${r.id}, '${(r.nome_cliente||'').replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>`);
+      });
+    }
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '–';
+    const [y,m,d] = iso.substring(0,10).split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // ── Modal helpers ─────────────────────────────────────────────────────
+  function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // ── Nova reserva ──────────────────────────────────────────────────────
+  function abrirModalNova() {
+    document.getElementById('modal-titulo').textContent = 'Nova Reserva';
+    document.getElementById('f-id').value = '';
+    document.getElementById('f-cliente').value    = '';
+    document.getElementById('f-whatsapp').value   = '';
+    document.getElementById('f-status').value     = 'pendente';
+    document.getElementById('f-passeio').value    = '';
+    document.getElementById('f-data').value       = '';
+    document.getElementById('f-pessoas').value    = 1;
+    document.getElementById('f-valor-pessoa').value     = '';
+    document.getElementById('f-valor-bruto').value      = '';
+    document.getElementById('f-comissao-agencia').value = '';
+    document.getElementById('f-comissao-recepcao').value= '';
+    document.getElementById('f-recepcionista').value    = '';
+    document.getElementById('f-data-pagamento').value   = '';
+    document.getElementById('f-obs').value              = '';
+    document.getElementById('mes-ref-badge').style.display = 'none';
+    abrirModal('modal-reserva');
+  }
+
+  // ── Editar reserva ────────────────────────────────────────────────────
+  function editarReserva(id) {
+    const r = todasReservas.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('modal-titulo').textContent = 'Editar Reserva';
+    document.getElementById('f-id').value               = r.id;
+    document.getElementById('f-cliente').value          = r.nome_cliente || '';
+    document.getElementById('f-whatsapp').value         = r.whatsapp || '';
+    document.getElementById('f-status').value           = r.status || 'pendente';
+    document.getElementById('f-passeio').value          = r.passeio || '';
+    document.getElementById('f-data').value             = r.data || '';
+    document.getElementById('f-pessoas').value          = r.numero_pessoas || 1;
+    document.getElementById('f-valor-pessoa').value     = r.valor_por_pessoa || '';
+    document.getElementById('f-valor-bruto').value      = r.valor_bruto || '';
+    document.getElementById('f-comissao-agencia').value = r.comissao_agencia || '';
+    document.getElementById('f-comissao-recepcao').value= r.comissao_recepcao || '';
+    document.getElementById('f-recepcionista').value    = r.recepcionista || '';
+    document.getElementById('f-data-pagamento').value   = r.data_pagamento || '';
+    document.getElementById('f-obs').value              = r.observacoes || '';
+    atualizarMesRef();
+    abrirModal('modal-reserva');
+  }
+
+  // ── Cálculo automático ─────────────────────────────────────────────────
+  function calcularValorBruto() {
+    const pessoas = parseFloat(document.getElementById('f-pessoas').value) || 1;
+    const vpp     = parseFloat(document.getElementById('f-valor-pessoa').value) || 0;
+    if (vpp > 0) {
+      document.getElementById('f-valor-bruto').value = (pessoas * vpp).toFixed(2);
+    }
+    sugerirComissao();
+  }
+
+  // Quando seleciona passeio, preenche valor por pessoa
+  document.getElementById('f-passeio').addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    const preco = parseFloat(opt.dataset.preco) || 0;
+    if (preco > 0) {
+      document.getElementById('f-valor-pessoa').value = preco.toFixed(2);
+      calcularValorBruto();
+    }
+  });
+
+  function sugerirComissao() {
+    const bruto    = parseFloat(document.getElementById('f-valor-bruto').value)      || 0;
+    const agencia  = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
+    const recep    = document.getElementById('f-comissao-recepcao');
+    // só sugere se o campo ainda estiver vazio ou igual ao valor calculado anteriormente
+    const sugestao = Math.max(0, bruto - agencia).toFixed(2);
+    if (!recep.value || parseFloat(recep.value) === 0) {
+      recep.value = sugestao;
+    }
+  }
+
+  function atualizarMesRef() {
+    const val   = document.getElementById('f-data-pagamento').value;
+    const badge = document.getElementById('mes-ref-badge');
+    if (val) {
+      const [ano, mes] = val.split('-');
+      const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      badge.textContent  = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // ── Salvar reserva ────────────────────────────────────────────────────
+  async function salvarReserva() {
+    const id = document.getElementById('f-id').value;
+
+    const payload = {
+      nome_cliente:       document.getElementById('f-cliente').value.trim(),
+      whatsapp:           document.getElementById('f-whatsapp').value.trim(),
+      status:             document.getElementById('f-status').value,
+      passeio:            document.getElementById('f-passeio').value || null,
+      data:               document.getElementById('f-data').value || null,
+      numero_pessoas:     parseInt(document.getElementById('f-pessoas').value) || 1,
+      valor_por_pessoa:   document.getElementById('f-valor-pessoa').value    || null,
+      valor_bruto:        document.getElementById('f-valor-bruto').value     || null,
+      comissao_agencia:   document.getElementById('f-comissao-agencia').value|| null,
+      comissao_recepcao:  document.getElementById('f-comissao-recepcao').value|| null,
+      recepcionista:      document.getElementById('f-recepcionista').value   || '',
+      data_pagamento:     document.getElementById('f-data-pagamento').value  || null,
+      observacoes:        document.getElementById('f-obs').value,
+    };
+
+    // mes_referencia automático
+    if (payload.data_pagamento) {
+      payload.mes_referencia = payload.data_pagamento.substring(0, 7);
+    }
+
+    if (!payload.nome_cliente) { alert('Informe o nome do cliente.'); return; }
+
+    const url    = id ? `${API_BASE}/${hotelSlug}/reservas/${id}/` : `${API_BASE}/${hotelSlug}/reservas/`;
+    const method = id ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) { const e = await res.json(); alert(e.erro || e.detail || 'Erro ao salvar.'); return; }
+      fecharModal('modal-reserva');
+      await carregarReservas();
+    } catch(e) {
+      console.error('[salvarReserva]', e);
+      alert('Erro de conexão.');
+    }
+  }
+
+  // ── Pagamento ─────────────────────────────────────────────────────────
+  function abrirPagamento(id) {
+    const r = todasReservas.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('pg-id').value = id;
+    document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
+    document.getElementById('pg-total-label').textContent =
+      `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
+    atualizarMesRefPg();
+    // Montar linhas de PIX
+    const pixList = document.getElementById('pix-list');
+    pixList.innerHTML = '';
+    const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
+    nomes.forEach(nome => addPixRow(nome));
+    abrirModal('modal-pagamento');
+  }
+
+  function addPixRow(nome='') {
+    const list = document.getElementById('pix-list');
+    const row  = document.createElement('div');
+    row.className = 'pix-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Nome recepcionista" value="${nome}" class="pix-nome"/>
+      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor" style="width:120px"/>
+    `;
+    list.appendChild(row);
+  }
+
+  function atualizarMesRefPg() {
+    const val   = document.getElementById('pg-data').value;
+    const badge = document.getElementById('mes-ref-badge-pg');
+    if (val) {
+      const [ano, mes] = val.split('-');
+      const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      badge.textContent  = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  async function confirmarPagamento() {
+    const id          = document.getElementById('pg-id').value;
+    const dataPag     = document.getElementById('pg-data').value;
+    if (!dataPag) { alert('Informe a data de pagamento.'); return; }
+
+    // coletar pix
+    const pixRows    = document.querySelectorAll('#pix-list .pix-row');
+    const pixRecebimentos = {};
+    pixRows.forEach(row => {
+      const nome = row.querySelector('.pix-nome').value.trim();
+      const val  = parseFloat(row.querySelector('.pix-valor').value) || 0;
+      if (nome) pixRecebimentos[nome] = val;
+    });
+
+    try {
+      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify({
+          status:           'pago',
+          data_pagamento:   dataPag,
+          mes_referencia:   dataPag.substring(0, 7),
+          pix_recebimentos: JSON.stringify(pixRecebimentos)
+        })
+      });
+      if (!res.ok) { const e = await res.json(); alert(e.erro || 'Erro ao confirmar pagamento.'); return; }
+      fecharModal('modal-pagamento');
+      await carregarReservas();
+    } catch(e) {
+      console.error('[confirmarPagamento]', e);
+      alert('Erro de conexão.');
+    }
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────
+  function confirmarDelete(id, nome) {
+    deleteIdPendente = id;
+    document.getElementById('del-nome').textContent = nome;
+    abrirModal('modal-delete');
+  }
+
+  async function executarDelete() {
+    if (!deleteIdPendente) return;
+    try {
+      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${deleteIdPendente}/`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': csrfToken }
+      });
+      if (!res.ok && res.status !== 204) { alert('Erro ao excluir.'); return; }
+      fecharModal('modal-delete');
+      deleteIdPendente = null;
+      await carregarReservas();
+    } catch(e) {
+      console.error('[executarDelete]', e);
+      alert('Erro de conexão.');
+    }
+  }
+
+  // Fechar modal ao clicar fora
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+  });
+</script>
+</body>
 </html>
