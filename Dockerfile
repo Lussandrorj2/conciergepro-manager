@@ -10,8 +10,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 WORKDIR /app/backend
-# collectstatic roda no build (não precisa de banco)
 RUN python manage.py collectstatic --noinput --clear
 EXPOSE 8000
-# migrate roda no start (precisa do banco já disponível)
-CMD ["sh", "-c", "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py shell -c \"from django.contrib.auth.models import User; User.objects.filter(username='$DJANGO_SUPERUSER_USERNAME').exists() or User.objects.create_superuser('$DJANGO_SUPERUSER_USERNAME', '$DJANGO_SUPERUSER_EMAIL', '$DJANGO_SUPERUSER_PASSWORD')\" && gunicorn backend.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
