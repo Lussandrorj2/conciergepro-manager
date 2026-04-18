@@ -3,7 +3,7 @@
 
 function init() {
 
-```
+
 var hotelSlug = window.hotelSlug;
 
 if (!hotelSlug) {
@@ -190,7 +190,7 @@ async function carregarDashboard() {
 }
 
 carregarDashboard();
-```
+
 
 }
 
