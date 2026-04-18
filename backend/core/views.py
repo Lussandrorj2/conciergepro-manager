@@ -438,10 +438,10 @@ def deletar_imagem(request, id):
         if not _get_hotel_do_usuario(request, imagem.passeio.hotel):
             return JsonResponse({"erro": "Sem permissão"}, status=403)
         imagem.delete()
-        return JsonResponse({“status”: “ok”})
+        return JsonResponse({"status": "ok"})
     except Exception as e:
         print(traceback.format_exc())
-        return JsonResponse({“erro”: str(e)}, status=500)
+        return JsonResponse({"erro": str(e)}, status=500)
 
 # =========================
 
@@ -454,10 +454,10 @@ def deletar_imagem(request, id):
 def criar_reserva(request, hotel_slug):
     try:
         hotel     = Hotel.objects.get(slug=hotel_slug)
-        agenda_id = request.data.get(“agenda_id”)
-        nome      = request.data.get(“nome”)
-        telefone  = request.data.get(“telefone”)
-        qtd       = int(request.data.get(“qtd_pessoas”, 1))
+        agenda_id = request.data.get("agenda_id")
+        nome      = request.data.get("nome")
+        telefone  = request.data.get("telefone")
+        qtd       = int(request.data.get("qtd_pessoas", 1))
         
     
         comissao_recepcao = float(str(request.data.get("comissao_recepcao", 0)).replace(",", "."))
