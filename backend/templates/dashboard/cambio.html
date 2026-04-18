@@ -94,7 +94,7 @@
                         <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
                     </div>
                     <div class="form-group">
-                        <label>Cotação Venda</label>
+                        <label>Cotação Venda <span class="label-opcional">(opcional)</span></label>
                         <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
                     </div>
                 </div>
@@ -105,11 +105,11 @@
                         <span>Valor pago ao hóspede</span>
                         <span id="f-pago">R$ —</span>
                     </div>
-                    <div class="fluxo-linha">
+                    <div class="fluxo-linha" id="f-linha-recebido" style="display:none;">
                         <span>Valor de repasse</span>
                         <span id="f-recebido">R$ —</span>
                     </div>
-                    <div class="fluxo-lucro">
+                    <div class="fluxo-lucro" id="f-linha-lucro" style="display:none;">
                         <span>Lucro estimado</span>
                         <span id="f-lucro">R$ —</span>
                     </div>
@@ -170,8 +170,8 @@
                     <input type="number" id="edit-compra" inputmode="decimal" min="0" step="any">
                 </div>
                 <div class="form-group">
-                    <label>Cotação Venda</label>
-                    <input type="number" id="edit-venda" inputmode="decimal" min="0" step="any">
+                    <label>Cotação Venda <span class="label-opcional">(opcional)</span></label>
+                    <input type="number" id="edit-venda" inputmode="decimal" min="0" step="any" placeholder="—">
                 </div>
             </div>
         </div>
@@ -195,18 +195,29 @@
         });
     });
 
-    // Preview do fluxo
+    // Preview do fluxo — cotacao_venda é opcional
     function atualizarFluxo() {
         const qty    = parseFloat(document.getElementById('quantidade').value) || 0;
         const compra = parseFloat(document.getElementById('cotacao_compra').value) || 0;
         const venda  = parseFloat(document.getElementById('cotacao_venda').value) || 0;
         const resumo = document.getElementById('fluxo-resumo');
 
-        if (qty > 0 && compra > 0 && venda > 0) {
-            document.getElementById('f-pago').textContent     = brl(qty * compra);
-            document.getElementById('f-recebido').textContent = brl(qty * venda);
-            document.getElementById('f-lucro').textContent    = brl(qty * venda - qty * compra);
+        if (qty > 0 && compra > 0) {
+            document.getElementById('f-pago').textContent = brl(qty * compra);
             resumo.classList.add('show');
+
+            const linhaRecebido = document.getElementById('f-linha-recebido');
+            const linhaLucro    = document.getElementById('f-linha-lucro');
+
+            if (venda > 0) {
+                document.getElementById('f-recebido').textContent = brl(qty * venda);
+                document.getElementById('f-lucro').textContent    = brl(qty * venda - qty * compra);
+                linhaRecebido.style.display = 'flex';
+                linhaLucro.style.display    = 'flex';
+            } else {
+                linhaRecebido.style.display = 'none';
+                linhaLucro.style.display    = 'none';
+            }
         } else {
             resumo.classList.remove('show');
         }
@@ -221,26 +232,29 @@
         return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // Registrar operação
+    // Registrar operação — apenas moeda, quantidade e cotacao_compra são obrigatórios
     document.getElementById('btn-registrar').addEventListener('click', async () => {
         const moeda  = document.getElementById('moeda').value;
         const qty    = parseFloat(document.getElementById('quantidade').value);
         const compra = parseFloat(document.getElementById('cotacao_compra').value);
-        const venda  = parseFloat(document.getElementById('cotacao_venda').value);
+        const venda  = parseFloat(document.getElementById('cotacao_venda').value) || null;
 
-        if (!qty || !compra || !venda) return toast('Preencha todos os campos.', true);
+        if (!qty || !compra) return toast('Preencha Quantidade e Cotação Compra.', true);
+
+        const payload = { moeda, quantidade: qty, cotacao_compra: compra };
+        if (venda) payload.cotacao_venda = venda;
 
         try {
             const r = await fetch(API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
-                body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
+                body: JSON.stringify(payload)
             });
             if (!r.ok) throw new Error();
             toast('Operação registrada!');
-            document.getElementById('quantidade').value = '';
+            document.getElementById('quantidade').value     = '';
             document.getElementById('cotacao_compra').value = '';
-            document.getElementById('cotacao_venda').value = '';
+            document.getElementById('cotacao_venda').value  = '';
             document.getElementById('fluxo-resumo').classList.remove('show');
             carregarOperacoes();
         } catch { toast('Erro ao registrar.', true); }
@@ -256,7 +270,7 @@
             let totalPago = 0, totalRecebido = 0;
             ops.forEach(op => {
                 totalPago     += parseFloat(op.valor_pago     || op.quantidade * op.cotacao_compra || 0);
-                totalRecebido += parseFloat(op.valor_recebido || op.quantidade * op.cotacao_venda  || 0);
+                totalRecebido += parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
             });
 
             document.getElementById('total-pago').textContent     = brl(totalPago);
@@ -289,18 +303,19 @@
                     <tbody>
                         ${ops.map(op => {
                             const pago     = parseFloat(op.valor_pago     || op.quantidade * op.cotacao_compra || 0);
-                            const recebido = parseFloat(op.valor_recebido || op.quantidade * op.cotacao_venda  || 0);
-                            const data     = op.data ? new Date(op.data).toLocaleDateString('pt-BR') : '—';
+                            const recebido = parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
+                            const temVenda = op.cotacao_venda && parseFloat(op.cotacao_venda) > 0;
+                            const dataFmt  = op.data ? new Date(op.data).toLocaleDateString('pt-BR') : '—';
                             const opJson   = encodeURIComponent(JSON.stringify(op));
                             return `<tr>
                                 <td><span class="badge badge-confirmado">${op.moeda}</span></td>
-                                <td>${data}</td>
+                                <td>${dataFmt}</td>
                                 <td>${Number(op.quantidade).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
                                 <td>${brl(op.cotacao_compra)}</td>
-                                <td>${brl(op.cotacao_venda)}</td>
+                                <td>${temVenda ? brl(op.cotacao_venda) : '<span style="color:var(--text-soft)">—</span>'}</td>
                                 <td style="color:#f87171;font-weight:600;">${brl(pago)}</td>
-                                <td style="color:#38bdf8;font-weight:600;">${brl(recebido)}</td>
-                                <td style="color:var(--green);font-weight:600;">${brl(recebido - pago)}</td>
+                                <td style="color:#38bdf8;font-weight:600;">${temVenda ? brl(recebido) : '<span style="color:var(--text-soft);font-weight:400">—</span>'}</td>
+                                <td style="color:var(--green);font-weight:600;">${temVenda ? brl(recebido - pago) : '<span style="color:var(--text-soft);font-weight:400">—</span>'}</td>
                                 <td>
                                     <div class="actions">
                                         <button class="btn-acao" onclick='abrirEdicao(decodeURIComponent("${opJson}"))'>✏️</button>
@@ -324,7 +339,7 @@
         document.getElementById('edit-moeda').value      = op.moeda;
         document.getElementById('edit-quantidade').value = op.quantidade;
         document.getElementById('edit-compra').value     = op.cotacao_compra;
-        document.getElementById('edit-venda').value      = op.cotacao_venda;
+        document.getElementById('edit-venda').value      = op.cotacao_venda || '';
         document.getElementById('modal-edicao').classList.add('open');
     }
 
@@ -337,13 +352,17 @@
         const moeda  = document.getElementById('edit-moeda').value;
         const qty    = parseFloat(document.getElementById('edit-quantidade').value);
         const compra = parseFloat(document.getElementById('edit-compra').value);
-        const venda  = parseFloat(document.getElementById('edit-venda').value);
+        const venda  = parseFloat(document.getElementById('edit-venda').value) || null;
+
+        if (!qty || !compra) return toast('Preencha Quantidade e Cotação Compra.', true);
+
+        const payload = { moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda };
 
         try {
             const r = await fetch(`${API}${id}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
-                body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
+                body: JSON.stringify(payload)
             });
             if (!r.ok) throw new Error();
             fecharModal();
