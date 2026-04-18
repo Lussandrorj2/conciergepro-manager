@@ -39,9 +39,7 @@
         <div class="topbar">
             <span class="topbar-title">Dashboard</span>
             <div style="display:flex;align-items:center;gap:10px;">
-                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-ver-hotel">
-                    🌐 Ver site
-                </a>
+                <a href="{% url 'dashboard_home' hotel.slug %}" target="_blank">
                 <div class="hotel-badge">
                     <div class="hotel-dot"></div>
                     {{ hotel.nome }}
