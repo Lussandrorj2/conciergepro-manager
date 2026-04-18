@@ -224,7 +224,7 @@
         const moeda  = document.getElementById('moeda').value;
         const qty    = parseFloat(document.getElementById('quantidade').value);
         const compra = parseFloat(document.getElementById('cotacao_compra').value);
-        const venda  = parseFloat(document.getElementById('cotacao_venda').value);
+        const venda  = parseFloat(document.getElementById('cotacao_venda').value) || 0;
 
         if (!qty || !compra) return toast('Preencha quantidade e cotação de compra.', true);
 
