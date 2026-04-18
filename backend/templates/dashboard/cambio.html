@@ -339,16 +339,22 @@
         const venda  = parseFloat(document.getElementById('edit-venda').value);
 
         try {
-            const r = await fetch(`${API}${id}/`, {
-                method: 'PATCH',
+            const r = await fetch(API, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
                 body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
             });
-            if (!r.ok) throw new Error();
-            fecharModal();
-            toast('Operação atualizada!');
+            const resposta = await r.json();
+            console.log('STATUS:', r.status, 'RESPOSTA:', JSON.stringify(resposta));
+            if (!r.ok) return toast('Erro: ' + JSON.stringify(resposta), true);
+            toast('Operação registrada!');
+            document.getElementById('quantidade').value = '';
+            document.getElementById('cotacao_compra').value = '';
+            document.getElementById('cotacao_venda').value = '';
+            document.getElementById('fluxo-resumo').classList.remove('show');
             carregarOperacoes();
-        } catch { toast('Erro ao salvar.', true); }
+        } catch(e) { toast('Erro JS: ' + e.message, true); }
+
     }
 
     // Excluir
