@@ -2423,6 +2423,167 @@ tr:hover td { background: rgba(255,255,255,.015); }
 }
 
 /* =========================
+   CONFIGURAÇÕES — LAYOUT
+========================= */
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: var(--text-main);
+}
+
+.content-narrow {
+    padding: 32px;
+    max-width: 860px;
+}
+
+/* =========================
+   CARD CONFIG
+========================= */
+.card-config {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-config h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* =========================
+   BTN SAVE (config)
+========================= */
+.btn-save-config {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-save-config:hover {
+    background: var(--green);
+    color: #000;
+    border-color: var(--green);
+}
+
+.btn-save-config:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.btn-save-config.loading::after {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================
+   BANNER PREVIEW (config)
+========================= */
+.banner-preview-config {
+    height: 190px;
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    background: var(--bg-input);
+    transition: border-color var(--transition);
+    margin-top: 8px;
+}
+
+.banner-preview-config:hover { border-color: var(--green); }
+
+.banner-preview-config img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.banner-placeholder svg { opacity: .5; }
+.banner-placeholder small { font-size: 11px; color: var(--text-soft); }
+
+/* =========================
+   WHATSAPP FIELD
+========================= */
+.whatsapp-wrap {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.whatsapp-prefix {
+    background: var(--bg-input);
+    border: 1px solid var(--border-light);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.whatsapp-wrap input { margin-top: 0; }
+
+/* =========================
+   ERROR MSG (inline)
+========================= */
+.error-msg {
+    font-size: 11px;
+    color: #f87171;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.3);
+    border-radius: 7px;
+    display: none;
+}
+
+.error-msg.visible { display: block; }
+
+/* =========================
+   TOAST (config — override cores)
+========================= */
+.toast.ok  { background: var(--green); color: #000; }
+.toast.err { background: #dc2626; color: #fff; }
+
+/* =========================
    SCROLLBAR
 ========================= */
 ::-webkit-scrollbar { width: 5px; }
