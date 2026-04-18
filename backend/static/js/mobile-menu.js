@@ -8,31 +8,52 @@
 (function () {
     'use strict';
 
-    // Só age se for mobile
     function isMobile() { return window.innerWidth <= 768; }
 
-    // ── Identifica a página ativa pelo URL ──
     const path = window.location.pathname;
-    function isActive(slug) { return path.includes(slug); }
 
-    // ── Itens do bottom nav (5 principais) ──
-    const NAV_ITEMS = [
-        { icon: '🏠', label: 'Dashboard', slug: 'dashboard',   path: 'dashboard/'   },
-        { icon: '📅', label: 'Reservas',  slug: 'reservas',    path: 'reservas/'    },
-        { icon: '🗺️', label: 'Passeios',  slug: 'listar',      path: 'listar/'      },
-        { icon: '💱', label: 'Câmbio',    slug: 'cambio',      path: 'cambio/'      },
-        { icon: '📊', label: 'Relatórios',slug: 'relatorios',  path: 'relatorios/'  },
-    ];
-
-    // ── Extrai o slug do hotel da URL ──
-    // URL padrão: /slug/dashboard/ → pega o primeiro segmento
+    // ── Extrai o hotel slug da URL ──
+    // URL: /ipanema/dashboard/reservas/ → slug = "ipanema"
     function getHotelSlug() {
+        if (window.hotelSlug) return window.hotelSlug;
         const parts = path.split('/').filter(Boolean);
         return parts[0] || '';
     }
 
+    // ── Identifica a subpágina ativa ──
+    // /slug/dashboard/reservas/ → "reservas"
+    // /slug/dashboard/          → "" (dashboard raiz)
+    function getActivePage() {
+        const parts = path.split('/').filter(Boolean);
+        // parts[0] = slug, parts[1] = "dashboard", parts[2] = subpágina
+        return parts[2] || '';
+    }
+
+    // ── Itens do bottom nav ──
+    const NAV_ITEMS = [
+        { icon: '🏠', label: 'Dashboard', key: '',           sub: ''            },
+        { icon: '📅', label: 'Reservas',  key: 'reservas',   sub: 'reservas/'   },
+        { icon: '🗺️', label: 'Passeios',  key: 'listar',     sub: 'listar/'     },
+        { icon: '💱', label: 'Câmbio',    key: 'cambio',     sub: 'cambio/'     },
+        { icon: '📊', label: 'Relatórios',key: 'relatorios', sub: 'relatorios/' },
+    ];
+
+    function buildNav() {
+        const slug       = getHotelSlug();
+        const activePage = getActivePage();
+
+        return NAV_ITEMS.map(item => {
+            const isActive = activePage === item.key;
+            const href     = `/${slug}/dashboard/${item.sub}`;
+            return `<a class="bottom-nav-item${isActive ? ' active' : ''}" href="${href}">
+                <span class="nav-icon">${item.icon}</span>
+                <span>${item.label}</span>
+            </a>`;
+        }).join('');
+    }
+
     function init() {
-        // 1. Adiciona backdrop
+        // 1. Backdrop
         if (!document.querySelector('.sidebar-backdrop')) {
             const backdrop = document.createElement('div');
             backdrop.className = 'sidebar-backdrop';
@@ -40,41 +61,32 @@
             backdrop.addEventListener('click', closeSidebar);
         }
 
-        // 2. Injeta hamburguer na topbar
+        // 2. Hamburguer na topbar
         const topbar = document.querySelector('.topbar');
         if (topbar && !topbar.querySelector('.hamburger-btn')) {
             const btn = document.createElement('button');
             btn.className = 'hamburger-btn';
-            btn.setAttribute('aria-label', 'Menu');
+            btn.setAttribute('aria-label', 'Abrir menu');
             btn.innerHTML = '☰';
             btn.addEventListener('click', toggleSidebar);
             topbar.insertBefore(btn, topbar.firstChild);
         }
 
-        // 3. Injeta bottom nav
+        // 3. Bottom nav
         if (!document.querySelector('.bottom-nav')) {
-            const slug = getHotelSlug();
             const nav = document.createElement('nav');
             nav.className = 'bottom-nav';
-            nav.innerHTML = NAV_ITEMS.map(item => {
-                const active = isActive(item.slug) ? 'active' : '';
-                return `
-                    <a class="bottom-nav-item ${active}" href="/${slug}/dashboard/${item.path}">
-                        <span class="nav-icon">${item.icon}</span>
-                        <span>${item.label}</span>
-                    </a>`;
-            }).join('');
+            nav.innerHTML = buildNav();
             document.body.appendChild(nav);
         }
+
+        bindSidebarLinks();
     }
 
     function toggleSidebar() {
-        const sidebar  = document.querySelector('.sidebar');
-        const backdrop = document.querySelector('.sidebar-backdrop');
+        const sidebar = document.querySelector('.sidebar');
         if (!sidebar) return;
-        const isOpen = sidebar.classList.contains('open');
-        if (isOpen) closeSidebar();
-        else openSidebar();
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
     }
 
     function openSidebar() {
@@ -89,7 +101,6 @@
         document.body.style.overflow = '';
     }
 
-    // Fecha sidebar ao clicar em um link dentro dela (mobile)
     function bindSidebarLinks() {
         document.querySelectorAll('.sidebar nav a').forEach(link => {
             link.addEventListener('click', () => {
@@ -98,7 +109,7 @@
         });
     }
 
-    // Re-init ao redimensionar (ex: rotação do celular)
+    // Fecha ao redimensionar para desktop
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -107,21 +118,30 @@
         }, 150);
     });
 
-    // Swipe para fechar sidebar (arrastar da esquerda para direita fecha)
+    // Swipe para fechar (arrastar para esquerda com sidebar aberta)
     let touchStartX = 0;
-    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    document.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar?.classList.contains('open') && dx < -60) closeSidebar();
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
     }, { passive: true });
 
-    // Inicializa
+    document.addEventListener('touchend', e => {
+        const dx      = e.changedTouches[0].clientX - touchStartX;
+        const sidebar = document.querySelector('.sidebar');
+        // Fechar: swipe esquerda com sidebar aberta
+        if (dx < -60 && sidebar?.classList.contains('open')) {
+            closeSidebar();
+        }
+        // Abrir: swipe direita começando na borda esquerda (<30px)
+        if (dx > 60 && touchStartX < 30 && !sidebar?.classList.contains('open')) {
+            openSidebar();
+        }
+    }, { passive: true });
+
+    // Init — aguarda DOM se necessário
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => { init(); bindSidebarLinks(); });
+        document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
-        bindSidebarLinks();
     }
 
 })();
