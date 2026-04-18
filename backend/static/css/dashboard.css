@@ -2877,6 +2877,20 @@ tr:hover td { background: #f8fafc; }
     .main { padding-bottom: 68px; }
 }
 
+/* =========================
+   CÂMBIO — MOBILE FIX
+========================= */
+@media (max-width: 640px) {
+    .tabela-container table { min-width: unset; }
+    .tabela-container th:nth-child(6),
+    .tabela-container td:nth-child(6),
+    .tabela-container th:nth-child(7),
+    .tabela-container td:nth-child(7) {
+        display: none;
+    }
+}
+
+
 /* ── PEQUENO (480px) ── */
 @media (max-width: 480px) {
     .stats-row      { grid-template-columns: 1fr 1fr; gap: 8px; }
