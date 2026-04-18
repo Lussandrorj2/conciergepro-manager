@@ -22,21 +22,31 @@ from deep_translator import GoogleTranslator
 
 def to_float(valor):
 try:
-return float(str(valor).replace(",", "."))
+return float(str(valor).replace(”,”, “.”))
 except Exception:
 return 0
 
 def get_media_url(field):
+“””
+Retorna a URL pública de um campo de arquivo.
+Funciona tanto com armazenamento local quanto com S3/R2.
+“””
 if not field:
 return None
 try:
+# .url já retorna a URL correta seja local ou S3
 return field.url
 except Exception:
 return None
 
 def _get_hotel_do_usuario(request, hotel):
+“””
+Retorna True se o usuário tem acesso ao hotel.
+Superusers e staff têm acesso irrestrito.
+“””
 if not request.user.is_authenticated:
 return False
+# ✅ FIX: superusers e staff (criados pelo Django Admin) têm acesso total
 if request.user.is_superuser or request.user.is_staff:
 return True
 try:
@@ -51,14 +61,14 @@ return False
 # =========================
 
 def home(request):
-slug  = request.GET.get('hotel', '').strip()
+slug  = request.GET.get(‘hotel’, ‘’).strip()
 hotel = None
 if slug:
 try:
 hotel = Hotel.objects.get(slug=slug)
 except Hotel.DoesNotExist:
 hotel = None
-return render(request, 'index.html', {'hotel': hotel})
+return render(request, ‘index.html’, {‘hotel’: hotel})
 
 # =========================
 
@@ -66,13 +76,13 @@ return render(request, 'index.html', {'hotel': hotel})
 
 # =========================
 
-@api_view(['GET'])
+@api_view([‘GET’])
 @permission_classes([AllowAny])
 def detalhe_hotel(request, slug):
 hotel = get_object_or_404(Hotel, slug=slug)
-lang  = request.GET.get('lang', 'pt')
+lang  = request.GET.get(‘lang’, ‘pt’)
 
-
+```
 if lang == 'en':
     titulo    = hotel.titulo_hero_en    or hotel.titulo_hero
     subtitulo = hotel.subtitulo_hero_en or hotel.subtitulo_hero
@@ -87,13 +97,13 @@ else:
     subtitulo = hotel.subtitulo_hero
 
 return Response({
-    "nome":           hotel.nome,
-    "titulo_hero":    titulo,
+    "nome":         hotel.nome,
+    "titulo_hero":  titulo,
     "subtitulo_hero": subtitulo,
-    "foto_capa":      get_media_url(hotel.foto_capa),
-    "whatsapp":       hotel.whatsapp,
+    "foto_capa":    get_media_url(hotel.foto_capa),
+    "whatsapp":     hotel.whatsapp,
 })
-
+```
 
 # =========================
 
@@ -101,14 +111,14 @@ return Response({
 
 # =========================
 
-@api_view(['GET'])
+@api_view([‘GET’])
 @permission_classes([AllowAny])
 def listar_passeios(request, hotel_slug):
-hotel    = Hotel.objects.filter(slug=hotel_slug).first()
-lang     = request.GET.get('lang', 'pt')
+hotel = Hotel.objects.filter(slug=hotel_slug).first()
+lang     = request.GET.get(‘lang’, ‘pt’)
 passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related(‘fotos’)
 
-
+```
 resultado = []
 for p in passeios:
     if lang == 'en':
@@ -139,7 +149,7 @@ for p in passeios:
         ],
     })
 return Response(resultado)
-
+```
 
 # =========================
 
@@ -218,6 +228,10 @@ return render(request, ‘dashboard/cambio.html’, {‘hotel’: get_object_or_
 def api_passeios(request, hotel_slug, passeio_id=None):
 hotel = get_object_or_404(Hotel, slug=hotel_slug)
 
+```
+# Garante que apenas usuários do hotel acessam
+#if not _get_hotel_do_usuario(request, hotel):
+    #return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 if request.method == "GET":
     if passeio_id:
@@ -278,6 +292,7 @@ if request.method == "POST":
 
         passeio.save()
 
+        # Salva imagens adicionais da galeria
         for f in request.FILES.getlist("imagens"):
             ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
 
@@ -293,7 +308,7 @@ if request.method == "DELETE":
     return JsonResponse({"status": "removido"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -306,9 +321,9 @@ return JsonResponse({"erro": "Método inválido"}, status=405)
 def api_cambio(request, hotel_slug):
 hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
-return JsonResponse({"erro": "Sem permissão"}, status=403)
+return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "GET":
     ano = request.GET.get("ano", "")
     mes = request.GET.get("mes", "")
@@ -326,7 +341,6 @@ if request.method == "GET":
         dados.append({
             "id":             t.id,
             "moeda":          t.moeda,
-            "quantidade":     str(t.valor),   # ✅ expõe como "quantidade" para o frontend
             "valor":          str(t.valor),
             "cotacao_compra": cotacao_compra,
             "cotacao_venda":  cotacao_venda,
@@ -338,19 +352,15 @@ if request.method == "GET":
         })
     return JsonResponse(dados, safe=False)
 
-# ✅ POST: lê JSON enviado pelo frontend (Content-Type: application/json)
 if request.method == "POST":
     try:
-        body = json.loads(request.body)
+        moeda          = request.POST.get("moeda")
+        valor          = float(request.POST.get("valor") or 0)
+        cotacao_compra = float(request.POST.get("cotacao_compra") or request.POST.get("cotacao") or 0)
+        cotacao_venda  = float(request.POST.get("cotacao_venda") or 0)
+        valor_recebido = float(request.POST.get("valor_recebido") or 0)
+        valor_pago     = valor * cotacao_compra
 
-        moeda          = body.get("moeda")
-        # frontend envia "quantidade"; aceita "valor" como fallback
-        valor          = float(body.get("quantidade") or body.get("valor") or 0)
-        cotacao_compra = float(body.get("cotacao_compra") or body.get("cotacao") or 0)
-        cotacao_venda  = float(body.get("cotacao_venda") or 0)
-        valor_recebido = float(body.get("valor_recebido") or 0)
-
-        valor_pago          = valor * cotacao_compra
         valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
         lucro               = valor_recebido_calc - valor_pago
 
@@ -360,7 +370,7 @@ if request.method == "POST":
         )
         if hasattr(t, 'cotacao_compra'): t.cotacao_compra = cotacao_compra
         if hasattr(t, 'cotacao_venda'):  t.cotacao_venda  = cotacao_venda
-        if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido_calc
+        if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido
         t.save()
         return JsonResponse({"status": "ok"})
     except Exception as e:
@@ -368,11 +378,11 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=400)
-
+```
 
 # =========================
 
-# CÂMBIO — detalhe (PATCH / PUT / DELETE)
+# CÂMBIO — detalhe (PUT / DELETE)
 
 # =========================
 
@@ -383,23 +393,20 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 transacao = get_object_or_404(CambioTransacao, id=transacao_id, hotel=hotel)
 
-# ✅ Aceita tanto PATCH (frontend) quanto PUT
-if request.method in ("PUT", "PATCH"):
+if request.method == "PUT":
     try:
-        data = json.loads(request.body)
-
+        data           = json.loads(request.body)
         moeda          = data.get("moeda", transacao.moeda)
-        # frontend envia "quantidade"; aceita "valor" como fallback
-        valor          = float(data.get("quantidade") or data.get("valor") or transacao.valor)
+        valor          = float(data.get("valor") or transacao.valor)
         cotacao_compra = float(data.get("cotacao_compra") or transacao.cotacao_usada)
         cotacao_venda  = float(data.get("cotacao_venda") or 0)
+        valor_recebido = float(data.get("valor_recebido") or 0)
 
-        valor_pago          = valor * cotacao_compra
-        valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
-        lucro               = valor_recebido_calc - valor_pago
+        valor_pago = valor * cotacao_compra
+        lucro      = valor_recebido - valor_pago if valor_recebido > 0 else 0
 
         transacao.moeda         = moeda
         transacao.valor         = valor
@@ -409,7 +416,7 @@ if request.method in ("PUT", "PATCH"):
 
         if hasattr(transacao, 'cotacao_compra'): transacao.cotacao_compra = cotacao_compra
         if hasattr(transacao, 'cotacao_venda'):  transacao.cotacao_venda  = cotacao_venda
-        if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido_calc
+        if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido
 
         transacao.save()
         return JsonResponse({"status": "ok"})
@@ -422,7 +429,7 @@ if request.method == "DELETE":
     return JsonResponse({"status": "removido"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -461,7 +468,7 @@ nome      = request.data.get(“nome”)
 telefone  = request.data.get(“telefone”)
 qtd       = int(request.data.get(“qtd_pessoas”, 1))
 
-
+```
     comissao_recepcao = float(str(request.data.get("comissao_recepcao", 0)).replace(",", "."))
     comissao_agencia  = float(str(request.data.get("comissao_agencia", 0)).replace(",", "."))
     recepcionista     = request.data.get("recepcionista", "")
@@ -492,7 +499,7 @@ qtd       = int(request.data.get(“qtd_pessoas”, 1))
 except Exception as e:
     print(traceback.format_exc())
     return Response({"erro": str(e)}, status=500)
-
+```
 
 # =========================
 
@@ -507,7 +514,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "GET":
     qs = Reserva.objects.filter(hotel=hotel).order_by('-data_reserva')
     if request.GET.get('status'):
@@ -560,6 +567,7 @@ if request.method == "GET":
 
 if request.method == "POST":
     try:
+        # Aceita tanto JSON quanto form-data
         if request.content_type and 'application/json' in request.content_type:
             body = json.loads(request.body)
             get = lambda k, d='': body.get(k, d)
@@ -594,6 +602,7 @@ if request.method == "POST":
             except Passeio.DoesNotExist:
                 pass
 
+        # gera mes_referencia automaticamente se não vier
         if not mes_referencia and data_pagamento:
             mes_referencia = data_pagamento[:7]
 
@@ -654,7 +663,7 @@ if request.method == "DELETE" and reserva_id:
     return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -718,7 +727,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "GET":
     try:
         cfg = hotel.divisao
@@ -741,7 +750,7 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -756,7 +765,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "GET":
     mes = request.GET.get("mes_referencia", "")
     qs  = Adiantamento.objects.filter(hotel=hotel)
@@ -764,12 +773,12 @@ if request.method == "GET":
         qs = qs.filter(mes_referencia=mes)
     dados = [
         {
-            "id":             a.id,
-            "rec":            a.recepcionista,
-            "valor":          str(a.valor),
-            "data":           str(a.data) if a.data else "",
+            "id":            a.id,
+            "rec":           a.recepcionista,
+            "valor":         str(a.valor),
+            "data":          str(a.data) if a.data else "",
             "mes_referencia": a.mes_referencia,
-            "observacao":     a.observacao,
+            "observacao":    a.observacao,
         }
         for a in qs.order_by('-criado_em')
     ]
@@ -803,7 +812,7 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -818,16 +827,16 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "GET":
     qs = PasseioAgenda.objects.filter(passeio__hotel=hotel).order_by('data', 'horario')
     dados = [{
-        "id":                a.id,
-        "passeio_id":        a.passeio_id,
-        "passeio__nome":     a.passeio.nome,
-        "data":              str(a.data),
-        "horario":           str(a.horario),
-        "vagas":             a.vagas,
+        "id":               a.id,
+        "passeio_id":       a.passeio_id,
+        "passeio__nome":    a.passeio.nome,
+        "data":             str(a.data),
+        "horario":          str(a.horario),
+        "vagas":            a.vagas,
         "vagas_disponiveis": a.vagas_disponiveis,
     } for a in qs]
     return JsonResponse(dados, safe=False)
@@ -852,7 +861,7 @@ if request.method == "DELETE":
         return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 # =========================
 
@@ -867,7 +876,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 if request.method == "POST":
     titulo    = request.POST.get("titulo", "").strip()
     subtitulo = request.POST.get("subtitulo", "").strip()
@@ -887,13 +896,14 @@ if request.method == "POST":
     try:
         hotel.save()
     except Exception as e:
-        traceback.print_exc()
+        import traceback
+        traceback.print_exc()  # aparece nos logs do Render
         return JsonResponse({"erro": str(e)}, status=500)
 
     return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-
+```
 
 @login_required
 def obter_hero(request, hotel_slug):
@@ -908,11 +918,12 @@ return JsonResponse({
 @csrf_exempt
 @login_required
 def forcar_traducao_hotel(request, hotel_slug):
+“”“Força re-tradução síncrona para recuperação/debug.”””
 hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-
+```
 try:
     campos = {}
     if hotel.titulo_hero:
@@ -929,3 +940,4 @@ try:
 except Exception as e:
     print(traceback.format_exc())
     return JsonResponse({"erro": str(e)}, status=500)
+```
