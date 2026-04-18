@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +15,7 @@
 <div class="layout">
 
 <!-- SIDEBAR -->
+
 <aside class="sidebar">
     <div class="sidebar-logo">🔔 Concierge</div>
     <nav>
@@ -32,109 +32,113 @@
 </aside>
 
 <!-- MAIN -->
+
 <main class="main">
 
-    <!-- TOPBAR -->
-    <div class="topbar">
-        <span class="topbar-title">💱 Câmbio</span>
-        <div class="hotel-badge">
-            <div class="hotel-dot"></div>
-            {{ hotel.nome }}
+```
+<!-- TOPBAR -->
+<div class="topbar">
+    <span class="topbar-title">💱 Câmbio</span>
+    <div class="hotel-badge">
+        <div class="hotel-dot"></div>
+        {{ hotel.nome }}
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+    <!-- STATS MINI -->
+    <div class="stats-mini-row">
+        <div class="stat-mini">
+            <div class="stat-mini-label">Pago</div>
+            <div class="stat-mini-value red" id="total-pago">R$ 0,00</div>
+        </div>
+        <div class="stat-mini">
+            <div class="stat-mini-label">Recebido</div>
+            <div class="stat-mini-value blue" id="total-recebido">R$ 0,00</div>
+        </div>
+        <div class="stat-mini">
+            <div class="stat-mini-label">Lucro período</div>
+            <div class="stat-mini-value green" id="total-lucro">R$ 0,00</div>
         </div>
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
+    <!-- GRID CÂMBIO -->
+    <div class="cambio-grid">
 
-        <!-- STATS MINI -->
-        <div class="stats-mini-row">
-            <div class="stat-mini">
-                <div class="stat-mini-label">Pago</div>
-                <div class="stat-mini-value red" id="total-pago">R$ 0,00</div>
+        <!-- FORMULÁRIO -->
+        <div class="card-form">
+            <h3>Registrar Operação</h3>
+
+            <div class="moedas-rapidas">
+                <button class="moeda-chip active" data-moeda="USD">USD</button>
+                <button class="moeda-chip" data-moeda="EUR">EUR</button>
+                <button class="moeda-chip" data-moeda="ARS">ARS</button>
+                <button class="moeda-chip" data-moeda="GBP">GBP</button>
             </div>
-            <div class="stat-mini">
-                <div class="stat-mini-label">Recebido</div>
-                <div class="stat-mini-value blue" id="total-recebido">R$ 0,00</div>
+
+            <label>Moeda</label>
+            <select id="moeda">
+                <option value="USD">USD — Dólar Americano</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="ARS">ARS — Peso Argentino</option>
+                <option value="GBP">GBP — Libra Esterlina</option>
+            </select>
+
+            <label>Quantidade</label>
+            <input type="number" id="quantidade" placeholder="Ex: 200,00" inputmode="decimal" min="0" step="any">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cotação Compra</label>
+                    <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label>Cotação Venda</label>
+                    <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
+                </div>
             </div>
-            <div class="stat-mini">
-                <div class="stat-mini-label">Lucro período</div>
-                <div class="stat-mini-value green" id="total-lucro">R$ 0,00</div>
+
+            <!-- Preview do lucro -->
+            <div class="fluxo-resumo" id="fluxo-resumo">
+                <div class="fluxo-linha">
+                    <span>Valor pago ao hóspede</span>
+                    <span id="f-pago">R$ —</span>
+                </div>
+                <div class="fluxo-linha">
+                    <span>Valor de repasse</span>
+                    <span id="f-recebido">R$ —</span>
+                </div>
+                <div class="fluxo-lucro">
+                    <span>Lucro estimado</span>
+                    <span id="f-lucro">R$ —</span>
+                </div>
+            </div>
+
+            <button class="btn-registrar" id="btn-registrar" style="margin-top: 20px;">
+                💾 Registrar Operação
+            </button>
+        </div>
+
+        <!-- PAINEL DIREITO -->
+        <div class="painel-direito">
+            <div class="tabela-container">
+                <div class="table-head">
+                    <h2>Operações do período</h2>
+                    <span id="count-registros" style="font-size:12px;color:var(--text-soft);">—</span>
+                </div>
+                <div id="tabela-body">
+                    <div class="loading">Carregando operações</div>
+                </div>
             </div>
         </div>
 
-        <!-- GRID CÂMBIO -->
-        <div class="cambio-grid">
+    </div><!-- /cambio-grid -->
 
-            <!-- FORMULÁRIO -->
-            <div class="card-form">
-                <h3>Registrar Operação</h3>
+</div><!-- /content -->
+```
 
-                <div class="moedas-rapidas">
-                    <button class="moeda-chip active" data-moeda="USD">USD</button>
-                    <button class="moeda-chip" data-moeda="EUR">EUR</button>
-                    <button class="moeda-chip" data-moeda="ARS">ARS</button>
-                    <button class="moeda-chip" data-moeda="GBP">GBP</button>
-                </div>
-
-                <label>Moeda</label>
-                <select id="moeda">
-                    <option value="USD">USD — Dólar Americano</option>
-                    <option value="EUR">EUR — Euro</option>
-                    <option value="ARS">ARS — Peso Argentino</option>
-                    <option value="GBP">GBP — Libra Esterlina</option>
-                </select>
-
-                <label>Quantidade</label>
-                <input type="number" id="quantidade" placeholder="Ex: 200,00" inputmode="decimal" min="0" step="any">
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Cotação Compra</label>
-                        <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
-                    </div>
-                    <div class="form-group">
-                        <label>Cotação Venda</label>
-                        <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
-                    </div>
-                </div>
-
-                <!-- Preview do lucro -->
-                <div class="fluxo-resumo" id="fluxo-resumo">
-                    <div class="fluxo-linha">
-                        <span>Valor pago ao hóspede</span>
-                        <span id="f-pago">R$ —</span>
-                    </div>
-                    <div class="fluxo-linha">
-                        <span>Valor de repasse</span>
-                        <span id="f-recebido">R$ —</span>
-                    </div>
-                    <div class="fluxo-lucro">
-                        <span>Lucro estimado</span>
-                        <span id="f-lucro">R$ —</span>
-                    </div>
-                </div>
-
-                <button class="btn-registrar" id="btn-registrar" style="margin-top: 20px;">
-                    💾 Registrar Operação
-                </button>
-            </div>
-
-            <!-- PAINEL DIREITO -->
-            <div class="painel-direito">
-                <div class="tabela-container">
-                    <div class="table-head">
-                        <h2>Operações do período</h2>
-                        <span id="count-registros" style="font-size:12px;color:var(--text-soft);">—</span>
-                    </div>
-                    <div id="tabela-body">
-                        <div class="loading">Carregando operações</div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /cambio-grid -->
-
-    </div><!-- /content -->
 </main>
 
 </div>
@@ -219,15 +223,14 @@
         return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // Registrar operação
+    // ── REGISTRAR OPERAÇÃO ──
     document.getElementById('btn-registrar').addEventListener('click', async () => {
         const moeda  = document.getElementById('moeda').value;
-        const qty    = parseFloat(document.getElementById('quantidade').value);
-        const compra = parseFloat(document.getElementById('cotacao_compra').value);
+        const qty    = parseFloat(document.getElementById('quantidade').value) || 0;
+        const compra = parseFloat(document.getElementById('cotacao_compra').value) || 0;
         const venda  = parseFloat(document.getElementById('cotacao_venda').value) || 0;
 
         if (!qty || !compra) return toast('Preencha quantidade e cotação de compra.', true);
-
 
         try {
             const r = await fetch(API, {
@@ -237,15 +240,15 @@
             });
             if (!r.ok) throw new Error();
             toast('Operação registrada!');
-            document.getElementById('quantidade').value = '';
+            document.getElementById('quantidade').value     = '';
             document.getElementById('cotacao_compra').value = '';
-            document.getElementById('cotacao_venda').value = '';
+            document.getElementById('cotacao_venda').value  = '';
             document.getElementById('fluxo-resumo').classList.remove('show');
             carregarOperacoes();
         } catch { toast('Erro ao registrar.', true); }
     });
 
-    // Carregar tabela
+    // ── CARREGAR TABELA ──
     async function carregarOperacoes() {
         try {
             const r    = await fetch(API);
@@ -258,10 +261,10 @@
                 totalRecebido += parseFloat(op.valor_recebido || op.quantidade * op.cotacao_venda  || 0);
             });
 
-            document.getElementById('total-pago').textContent     = brl(totalPago);
-            document.getElementById('total-recebido').textContent = brl(totalRecebido);
-            document.getElementById('total-lucro').textContent    = brl(totalRecebido - totalPago);
-            document.getElementById('count-registros').textContent = `${ops.length} registro(s)`;
+            document.getElementById('total-pago').textContent      = brl(totalPago);
+            document.getElementById('total-recebido').textContent   = brl(totalRecebido);
+            document.getElementById('total-lucro').textContent      = brl(totalRecebido - totalPago);
+            document.getElementById('count-registros').textContent  = `${ops.length} registro(s)`;
 
             const body = document.getElementById('tabela-body');
 
@@ -316,7 +319,7 @@
         }
     }
 
-    // Edição
+    // ── EDIÇÃO ──
     function abrirEdicao(jsonStr) {
         const op = JSON.parse(jsonStr);
         document.getElementById('edit-id').value         = op.id;
@@ -334,30 +337,24 @@
     async function salvarEdicao() {
         const id     = document.getElementById('edit-id').value;
         const moeda  = document.getElementById('edit-moeda').value;
-        const qty    = parseFloat(document.getElementById('edit-quantidade').value);
-        const compra = parseFloat(document.getElementById('edit-compra').value);
-        const venda  = parseFloat(document.getElementById('edit-venda').value);
+        const qty    = parseFloat(document.getElementById('edit-quantidade').value) || 0;
+        const compra = parseFloat(document.getElementById('edit-compra').value) || 0;
+        const venda  = parseFloat(document.getElementById('edit-venda').value) || 0;
 
         try {
-            const r = await fetch(API, {
-                method: 'POST',
+            const r = await fetch(`${API}${id}/`, {
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
                 body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
             });
-            const resposta = await r.json();
-            console.log('STATUS:', r.status, 'RESPOSTA:', JSON.stringify(resposta));
-            if (!r.ok) return toast('Erro: ' + JSON.stringify(resposta), true);
-            toast('Operação registrada!');
-            document.getElementById('quantidade').value = '';
-            document.getElementById('cotacao_compra').value = '';
-            document.getElementById('cotacao_venda').value = '';
-            document.getElementById('fluxo-resumo').classList.remove('show');
+            if (!r.ok) throw new Error();
+            fecharModal();
+            toast('Operação atualizada!');
             carregarOperacoes();
-        } catch(e) { toast('Erro JS: ' + e.message, true); }
-
+        } catch { toast('Erro ao salvar.', true); }
     }
 
-    // Excluir
+    // ── EXCLUIR ──
     async function excluir(id) {
         if (!confirm('Excluir esta operação?')) return;
         try {
@@ -371,7 +368,7 @@
         } catch { toast('Erro ao excluir.', true); }
     }
 
-    // Toast
+    // ── TOAST ──
     function toast(msg, erro = false) {
         const t = document.createElement('div');
         t.className = 'toast' + (erro ? ' error' : '');
@@ -380,7 +377,7 @@
         setTimeout(() => t.remove(), 3000);
     }
 
-    // CSRF
+    // ── CSRF ──
     function getCsrf() {
         return document.cookie.split(';').map(c => c.trim())
             .find(c => c.startsWith('csrftoken='))?.split('=')[1] || '';
