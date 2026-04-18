@@ -1493,6 +1493,243 @@ tr:hover td { background: rgba(255,255,255,.015); }
 }
 
 /* =========================
+   CÂMBIO — LAYOUT
+========================= */
+.cambio-grid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.painel-direito {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* =========================
+   CARD FORM (câmbio)
+========================= */
+.card-form {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+}
+
+.card-form h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+
+/* =========================
+   MOEDAS RÁPIDAS
+========================= */
+.moedas-rapidas {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.moeda-chip {
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-light);
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.moeda-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.moeda-chip.active {
+    background: var(--green);
+    color: #000;
+    border-color: var(--green);
+    font-weight: 600;
+}
+
+/* =========================
+   FLUXO RESUMO
+========================= */
+.fluxo-resumo {
+    background: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 16px 0;
+    display: none;
+}
+
+.fluxo-resumo.show { display: block; }
+
+.fluxo-linha {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.fluxo-lucro {
+    border-top: 1px solid var(--border-light);
+    padding-top: 10px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: var(--green);
+}
+
+/* =========================
+   BTN REGISTRAR
+========================= */
+.btn-registrar {
+    width: 100%;
+    background: var(--green);
+    color: #000;
+    border: none;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: filter var(--transition);
+}
+
+.btn-registrar:hover { filter: brightness(1.1); }
+
+/* =========================
+   STATS MINI (câmbio)
+========================= */
+.stats-mini-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.stat-mini {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+}
+
+.stat-mini-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+}
+
+.stat-mini-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.stat-mini-value.green  { color: var(--green); }
+.stat-mini-value.red    { color: #f87171; }
+.stat-mini-value.blue   { color: #38bdf8; }
+
+/* =========================
+   TABELA CONTAINER (câmbio)
+========================= */
+.tabela-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.tabela-container table { font-size: 12px; }
+
+.tabela-container thead th {
+    padding: 12px 14px;
+    color: var(--text-soft);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.tabela-container tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.tabela-container tbody tr:last-child td { border-bottom: none; }
+.tabela-container tbody tr:hover td { background: var(--bg-hover); }
+
+.btn-acao {
+    background: none;
+    border: 1px solid var(--border-light);
+    color: var(--text-muted);
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all var(--transition);
+    margin-right: 4px;
+}
+
+.btn-acao:hover {
+    background: var(--border-light);
+    color: var(--text-main);
+}
+
+/* =========================
+   MODAL CÂMBIO (edição)
+========================= */
+.modal-overlay.show { display: flex; }
+
+.modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    flex: 1;
+    background: var(--green);
+    color: #000;
+    border: none;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: filter var(--transition);
+}
+
+.btn-save:hover { filter: brightness(1.1); }
+
+.btn-cancel {
+    background: var(--border-light);
+    color: var(--text-muted);
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background var(--transition);
+}
+
+.btn-cancel:hover { background: var(--bg-hover); color: var(--text-main); }
+
+/* =========================
    SCROLLBAR
 ========================= */
 ::-webkit-scrollbar { width: 5px; }
