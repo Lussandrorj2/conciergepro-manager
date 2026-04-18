@@ -152,7 +152,7 @@
         async function carregarDashboard() {
             try {
                 const [passRes, hotelRes, resRes] = await Promise.all([
-                    fetch(`/api/admin/${hotelSlug}/passeios/`)
+                    fetch(`/api/admin/${hotelSlug}/passeios/`),
                     fetch(`/api/hotel/${hotelSlug}/`).catch(() => ({ json: () => ({}) })),
                     fetch(`/api/admin/${hotelSlug}/reservas/`).catch(() => ({ json: () => ([]) }))
                 ]);
