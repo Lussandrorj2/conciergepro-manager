@@ -1,252 +1,213 @@
-// ==========================
-// CONFIG GLOBAL
-// ==========================
-const hotelSlug = window.hotelSlug;
-const params    = new URLSearchParams(window.location.search);
-const passeioId = params.get('id');
+// dashboard.js
 
-// ==========================
-// CSRF HELPER
-// ✅ FIX: busca o token do cookie com fallback robusto.
-// Como as views de passeio usam @csrf_exempt, o token não é
-// obrigatório ali — mas mantemos para consistência com outras views.
-// ==========================
-function getCsrfToken() {
-    // Tenta cookie primeiro
-    const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
-    if (match) return decodeURIComponent(match[1]);
+(function () {
+‘use strict’;
 
-    // Fallback: meta tag
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    if (meta) return meta.getAttribute('content');
+```
+function init() {
 
-    return '';
-}
+    const hotelSlug = window.hotelSlug;
 
-// ==========================
-// INIT
-// ==========================
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btn-salvar-passeio');
-    if (btn) btn.addEventListener('click', validarCriacao);
-
-    if (passeioId) {
-        const titulo = document.getElementById('titulo-pagina');
-        if (titulo) titulo.innerText = 'Editar Passeio';
-        carregarPasseio(passeioId);
-    }
-
-    configurarPreview();
-    configurarSwitches();
-});
-
-// ==========================
-// CARREGAR PASSEIO (EDIT)
-// ==========================
-async function carregarPasseio(id) {
-    try {
-        const res = await fetch(`/api/admin/${hotelSlug}/passeios/${id}/`, {
-            credentials: 'same-origin',
-        });
-
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`HTTP ${res.status}: ${text}`);
-        }
-
-        const p = await res.json();
-
-        document.getElementById('nome').value      = p.nome      || '';
-        document.getElementById('descricao').value = p.descricao || '';
-        document.getElementById('preco').value     = p.preco     || '';
-        document.getElementById('preco_sob_consulta').checked = !!p.preco_sob_consulta;
-        document.getElementById('preco_por_pessoa').checked   = !!p.preco_por_pessoa;
-
-        if (p.preco_sob_consulta) {
-            document.getElementById('preco').disabled = true;
-        }
-
-        // Galeria existente
-        if (p.fotos && p.fotos.length > 0) {
-            const box       = document.getElementById('galeria-existente');
-            const container = document.getElementById('galeria-atual');
-            if (box) box.style.display = 'block';
-            if (container) {
-                container.innerHTML = p.fotos.map(f => `
-                    <div class="foto-item" id="foto-${f.id}">
-                        <img src="${f.url}" alt="foto" onerror="this.style.display='none'">
-                        <button class="foto-del" onclick="deletarFoto(${f.id})" title="Remover">✕</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-    } catch (err) {
-        console.error('[carregarPasseio]', err);
-        mostrarToast('Erro ao carregar passeio: ' + err.message, 'error');
-    }
-}
-
-// ==========================
-// DELETAR FOTO
-// ==========================
-async function deletarFoto(id) {
-    if (!confirm('Remover esta foto?')) return;
-
-    try {
-        const res = await fetch(`/api/admin/imagem/${id}/`, {
-            method:      'DELETE',
-            credentials: 'same-origin',
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
-            },
-        });
-
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`HTTP ${res.status}: ${text}`);
-        }
-
-        const el = document.getElementById(`foto-${id}`);
-        if (el) el.remove();
-        mostrarToast('Foto removida');
-    } catch (e) {
-        console.error('[deletarFoto]', e);
-        mostrarToast('Erro ao remover foto: ' + e.message, 'error');
-    }
-}
-
-// ==========================
-// SALVAR (CREATE / UPDATE)
-// ✅ FIX: não define Content-Type (o browser define com o boundary do FormData).
-// A view usa @csrf_exempt, então o token é opcional, mas enviamos mesmo assim.
-// Logs de erro melhorados para facilitar debug.
-// ==========================
-async function validarCriacao() {
-    const nome = document.getElementById('nome').value.trim();
-    if (!nome) {
-        mostrarToast('Digite o nome do passeio', 'error');
+    if (!hotelSlug) {
+        console.error('[dashboard.js] hotelSlug não definido.');
         return;
     }
 
-    const sobConsulta = document.getElementById('preco_sob_consulta').checked;
-    const form        = new FormData();
+    // Data de hoje
+    const elData = document.getElementById('data-hoje');
+    if (elData) elData.innerText =
+        new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
 
-    form.append('nome',               nome);
-    form.append('descricao',          document.getElementById('descricao').value);
-    form.append('preco',              sobConsulta ? '' : (document.getElementById('preco').value || '0'));
-    form.append('preco_sob_consulta', sobConsulta ? 'true' : 'false');
-    form.append('preco_por_pessoa',   document.getElementById('preco_por_pessoa').checked ? 'true' : 'false');
-
-    // ✅ Inclui o banner se houver campo dedicado (opcional)
-    const bannerInput = document.getElementById('banner');
-    if (bannerInput && bannerInput.files[0]) {
-        form.append('banner', bannerInput.files[0]);
+    function formatPreco(p) {
+        if (p.preco_sob_consulta) return 'Sob consulta';
+        const val = Number(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        return `R$ ${val}${p.preco_por_pessoa ? ' / pax' : ''}`;
     }
 
-    // Fotos da galeria
-    const fotosInput = document.getElementById('fotos');
-    if (fotosInput) {
-        for (const f of fotosInput.files) {
-            form.append('imagens', f);
-        }
+    function setEl(id, html) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
     }
 
-    const url = passeioId
-        ? `/api/admin/${hotelSlug}/passeios/${passeioId}/`
-        : `/api/admin/${hotelSlug}/passeios/`;
+    function setText(id, txt) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = txt;
+    }
 
-    const btn = document.getElementById('btn-salvar-passeio');
-    if (btn) { btn.disabled = true; btn.innerText = 'Salvando...'; }
+    async function carregarDashboard() {
 
-    try {
-        const res = await fetch(url, {
-            method:      'POST',
-            credentials: 'same-origin',
-            // ✅ NÃO define Content-Type: o browser coloca o boundary correto do FormData
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
-            },
-            body: form,
-        });
-
-        // Lê a resposta como texto primeiro para logar em caso de erro HTML
-        const text = await res.text();
-
-        if (!res.ok) {
-            console.error('[validarCriacao] Resposta do servidor:', text);
-            throw new Error(`HTTP ${res.status} — veja o console para detalhes`);
-        }
-
-        let data;
+        // ── 1. Passeios ──
+        let passeios = [];
         try {
-            data = JSON.parse(text);
-        } catch {
-            console.error('[validarCriacao] Resposta não é JSON:', text);
-            throw new Error('Resposta inesperada do servidor');
+            const r = await fetch(`/api/admin/${hotelSlug}/passeios/`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            const raw = await r.json();
+            passeios = Array.isArray(raw) ? raw : (raw.results || raw.passeios || []);
+        } catch (e) {
+            console.error('[passeios]', e);
+            setEl('lista-passeios', `<div class="empty-state" style="color:#f87171">⚠️ Erro ao carregar passeios: ${e.message}</div>`);
+            setEl('checklist',      `<div class="empty-state" style="color:#f87171">⚠️ ${e.message}</div>`);
         }
 
-        if (data.erro) throw new Error(data.erro);
+        // ── 2. Hotel info ──
+        let hotel = {};
+        try {
+            const r = await fetch(`/api/hotel/${hotelSlug}/`);
+            if (r.ok) hotel = await r.json();
+        } catch (e) {
+            console.warn('[hotel info]', e.message);
+        }
 
-        mostrarToast('Passeio salvo com sucesso! 🚀');
-        setTimeout(() => {
-            window.location.href = `/${hotelSlug}/dashboard/listar/`;
-        }, 1200);
+        // ── 3. Reservas ──
+        let reservas = [];
+        try {
+            const r = await fetch(`/api/admin/${hotelSlug}/reservas/`);
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            const raw = await r.json();
+            reservas = Array.isArray(raw) ? raw : (raw.results || []);
+        } catch (e) {
+            console.error('[reservas]', e);
+            setEl('lista-reservas-recentes', `<div class="empty-state" style="color:#f87171">⚠️ Erro ao carregar reservas: ${e.message}</div>`);
+        }
 
-    } catch (err) {
-        console.error('[validarCriacao]', err);
-        mostrarToast(err.message || 'Erro ao salvar', 'error');
-    } finally {
-        if (btn) { btn.disabled = false; btn.innerText = '🚀 Salvar Passeio'; }
+        // ── Stats ──
+        setText('total-passeios', passeios.length);
+
+        const sobConsulta = passeios.filter(p => p.preco_sob_consulta).length;
+        setText('sub-sob-consulta', sobConsulta ? `${sobConsulta} sob consulta` : '');
+
+        const comPreco = passeios.filter(p => !p.preco_sob_consulta && p.preco > 0);
+        if (comPreco.length) {
+            const media = comPreco.reduce((s, p) => s + Number(p.preco), 0) / comPreco.length;
+            setText('preco-medio', 'R$ ' + media.toLocaleString('pt-BR', { minimumFractionDigits: 2 }));
+        } else {
+            setText('preco-medio', '—');
+        }
+
+        const hoje = new Date().toISOString().split('T')[0];
+        const reservasHoje = reservas.filter(
+            r => (r.data_passeio || '').startsWith(hoje) && r.status === 'confirmada'
+        ).length;
+        setText('reservas-hoje', reservasHoje);
+
+        // ── Reservas recentes ──
+        const listaRes = document.getElementById('lista-reservas-recentes');
+        if (listaRes && !listaRes.querySelector('[style*="color:#f87171"]')) {
+            if (!reservas.length) {
+                listaRes.innerHTML = `<div class="empty-state">Nenhuma reserva ainda.</div>`;
+            } else {
+                const statusClass = s =>
+                    s === 'confirmada' ? 'status-confirmada' :
+                    s === 'cancelada'  ? 'status-cancelada'  : 'status-pendente';
+                const statusLabel = s =>
+                    s === 'confirmada' ? '✓ Confirmada' :
+                    s === 'cancelada'  ? '✕ Cancelada'  : '⏳ Pendente';
+
+                listaRes.innerHTML = reservas.slice(0, 5).map(r => {
+                    const ini      = (r.nome_cliente || '?').charAt(0).toUpperCase();
+                    const dataPass = r.data_passeio
+                        ? new Date(r.data_passeio).toLocaleDateString('pt-BR')
+                        : '—';
+                    return `
+                    <div class="reserva-row">
+                        <div class="reserva-avatar">${ini}</div>
+                        <div class="reserva-info">
+                            <div class="reserva-nome">${r.nome_cliente || '—'}</div>
+                            <div class="reserva-detalhe">${r.passeio_nome || r.passeio || 'Passeio'} · ${dataPass}</div>
+                        </div>
+                        <span class="status-pill ${statusClass(r.status)}">${statusLabel(r.status)}</span>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        // ── Lista passeios ──
+        const lista = document.getElementById('lista-passeios');
+        if (lista && !lista.querySelector('[style*="color:#f87171"]')) {
+            if (!passeios.length) {
+                lista.innerHTML = `<div class="empty-state">
+                    Nenhum passeio criado ainda.<br>
+                    <a href="/${hotelSlug}/dashboard/criar/">Criar agora →</a>
+                </div>`;
+            } else {
+                lista.innerHTML = passeios.slice(0, 5).map(p => {
+                    const imgSrc = p.banner || p.fotos?.[0]?.url;
+                    const thumb  = imgSrc
+                        ? `<div class="passeio-thumb"><img src="${imgSrc}" alt="${p.nome}"></div>`
+                        : `<div class="passeio-thumb">🏖️</div>`;
+                    return `
+                    <div class="passeio-row">
+                        ${thumb}
+                        <div class="passeio-row-info">
+                            <div class="passeio-row-nome">${p.nome}</div>
+                            <div class="passeio-row-desc">${p.descricao || ''}</div>
+                        </div>
+                        <div class="passeio-row-preco">${formatPreco(p)}</div>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        // ── Checklist ──
+        const checklist = document.getElementById('checklist');
+        if (checklist && !checklist.querySelector('[style*="color:#f87171"]')) {
+            const semFoto = passeios.filter(p => !p.banner && (!p.fotos || !p.fotos.length));
+            const checks  = [
+                {
+                    label: 'Passeios cadastrados',
+                    sub:   passeios.length ? `${passeios.length} passeio(s) ativo(s)` : 'Nenhum passeio ainda',
+                    done:  passeios.length > 0,
+                    link:  passeios.length ? null : `/${hotelSlug}/dashboard/criar/`,
+                    linkLabel: 'Criar'
+                },
+                {
+                    label: 'Foto de capa do hotel',
+                    sub:   hotel.foto_capa ? 'Imagem definida' : 'Sem foto de capa',
+                    done:  !!hotel.foto_capa,
+                    link:  hotel.foto_capa ? null : `/${hotelSlug}/dashboard/configuracoes/`,
+                    linkLabel: 'Configurar'
+                },
+                {
+                    label: 'Título da página inicial',
+                    sub:   hotel.titulo_hero ? `"${hotel.titulo_hero.substring(0, 28)}..."` : 'Título padrão em uso',
+                    done:  !!hotel.titulo_hero,
+                    link:  hotel.titulo_hero ? null : `/${hotelSlug}/dashboard/configuracoes/`,
+                    linkLabel: 'Definir'
+                },
+                {
+                    label: 'Passeios com foto',
+                    sub:   semFoto.length ? `${semFoto.length} passeio(s) sem imagem` : 'Todos com imagem',
+                    done:  passeios.length > 0 && semFoto.length === 0,
+                    link:  semFoto.length ? `/${hotelSlug}/dashboard/listar/` : null,
+                    linkLabel: 'Revisar'
+                },
+            ];
+
+            const feitos = checks.filter(c => c.done).length;
+            setText('check-progress', `${feitos}/${checks.length} concluídos`);
+
+            checklist.innerHTML = checks.map(c => `
+                <div class="check-item">
+                    <div class="check-circle ${c.done ? 'done' : 'warn'}">${c.done ? '✓' : '!'}</div>
+                    <div class="check-text">
+                        <div class="check-label">${c.label}</div>
+                        <div class="check-sub">${c.sub}</div>
+                    </div>
+                    ${c.link ? `<a href="${c.link}" class="check-action">${c.linkLabel}</a>` : ''}
+                </div>
+            `).join('');
+        }
     }
+
+    carregarDashboard();
 }
 
-// ==========================
-// PREVIEW DE IMAGENS
-// ==========================
-function configurarPreview() {
-    const input   = document.getElementById('fotos');
-    const preview = document.getElementById('previewGaleria');
-    if (!input || !preview) return;
-
-    input.addEventListener('change', () => {
-        preview.innerHTML = '';
-        for (const file of input.files) {
-            const reader  = new FileReader();
-            reader.onload = e => {
-                const img = document.createElement('img');
-                img.src   = e.target.result;
-                preview.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+// Aguarda DOM estar pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
 }
+```
 
-// ==========================
-// REGRAS DE PREÇO
-// ==========================
-function configurarSwitches() {
-    const sobConsulta = document.getElementById('preco_sob_consulta');
-    const precoInput  = document.getElementById('preco');
-    if (!sobConsulta || !precoInput) return;
-
-    sobConsulta.addEventListener('change', () => {
-        precoInput.disabled = sobConsulta.checked;
-        if (sobConsulta.checked) precoInput.value = '';
-    });
-}
-
-// ==========================
-// TOAST
-// ==========================
-function mostrarToast(msg, tipo = '') {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-
-    const t       = document.createElement('div');
-    t.className   = `toast ${tipo}`;
-    t.innerText   = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2500);
-}
+})();
