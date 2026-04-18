@@ -3,7 +3,6 @@
 (function () {
 ‘use strict’;
 
-```
 function init() {
 
     const hotelSlug = window.hotelSlug;
@@ -208,6 +207,6 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
-```
+
 
 })();
