@@ -432,7 +432,7 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
 @login_required
 def deletar_imagem(request, id):
     if request.method != "DELETE":
-        return JsonResponse({“erro”: “Método inválido”}, status=400)
+        return JsonResponse({"erro": "Método inválido"}, status=400)
     try:
         imagem = get_object_or_404(ImagemPasseio, id=id)
         if not _get_hotel_do_usuario(request, imagem.passeio.hotel):
@@ -674,7 +674,7 @@ def relatorio_mensal(request, hotel_slug):
 @login_required
 def relatorio_passeios(request, hotel_slug):
     dados = Reserva.objects.filter(
-        passeio__hotel__slug=hotel_slug, status=‘pago’
+        passeio__hotel__slug=hotel_slug, status='pago'
     ).values(nome=F('passeio__nome')).annotate(
         total_vendas=Count('id'), faturamento=Sum('comissao_recepcao')
     ).order_by('-total_vendas')
@@ -685,7 +685,7 @@ def relatorio_comissoes(request, hotel_slug):
     dados = Reserva.objects.filter(
         hotel__slug=hotel_slug, status='pago', comissao_recepcao__gt=0
     ).values('recepcionista').annotate(
-        total_comissao=Sum('comissao_recepcao'), qtd_reservas=Count(‘id’)
+        total_comissao=Sum('comissao_recepcao'), qtd_reservas=Count('id')
     ).order_by('-total_comissao')
     return JsonResponse(list(dados), safe=False)
 
@@ -898,10 +898,10 @@ def salvar_hero(request, hotel_slug):
 def obter_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     return JsonResponse({
-        "titulo": hotel.titulo_hero
-        “subtitulo”: hotel.subtitulo_hero,
-        “banner”:    get_media_url(hotel.foto_capa),
-        “whatsapp”:  hotel.whatsapp or “”,
+        "titulo": hotel.titulo_hero,
+        "subtitulo": hotel.subtitulo_hero,
+        "banner": get_media_url(hotel.foto_capa),
+        "whatsapp": hotel.whatsapp or "",
     })
 
 @csrf_exempt
