@@ -1,607 +1,177 @@
-<!DOCTYPE html>
+<!-- TOPBAR -->
 
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Câmbio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-–bg: #F2F4F7;
-–surface: #FFFFFF;
-–surface2: #F8FAFC;
-–border: #E4E8EF;
-–text-primary: #111827;
-–text-secondary: #6B7280;
-–text-muted: #9CA3AF;
-–green: #16A34A;
-–green-light: #DCFCE7;
-–green-btn: #22C55E;
-–red: #DC2626;
-–red-light: #FEE2E2;
-–blue: #2563EB;
-–blue-light: #DBEAFE;
-–accent: #0EA5E9;
-–radius: 14px;
-–radius-sm: 10px;
-–shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-–shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-body {
-font-family: ‘DM Sans’, sans-serif;
-background: var(–bg);
-min-height: 100vh;
-max-width: 430px;
-margin: 0 auto;
-color: var(–text-primary);
-}
-
-/* Header */
-.header {
-background: var(–surface);
-padding: 20px 20px 0;
-border-bottom: 1px solid var(–border);
-position: sticky;
-top: 0;
-z-index: 10;
-}
-
-.header-title {
-font-size: 22px;
-font-weight: 700;
-color: var(–text-primary);
-letter-spacing: -0.4px;
-margin-bottom: 16px;
-}
-
-/* Tab nav */
-.tabs {
-display: flex;
-gap: 4px;
-background: var(–bg);
-border-radius: 10px;
-padding: 4px;
-margin-bottom: 0;
-}
-
-.tab {
-flex: 1;
-text-align: center;
-padding: 8px 0;
-font-size: 13px;
-font-weight: 600;
-border-radius: 8px;
-cursor: pointer;
-color: var(–text-muted);
-transition: all 0.2s;
-border: none;
-background: transparent;
-}
-
-.tab.active {
-background: var(–surface);
-color: var(–accent);
-box-shadow: var(–shadow);
-}
-
-/* Main content */
-.content {
-padding: 16px;
-display: flex;
-flex-direction: column;
-gap: 16px;
-}
-
-/* Card */
-.card {
-background: var(–surface);
-border-radius: var(–radius);
-padding: 20px;
-box-shadow: var(–shadow);
-border: 1px solid var(–border);
-}
-
-.card-title {
-font-size: 12px;
-font-weight: 600;
-color: var(–text-muted);
-text-transform: uppercase;
-letter-spacing: 0.8px;
-margin-bottom: 16px;
-}
-
-/* Form fields */
-.form-group {
-margin-bottom: 14px;
-}
-
-.form-group:last-of-type {
-margin-bottom: 0;
-}
-
-label {
-display: block;
-font-size: 11px;
-font-weight: 600;
-color: var(–text-muted);
-text-transform: uppercase;
-letter-spacing: 0.6px;
-margin-bottom: 6px;
-}
-
-.input-wrapper {
-position: relative;
-}
-
-input, select {
-width: 100%;
-padding: 12px 14px;
-background: var(–surface2);
-border: 1.5px solid var(–border);
-border-radius: var(–radius-sm);
-font-family: ‘DM Sans’, sans-serif;
-font-size: 15px;
-font-weight: 500;
-color: var(–text-primary);
-outline: none;
-transition: border-color 0.2s, box-shadow 0.2s;
--webkit-appearance: none;
-appearance: none;
-}
-
-select {
-background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘16’ height=‘16’ viewBox=‘0 0 24 24’ fill=‘none’ stroke=’%236B7280’ stroke-width=‘2’%3E%3Cpath d=‘M6 9l6 6 6-6’/%3E%3C/svg%3E”);
-background-repeat: no-repeat;
-background-position: right 12px center;
-padding-right: 36px;
-}
-
-input:focus, select:focus {
-border-color: var(–accent);
-box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
-background: var(–surface);
-}
-
-input::placeholder {
-color: var(–text-muted);
-font-weight: 400;
-}
-
-/* Currency flag */
-.currency-flag {
-width: 20px;
-height: 20px;
-border-radius: 50%;
-background: #3B82F6;
-display: inline-flex;
-align-items: center;
-justify-content: center;
-font-size: 10px;
-margin-right: 8px;
-}
-
-/* Two columns */
-.form-row {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 12px;
-}
-
-/* Prefix inside input */
-.input-prefix {
-position: absolute;
-left: 12px;
-top: 50%;
-transform: translateY(-50%);
-font-size: 13px;
-font-weight: 600;
-color: var(–text-muted);
-pointer-events: none;
-}
-
-.has-prefix input {
-padding-left: 38px;
-}
-
-/* Button */
-.btn-register {
-width: 100%;
-padding: 15px;
-background: var(–green-btn);
-color: white;
-font-family: ‘DM Sans’, sans-serif;
-font-size: 15px;
-font-weight: 700;
-border: none;
-border-radius: var(–radius-sm);
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-letter-spacing: 0.2px;
-transition: all 0.2s;
-margin-top: 4px;
-box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
-}
-
-.btn-register:active {
-transform: scale(0.98);
-box-shadow: 0 1px 4px rgba(34, 197, 94, 0.3);
-}
-
-/* Summary cards */
-.summary-grid {
-display: grid;
-grid-template-columns: 1fr 1fr 1fr;
-gap: 10px;
-}
-
-.summary-card {
-background: var(–surface);
-border-radius: var(–radius-sm);
-padding: 14px 12px;
-box-shadow: var(–shadow);
-border: 1px solid var(–border);
-text-align: center;
-}
-
-.summary-label {
-font-size: 10px;
-font-weight: 600;
-text-transform: uppercase;
-letter-spacing: 0.6px;
-color: var(–text-muted);
-margin-bottom: 6px;
-}
-
-.summary-value {
-font-family: ‘DM Mono’, monospace;
-font-size: 14px;
-font-weight: 500;
-line-height: 1.2;
-}
-
-.value-red { color: var(–red); }
-.value-blue { color: var(–blue); }
-.value-green { color: var(–green); }
-
-/* Transaction list */
-.section-header {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-bottom: 10px;
-}
-
-.section-title {
-font-size: 13px;
-font-weight: 700;
-color: var(–text-secondary);
-text-transform: uppercase;
-letter-spacing: 0.6px;
-}
-
-.section-count {
-font-size: 12px;
-background: var(–blue-light);
-color: var(–blue);
-padding: 2px 8px;
-border-radius: 20px;
-font-weight: 600;
-}
-
-/* Transaction item */
-.transaction {
-background: var(–surface);
-border-radius: var(–radius);
-border: 1px solid var(–border);
-box-shadow: var(–shadow);
-overflow: hidden;
-}
-
-.transaction-header {
-padding: 14px 16px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-border-bottom: 1px solid var(–border);
-}
-
-.transaction-meta {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.currency-badge {
-background: var(–blue-light);
-color: var(–blue);
-font-size: 12px;
-font-weight: 700;
-padding: 4px 10px;
-border-radius: 8px;
-letter-spacing: 0.4px;
-}
-
-.transaction-info {
-display: flex;
-flex-direction: column;
-gap: 2px;
-}
-
-.transaction-date {
-font-size: 13px;
-font-weight: 600;
-color: var(–text-primary);
-}
-
-.transaction-qty {
-font-size: 12px;
-color: var(–text-muted);
-font-family: ‘DM Mono’, monospace;
-}
-
-.transaction-actions {
-display: flex;
-gap: 6px;
-}
-
-.action-btn {
-width: 34px;
-height: 34px;
-border-radius: 8px;
-border: 1.5px solid var(–border);
-background: var(–surface2);
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-transition: all 0.15s;
-font-size: 15px;
-}
-
-.action-btn:active {
-transform: scale(0.93);
-}
-
-.action-btn.edit { color: #F59E0B; border-color: #FDE68A; background: #FFFBEB; }
-.action-btn.delete { color: var(–red); border-color: #FECACA; background: #FEF2F2; }
-
-.transaction-body {
-padding: 12px 16px;
-display: grid;
-grid-template-columns: 1fr 1fr 1fr;
-gap: 8px;
-}
-
-.tx-stat {
-display: flex;
-flex-direction: column;
-gap: 3px;
-}
-
-.tx-stat-label {
-font-size: 10px;
-font-weight: 600;
-text-transform: uppercase;
-letter-spacing: 0.5px;
-color: var(–text-muted);
-}
-
-.tx-stat-value {
-font-family: ‘DM Mono’, monospace;
-font-size: 13px;
-font-weight: 500;
-}
-
-/* Bottom nav */
-.bottom-nav {
-position: fixed;
-bottom: 0;
-left: 50%;
-transform: translateX(-50%);
-width: 100%;
-max-width: 430px;
-background: var(–surface);
-border-top: 1px solid var(–border);
-display: flex;
-padding: 10px 0 20px;
-}
-
-.nav-item {
-flex: 1;
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 4px;
-cursor: pointer;
-padding: 4px 0;
-}
-
-.nav-icon {
-font-size: 20px;
-line-height: 1;
-}
-
-.nav-label {
-font-size: 10px;
-font-weight: 600;
-color: var(–text-muted);
-letter-spacing: 0.3px;
-}
-
-.nav-item.active .nav-label {
-color: var(–accent);
-}
-
-.nav-item.active .nav-icon {
-filter: none;
-}
-
-.spacer { height: 100px; }
-</style>
-
-</head>
-<body>
-
-<!-- Header -->
-
-<div class="header">
-  <div style="padding-bottom: 16px;">
-    <p style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;">Módulo</p>
-    <h1 class="header-title">💱 Câmbio</h1>
-    <div class="tabs">
-      <button class="tab active">Nova Operação</button>
-      <button class="tab">Histórico</button>
-      <button class="tab">Relatório</button>
-    </div>
-    <div style="height:16px;"></div>
+<div class="topbar">
+  <button class="hamburger-btn" aria-label="Abrir menu">☰</button>
+  <span class="topbar-title">💱 Câmbio</span>
+  <div class="hotel-badge">
+    <div class="hotel-dot"></div>
+    Hotel Exemplo
   </div>
 </div>
 
-<!-- Content -->
+<!-- CONTENT -->
 
 <div class="content">
 
-  <!-- Summary -->
+  <!-- Stats mini -->
 
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-label">Pago</div>
-      <div class="summary-value value-red">R$<br>900,00</div>
+  <div class="stats-mini-row">
+    <div class="stat-mini">
+      <div class="stat-mini-label">Pago</div>
+      <div class="stat-mini-value red">R$ 900,00</div>
     </div>
-    <div class="summary-card">
-      <div class="summary-label">Recebido</div>
-      <div class="summary-value value-blue">R$<br>1.040,00</div>
+    <div class="stat-mini">
+      <div class="stat-mini-label">Recebido</div>
+      <div class="stat-mini-value blue">R$ 1.040,00</div>
     </div>
-    <div class="summary-card">
-      <div class="summary-label">Lucro</div>
-      <div class="summary-value value-green">R$<br>140,00</div>
+    <div class="stat-mini">
+      <div class="stat-mini-label">Lucro período</div>
+      <div class="stat-mini-value green">R$ 140,00</div>
     </div>
   </div>
 
-  <!-- Form Card -->
+  <!-- Grid principal -->
 
-  <div class="card">
-    <div class="card-title">Registrar operação</div>
+  <div class="cambio-grid">
 
 ```
-<div class="form-group">
-  <label>Moeda</label>
-  <select>
-    <option>🇺🇸  USD — Dólar Americano</option>
-    <option>🇪🇺  EUR — Euro</option>
-    <option>🇬🇧  GBP — Libra Esterlina</option>
-    <option>🇦🇷  ARS — Peso Argentino</option>
-  </select>
-</div>
+<!-- COLUNA ESQUERDA: Formulário -->
+<div class="card-form">
+  <h3>Registrar Operação</h3>
 
-<div class="form-group">
-  <label>Quantidade</label>
-  <input type="number" placeholder="Ex: 200,00" inputmode="decimal">
-</div>
+  <!-- Moedas rápidas -->
+  <div class="moedas-rapidas">
+    <button class="moeda-chip active">USD</button>
+    <button class="moeda-chip">EUR</button>
+    <button class="moeda-chip">ARS</button>
+    <button class="moeda-chip">GBP</button>
+  </div>
 
-<div class="form-row">
-  <div class="form-group" style="margin-bottom:0">
-    <label>Cotação Compra</label>
-    <div class="input-wrapper has-prefix">
-      <span class="input-prefix">R$</span>
-      <input type="number" placeholder="0,00" inputmode="decimal">
+  <div class="form-group">
+    <label>Moeda</label>
+    <select id="moeda">
+      <option value="USD">USD — Dólar Americano</option>
+      <option value="EUR">EUR — Euro</option>
+      <option value="ARS">ARS — Peso Argentino</option>
+      <option value="GBP">GBP — Libra Esterlina</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Quantidade</label>
+    <input type="number" id="quantidade" placeholder="Ex: 200,00" inputmode="decimal">
+  </div>
+
+  <div class="form-grid" style="margin-top: 0;">
+    <div class="form-group">
+      <label>Cotação Compra <small style="text-transform:none;font-weight:400;">(pago ao hóspede)</small></label>
+      <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal">
+    </div>
+    <div class="form-group">
+      <label>Cotação Venda <small style="text-transform:none;font-weight:400;">(repasse)</small></label>
+      <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal">
     </div>
   </div>
-  <div class="form-group" style="margin-bottom:0">
-    <label>Cotação Venda</label>
-    <div class="input-wrapper has-prefix">
-      <span class="input-prefix">R$</span>
-      <input type="number" placeholder="0,00" inputmode="decimal">
+
+  <!-- Resumo do fluxo (aparece ao preencher) -->
+  <div class="fluxo-resumo" id="fluxo-resumo">
+    <div class="fluxo-linha">
+      <span>Valor pago ao hóspede</span>
+      <span id="f-pago">R$ —</span>
+    </div>
+    <div class="fluxo-linha">
+      <span>Valor de repasse</span>
+      <span id="f-recebido">R$ —</span>
+    </div>
+    <div class="fluxo-lucro">
+      <span>Lucro estimado</span>
+      <span id="f-lucro">R$ —</span>
     </div>
   </div>
+
+  <button class="btn-registrar" style="margin-top: 20px;">
+    💾 Registrar Operação
+  </button>
 </div>
 
-<div style="height:16px;"></div>
+<!-- COLUNA DIREITA: Tabela de operações -->
+<div class="painel-direito">
+  <div class="tabela-container">
+    <div class="table-head">
+      <h2>Operações do período</h2>
+      <span style="font-size:12px;color:var(--text-soft);">1 registro</span>
+    </div>
 
-<button class="btn-register">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-  Registrar Operação
-</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Moeda</th>
+          <th>Data</th>
+          <th>Qtd.</th>
+          <th>Pago</th>
+          <th>Recebido</th>
+          <th>Lucro</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <span class="badge badge-confirmado">USD</span>
+          </td>
+          <td>17/04/2026</td>
+          <td style="font-variant-numeric:tabular-nums;">200,00</td>
+          <td style="color:#f87171;font-weight:600;">R$ 900,00</td>
+          <td style="color:#38bdf8;font-weight:600;">R$ 1.040,00</td>
+          <td style="color:var(--green);font-weight:600;">R$ 140,00</td>
+          <td>
+            <div class="actions">
+              <button class="btn-acao" title="Editar">✏️</button>
+              <button class="btn-acao" title="Excluir">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 ```
 
-  </div>
+  </div><!-- /cambio-grid -->
 
-  <!-- Transactions -->
+</div><!-- /content -->
 
-  <div>
-    <div class="section-header">
-      <span class="section-title">Operações do período</span>
-      <span class="section-count">1 registro</span>
-    </div>
+<script>
+// Chips de moeda sincronizam com o select
+document.querySelectorAll('.moeda-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.moeda-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    document.getElementById('moeda').value = chip.textContent.trim();
+  });
+});
 
-```
-<div class="transaction">
-  <div class="transaction-header">
-    <div class="transaction-meta">
-      <span class="currency-badge">USD</span>
-      <div class="transaction-info">
-        <span class="transaction-date">17 de abril, 2026</span>
-        <span class="transaction-qty">200,00 unidades</span>
-      </div>
-    </div>
-    <div class="transaction-actions">
-      <button class="action-btn edit" title="Editar">✏️</button>
-      <button class="action-btn delete" title="Excluir">🗑️</button>
-    </div>
-  </div>
-  <div class="transaction-body">
-    <div class="tx-stat">
-      <span class="tx-stat-label">Pago</span>
-      <span class="tx-stat-value value-red">R$ 900,00</span>
-    </div>
-    <div class="tx-stat">
-      <span class="tx-stat-label">Recebido</span>
-      <span class="tx-stat-value value-blue">R$ 1.040,00</span>
-    </div>
-    <div class="tx-stat">
-      <span class="tx-stat-label">Lucro</span>
-      <span class="tx-stat-value value-green">R$ 140,00</span>
-    </div>
-  </div>
-</div>
-```
+// Preview do fluxo financeiro em tempo real
+function atualizarFluxo() {
+  const qty    = parseFloat(document.getElementById('quantidade').value) || 0;
+  const compra = parseFloat(document.getElementById('cotacao_compra').value) || 0;
+  const venda  = parseFloat(document.getElementById('cotacao_venda').value) || 0;
 
-  </div>
+  if (qty > 0 && compra > 0 && venda > 0) {
+    const pago     = qty * compra;
+    const recebido = qty * venda;
+    const lucro    = recebido - pago;
 
-  <div class="spacer"></div>
-</div>
+    document.getElementById('f-pago').textContent     = 'R$ ' + pago.toFixed(2).replace('.', ',');
+    document.getElementById('f-recebido').textContent = 'R$ ' + recebido.toFixed(2).replace('.', ',');
+    document.getElementById('f-lucro').textContent    = 'R$ ' + lucro.toFixed(2).replace('.', ',');
+    document.getElementById('fluxo-resumo').classList.add('show');
+  } else {
+    document.getElementById('fluxo-resumo').classList.remove('show');
+  }
+}
 
-<!-- Bottom Nav -->
-
-<nav class="bottom-nav">
-  <div class="nav-item">
-    <div class="nav-icon">🏠</div>
-    <div class="nav-label">Dashboard</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon">📅</div>
-    <div class="nav-label">Reservas</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon">🗺️</div>
-    <div class="nav-label">Passeios</div>
-  </div>
-  <div class="nav-item active">
-    <div class="nav-icon">💱</div>
-    <div class="nav-label" style="color:var(--accent)">Câmbio</div>
-  </div>
-  <div class="nav-item">
-    <div class="nav-icon">📊</div>
-    <div class="nav-label">Relatórios</div>
-  </div>
-</nav>
-
-</body>
-</html>
+['quantidade', 'cotacao_compra', 'cotacao_venda'].forEach(id => {
+  document.getElementById(id).addEventListener('input', atualizarFluxo);
+});
+</script>
