@@ -1,277 +1,390 @@
-import { useState } from “react”;
+{% load static %}
 
-const transactions = [
-{
-id: 1,
-currency: “USD”,
-date: “17 de abril, 2026”,
-qty: “200,00”,
-paid: “R$ 900,00”,
-received: “R$ 1.040,00”,
-profit: “R$ 140,00”,
-},
-];
+<!DOCTYPE html>
 
-export default function Cambio() {
-const [activeTab, setActiveTab] = useState(0);
-const [moeda, setMoeda] = useState(“USD — Dólar Americano”);
-const [qty, setQty] = useState(””);
-const [compra, setCompra] = useState(””);
-const [venda, setVenda] = useState(””);
+<html lang="pt-br">
 
-const tabs = [“Nova Operação”, “Histórico”, “Relatório”];
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câmbio — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
 
-return (
-<div style={{
-fontFamily: “‘DM Sans’, ‘Segoe UI’, sans-serif”,
-background: “#F1F4F9”,
-minHeight: “100vh”,
-maxWidth: 430,
-margin: “0 auto”,
-display: “flex”,
-flexDirection: “column”,
-color: “#111827”,
-}}>
+<body>
+<div class="layout">
 
 ```
-  {/* Header */}
-  <div style={{
-    background: "#fff",
-    padding: "20px 20px 0",
-    borderBottom: "1px solid #E5E7EB",
-    position: "sticky",
-    top: 0,
-    zIndex: 10,
-  }}>
-    <p style={{ fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Módulo</p>
-    <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, marginBottom: 16, color: "#0F172A" }}>💱 Câmbio</h1>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo">🔔 Concierge</div>
+    <nav>
+        <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+        <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active">💱 Câmbio</a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+        <hr>
+        <a href="/logout/">↩ Sair</a>
+    </nav>
+</aside>
 
-    {/* Tabs */}
-    <div style={{ display: "flex", background: "#F1F4F9", borderRadius: 10, padding: 4, gap: 4, marginBottom: 0 }}>
-      {tabs.map((t, i) => (
-        <button key={i} onClick={() => setActiveTab(i)} style={{
-          flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 700,
-          border: "none", borderRadius: 8, cursor: "pointer",
-          background: activeTab === i ? "#fff" : "transparent",
-          color: activeTab === i ? "#0EA5E9" : "#9CA3AF",
-          boxShadow: activeTab === i ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-          transition: "all 0.2s",
-        }}>{t}</button>
-      ))}
-    </div>
-    <div style={{ height: 16 }} />
-  </div>
+<!-- MAIN -->
+<main class="main">
 
-  {/* Scrollable content */}
-  <div style={{ flex: 1, padding: "16px 16px 100px", display: "flex", flexDirection: "column", gap: 14, overflowY: "auto" }}>
-
-    {/* Summary */}
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-      {[
-        { label: "Pago", value: "R$ 900,00", color: "#DC2626" },
-        { label: "Recebido", value: "R$ 1.040,00", color: "#2563EB" },
-        { label: "Lucro", value: "R$ 140,00", color: "#16A34A" },
-      ].map((s) => (
-        <div key={s.label} style={{
-          background: "#fff", borderRadius: 12, padding: "12px 10px",
-          border: "1px solid #E5E7EB", textAlign: "center",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-        }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 }}>{s.label}</p>
-          <p style={{ fontSize: 13, fontWeight: 700, color: s.color, fontVariantNumeric: "tabular-nums" }}>{s.value}</p>
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <span class="topbar-title">💱 Câmbio</span>
+        <div class="hotel-badge">
+            <div class="hotel-dot"></div>
+            {{ hotel.nome }}
         </div>
-      ))}
     </div>
 
-    {/* Form Card */}
-    <div style={{
-      background: "#fff", borderRadius: 16, padding: 20,
-      border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-    }}>
-      <p style={{ fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 18 }}>Nova operação</p>
+    <!-- CONTENT -->
+    <div class="content">
 
-      {/* Moeda */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={labelStyle}>Moeda</label>
-        <select value={moeda} onChange={e => setMoeda(e.target.value)} style={inputStyle}>
-          <option>USD — Dólar Americano</option>
-          <option>EUR — Euro</option>
-          <option>GBP — Libra Esterlina</option>
-          <option>ARS — Peso Argentino</option>
-        </select>
-      </div>
-
-      {/* Quantidade */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={labelStyle}>Quantidade</label>
-        <input
-          type="number" placeholder="Ex: 200,00" value={qty}
-          onChange={e => setQty(e.target.value)}
-          style={inputStyle} inputMode="decimal"
-        />
-      </div>
-
-      {/* Compra + Venda */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
-        <div>
-          <label style={labelStyle}>Cotação Compra</label>
-          <div style={{ position: "relative" }}>
-            <span style={prefixStyle}>R$</span>
-            <input type="number" placeholder="0,00" value={compra}
-              onChange={e => setCompra(e.target.value)}
-              style={{ ...inputStyle, paddingLeft: 36 }} inputMode="decimal" />
-          </div>
+        <!-- STATS MINI -->
+        <div class="stats-mini-row">
+            <div class="stat-mini">
+                <div class="stat-mini-label">Pago</div>
+                <div class="stat-mini-value red" id="total-pago">R$ 0,00</div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-label">Recebido</div>
+                <div class="stat-mini-value blue" id="total-recebido">R$ 0,00</div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-label">Lucro período</div>
+                <div class="stat-mini-value green" id="total-lucro">R$ 0,00</div>
+            </div>
         </div>
-        <div>
-          <label style={labelStyle}>Cotação Venda</label>
-          <div style={{ position: "relative" }}>
-            <span style={prefixStyle}>R$</span>
-            <input type="number" placeholder="0,00" value={venda}
-              onChange={e => setVenda(e.target.value)}
-              style={{ ...inputStyle, paddingLeft: 36 }} inputMode="decimal" />
-          </div>
-        </div>
-      </div>
 
-      {/* Button */}
-      <button style={{
-        width: "100%", padding: "15px 0",
-        background: "linear-gradient(135deg, #22C55E, #16A34A)",
-        color: "#fff", fontSize: 15, fontWeight: 700,
-        border: "none", borderRadius: 10, cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-        boxShadow: "0 4px 12px rgba(34,197,94,0.3)",
-        letterSpacing: 0.2,
-      }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-        Registrar Operação
-      </button>
-    </div>
+        <!-- GRID CÂMBIO -->
+        <div class="cambio-grid">
 
-    {/* Transactions */}
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.6 }}>Operações do período</p>
-        <span style={{ fontSize: 12, fontWeight: 700, background: "#DBEAFE", color: "#2563EB", padding: "3px 10px", borderRadius: 20 }}>
-          {transactions.length} registro{transactions.length !== 1 ? "s" : ""}
-        </span>
-      </div>
+            <!-- FORMULÁRIO -->
+            <div class="card-form">
+                <h3>Registrar Operação</h3>
 
-      {transactions.map(tx => (
-        <div key={tx.id} style={{
-          background: "#fff", borderRadius: 14,
-          border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-          overflow: "hidden",
-        }}>
-          {/* Top row */}
-          <div style={{
-            padding: "13px 16px", display: "flex",
-            alignItems: "center", justifyContent: "space-between",
-            borderBottom: "1px solid #F3F4F6",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{
-                background: "#DBEAFE", color: "#2563EB",
-                fontSize: 12, fontWeight: 800, padding: "4px 10px",
-                borderRadius: 8, letterSpacing: 0.5,
-              }}>{tx.currency}</span>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{tx.date}</p>
-                <p style={{ fontSize: 12, color: "#9CA3AF", fontVariantNumeric: "tabular-nums" }}>{tx.qty} unidades</p>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              <button style={{ ...actionBtn, background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>✏️</button>
-              <button style={{ ...actionBtn, background: "#FEF2F2", border: "1.5px solid #FECACA" }}>🗑️</button>
-            </div>
-          </div>
+                <div class="moedas-rapidas">
+                    <button class="moeda-chip active" data-moeda="USD">USD</button>
+                    <button class="moeda-chip" data-moeda="EUR">EUR</button>
+                    <button class="moeda-chip" data-moeda="ARS">ARS</button>
+                    <button class="moeda-chip" data-moeda="GBP">GBP</button>
+                </div>
 
-          {/* Stats */}
-          <div style={{ padding: "12px 16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
-            <div>
-              <p style={statLabel}>Pago</p>
-              <p style={{ ...statValue, color: "#DC2626" }}>{tx.paid}</p>
-            </div>
-            <div>
-              <p style={statLabel}>Recebido</p>
-              <p style={{ ...statValue, color: "#2563EB" }}>{tx.received}</p>
-            </div>
-            <div>
-              <p style={statLabel}>Lucro</p>
-              <p style={{ ...statValue, color: "#16A34A" }}>{tx.profit}</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
+                <label>Moeda</label>
+                <select id="moeda">
+                    <option value="USD">USD — Dólar Americano</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="ARS">ARS — Peso Argentino</option>
+                    <option value="GBP">GBP — Libra Esterlina</option>
+                </select>
 
-  {/* Bottom Nav */}
-  <nav style={{
-    position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
-    width: "100%", maxWidth: 430,
-    background: "#fff", borderTop: "1px solid #E5E7EB",
-    display: "flex", padding: "10px 0 18px",
-  }}>
-    {[
-      { icon: "🏠", label: "Dashboard" },
-      { icon: "📅", label: "Reservas" },
-      { icon: "🗺️", label: "Passeios" },
-      { icon: "💱", label: "Câmbio", active: true },
-      { icon: "📊", label: "Relatórios" },
-    ].map((n) => (
-      <div key={n.label} style={{
-        flex: 1, display: "flex", flexDirection: "column",
-        alignItems: "center", gap: 3, cursor: "pointer",
-      }}>
-        <span style={{ fontSize: 20 }}>{n.icon}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: n.active ? "#0EA5E9" : "#9CA3AF" }}>{n.label}</span>
-      </div>
-    ))}
-  </nav>
+                <label>Quantidade</label>
+                <input type="number" id="quantidade" placeholder="Ex: 200,00" inputmode="decimal" min="0" step="any">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Cotação Compra</label>
+                        <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label>Cotação Venda</label>
+                        <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
+                    </div>
+                </div>
+
+                <!-- Preview do lucro -->
+                <div class="fluxo-resumo" id="fluxo-resumo">
+                    <div class="fluxo-linha">
+                        <span>Valor pago ao hóspede</span>
+                        <span id="f-pago">R$ —</span>
+                    </div>
+                    <div class="fluxo-linha">
+                        <span>Valor de repasse</span>
+                        <span id="f-recebido">R$ —</span>
+                    </div>
+                    <div class="fluxo-lucro">
+                        <span>Lucro estimado</span>
+                        <span id="f-lucro">R$ —</span>
+                    </div>
+                </div>
+
+                <button class="btn-registrar" id="btn-registrar" style="margin-top: 20px;">
+                    💾 Registrar Operação
+                </button>
+            </div>
+
+            <!-- PAINEL DIREITO -->
+            <div class="painel-direito">
+                <div class="tabela-container">
+                    <div class="table-head">
+                        <h2>Operações do período</h2>
+                        <span id="count-registros" style="font-size:12px;color:var(--text-soft);">—</span>
+                    </div>
+                    <div id="tabela-body">
+                        <div class="loading">Carregando operações</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /cambio-grid -->
+
+    </div><!-- /content -->
+</main>
+```
+
 </div>
-```
 
-);
-}
+<!-- MODAL EDIÇÃO -->
 
-const labelStyle = {
-display: “block”, fontSize: 11, fontWeight: 700,
-color: “#9CA3AF”, textTransform: “uppercase”,
-letterSpacing: 0.6, marginBottom: 6,
-};
+<div class="modal-overlay" id="modal-edicao">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Editar Operação</h3>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-id">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Moeda</label>
+                    <select id="edit-moeda">
+                        <option value="USD">USD — Dólar Americano</option>
+                        <option value="EUR">EUR — Euro</option>
+                        <option value="ARS">ARS — Peso Argentino</option>
+                        <option value="GBP">GBP — Libra Esterlina</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="edit-quantidade" inputmode="decimal" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label>Cotação Compra</label>
+                    <input type="number" id="edit-compra" inputmode="decimal" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label>Cotação Venda</label>
+                    <input type="number" id="edit-venda" inputmode="decimal" min="0" step="any">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-save" onclick="salvarEdicao()">💾 Salvar</button>
+        </div>
+    </div>
+</div>
 
-const inputStyle = {
-width: “100%”, padding: “11px 12px”,
-background: “#F8FAFC”, border: “1.5px solid #E5E7EB”,
-borderRadius: 10, fontSize: 15, fontWeight: 500,
-color: “#111827”, outline: “none”,
-fontFamily: “inherit”, appearance: “none”,
-WebkitAppearance: “none”,
-};
+<script>
+    const hotelSlug = "{{ hotel.slug }}";
+    const API = `/api/admin/${hotelSlug}/cambio/`;
 
-const prefixStyle = {
-position: “absolute”, left: 12,
-top: “50%”, transform: “translateY(-50%)”,
-fontSize: 13, fontWeight: 700, color: “#9CA3AF”,
-pointerEvents: “none”,
-};
+    // Chips de moeda
+    document.querySelectorAll('.moeda-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.moeda-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            document.getElementById('moeda').value = chip.dataset.moeda;
+        });
+    });
 
-const actionBtn = {
-width: 34, height: 34, borderRadius: 8,
-display: “flex”, alignItems: “center”, justifyContent: “center”,
-cursor: “pointer”, fontSize: 15,
-};
+    // Preview do fluxo
+    function atualizarFluxo() {
+        const qty    = parseFloat(document.getElementById('quantidade').value) || 0;
+        const compra = parseFloat(document.getElementById('cotacao_compra').value) || 0;
+        const venda  = parseFloat(document.getElementById('cotacao_venda').value) || 0;
+        const resumo = document.getElementById('fluxo-resumo');
 
-const statLabel = {
-fontSize: 10, fontWeight: 700, color: “#9CA3AF”,
-textTransform: “uppercase”, letterSpacing: 0.5, marginBottom: 3,
-};
+        if (qty > 0 && compra > 0 && venda > 0) {
+            document.getElementById('f-pago').textContent     = brl(qty * compra);
+            document.getElementById('f-recebido').textContent = brl(qty * venda);
+            document.getElementById('f-lucro').textContent    = brl(qty * venda - qty * compra);
+            resumo.classList.add('show');
+        } else {
+            resumo.classList.remove('show');
+        }
+    }
 
-const statValue = {
-fontSize: 13, fontWeight: 700, fontVariantNumeric: “tabular-nums”,
-};
+    ['quantidade', 'cotacao_compra', 'cotacao_venda'].forEach(id => {
+        document.getElementById(id).addEventListener('input', atualizarFluxo);
+    });
+
+    // Formatar BRL
+    function brl(v) {
+        return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Registrar operação
+    document.getElementById('btn-registrar').addEventListener('click', async () => {
+        const moeda  = document.getElementById('moeda').value;
+        const qty    = parseFloat(document.getElementById('quantidade').value);
+        const compra = parseFloat(document.getElementById('cotacao_compra').value);
+        const venda  = parseFloat(document.getElementById('cotacao_venda').value);
+
+        if (!qty || !compra || !venda) return toast('Preencha todos os campos.', true);
+
+        try {
+            const r = await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
+                body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
+            });
+            if (!r.ok) throw new Error();
+            toast('Operação registrada!');
+            document.getElementById('quantidade').value = '';
+            document.getElementById('cotacao_compra').value = '';
+            document.getElementById('cotacao_venda').value = '';
+            document.getElementById('fluxo-resumo').classList.remove('show');
+            carregarOperacoes();
+        } catch { toast('Erro ao registrar.', true); }
+    });
+
+    // Carregar tabela
+    async function carregarOperacoes() {
+        try {
+            const r    = await fetch(API);
+            const data = await r.json();
+            const ops  = Array.isArray(data) ? data : (data.results || []);
+
+            let totalPago = 0, totalRecebido = 0;
+            ops.forEach(op => {
+                totalPago     += parseFloat(op.valor_pago     || op.quantidade * op.cotacao_compra || 0);
+                totalRecebido += parseFloat(op.valor_recebido || op.quantidade * op.cotacao_venda  || 0);
+            });
+
+            document.getElementById('total-pago').textContent     = brl(totalPago);
+            document.getElementById('total-recebido').textContent = brl(totalRecebido);
+            document.getElementById('total-lucro').textContent    = brl(totalRecebido - totalPago);
+            document.getElementById('count-registros').textContent = `${ops.length} registro(s)`;
+
+            const body = document.getElementById('tabela-body');
+
+            if (!ops.length) {
+                body.innerHTML = `<div class="empty"><span class="empty-icon">💱</span>Nenhuma operação registrada.</div>`;
+                return;
+            }
+
+            body.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Moeda</th>
+                            <th>Data</th>
+                            <th>Qtd.</th>
+                            <th>Compra</th>
+                            <th>Venda</th>
+                            <th>Pago</th>
+                            <th>Recebido</th>
+                            <th>Lucro</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${ops.map(op => {
+                            const pago     = parseFloat(op.valor_pago     || op.quantidade * op.cotacao_compra || 0);
+                            const recebido = parseFloat(op.valor_recebido || op.quantidade * op.cotacao_venda  || 0);
+                            const data     = op.data ? new Date(op.data).toLocaleDateString('pt-BR') : '—';
+                            const opJson   = encodeURIComponent(JSON.stringify(op));
+                            return `<tr>
+                                <td><span class="badge badge-confirmado">${op.moeda}</span></td>
+                                <td>${data}</td>
+                                <td>${Number(op.quantidade).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                                <td>${brl(op.cotacao_compra)}</td>
+                                <td>${brl(op.cotacao_venda)}</td>
+                                <td style="color:#f87171;font-weight:600;">${brl(pago)}</td>
+                                <td style="color:#38bdf8;font-weight:600;">${brl(recebido)}</td>
+                                <td style="color:var(--green);font-weight:600;">${brl(recebido - pago)}</td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="btn-acao" onclick='abrirEdicao(decodeURIComponent("${opJson}"))'>✏️</button>
+                                        <button class="btn-acao" onclick="excluir(${op.id})">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+        } catch {
+            document.getElementById('tabela-body').innerHTML =
+                `<div class="empty-state">Erro ao carregar operações.</div>`;
+        }
+    }
+
+    // Edição
+    function abrirEdicao(jsonStr) {
+        const op = JSON.parse(jsonStr);
+        document.getElementById('edit-id').value         = op.id;
+        document.getElementById('edit-moeda').value      = op.moeda;
+        document.getElementById('edit-quantidade').value = op.quantidade;
+        document.getElementById('edit-compra').value     = op.cotacao_compra;
+        document.getElementById('edit-venda').value      = op.cotacao_venda;
+        document.getElementById('modal-edicao').classList.add('open');
+    }
+
+    function fecharModal() {
+        document.getElementById('modal-edicao').classList.remove('open');
+    }
+
+    async function salvarEdicao() {
+        const id     = document.getElementById('edit-id').value;
+        const moeda  = document.getElementById('edit-moeda').value;
+        const qty    = parseFloat(document.getElementById('edit-quantidade').value);
+        const compra = parseFloat(document.getElementById('edit-compra').value);
+        const venda  = parseFloat(document.getElementById('edit-venda').value);
+
+        try {
+            const r = await fetch(`${API}${id}/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
+                body: JSON.stringify({ moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda })
+            });
+            if (!r.ok) throw new Error();
+            fecharModal();
+            toast('Operação atualizada!');
+            carregarOperacoes();
+        } catch { toast('Erro ao salvar.', true); }
+    }
+
+    // Excluir
+    async function excluir(id) {
+        if (!confirm('Excluir esta operação?')) return;
+        try {
+            const r = await fetch(`${API}${id}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCsrf() }
+            });
+            if (!r.ok) throw new Error();
+            toast('Operação excluída.');
+            carregarOperacoes();
+        } catch { toast('Erro ao excluir.', true); }
+    }
+
+    // Toast
+    function toast(msg, erro = false) {
+        const t = document.createElement('div');
+        t.className = 'toast' + (erro ? ' error' : '');
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    // CSRF
+    function getCsrf() {
+        return document.cookie.split(';').map(c => c.trim())
+            .find(c => c.startsWith('csrftoken='))?.split('=')[1] || '';
+    }
+
+    carregarOperacoes();
+</script>
+
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+
+</body>
+</html>
