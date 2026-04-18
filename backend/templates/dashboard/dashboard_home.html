@@ -1,5 +1,7 @@
 {% load static %}
+
 <!DOCTYPE html>
+
 <html lang="pt-br">
 
 <head>
@@ -13,291 +15,144 @@
 <body>
     <div class="layout">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                🔔 Concierge
-            </div>
-            <nav>
-                <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
-                <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-                <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-                <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-                <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-                <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-                <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-                <hr>
-                <a href="/logout/">↩ Sair</a>
-            </nav>
-        </aside>
+```
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
 
-        <!-- MAIN -->
-        <main class="main">
+    <!-- MAIN -->
+    <main class="main">
 
-            <!-- TOPBAR -->
-            <div class="topbar">
-                <span class="topbar-title">Dashboard</span>
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <span class="topbar-title">Dashboard</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-ver-hotel">
+                    🌐 Ver site
+                </a>
                 <div class="hotel-badge">
                     <div class="hotel-dot"></div>
                     {{ hotel.nome }}
                 </div>
             </div>
+        </div>
 
-            <!-- CONTENT -->
-            <div class="content">
+        <!-- CONTENT -->
+        <div class="content">
 
-                <!-- Ações rápidas -->
-                <div class="acoes-rapidas">
-                    <a href="/{{ hotel.slug }}/dashboard/reservas/" class="btn-action destaque">
-                        📅 Ver Todas as Reservas
-                    </a>
-                    <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-action">
-                        ➕ Novo Passeio
-                    </a>
-                    <a href="/{{ hotel.slug }}/dashboard/cambio/" class="btn-action">
-                        💱 Câmbio
-                    </a>
+            <!-- Ações rápidas -->
+            <div class="acoes-rapidas">
+                <a href="/{{ hotel.slug }}/dashboard/reservas/" class="btn-action destaque">
+                    📅 Ver Todas as Reservas
+                </a>
+                <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-action">
+                    ➕ Novo Passeio
+                </a>
+                <a href="/{{ hotel.slug }}/dashboard/cambio/" class="btn-action">
+                    💱 Câmbio
+                </a>
+                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-action btn-action-hotel">
+                    🌐 Página do Hotel ↗
+                </a>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Passeios ativos</div>
+                        <div class="stat-value" id="total-passeios">--</div>
+                        <div class="stat-sub" id="sub-sob-consulta"></div>
+                    </div>
+                    <div class="stat-icon green">🗺️</div>
                 </div>
-
-                <!-- STATS -->
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Passeios ativos</div>
-                            <div class="stat-value" id="total-passeios">--</div>
-                            <div class="stat-sub" id="sub-sob-consulta"></div>
-                        </div>
-                        <div class="stat-icon green">🗺️</div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Reservas hoje</div>
+                        <div class="stat-value" id="reservas-hoje">--</div>
+                        <div class="stat-sub">confirmadas</div>
                     </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Reservas hoje</div>
-                            <div class="stat-value" id="reservas-hoje">--</div>
-                            <div class="stat-sub">confirmadas</div>
-                        </div>
-                        <div class="stat-icon blue">📅</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Preço médio</div>
-                            <div class="stat-value" id="preco-medio">--</div>
-                            <div class="stat-sub">passeios com preço fixo</div>
-                        </div>
-                        <div class="stat-icon yellow">💰</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>
-                            <div class="stat-label">Hoje</div>
-                            <div class="stat-value" id="data-hoje" style="font-size:16px;padding-top:4px"></div>
-                            <div class="stat-sub">sistema operando normalmente</div>
-                        </div>
-                        <div class="stat-icon gold">🗓️</div>
-                    </div>
+                    <div class="stat-icon blue">📅</div>
                 </div>
-
-                <!-- PAINEL DUPLO -->
-                <div class="two-col">
-
-                    <!-- Reservas recentes -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <span class="panel-title">📅 Reservas Recentes</span>
-                            <a href="/{{ hotel.slug }}/dashboard/reservas/" class="panel-link">Ver todas →</a>
-                        </div>
-                        <div id="lista-reservas-recentes">
-                            <div class="loading">Carregando reservas</div>
-                        </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Preço médio</div>
+                        <div class="stat-value" id="preco-medio">--</div>
+                        <div class="stat-sub">passeios com preço fixo</div>
                     </div>
-
-                    <!-- Últimos passeios -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <span class="panel-title">🗺️ Passeios Cadastrados</span>
-                            <a href="/{{ hotel.slug }}/dashboard/listar/" class="panel-link">Ver todos →</a>
-                        </div>
-                        <div id="lista-passeios">
-                            <div class="loading">Carregando passeios</div>
-                        </div>
-                    </div>
-
+                    <div class="stat-icon yellow">💰</div>
                 </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Hoje</div>
+                        <div class="stat-value" id="data-hoje" style="font-size:16px;padding-top:4px"></div>
+                        <div class="stat-sub">sistema operando normalmente</div>
+                    </div>
+                    <div class="stat-icon gold">🗓️</div>
+                </div>
+            </div>
 
-                <!-- CHECKLIST -->
+            <!-- PAINEL DUPLO -->
+            <div class="two-col">
+
+                <!-- Reservas recentes -->
                 <div class="panel">
                     <div class="panel-header">
-                        <span class="panel-title">⚙️ Configuração do hotel</span>
-                        <span id="check-progress" style="font-size:12px;color:var(--text-soft)"></span>
+                        <span class="panel-title">📅 Reservas Recentes</span>
+                        <a href="/{{ hotel.slug }}/dashboard/reservas/" class="panel-link">Ver todas →</a>
                     </div>
-                    <div id="checklist">
-                        <div class="loading">Verificando configurações</div>
+                    <div id="lista-reservas-recentes">
+                        <div class="loading">Carregando reservas</div>
+                    </div>
+                </div>
+
+                <!-- Últimos passeios -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">🗺️ Passeios Cadastrados</span>
+                        <a href="/{{ hotel.slug }}/dashboard/listar/" class="panel-link">Ver todos →</a>
+                    </div>
+                    <div id="lista-passeios">
+                        <div class="loading">Carregando passeios</div>
                     </div>
                 </div>
 
             </div>
-        </main>
-    </div>
 
-    <script>
-        const hotelSlug = "{{ hotel.slug }}";
+            <!-- CHECKLIST -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">⚙️ Configuração do hotel</span>
+                    <span id="check-progress" style="font-size:12px;color:var(--text-soft)"></span>
+                </div>
+                <div id="checklist">
+                    <div class="loading">Verificando configurações</div>
+                </div>
+            </div>
 
-        document.getElementById("data-hoje").innerText =
-            new Date().toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" });
+        </div>
+    </main>
+</div>
 
-        function formatPreco(p) {
-            if (p.preco_sob_consulta) return "Sob consulta";
-            const val = Number(p.preco || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-            return `R$ ${val}${p.preco_por_pessoa ? " / pax" : ""}`;
-        }
+<script>
+    window.hotelSlug = "{{ hotel.slug }}";
+</script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+```
 
-        async function carregarDashboard() {
-            try {
-                const [passRes, hotelRes, resRes] = await Promise.all([
-                    fetch(`/api/admin/${hotelSlug}/passeios/`),
-                    fetch(`/api/hotel/${hotelSlug}/`).catch(() => ({ json: () => ({}) })),
-                    fetch(`/api/admin/${hotelSlug}/reservas/`).catch(() => ({ json: () => ([]) }))
-                ]);
-
-                const raw = await passRes.json();
-                const passeios = Array.isArray(raw) ? raw : (raw.results || raw.passeios || []);
-
-                const hotel = await hotelRes.json().catch(() => ({}));
-                const reservas = await resRes.json().catch(() => ([]));
-
-                // Stats
-                document.getElementById("total-passeios").innerText = passeios.length;
-
-                const sobConsulta = passeios.filter(p => p.preco_sob_consulta).length;
-                if (sobConsulta)
-                    document.getElementById("sub-sob-consulta").innerText = `${sobConsulta} sob consulta`;
-
-                const comPreco = passeios.filter(p => !p.preco_sob_consulta && p.preco > 0);
-                if (comPreco.length) {
-                    const media = comPreco.reduce((s, p) => s + Number(p.preco), 0) / comPreco.length;
-                    document.getElementById("preco-medio").innerText =
-                        "R$ " + media.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-                }
-
-                // Reservas hoje
-                const hoje = new Date().toISOString().split('T')[0];
-                const reservasHoje = reservas.filter(
-                    r => (r.data_passeio || '').startsWith(hoje) && r.status === 'confirmada'
-                ).length;
-                document.getElementById("reservas-hoje").innerText = reservasHoje;
-
-                // Reservas recentes
-                const listaRes = document.getElementById("lista-reservas-recentes");
-                if (!reservas.length) {
-                    listaRes.innerHTML = `<div class="empty-state">Nenhuma reserva ainda.</div>`;
-                } else {
-                    const recentes = reservas.slice(0, 5);
-                    const statusClass = s =>
-                        s === 'confirmada' ? 'status-confirmada' :
-                        s === 'cancelada'  ? 'status-cancelada'  : 'status-pendente';
-                    const statusLabel = s =>
-                        s === 'confirmada' ? '✓ Confirmada' :
-                        s === 'cancelada'  ? '✕ Cancelada'  : '⏳ Pendente';
-
-                    listaRes.innerHTML = recentes.map(r => {
-                        const ini = (r.nome_cliente || '?').charAt(0).toUpperCase();
-                        const dataPass = r.data_passeio
-                            ? new Date(r.data_passeio).toLocaleDateString('pt-BR')
-                            : '—';
-                        return `
-                        <div class="reserva-row">
-                            <div class="reserva-avatar">${ini}</div>
-                            <div class="reserva-info">
-                                <div class="reserva-nome">${r.nome_cliente || '—'}</div>
-                                <div class="reserva-detalhe">${r.passeio_nome || r.passeio || 'Passeio'} · ${dataPass}</div>
-                            </div>
-                            <span class="status-pill ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                        </div>`;
-                    }).join('');
-                }
-
-                // Lista passeios
-                const lista = document.getElementById("lista-passeios");
-                if (!passeios.length) {
-                    lista.innerHTML = `<div class="empty-state">
-                        Nenhum passeio criado ainda.<br>
-                        <a href="/${hotelSlug}/dashboard/criar/">Criar agora →</a>
-                    </div>`;
-                } else {
-                    lista.innerHTML = passeios.slice(0, 5).map(p => {
-                        const imgSrc = p.banner || p.fotos?.[0]?.url;
-                        const thumb = imgSrc
-                            ? `<div class="passeio-thumb"><img src="${imgSrc}" alt="${p.nome}"></div>`
-                            : `<div class="passeio-thumb">🏖️</div>`;
-                        return `
-                        <div class="passeio-row">
-                            ${thumb}
-                            <div class="passeio-row-info">
-                                <div class="passeio-row-nome">${p.nome}</div>
-                                <div class="passeio-row-desc">${p.descricao || ""}</div>
-                            </div>
-                            <div class="passeio-row-preco">${formatPreco(p)}</div>
-                        </div>`;
-                    }).join("");
-                }
-
-                // Checklist
-                const semFoto = passeios.filter(p => !p.banner && (!p.fotos || !p.fotos.length));
-                const checks = [
-                    {
-                        label: "Passeios cadastrados",
-                        sub: passeios.length ? `${passeios.length} passeio(s) ativo(s)` : "Nenhum passeio ainda",
-                        done: passeios.length > 0,
-                        link: passeios.length ? null : `/${hotelSlug}/dashboard/criar/`,
-                        linkLabel: "Criar"
-                    },
-                    {
-                        label: "Foto de capa do hotel",
-                        sub: hotel.foto_capa ? "Imagem definida" : "Sem foto de capa",
-                        done: !!hotel.foto_capa,
-                        link: hotel.foto_capa ? null : `/${hotelSlug}/dashboard/configuracoes/`,
-                        linkLabel: "Configurar"
-                    },
-                    {
-                        label: "Título da página inicial",
-                        sub: hotel.titulo_hero
-                            ? `"${hotel.titulo_hero.substring(0, 28)}..."`
-                            : "Título padrão em uso",
-                        done: !!hotel.titulo_hero,
-                        link: hotel.titulo_hero ? null : `/${hotelSlug}/dashboard/configuracoes/`,
-                        linkLabel: "Definir"
-                    },
-                    {
-                        label: "Passeios com foto",
-                        sub: semFoto.length
-                            ? `${semFoto.length} passeio(s) sem imagem`
-                            : "Todos com imagem",
-                        done: passeios.length > 0 && semFoto.length === 0,
-                        link: semFoto.length ? `/${hotelSlug}/dashboard/listar/` : null,
-                        linkLabel: "Revisar"
-                    },
-                ];
-
-                const feitos = checks.filter(c => c.done).length;
-                document.getElementById("check-progress").innerText = `${feitos}/${checks.length} concluídos`;
-
-                document.getElementById("checklist").innerHTML = checks.map(c => `
-                    <div class="check-item">
-                        <div class="check-circle ${c.done ? 'done' : 'warn'}">${c.done ? '✓' : '!'}</div>
-                        <div class="check-text">
-                            <div class="check-label">${c.label}</div>
-                            <div class="check-sub">${c.sub}</div>
-                        </div>
-                        ${c.link ? `<a href="${c.link}" class="check-action">${c.linkLabel}</a>` : ""}
-                    </div>
-                `).join("");
-
-            } catch (e) {
-                console.error("Erro ao carregar dashboard:", e);
-            }
-        }
-
-        carregarDashboard();
-    </script>
-    <script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
 
 </html>
