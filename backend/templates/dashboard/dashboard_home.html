@@ -15,7 +15,6 @@
 <body>
     <div class="layout">
 
-
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
@@ -39,7 +38,9 @@
         <div class="topbar">
             <span class="topbar-title">Dashboard</span>
             <div style="display:flex;align-items:center;gap:10px;">
-                <a href="{% url 'dashboard_home' hotel.slug %}" target="_blank"></a>
+                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-ver-hotel">
+                    🌐 Ver site
+                </a>
                 <div class="hotel-badge">
                     <div class="hotel-dot"></div>
                     {{ hotel.nome }}
@@ -105,7 +106,6 @@
             <!-- PAINEL DUPLO -->
             <div class="two-col">
 
-                <!-- Reservas recentes -->
                 <div class="panel">
                     <div class="panel-header">
                         <span class="panel-title">📅 Reservas Recentes</span>
@@ -116,7 +116,6 @@
                     </div>
                 </div>
 
-                <!-- Últimos passeios -->
                 <div class="panel">
                     <div class="panel-header">
                         <span class="panel-title">🗺️ Passeios Cadastrados</span>
