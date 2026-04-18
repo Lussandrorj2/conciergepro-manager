@@ -35,6 +35,10 @@ def get_media_url(field):
         return None
 
 def _get_hotel_do_usuario(request, hotel):
+    """
+    Retorna True se o usuário tem acesso ao hotel.
+    Superusers e staff têm acesso irrestrito.
+    """
     if not request.user.is_authenticated:
         return False
     if request.user.is_superuser or request.user.is_staff:
@@ -51,7 +55,7 @@ def _get_hotel_do_usuario(request, hotel):
 # =========================
 
 def home(request):
-    slug = request.GET.get('hotel', '').strip()
+    slug  = request.GET.get('hotel', '').strip()
     hotel = None
     if slug:
         try:
@@ -99,7 +103,7 @@ def detalhe_hotel(request, slug):
 
 # =========================
 
-@api_view([‘GET’])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_passeios(request, hotel_slug):
     hotel    = Hotel.objects.filter(slug=hotel_slug).first()
@@ -151,7 +155,7 @@ def login_view(request):
             request,
             username=request.POST.get("username"),
             password=request.POST.get("password"),
-            )
+        )
         if user:
             login(request, user)
             try:
@@ -161,11 +165,11 @@ def login_view(request):
                 pass
             return redirect('/')
         return render(request, 'login.html', {"erro": "Login inválido"})
-    return render(request, ‘login.html’)
+    return render(request, 'login.html')
 
 def logout_view(request):
     logout(request)
-    return redirect(‘login’)
+    return redirect('login')
 
 # =========================
 
@@ -303,7 +307,7 @@ return JsonResponse({"erro": "Método inválido"}, status=405)
 def api_cambio(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     if request.method == "GET":
@@ -376,7 +380,7 @@ def api_cambio(request, hotel_slug):
 def api_cambio_detail(request, hotel_slug, transacao_id):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     transacao = get_object_or_404(CambioTransacao, id=transacao_id, hotel=hotel)
@@ -432,7 +436,7 @@ def deletar_imagem(request, id):
     try:
         imagem = get_object_or_404(ImagemPasseio, id=id)
         if not _get_hotel_do_usuario(request, imagem.passeio.hotel):
-            return JsonResponse({“erro”: “Sem permissão”}, status=403)
+            return JsonResponse({"erro": "Sem permissão"}, status=403)
         imagem.delete()
         return JsonResponse({“status”: “ok”})
     except Exception as e:
@@ -499,7 +503,7 @@ def criar_reserva(request, hotel_slug):
 def api_reservas(request, hotel_slug, reserva_id=None):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
     
     
     if request.method == "GET":
@@ -712,7 +716,7 @@ def relatorio_cambio(request, hotel_slug):
 def api_divisao(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
     if request.method == "GET":
         try:
@@ -749,7 +753,7 @@ def api_divisao(request, hotel_slug):
 def api_adiantamentos(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     if request.method == "GET":
@@ -811,7 +815,7 @@ def api_adiantamentos(request, hotel_slug):
 def api_agenda(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     if request.method == "GET":
@@ -860,7 +864,7 @@ def api_agenda(request, hotel_slug):
 def salvar_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     if request.method == "POST":
