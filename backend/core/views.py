@@ -665,44 +665,44 @@ def api_reservas(request, hotel_slug, reserva_id=None):
 @login_required
 def relatorio_mensal(request, hotel_slug):
     dados = Reserva.objects.filter(
-        hotel__slug=hotel_slug, status=‘pago’, data_reserva__isnull=False
-    ).annotate(mes=TruncMonth(‘data_reserva’)).values(‘mes’).annotate(
-        total=Count(‘id’), faturamento=Sum(‘comissao_recepcao’)
-    ).order_by(‘mes’)
+        hotel__slug=hotel_slug, status='pago', data_reserva__isnull=False
+    ).annotate(mes=TruncMonth('data_reserva')).values('mes').annotate(
+        total=Count('id'), faturamento=Sum('comissao_recepcao')
+    ).order_by('mes')
     return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_passeios(request, hotel_slug):
     dados = Reserva.objects.filter(
         passeio__hotel__slug=hotel_slug, status=‘pago’
-    ).values(nome=F(‘passeio__nome’)).annotate(
-        total_vendas=Count(‘id’), faturamento=Sum(‘comissao_recepcao’)
-    ).order_by(’-total_vendas’)
+    ).values(nome=F('passeio__nome')).annotate(
+        total_vendas=Count('id'), faturamento=Sum('comissao_recepcao')
+    ).order_by('-total_vendas')
     return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_comissoes(request, hotel_slug):
     dados = Reserva.objects.filter(
-        hotel__slug=hotel_slug, status=‘pago’, comissao_recepcao__gt=0
-    ).values(‘recepcionista’).annotate(
-        total_comissao=Sum(‘comissao_recepcao’), qtd_reservas=Count(‘id’)
-    ).order_by(’-total_comissao’)
+        hotel__slug=hotel_slug, status='pago', comissao_recepcao__gt=0
+    ).values('recepcionista').annotate(
+        total_comissao=Sum('comissao_recepcao'), qtd_reservas=Count(‘id’)
+    ).order_by('-total_comissao')
     return JsonResponse(list(dados), safe=False)
 
 @login_required
 def relatorio_cambio(request, hotel_slug):
     qs             = CambioTransacao.objects.filter(hotel__slug=hotel_slug)
-    total_lucro    = qs.aggregate(total=Sum(‘lucro’))[‘total’] or 0
-    total_recebido = qs.aggregate(total=Sum(‘valor_recebido’))[‘total’] or 0
-    total_pago     = qs.aggregate(total=Sum(‘valor_reais’))[‘total’] or 0
-    dados          = qs.values(‘moeda’).annotate(total=Sum(‘lucro’))
+    total_lucro    = qs.aggregate(total=Sum('lucro'))['total'] or 0
+    total_recebido = qs.aggregate(total=Sum('valor_recebido'))['total'] or 0
+    total_pago     = qs.aggregate(total=Sum('valor_reais'))['total'] or 0
+    dados          = qs.values('moeda').annotate(total=Sum('lucro'))
     return JsonResponse({
-        “resumo”: {
-            “total_lucro”:    float(total_lucro),
-            “total_recebido”: float(total_recebido),
-            “total_pago”:     float(total_pago),
+        "resumo": {
+            "total_lucro":    float(total_lucro),
+            "total_recebido": float(total_recebido),
+            "total_pago":     float(total_pago),
         },
-        “dados”: list(dados),
+        "dados": list(dados),
     })
 
 # =========================
@@ -802,7 +802,7 @@ def api_adiantamentos(request, hotel_slug):
             return JsonResponse({"erro": str(e)}, status=500)
     
     return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 # =========================
 
@@ -898,7 +898,7 @@ def salvar_hero(request, hotel_slug):
 def obter_hero(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     return JsonResponse({
-        “titulo”:    hotel.titulo_hero,
+        "titulo": hotel.titulo_hero
         “subtitulo”: hotel.subtitulo_hero,
         “banner”:    get_media_url(hotel.foto_capa),
         “whatsapp”:  hotel.whatsapp or “”,
@@ -909,7 +909,7 @@ def obter_hero(request, hotel_slug):
 def forcar_traducao_hotel(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
     if not _get_hotel_do_usuario(request, hotel):
-        return JsonResponse({“erro”: “Sem permissão”}, status=403)
+        return JsonResponse({"erro": "Sem permissão"}, status=403)
 
 
     try:
