@@ -70,7 +70,7 @@ return render(request, 'index.html', {'hotel': hotel})
 @permission_classes([AllowAny])
 def detalhe_hotel(request, slug):
 hotel = get_object_or_404(Hotel, slug=slug)
-lang  = request.GET.get(‘lang’, ‘pt’)
+lang  = request.GET.get('lang', 'pt')
 
 
 if lang == 'en':
@@ -654,7 +654,7 @@ if request.method == "DELETE" and reserva_id:
     return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 # =========================
 
@@ -718,7 +718,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 if request.method == "GET":
     try:
         cfg = hotel.divisao
@@ -741,7 +741,7 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 # =========================
 
@@ -756,7 +756,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 if request.method == "GET":
     mes = request.GET.get("mes_referencia", "")
     qs  = Adiantamento.objects.filter(hotel=hotel)
@@ -803,7 +803,7 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 # =========================
 
@@ -818,7 +818,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 if request.method == "GET":
     qs = PasseioAgenda.objects.filter(passeio__hotel=hotel).order_by('data', 'horario')
     dados = [{
@@ -852,7 +852,7 @@ if request.method == "DELETE":
         return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 # =========================
 
@@ -867,7 +867,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 if request.method == "POST":
     titulo    = request.POST.get("titulo", "").strip()
     subtitulo = request.POST.get("subtitulo", "").strip()
@@ -893,7 +893,7 @@ if request.method == "POST":
     return JsonResponse({"status": "ok"})
 
 return JsonResponse({"erro": "Método inválido"}, status=405)
-```
+
 
 @login_required
 def obter_hero(request, hotel_slug):
@@ -912,7 +912,7 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 try:
     campos = {}
     if hotel.titulo_hero:
@@ -929,4 +929,3 @@ try:
 except Exception as e:
     print(traceback.format_exc())
     return JsonResponse({"erro": str(e)}, status=500)
-```
