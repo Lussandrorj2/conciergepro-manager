@@ -2,780 +2,643 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reservas — {{ hotel.nome }}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg-main:    #0b0f19;
-      --bg-sidebar: #0f1626;
-      --bg-card:    #121a2b;
-      --bg-hover:   #1a2438;
-      --border:     #1f2a40;
-      --border-light: #2a3754;
-      --text-main:  #e6edf3;
-      --text-muted: #9fb0c7;
-      --text-soft:  #6b7a90;
-      --gold:       #c9a96e;
-      --primary:    #22c55e;
-      --accent:     #6c63ff;
-      --green:      #22c55e;
-      --yellow:     #f59e0b;
-      --red:        #ef4444;
-      --sidebar-w:  240px;
-    }
-
-    body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-w); background: var(--bg-sidebar); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
-      padding: 24px 16px; z-index: 1000;
-    }
-    .sidebar-logo {
-      display: flex; align-items: center; gap: 12px;
-      padding: 0 12px 30px; font-size: 18px; font-weight: 700; color: var(--text-main);
-    }
-    nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-    nav a {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      color: var(--text-muted); font-size: 14px; text-decoration: none;
-      border-radius: 10px; transition: .2s;
-    }
-    nav a:hover { background: var(--bg-hover); color: var(--text-main); }
-    nav a.active { background: rgba(201,169,110,0.1); color: var(--gold); font-weight: 600; }
-    nav hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
-
-    /* ── MAIN ── */
-    .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); display: flex; flex-direction: column; min-height: 100vh; }
-
-    .topbar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 28px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 5;
-    }
-    .topbar-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
-    .hotel-badge {
-      display: flex; align-items: center; gap: 8px; font-size: 13px;
-      color: var(--text-muted); background: var(--bg-hover); padding: 6px 12px; border-radius: 8px;
-    }
-    .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
-
-    .content { padding: 28px; flex: 1; }
-
-    /* ── STATS ── */
-    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
-    .stat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 18px 20px; display: flex; align-items: center; gap: 16px;
-    }
-    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .stat-icon.blue   { background: rgba(108,99,255,.12); }
-    .stat-icon.green  { background: rgba(34,197,94,.12); }
-    .stat-icon.yellow { background: rgba(245,158,11,.12); }
-    .stat-icon.red    { background: rgba(239,68,68,.12); }
-    .stat-body { min-width: 0; }
-    .stat-label { font-size: 12px; color: var(--text-soft); margin-bottom: 4px; }
-    .stat-value { font-size: 22px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* ── FILTER BAR ── */
-    .filter-bar {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
-    }
-    .filter-bar select, .filter-bar input {
-      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text-main); padding: 8px 12px; font-size: 13px; outline: none; font-family: 'Inter', sans-serif;
-    }
-    .filter-bar select:focus, .filter-bar input:focus { border-color: var(--gold); }
-    .filter-bar input { flex: 1; min-width: 160px; }
-    .btn {
-      border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 7px;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn:hover { opacity: .85; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-success { background: #10b981; color: #fff; }
-    .btn-danger  { background: var(--red); color: #fff; }
-    .btn-ghost   { background: var(--bg-hover); color: var(--text-main); border: 1px solid var(--border); }
-    .btn-sm { padding: 5px 11px; font-size: 12px; }
-
-    /* ── TABLE ── */
-    .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .table-head {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .table-head h2 { font-size: 13px; font-weight: 600; color: var(--text-main); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead tr { background: var(--bg-hover); }
-    th { padding: 11px 14px; text-align: left; color: var(--text-soft); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
-    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-muted); }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,.015); }
-
-    .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .badge-pendente   { background: rgba(245,158,11,.12); color: var(--yellow); }
-    .badge-confirmado { background: rgba(108,99,255,.12); color: #a5a0ff; }
-    .badge-pago       { background: rgba(34,197,94,.12);  color: var(--green); }
-    .badge-cancelado  { background: rgba(239,68,68,.12);  color: var(--red); }
-
-    .actions { display: flex; gap: 6px; }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
-      z-index: 200; align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px;
-      width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 24px 60px rgba(0,0,0,.5);
-    }
-    .modal-header {
-      padding: 20px 24px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .modal-header h3 { font-size: 15px; font-weight: 600; color: var(--text-main); }
-    .modal-close { background: none; border: none; color: var(--text-soft); font-size: 20px; cursor: pointer; line-height: 1; }
-    .modal-close:hover { color: var(--text-main); }
-    .modal-body { padding: 24px; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
-
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 11px; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
-    .form-group input, .form-group select, .form-group textarea {
-      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text-main); padding: 9px 12px; font-size: 13px; outline: none; width: 100%;
-      font-family: 'Inter', sans-serif;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
-    .form-group textarea { min-height: 72px; resize: vertical; }
-    .form-hint { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
-
-    .divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
-    .section-title { font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
-
-    .f-pix-row {
-      display: grid; grid-template-columns: 1fr 130px 32px;
-      gap: 8px; align-items: center; margin-bottom: 8px;
-    }
-    .f-pix-row select,
-    .f-pix-row input[type="number"] {
-      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text-main); padding: 8px 10px; font-size: 13px; width: 100%; outline: none; font-family: 'Inter', sans-serif;
-    }
-    .f-pix-row select:focus, .f-pix-row input:focus { border-color: var(--gold); }
-    .btn-rm-pix {
-      background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3); border-radius: 8px;
-      color: var(--red); cursor: pointer; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s;
-    }
-    .btn-rm-pix:hover { background: var(--red); color: #fff; }
-    .pix-col-labels { display: grid; grid-template-columns: 1fr 130px 32px; gap: 8px; margin-bottom: 6px; }
-    .pix-col-labels span { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; }
-
-    #pix-list .pix-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-bottom: 8px; }
-    #pix-list .pix-row input {
-      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text-main); padding: 8px 10px; font-size: 13px; width: 100%; outline: none; font-family: 'Inter', sans-serif;
-    }
-
-    #mes-ref-badge {
-      display: none; background: rgba(201,169,110,.12); color: var(--gold);
-      border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600;
-      width: fit-content; margin-top: 6px;
-    }
-
-    .empty { text-align: center; padding: 52px 20px; color: var(--text-soft); }
-    .empty-icon { font-size: 32px; margin-bottom: 12px; display: block; }
-
-    @media (max-width: 900px) {
-      :root { --sidebar-w: 0px; }
-      .sidebar { display: none; }
-      .stats-row { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 600px) {
-      .stats-row { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-grid .full { grid-column: 1; }
-      .f-pix-row { grid-template-columns: 1fr 100px 32px; }
-    }
-  </style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reservas — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="layout">
 
-<aside class="sidebar">
-  <div class="sidebar-logo">🔔 Concierge</div>
-  <nav>
-    <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-    <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-    <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-    <a href="/{{ hotel.slug }}/dashboard/reservas/" class="active">📅 Reservas</a>
-    <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-    <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-    <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-    <hr>
-    <a href="/logout/">↩ Sair</a>
-  </nav>
-</aside>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/" class="active">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
 
-<div class="main">
+    <!-- MAIN -->
+    <main class="main">
 
-  <div class="topbar">
-    <span class="topbar-title">📅 Reservas</span>
-    <div class="hotel-badge">
-      <div class="hotel-dot"></div>
-      <span id="hotel-nome-top">{{ hotel.nome }}</span>
-    </div>
-  </div>
+        <div class="topbar">
+            <span class="topbar-title">📅 Reservas</span>
+            <div class="hotel-badge">
+                <div class="hotel-dot"></div>
+                <span>{{ hotel.nome }}</span>
+            </div>
+        </div>
 
-  <div class="content">
+        <div class="content">
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon blue">🎫</div>
-        <div class="stat-body"><div class="stat-label">Total de Reservas</div><div class="stat-value" id="stat-total">0</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon yellow">⏳</div>
-        <div class="stat-body"><div class="stat-label">Confirmadas</div><div class="stat-value" id="stat-confirmadas">0</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green">✅</div>
-        <div class="stat-body"><div class="stat-label">Pagas</div><div class="stat-value" id="stat-pagas">0</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon red">💰</div>
-        <div class="stat-body"><div class="stat-label">Comissão Recepção (pagas)</div><div class="stat-value" id="stat-comissao">R$ 0,00</div></div>
-      </div>
-    </div>
+            <!-- STATS -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue">🎫</div>
+                    <div>
+                        <div class="stat-label">Total de Reservas</div>
+                        <div class="stat-value" id="stat-total">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div>
+                        <div class="stat-label">Confirmadas</div>
+                        <div class="stat-value" id="stat-confirmadas">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div>
+                        <div class="stat-label">Pagas</div>
+                        <div class="stat-value" id="stat-pagas">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon gold">💰</div>
+                    <div>
+                        <div class="stat-label">Comissão Recepção (pagas)</div>
+                        <div class="stat-value" id="stat-comissao">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="filter-bar">
-      <select id="filtro-status" onchange="renderTabela()">
-        <option value="">Todos os status</option>
-        <option value="pendente">Pendente</option>
-        <option value="confirmado">Confirmado</option>
-        <option value="pago">Pago</option>
-        <option value="cancelado">Cancelado</option>
-      </select>
-      <select id="filtro-mes" onchange="renderTabela()">
-        <option value="">Todos os meses</option>
-      </select>
-      <input type="text" id="filtro-busca" placeholder="Buscar cliente ou passeio…" oninput="renderTabela()"/>
-      <button class="btn btn-primary" onclick="abrirModalNova()">➕ Nova Reserva</button>
-    </div>
+            <!-- FILTROS -->
+            <div class="filter-bar">
+                <select id="filtro-status" onchange="renderTabela()">
+                    <option value="">Todos os status</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="pago">Pago</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+                <select id="filtro-mes" onchange="renderTabela()">
+                    <option value="">Todos os meses</option>
+                </select>
+                <input type="text" id="filtro-busca" placeholder="Buscar cliente ou passeio…" oninput="renderTabela()"/>
+                <button class="btn btn-primary" onclick="abrirModalNova()">➕ Nova Reserva</button>
+            </div>
 
-    <div class="table-wrap">
-      <div class="table-head">
-        <h2>Lista de Reservas</h2>
-        <span id="count-label" style="font-size:12px;color:var(--text-soft)"></span>
-      </div>
-      <table id="tabela-reservas">
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Cliente</th>
-            <th>Passeio</th>
-            <th>Data</th>
-            <th>Pessoas</th>
-            <th>Valor Bruto</th>
-            <th>Com. Recepção</th>
-            <th>Recepcionista</th>
-            <th>Pagamento</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-      <div id="empty-state" class="empty" style="display:none">
-        <span class="empty-icon">📅</span>
-        <p style="color:var(--text-soft)">Nenhuma reserva encontrada.</p>
-        <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()">➕ Criar Reserva</button>
-      </div>
-    </div>
+            <!-- TABELA -->
+            <div class="table-wrap">
+                <div class="table-head">
+                    <h2>Lista de Reservas</h2>
+                    <span id="count-label" style="font-size:12px;color:var(--text-soft)"></span>
+                </div>
+                <table id="tabela-reservas">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Cliente</th>
+                            <th>Passeio</th>
+                            <th>Data</th>
+                            <th>Pessoas</th>
+                            <th>Valor Bruto</th>
+                            <th>Com. Recepção</th>
+                            <th>Recepcionista</th>
+                            <th>Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+                <div id="empty-state" class="empty" style="display:none">
+                    <span class="empty-icon">📅</span>
+                    <p>Nenhuma reserva encontrada.</p>
+                    <button class="btn btn-primary" style="margin-top:14px" onclick="abrirModalNova()">➕ Criar Reserva</button>
+                </div>
+            </div>
 
-  </div>
+        </div>
+    </main>
 </div>
 
 <!-- MODAL: NOVA / EDITAR -->
 <div class="modal-overlay" id="modal-reserva">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-titulo">Nova Reserva</h3>
-      <button class="modal-close" onclick="fecharModal('modal-reserva')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="f-id"/>
-      <p class="section-title">Dados do Cliente</p>
-      <div class="form-grid">
-        <div class="form-group full"><label>Nome do Cliente *</label><input type="text" id="f-cliente" placeholder="Nome completo"/></div>
-        <div class="form-group"><label>WhatsApp</label><input type="text" id="f-whatsapp" placeholder="+55 11 99999-9999"/></div>
-        <div class="form-group"><label>Status</label>
-          <select id="f-status">
-            <option value="pendente">Pendente</option>
-            <option value="confirmado">Confirmado</option>
-            <option value="pago">Pago</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-titulo">Nova Reserva</h3>
+            <button class="modal-close" onclick="fecharModal('modal-reserva')">&times;</button>
         </div>
-      </div>
-      <hr class="divider"/>
-      <p class="section-title">Passeio & Data</p>
-      <div class="form-grid">
-        <div class="form-group full"><label>Passeio *</label><select id="f-passeio"><option value="">Carregando…</option></select></div>
-        <div class="form-group"><label>Data do Passeio *</label><input type="date" id="f-data"/></div>
-        <div class="form-group"><label>Horário</label><input type="time" id="f-horario"/></div>
-        <div class="form-group"><label>Nº de Pessoas</label><input type="number" id="f-pessoas" value="1" min="1" oninput="calcularValorBruto()"/></div>
-      </div>
-      <hr class="divider"/>
-      <p class="section-title">Valores & Comissão</p>
-      <div class="form-grid">
-        <div class="form-group"><label>Valor por Pessoa (R$)</label><input type="number" id="f-valor-pessoa" step="0.01" placeholder="0.00" oninput="calcularValorBruto()"/></div>
-        <div class="form-group"><label>Valor Bruto (R$)</label><input type="number" id="f-valor-bruto" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/><span class="form-hint">Calculado automaticamente</span></div>
-        <div class="form-group"><label>Comissão Agência (R$)</label><input type="number" id="f-comissao-agencia" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/></div>
-        <div class="form-group"><label>★ Comissão Recepção (R$)</label><input type="number" id="f-comissao-recepcao" step="0.01" placeholder="0.00"/><span class="form-hint">Vai para o relatório</span></div>
-      </div>
-      <hr class="divider"/>
-      <p class="section-title">Recepcionista</p>
-      <div class="form-group"><label>Responsável pelo Atendimento</label><select id="f-recepcionista"><option value="">Nenhum / Não definido</option></select></div>
-      <hr class="divider"/>
-      <p class="section-title">Pagamento PIX <span style="font-weight:400;color:var(--text-soft);text-transform:none;font-size:11px">— opcional</span></p>
-      <div class="form-group" style="margin-bottom:16px">
-        <label>Data de Pagamento</label>
-        <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
-        <div id="mes-ref-badge"></div>
-      </div>
-      <div class="pix-col-labels">
-        <span>Recepcionista que recebeu</span>
-        <span>Valor PIX (R$)</span>
-        <span></span>
-      </div>
-      <div id="f-pix-list"></div>
-      <button type="button" class="btn btn-ghost btn-sm" onclick="addModalPixRow()" style="margin-top:6px">➕ Adicionar recepcionista</button>
-      <hr class="divider"/>
-      <p class="section-title">Observações</p>
-      <div class="form-group"><textarea id="f-obs" placeholder="Observações opcionais…"></textarea></div>
+        <div class="modal-body">
+            <input type="hidden" id="f-id"/>
+            <p class="section-title">Dados do Cliente</p>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Nome do Cliente *</label>
+                    <input type="text" id="f-cliente" placeholder="Nome completo"/>
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp</label>
+                    <input type="text" id="f-whatsapp" placeholder="+55 11 99999-9999"/>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="f-status">
+                        <option value="pendente">Pendente</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="pago">Pago</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+            <hr class="divider"/>
+            <p class="section-title">Passeio & Data</p>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Passeio *</label>
+                    <select id="f-passeio"><option value="">Carregando…</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Data do Passeio *</label>
+                    <input type="date" id="f-data"/>
+                </div>
+                <div class="form-group">
+                    <label>Horário</label>
+                    <input type="time" id="f-horario"/>
+                </div>
+                <div class="form-group">
+                    <label>Nº de Pessoas</label>
+                    <input type="number" id="f-pessoas" value="1" min="1" oninput="calcularValorBruto()"/>
+                </div>
+            </div>
+            <hr class="divider"/>
+            <p class="section-title">Valores & Comissão</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Valor por Pessoa (R$)</label>
+                    <input type="number" id="f-valor-pessoa" step="0.01" placeholder="0.00" oninput="calcularValorBruto()"/>
+                </div>
+                <div class="form-group">
+                    <label>Valor Bruto (R$)</label>
+                    <input type="number" id="f-valor-bruto" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
+                    <span class="form-hint">Calculado automaticamente</span>
+                </div>
+                <div class="form-group">
+                    <label>Comissão Agência (R$)</label>
+                    <input type="number" id="f-comissao-agencia" step="0.01" placeholder="0.00" oninput="sugerirComissao()"/>
+                </div>
+                <div class="form-group">
+                    <label>★ Comissão Recepção (R$)</label>
+                    <input type="number" id="f-comissao-recepcao" step="0.01" placeholder="0.00"/>
+                    <span class="form-hint">Vai para o relatório</span>
+                </div>
+            </div>
+            <hr class="divider"/>
+            <p class="section-title">Recepcionista</p>
+            <div class="form-group">
+                <label>Responsável pelo Atendimento</label>
+                <select id="f-recepcionista"><option value="">Nenhum / Não definido</option></select>
+            </div>
+            <hr class="divider"/>
+            <p class="section-title">Pagamento PIX <span style="font-weight:400;color:var(--text-soft);text-transform:none;font-size:11px">— opcional</span></p>
+            <div class="form-group" style="margin-bottom:16px">
+                <label>Data de Pagamento</label>
+                <input type="date" id="f-data-pagamento" onchange="atualizarMesRef()"/>
+                <div id="mes-ref-badge" class="mes-ref-badge"></div>
+            </div>
+            <div class="pix-col-labels">
+                <span>Recepcionista que recebeu</span>
+                <span>Valor PIX (R$)</span>
+                <span></span>
+            </div>
+            <div id="f-pix-list"></div>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="addModalPixRow()" style="margin-top:6px">➕ Adicionar recepcionista</button>
+            <hr class="divider"/>
+            <p class="section-title">Observações</p>
+            <div class="form-group">
+                <textarea id="f-obs" placeholder="Observações opcionais…"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarReserva()">💾 Salvar</button>
+        </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarReserva()">💾 Salvar</button>
-    </div>
-  </div>
 </div>
 
 <!-- MODAL: PAGAMENTO -->
 <div class="modal-overlay" id="modal-pagamento">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Registrar Pagamento</h3>
-      <button class="modal-close" onclick="fecharModal('modal-pagamento')">&times;</button>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Registrar Pagamento</h3>
+            <button class="modal-close" onclick="fecharModal('modal-pagamento')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="pg-id"/>
+            <div class="form-group" style="margin-bottom:14px">
+                <label>Data de Pagamento *</label>
+                <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
+                <div id="mes-ref-badge-pg" class="mes-ref-badge"></div>
+            </div>
+            <hr class="divider"/>
+            <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
+            <div id="pix-list"></div>
+            <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
+            <button class="btn btn-success" onclick="confirmarPagamento()">✅ Confirmar Pagamento</button>
+        </div>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="pg-id"/>
-      <div class="form-group" style="margin-bottom:14px">
-        <label>Data de Pagamento *</label>
-        <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
-        <div id="mes-ref-badge-pg" style="display:none;background:rgba(201,169,110,.12);color:var(--gold);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;width:fit-content;margin-top:6px;"></div>
-      </div>
-      <hr class="divider"/>
-      <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
-      <div id="pix-list"></div>
-      <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
-      <button class="btn btn-success" onclick="confirmarPagamento()">✅ Confirmar Pagamento</button>
-    </div>
-  </div>
 </div>
 
 <!-- MODAL: DELETE -->
 <div class="modal-overlay" id="modal-delete">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header">
-      <h3>Excluir Reserva</h3>
-      <button class="modal-close" onclick="fecharModal('modal-delete')">&times;</button>
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header">
+            <h3>Excluir Reserva</h3>
+            <button class="modal-close" onclick="fecharModal('modal-delete')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-muted);font-size:13px">
+                Tem certeza que deseja excluir a reserva de
+                <strong id="del-nome" style="color:var(--text-main)"></strong>?
+                Esta ação não pode ser desfeita.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModal('modal-delete')">Cancelar</button>
+            <button class="btn btn-danger" onclick="executarDelete()">🗑️ Excluir</button>
+        </div>
     </div>
-    <div class="modal-body">
-      <p style="color:var(--text-muted);font-size:13px">
-        Tem certeza que deseja excluir a reserva de <strong id="del-nome" style="color:var(--text-main)"></strong>?
-        Esta ação não pode ser desfeita.
-      </p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModal('modal-delete')">Cancelar</button>
-      <button class="btn btn-danger" onclick="executarDelete()">🗑️ Excluir</button>
-    </div>
-  </div>
 </div>
 
 <script>
-  const API_BASE  = '/api/admin';
-  const hotelSlug = '{{ hotel.slug }}';
-  const csrfToken = '{{ csrf_token }}';
+    const API_BASE  = '/api/admin';
+    const hotelSlug = '{{ hotel.slug }}';
+    const csrfToken = '{{ csrf_token }}';
 
-  let todasReservas    = [];
-  let passeiosCache    = [];
-  let recepcionistas   = [];
-  let deleteIdPendente = null;
+    let todasReservas    = [];
+    let passeiosCache    = [];
+    let recepcionistas   = [];
+    let deleteIdPendente = null;
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    await Promise.all([carregarPasseios(), carregarRecepcionistas(), carregarReservas()]);
-  });
-
-  function parsePix(raw) {
-    if (!raw) return [];
-    try {
-      const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (Array.isArray(p)) return p.map(x => ({ nome: x.nome || '', valor: parseFloat(x.valor) || 0 }));
-      if (typeof p === 'object' && p !== null) return Object.entries(p).map(([nome, valor]) => ({ nome, valor: parseFloat(valor) || 0 }));
-      return [];
-    } catch { return []; }
-  }
-
-  async function carregarRecepcionistas() {
-    try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/divisao/`, { headers: { 'X-CSRFToken': csrfToken } });
-      if (!res.ok) return;
-      const data = await res.json();
-      let nomes = [];
-      if (data.nomes && Array.isArray(data.nomes)) {
-        nomes = data.nomes;
-      } else if (data.nomes_recepcionistas) {
-        try { const p = typeof data.nomes_recepcionistas === 'string' ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas; if (Array.isArray(p)) nomes = p; } catch(e) {}
-      }
-      recepcionistas = [...new Set(nomes)].filter(Boolean);
-      const sel = document.getElementById('f-recepcionista');
-      sel.innerHTML = '<option value="">Nenhum / Não definido</option>';
-      recepcionistas.forEach(n => sel.insertAdjacentHTML('beforeend', `<option value="${n}">${n}</option>`));
-    } catch(e) { console.warn('[carregarRecepcionistas]', e); }
-  }
-
-  async function carregarPasseios() {
-    try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/`);
-      if (!res.ok) return;
-      const data = await res.json();
-      passeiosCache = Array.isArray(data) ? data : [];
-      const sel = document.getElementById('f-passeio');
-      sel.innerHTML = '<option value="">Selecionar passeio…</option>';
-      passeiosCache.forEach(p => {
-        const nome = p.nome || p.titulo || String(p.id);
-        sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${nome}</option>`);
-      });
-    } catch(e) { console.warn('[carregarPasseios]', e); }
-  }
-
-  async function carregarReservas() {
-    try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/`, { headers: { 'X-CSRFToken': csrfToken } });
-      if (!res.ok) { console.warn('[carregarReservas] HTTP', res.status); return; }
-      const data = await res.json();
-      if (!Array.isArray(data)) { console.warn('[carregarReservas] resposta inválida:', data); return; }
-      todasReservas = data;
-      popularFiltroMes();
-      atualizarStats();
-      renderTabela();
-    } catch(e) { console.error('[carregarReservas]', e); }
-  }
-
-  function popularFiltroMes() {
-    const meses = [...new Set(
-      todasReservas.map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : null)).filter(Boolean)
-    )].sort().reverse();
-    const sel = document.getElementById('filtro-mes');
-    sel.innerHTML = '<option value="">Todos os meses</option>';
-    const nomesM = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    meses.forEach(m => {
-      const parts = m.split('-');
-      if (parts.length < 2) return;
-      const label = (nomesM[parseInt(parts[1],10)-1]||parts[1]) + '/' + parts[0];
-      sel.insertAdjacentHTML('beforeend', `<option value="${m}">${label}</option>`);
+    document.addEventListener('DOMContentLoaded', async () => {
+        await Promise.all([carregarPasseios(), carregarRecepcionistas(), carregarReservas()]);
     });
-  }
 
-  function atualizarStats() {
-    const total       = todasReservas.length;
-    const confirmadas = todasReservas.filter(r => r.status === 'confirmado').length;
-    const pagas       = todasReservas.filter(r => r.status === 'pago').length;
-    const comissao    = todasReservas.filter(r => r.status === 'pago').reduce((s,r) => s + parseFloat(r.comissao_recepcao||0), 0);
-    document.getElementById('stat-total').textContent       = total;
-    document.getElementById('stat-confirmadas').textContent = confirmadas;
-    document.getElementById('stat-pagas').textContent       = pagas;
-    document.getElementById('stat-comissao').textContent    = 'R$ ' + comissao.toFixed(2).replace('.',',');
-  }
+    function parsePix(raw) {
+        if (!raw) return [];
+        try {
+            const p = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (Array.isArray(p)) return p.map(x => ({ nome: x.nome || '', valor: parseFloat(x.valor) || 0 }));
+            if (typeof p === 'object' && p !== null) return Object.entries(p).map(([nome, valor]) => ({ nome, valor: parseFloat(valor) || 0 }));
+            return [];
+        } catch { return []; }
+    }
 
-  function renderTabela() {
-    const filtroStatus = document.getElementById('filtro-status').value;
-    const filtroMes    = document.getElementById('filtro-mes').value;
-    const busca        = document.getElementById('filtro-busca').value.toLowerCase();
-    let lista = todasReservas.filter(r => {
-      if (filtroStatus && r.status !== filtroStatus) return false;
-      if (filtroMes) { const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : ''); if (ref !== filtroMes) return false; }
-      if (busca) { const hay = `${r.nome_cliente||''} ${r.passeio_nome||r.passeio_titulo||''}`.toLowerCase(); if (!hay.includes(busca)) return false; }
-      return true;
+    async function carregarRecepcionistas() {
+        try {
+            const res = await fetch(`${API_BASE}/${hotelSlug}/divisao/`, { headers: { 'X-CSRFToken': csrfToken } });
+            if (!res.ok) return;
+            const data = await res.json();
+            let nomes = [];
+            if (data.nomes && Array.isArray(data.nomes)) {
+                nomes = data.nomes;
+            } else if (data.nomes_recepcionistas) {
+                try { const p = typeof data.nomes_recepcionistas === 'string' ? JSON.parse(data.nomes_recepcionistas) : data.nomes_recepcionistas; if (Array.isArray(p)) nomes = p; } catch(e) {}
+            }
+            recepcionistas = [...new Set(nomes)].filter(Boolean);
+            const sel = document.getElementById('f-recepcionista');
+            sel.innerHTML = '<option value="">Nenhum / Não definido</option>';
+            recepcionistas.forEach(n => sel.insertAdjacentHTML('beforeend', `<option value="${n}">${n}</option>`));
+        } catch(e) { console.warn('[carregarRecepcionistas]', e); }
+    }
+
+    async function carregarPasseios() {
+        try {
+            const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/`);
+            if (!res.ok) return;
+            const data = await res.json();
+            passeiosCache = Array.isArray(data) ? data : [];
+            const sel = document.getElementById('f-passeio');
+            sel.innerHTML = '<option value="">Selecionar passeio…</option>';
+            passeiosCache.forEach(p => {
+                const nome = p.nome || p.titulo || String(p.id);
+                sel.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-preco="${p.preco || 0}">${nome}</option>`);
+            });
+        } catch(e) { console.warn('[carregarPasseios]', e); }
+    }
+
+    async function carregarReservas() {
+        try {
+            const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/`, { headers: { 'X-CSRFToken': csrfToken } });
+            if (!res.ok) { console.warn('[carregarReservas] HTTP', res.status); return; }
+            const data = await res.json();
+            if (!Array.isArray(data)) { console.warn('[carregarReservas] resposta inválida:', data); return; }
+            todasReservas = data;
+            popularFiltroMes();
+            atualizarStats();
+            renderTabela();
+        } catch(e) { console.error('[carregarReservas]', e); }
+    }
+
+    function popularFiltroMes() {
+        const meses = [...new Set(
+            todasReservas.map(r => r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : null)).filter(Boolean)
+        )].sort().reverse();
+        const sel = document.getElementById('filtro-mes');
+        sel.innerHTML = '<option value="">Todos os meses</option>';
+        const nomesM = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        meses.forEach(m => {
+            const parts = m.split('-');
+            if (parts.length < 2) return;
+            const label = (nomesM[parseInt(parts[1],10)-1]||parts[1]) + '/' + parts[0];
+            sel.insertAdjacentHTML('beforeend', `<option value="${m}">${label}</option>`);
+        });
+    }
+
+    function atualizarStats() {
+        const total       = todasReservas.length;
+        const confirmadas = todasReservas.filter(r => r.status === 'confirmado').length;
+        const pagas       = todasReservas.filter(r => r.status === 'pago').length;
+        const comissao    = todasReservas.filter(r => r.status === 'pago').reduce((s,r) => s + parseFloat(r.comissao_recepcao||0), 0);
+        document.getElementById('stat-total').textContent       = total;
+        document.getElementById('stat-confirmadas').textContent = confirmadas;
+        document.getElementById('stat-pagas').textContent       = pagas;
+        document.getElementById('stat-comissao').textContent    = 'R$ ' + comissao.toFixed(2).replace('.',',');
+    }
+
+    function renderTabela() {
+        const filtroStatus = document.getElementById('filtro-status').value;
+        const filtroMes    = document.getElementById('filtro-mes').value;
+        const busca        = document.getElementById('filtro-busca').value.toLowerCase();
+        let lista = todasReservas.filter(r => {
+            if (filtroStatus && r.status !== filtroStatus) return false;
+            if (filtroMes) { const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.substring(0,7) : ''); if (ref !== filtroMes) return false; }
+            if (busca) { const hay = `${r.nome_cliente||''} ${r.passeio_nome||r.passeio_titulo||''}`.toLowerCase(); if (!hay.includes(busca)) return false; }
+            return true;
+        });
+        const tbody = document.getElementById('tbody');
+        tbody.innerHTML = '';
+        document.getElementById('count-label').textContent = `${lista.length} registros`;
+        if (!lista.length) { document.getElementById('empty-state').style.display = ''; return; }
+        document.getElementById('empty-state').style.display = 'none';
+        lista.forEach(r => {
+            const comR  = parseFloat(r.comissao_recepcao||0).toFixed(2).replace('.',',');
+            const valB  = parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',');
+            const badgeClass = { pendente:'badge-pendente', confirmado:'badge-confirmado', pago:'badge-pago', cancelado:'badge-cancelado' }[r.status] || 'badge-pendente';
+            const dataPasseio = r.data_passeio || r.data || null;
+            const passeioNome = r.passeio_nome || r.passeio_titulo || '–';
+            tbody.insertAdjacentHTML('beforeend', `
+                <tr>
+                    <td><span class="badge ${badgeClass}">${r.status}</span></td>
+                    <td>
+                        <div style="font-weight:500;color:var(--text-main)">${r.nome_cliente||'–'}</div>
+                        ${r.whatsapp ? `<div style="font-size:11px;color:var(--text-soft)">${r.whatsapp}</div>` : ''}
+                    </td>
+                    <td>${passeioNome}</td>
+                    <td>${dataPasseio ? formatarData(dataPasseio) : '–'}</td>
+                    <td>${r.numero_pessoas||1}</td>
+                    <td>R$ ${valB}</td>
+                    <td style="color:var(--green);font-weight:600">R$ ${comR}</td>
+                    <td>${r.recepcionista||'<span style="color:var(--text-soft)">–</span>'}</td>
+                    <td>${r.data_pagamento
+                        ? `<span style="font-size:12px;color:var(--green)">${formatarData(r.data_pagamento)}</span>`
+                        : (r.status !== 'cancelado' && r.status !== 'pago'
+                            ? `<button class="btn btn-success btn-sm" onclick="abrirPagamento(${r.id})">💰 Pagar</button>`
+                            : '<span style="color:var(--text-soft);font-size:12px">–</span>')}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmarDelete(${r.id}, '${(r.nome_cliente||'').replace(/'/g,"\\'")}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>`);
+        });
+    }
+
+    function formatarData(iso) {
+        if (!iso) return '–';
+        const s = String(iso).substring(0,10);
+        const parts = s.split('-');
+        if (parts.length < 3) return iso;
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+    function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function addModalPixRow(nome='', valor='') {
+        const list = document.getElementById('f-pix-list');
+        const row  = document.createElement('div');
+        row.className = 'f-pix-row';
+        const opts = recepcionistas.length ? recepcionistas.map(n=>`<option value="${n}">${n}</option>`).join('') : '';
+        row.innerHTML = `
+            <select><option value="">Selecionar recepcionista…</option>${opts}</select>
+            <input type="number" placeholder="R$ 0,00" step="0.01" min="0" value="${valor!==''?valor:''}">
+            <button type="button" class="btn-rm-pix" onclick="this.parentElement.remove()">✕</button>`;
+        list.appendChild(row);
+        if (nome) row.querySelector('select').value = nome;
+    }
+
+    function abrirModalNova() {
+        document.getElementById('modal-titulo').textContent = 'Nova Reserva';
+        ['f-id','f-cliente','f-whatsapp','f-passeio','f-data','f-horario','f-valor-pessoa','f-valor-bruto','f-comissao-agencia','f-comissao-recepcao','f-recepcionista','f-data-pagamento','f-obs'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+        });
+        document.getElementById('f-status').value = 'pendente';
+        document.getElementById('f-pessoas').value = 1;
+        const badge = document.getElementById('mes-ref-badge');
+        badge.style.display = 'none';
+        document.getElementById('f-pix-list').innerHTML = '';
+        addModalPixRow();
+        abrirModal('modal-reserva');
+    }
+
+    function editarReserva(id) {
+        const r = todasReservas.find(x => x.id === id);
+        if (!r) return;
+        document.getElementById('modal-titulo').textContent          = 'Editar Reserva';
+        document.getElementById('f-id').value                        = r.id;
+        document.getElementById('f-cliente').value                   = r.nome_cliente || '';
+        document.getElementById('f-whatsapp').value                  = r.whatsapp || '';
+        document.getElementById('f-status').value                    = r.status || 'pendente';
+        document.getElementById('f-passeio').value                   = r.passeio || r.passeio_id || '';
+        document.getElementById('f-data').value                      = r.data_passeio || r.data || '';
+        document.getElementById('f-horario').value                   = r.horario || '';
+        document.getElementById('f-pessoas').value                   = r.numero_pessoas || 1;
+        document.getElementById('f-valor-pessoa').value              = r.valor_por_pessoa || '';
+        document.getElementById('f-valor-bruto').value               = r.valor_bruto || '';
+        document.getElementById('f-comissao-agencia').value          = r.comissao_agencia || '';
+        document.getElementById('f-comissao-recepcao').value         = r.comissao_recepcao || '';
+        document.getElementById('f-recepcionista').value             = r.recepcionista || '';
+        document.getElementById('f-data-pagamento').value            = r.data_pagamento || '';
+        document.getElementById('f-obs').value                       = r.observacoes || '';
+        atualizarMesRef();
+        document.getElementById('f-pix-list').innerHTML = '';
+        const pixEntries = parsePix(r.pix_recebimentos);
+        if (pixEntries.length) pixEntries.forEach(p => addModalPixRow(p.nome, p.valor > 0 ? p.valor : ''));
+        else addModalPixRow();
+        abrirModal('modal-reserva');
+    }
+
+    function calcularValorBruto() {
+        const pessoas = parseFloat(document.getElementById('f-pessoas').value) || 1;
+        const vpp     = parseFloat(document.getElementById('f-valor-pessoa').value) || 0;
+        if (vpp > 0) document.getElementById('f-valor-bruto').value = (pessoas * vpp).toFixed(2);
+        sugerirComissao();
+    }
+
+    document.getElementById('f-passeio').addEventListener('change', function() {
+        const opt   = this.options[this.selectedIndex];
+        const preco = parseFloat(opt.dataset.preco) || 0;
+        if (preco > 0) { document.getElementById('f-valor-pessoa').value = preco.toFixed(2); calcularValorBruto(); }
     });
-    const tbody = document.getElementById('tbody');
-    tbody.innerHTML = '';
-    document.getElementById('count-label').textContent = `${lista.length} registros`;
-    if (!lista.length) { document.getElementById('empty-state').style.display = ''; return; }
-    document.getElementById('empty-state').style.display = 'none';
-    lista.forEach(r => {
-      const comR  = parseFloat(r.comissao_recepcao||0).toFixed(2).replace('.',',');
-      const valB  = parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',');
-      const badgeClass = { pendente:'badge-pendente', confirmado:'badge-confirmado', pago:'badge-pago', cancelado:'badge-cancelado' }[r.status] || 'badge-pendente';
-      const dataPasseio = r.data_passeio || r.data || null;
-      const passeioNome = r.passeio_nome || r.passeio_titulo || '–';
-      tbody.insertAdjacentHTML('beforeend', `
-        <tr>
-          <td><span class="badge ${badgeClass}">${r.status}</span></td>
-          <td><div style="font-weight:500;color:var(--text-main)">${r.nome_cliente||'–'}</div>${r.whatsapp?`<div style="font-size:11px;color:var(--text-soft)">${r.whatsapp}</div>`:''}</td>
-          <td>${passeioNome}</td>
-          <td>${dataPasseio ? formatarData(dataPasseio) : '–'}</td>
-          <td>${r.numero_pessoas||1}</td>
-          <td>R$ ${valB}</td>
-          <td style="color:var(--primary);font-weight:600">R$ ${comR}</td>
-          <td>${r.recepcionista||'<span style="color:var(--text-soft)">–</span>'}</td>
-          <td>${r.data_pagamento
-            ? `<span style="font-size:12px;color:var(--primary)">${formatarData(r.data_pagamento)}</span>`
-            : (r.status !== 'cancelado' && r.status !== 'pago'
-              ? `<button class="btn btn-success btn-sm" onclick="abrirPagamento(${r.id})">💰 Pagar</button>`
-              : '<span style="color:var(--text-soft);font-size:12px">–</span>')}</td>
-          <td>
-            <div class="actions">
-              <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.id})">✏️</button>
-              <button class="btn btn-danger btn-sm" onclick="confirmarDelete(${r.id}, '${(r.nome_cliente||'').replace(/'/g,"\\'")}')">🗑️</button>
-            </div>
-          </td>
-        </tr>`);
+
+    function sugerirComissao() {
+        const bruto   = parseFloat(document.getElementById('f-valor-bruto').value) || 0;
+        const agencia = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
+        const recep   = document.getElementById('f-comissao-recepcao');
+        if (!recep.value || parseFloat(recep.value) === 0) recep.value = Math.max(0, bruto - agencia).toFixed(2);
+    }
+
+    function atualizarMesRef() {
+        const val   = document.getElementById('f-data-pagamento').value;
+        const badge = document.getElementById('mes-ref-badge');
+        if (val) {
+            const [ano, mes] = val.split('-');
+            const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+            badge.style.display = '';
+        } else { badge.style.display = 'none'; }
+    }
+
+    async function salvarReserva() {
+        const id      = document.getElementById('f-id').value;
+        const pixRows = document.querySelectorAll('#f-pix-list .f-pix-row');
+        const pixObj  = {};
+        pixRows.forEach(row => {
+            const nome = row.querySelector('select')?.value?.trim();
+            const val  = parseFloat(row.querySelector('input[type="number"]')?.value) || 0;
+            if (nome && val > 0) pixObj[nome] = val;
+        });
+        const dataPag = document.getElementById('f-data-pagamento').value || null;
+        const dataVal = document.getElementById('f-data').value || null;
+        const payload = {
+            nome_cliente:      document.getElementById('f-cliente').value.trim(),
+            whatsapp:          document.getElementById('f-whatsapp').value.trim(),
+            status:            document.getElementById('f-status').value,
+            passeio:           document.getElementById('f-passeio').value || null,
+            data_passeio:      dataVal, data: dataVal,
+            horario:           document.getElementById('f-horario').value || null,
+            numero_pessoas:    parseInt(document.getElementById('f-pessoas').value) || 1,
+            valor_por_pessoa:  document.getElementById('f-valor-pessoa').value || null,
+            valor_bruto:       document.getElementById('f-valor-bruto').value || null,
+            comissao_agencia:  document.getElementById('f-comissao-agencia').value || null,
+            comissao_recepcao: document.getElementById('f-comissao-recepcao').value || null,
+            recepcionista:     document.getElementById('f-recepcionista').value || '',
+            data_pagamento:    dataPag,
+            observacoes:       document.getElementById('f-obs').value,
+        };
+        if (dataPag) payload.mes_referencia = dataPag.substring(0,7);
+        if (Object.keys(pixObj).length > 0) payload.pix_recebimentos = JSON.stringify(pixObj);
+        if (!payload.nome_cliente) { alert('Informe o nome do cliente.'); return; }
+        const url    = id ? `${API_BASE}/${hotelSlug}/reservas/${id}/` : `${API_BASE}/${hotelSlug}/reservas/`;
+        const method = id ? 'PUT' : 'POST';
+        try {
+            const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }, body: JSON.stringify(payload) });
+            if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || e.detail || `Erro ${res.status} ao salvar.`); return; }
+            fecharModal('modal-reserva');
+            await carregarReservas();
+        } catch(e) { console.error('[salvarReserva]', e); alert('Erro de conexão.'); }
+    }
+
+    function abrirPagamento(id) {
+        const r = todasReservas.find(x => x.id === id);
+        if (!r) return;
+        document.getElementById('pg-id').value = id;
+        document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
+        document.getElementById('pg-total-label').textContent = `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
+        atualizarMesRefPg();
+        const pixList = document.getElementById('pix-list');
+        pixList.innerHTML = '';
+        const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
+        nomes.forEach(nome => addPixRow(nome));
+        abrirModal('modal-pagamento');
+    }
+
+    function addPixRow(nome='') {
+        const list = document.getElementById('pix-list');
+        const row  = document.createElement('div');
+        row.className = 'pix-row';
+        const opts = recepcionistas.length
+            ? recepcionistas.map(n=>`<option value="${n}" ${n===nome?'selected':''}>${n}</option>`).join('')
+            : `<option value="${nome}">${nome||'Recepção'}</option>`;
+        row.innerHTML = `
+            <select style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:100%;outline:none;font-family:'Inter',sans-serif;">
+                <option value="">Selecionar…</option>${opts}
+            </select>
+            <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor"
+                style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:120px;outline:none;font-family:'Inter',sans-serif;"/>`;
+        list.appendChild(row);
+        if (nome) row.querySelector('select').value = nome;
+    }
+
+    function atualizarMesRefPg() {
+        const val   = document.getElementById('pg-data').value;
+        const badge = document.getElementById('mes-ref-badge-pg');
+        if (val) {
+            const [ano, mes] = val.split('-');
+            const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
+            badge.style.display = '';
+        } else { badge.style.display = 'none'; }
+    }
+
+    async function confirmarPagamento() {
+        const id      = document.getElementById('pg-id').value;
+        const dataPag = document.getElementById('pg-data').value;
+        if (!dataPag) { alert('Informe a data de pagamento.'); return; }
+        const pixRows = document.querySelectorAll('#pix-list .pix-row');
+        const pixRecebimentos = {};
+        pixRows.forEach(row => {
+            const nome = row.querySelector('select')?.value?.trim();
+            const val  = parseFloat(row.querySelector('.pix-valor')?.value) || 0;
+            if (nome) pixRecebimentos[nome] = val;
+        });
+        try {
+            const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ status:'pago', data_pagamento:dataPag, mes_referencia:dataPag.substring(0,7), pix_recebimentos:JSON.stringify(pixRecebimentos) })
+            });
+            if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`); return; }
+            fecharModal('modal-pagamento');
+            await carregarReservas();
+        } catch(e) { console.error('[confirmarPagamento]', e); alert('Erro de conexão.'); }
+    }
+
+    function confirmarDelete(id, nome) {
+        deleteIdPendente = id;
+        document.getElementById('del-nome').textContent = nome;
+        abrirModal('modal-delete');
+    }
+
+    async function executarDelete() {
+        if (!deleteIdPendente) return;
+        try {
+            const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${deleteIdPendente}/`, { method:'DELETE', headers:{ 'X-CSRFToken':csrfToken } });
+            if (!res.ok && res.status !== 204) { alert('Erro ao excluir.'); return; }
+            fecharModal('modal-delete');
+            deleteIdPendente = null;
+            await carregarReservas();
+        } catch(e) { console.error('[executarDelete]', e); alert('Erro de conexão.'); }
+    }
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
     });
-  }
-
-  function formatarData(iso) {
-    if (!iso) return '–';
-    const s = String(iso).substring(0,10);
-    const parts = s.split('-');
-    if (parts.length < 3) return iso;
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  }
-
-  function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
-  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
-
-  function addModalPixRow(nome='', valor='') {
-    const list = document.getElementById('f-pix-list');
-    const row  = document.createElement('div');
-    row.className = 'f-pix-row';
-    const opts = recepcionistas.length ? recepcionistas.map(n=>`<option value="${n}">${n}</option>`).join('') : '';
-    row.innerHTML = `
-      <select><option value="">Selecionar recepcionista…</option>${opts}</select>
-      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" value="${valor!==''?valor:''}">
-      <button type="button" class="btn-rm-pix" onclick="this.parentElement.remove()">✕</button>`;
-    list.appendChild(row);
-    if (nome) row.querySelector('select').value = nome;
-  }
-
-  function abrirModalNova() {
-    document.getElementById('modal-titulo').textContent = 'Nova Reserva';
-    ['f-id','f-cliente','f-whatsapp','f-passeio','f-data','f-horario','f-valor-pessoa','f-valor-bruto','f-comissao-agencia','f-comissao-recepcao','f-recepcionista','f-data-pagamento','f-obs'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    document.getElementById('f-status').value = 'pendente';
-    document.getElementById('f-pessoas').value = 1;
-    document.getElementById('mes-ref-badge').style.display = 'none';
-    document.getElementById('f-pix-list').innerHTML = '';
-    addModalPixRow();
-    abrirModal('modal-reserva');
-  }
-
-  function editarReserva(id) {
-    const r = todasReservas.find(x => x.id === id);
-    if (!r) return;
-    document.getElementById('modal-titulo').textContent       = 'Editar Reserva';
-    document.getElementById('f-id').value                    = r.id;
-    document.getElementById('f-cliente').value               = r.nome_cliente || '';
-    document.getElementById('f-whatsapp').value              = r.whatsapp || '';
-    document.getElementById('f-status').value                = r.status || 'pendente';
-    document.getElementById('f-passeio').value               = r.passeio || r.passeio_id || '';
-    document.getElementById('f-data').value                  = r.data_passeio || r.data || '';
-    document.getElementById('f-horario').value               = r.horario || '';
-    document.getElementById('f-pessoas').value               = r.numero_pessoas || 1;
-    document.getElementById('f-valor-pessoa').value          = r.valor_por_pessoa || '';
-    document.getElementById('f-valor-bruto').value           = r.valor_bruto || '';
-    document.getElementById('f-comissao-agencia').value      = r.comissao_agencia || '';
-    document.getElementById('f-comissao-recepcao').value     = r.comissao_recepcao || '';
-    document.getElementById('f-recepcionista').value         = r.recepcionista || '';
-    document.getElementById('f-data-pagamento').value        = r.data_pagamento || '';
-    document.getElementById('f-obs').value                   = r.observacoes || '';
-    atualizarMesRef();
-    document.getElementById('f-pix-list').innerHTML = '';
-    const pixEntries = parsePix(r.pix_recebimentos);
-    if (pixEntries.length) pixEntries.forEach(p => addModalPixRow(p.nome, p.valor > 0 ? p.valor : ''));
-    else addModalPixRow();
-    abrirModal('modal-reserva');
-  }
-
-  function calcularValorBruto() {
-    const pessoas = parseFloat(document.getElementById('f-pessoas').value) || 1;
-    const vpp     = parseFloat(document.getElementById('f-valor-pessoa').value) || 0;
-    if (vpp > 0) document.getElementById('f-valor-bruto').value = (pessoas * vpp).toFixed(2);
-    sugerirComissao();
-  }
-
-  document.getElementById('f-passeio').addEventListener('change', function() {
-    const opt = this.options[this.selectedIndex];
-    const preco = parseFloat(opt.dataset.preco) || 0;
-    if (preco > 0) { document.getElementById('f-valor-pessoa').value = preco.toFixed(2); calcularValorBruto(); }
-  });
-
-  function sugerirComissao() {
-    const bruto   = parseFloat(document.getElementById('f-valor-bruto').value) || 0;
-    const agencia = parseFloat(document.getElementById('f-comissao-agencia').value) || 0;
-    const recep   = document.getElementById('f-comissao-recepcao');
-    if (!recep.value || parseFloat(recep.value) === 0) recep.value = Math.max(0, bruto - agencia).toFixed(2);
-  }
-
-  function atualizarMesRef() {
-    const val = document.getElementById('f-data-pagamento').value;
-    const badge = document.getElementById('mes-ref-badge');
-    if (val) {
-      const [ano, mes] = val.split('-');
-      const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
-      badge.style.display = '';
-    } else { badge.style.display = 'none'; }
-  }
-
-  async function salvarReserva() {
-    const id = document.getElementById('f-id').value;
-    const pixRows = document.querySelectorAll('#f-pix-list .f-pix-row');
-    const pixObj = {};
-    pixRows.forEach(row => {
-      const nome = row.querySelector('select')?.value?.trim();
-      const val  = parseFloat(row.querySelector('input[type="number"]')?.value) || 0;
-      if (nome && val > 0) pixObj[nome] = val;
-    });
-    const dataPag = document.getElementById('f-data-pagamento').value || null;
-    const dataVal = document.getElementById('f-data').value || null;
-    const payload = {
-      nome_cliente: document.getElementById('f-cliente').value.trim(),
-      whatsapp: document.getElementById('f-whatsapp').value.trim(),
-      status: document.getElementById('f-status').value,
-      passeio: document.getElementById('f-passeio').value || null,
-      data_passeio: dataVal, data: dataVal,
-      horario: document.getElementById('f-horario').value || null,
-      numero_pessoas: parseInt(document.getElementById('f-pessoas').value) || 1,
-      valor_por_pessoa: document.getElementById('f-valor-pessoa').value || null,
-      valor_bruto: document.getElementById('f-valor-bruto').value || null,
-      comissao_agencia: document.getElementById('f-comissao-agencia').value || null,
-      comissao_recepcao: document.getElementById('f-comissao-recepcao').value || null,
-      recepcionista: document.getElementById('f-recepcionista').value || '',
-      data_pagamento: dataPag,
-      observacoes: document.getElementById('f-obs').value,
-    };
-    if (dataPag) payload.mes_referencia = dataPag.substring(0,7);
-    if (Object.keys(pixObj).length > 0) payload.pix_recebimentos = JSON.stringify(pixObj);
-    if (!payload.nome_cliente) { alert('Informe o nome do cliente.'); return; }
-    const url    = id ? `${API_BASE}/${hotelSlug}/reservas/${id}/` : `${API_BASE}/${hotelSlug}/reservas/`;
-    const method = id ? 'PUT' : 'POST';
-    try {
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }, body: JSON.stringify(payload) });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || e.detail || `Erro ${res.status} ao salvar.`); return; }
-      fecharModal('modal-reserva');
-      await carregarReservas();
-    } catch(e) { console.error('[salvarReserva]', e); alert('Erro de conexão.'); }
-  }
-
-  function abrirPagamento(id) {
-    const r = todasReservas.find(x => x.id === id);
-    if (!r) return;
-    document.getElementById('pg-id').value = id;
-    document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
-    document.getElementById('pg-total-label').textContent = `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
-    atualizarMesRefPg();
-    const pixList = document.getElementById('pix-list');
-    pixList.innerHTML = '';
-    const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
-    nomes.forEach(nome => addPixRow(nome));
-    abrirModal('modal-pagamento');
-  }
-
-  function addPixRow(nome='') {
-    const list = document.getElementById('pix-list');
-    const row  = document.createElement('div');
-    row.className = 'pix-row';
-    const opts = recepcionistas.length ? recepcionistas.map(n=>`<option value="${n}" ${n===nome?'selected':''}>${n}</option>`).join('') : `<option value="${nome}">${nome||'Recepção'}</option>`;
-    row.innerHTML = `
-      <select style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:100%;outline:none;font-family:'Inter',sans-serif;">
-        <option value="">Selecionar…</option>${opts}
-      </select>
-      <input type="number" placeholder="R$ 0,00" step="0.01" min="0" class="pix-valor"
-        style="background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;color:var(--text-main);padding:8px 10px;font-size:13px;width:120px;outline:none;font-family:'Inter',sans-serif;"/>`;
-    list.appendChild(row);
-    if (nome) row.querySelector('select').value = nome;
-  }
-
-  function atualizarMesRefPg() {
-    const val = document.getElementById('pg-data').value;
-    const badge = document.getElementById('mes-ref-badge-pg');
-    if (val) {
-      const [ano, mes] = val.split('-');
-      const nomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      badge.textContent   = `Mês referência: ${nomes[parseInt(mes,10)-1]}/${ano}`;
-      badge.style.display = '';
-    } else { badge.style.display = 'none'; }
-  }
-
-  async function confirmarPagamento() {
-    const id = document.getElementById('pg-id').value;
-    const dataPag = document.getElementById('pg-data').value;
-    if (!dataPag) { alert('Informe a data de pagamento.'); return; }
-    const pixRows = document.querySelectorAll('#pix-list .pix-row');
-    const pixRecebimentos = {};
-    pixRows.forEach(row => {
-      const nome = row.querySelector('select')?.value?.trim();
-      const val  = parseFloat(row.querySelector('.pix-valor')?.value) || 0;
-      if (nome) pixRecebimentos[nome] = val;
-    });
-    try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-        body: JSON.stringify({ status:'pago', data_pagamento:dataPag, mes_referencia:dataPag.substring(0,7), pix_recebimentos:JSON.stringify(pixRecebimentos) })
-      });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`); return; }
-      fecharModal('modal-pagamento');
-      await carregarReservas();
-    } catch(e) { console.error('[confirmarPagamento]', e); alert('Erro de conexão.'); }
-  }
-
-  function confirmarDelete(id, nome) {
-    deleteIdPendente = id;
-    document.getElementById('del-nome').textContent = nome;
-    abrirModal('modal-delete');
-  }
-
-  async function executarDelete() {
-    if (!deleteIdPendente) return;
-    try {
-      const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${deleteIdPendente}/`, { method:'DELETE', headers:{ 'X-CSRFToken':csrfToken } });
-      if (!res.ok && res.status !== 204) { alert('Erro ao excluir.'); return; }
-      fecharModal('modal-delete');
-      deleteIdPendente = null;
-      await carregarReservas();
-    } catch(e) { console.error('[executarDelete]', e); alert('Erro de conexão.'); }
-  }
-
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-  });
 </script>
 </body>
 </html>
