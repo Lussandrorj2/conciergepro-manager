@@ -2880,12 +2880,20 @@ tr:hover td { background: #f8fafc; }
 /* =========================
    CÂMBIO — MOBILE FIX
 ========================= */
-@media (max-width: 640px) {
-    .tabela-container table { min-width: unset; }
+@media (max-width: 768px) {
+    .tabela-container table { min-width: unset !important; }
+    
+    /* Oculta Compra, Venda, Pago, Recebido, Lucro no mobile */
+    .tabela-container th:nth-child(4),
+    .tabela-container td:nth-child(4),
+    .tabela-container th:nth-child(5),
+    .tabela-container td:nth-child(5),
     .tabela-container th:nth-child(6),
     .tabela-container td:nth-child(6),
     .tabela-container th:nth-child(7),
-    .tabela-container td:nth-child(7) {
+    .tabela-container td:nth-child(7),
+    .tabela-container th:nth-child(8),
+    .tabela-container td:nth-child(8) {
         display: none;
     }
 }
