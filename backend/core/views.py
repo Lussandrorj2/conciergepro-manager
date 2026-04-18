@@ -254,46 +254,46 @@ def api_passeios(request, hotel_slug, passeio_id=None):
         ],
     } for p in passeios], safe=False)
 
-if request.method == "POST":
-    try:
-        if passeio_id:
-            passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
-        else:
-            passeio = Passeio(hotel=hotel)
-
-        passeio.nome               = request.POST.get("nome", "").strip()
-        passeio.descricao          = request.POST.get("descricao", "").strip()
-        passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
-        passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
-
-        if passeio.preco_sob_consulta:
-            passeio.preco = None
-        else:
-            try:
-                passeio.preco = float(request.POST.get("preco") or 0)
-            except (ValueError, TypeError):
-                passeio.preco = 0
-
-        if request.FILES.get("banner"):
-            passeio.banner = request.FILES.get("banner")
-
-        passeio.save()
-
-        for f in request.FILES.getlist("imagens"):
-            ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
-
-        return JsonResponse({"status": "ok", "id": passeio.id})
-
-    except Exception as e:
-        print("[api_passeios POST] Erro:")
-        print(traceback.format_exc())
-        return JsonResponse({"erro": str(e)}, status=500)
-
-if request.method == "DELETE":
-    get_object_or_404(Passeio, id=passeio_id, hotel=hotel).delete()
-    return JsonResponse({"status": "removido"})
-
-return JsonResponse({"erro": "Método inválido"}, status=405)
+    if request.method == "POST":
+        try:
+            if passeio_id:
+                passeio = get_object_or_404(Passeio, id=passeio_id, hotel=hotel)
+            else:
+                passeio = Passeio(hotel=hotel)
+    
+            passeio.nome               = request.POST.get("nome", "").strip()
+            passeio.descricao          = request.POST.get("descricao", "").strip()
+            passeio.preco_sob_consulta = request.POST.get("preco_sob_consulta") == "true"
+            passeio.preco_por_pessoa   = request.POST.get("preco_por_pessoa") == "true"
+    
+            if passeio.preco_sob_consulta:
+                passeio.preco = None
+            else:
+                try:
+                    passeio.preco = float(request.POST.get("preco") or 0)
+                except (ValueError, TypeError):
+                    passeio.preco = 0
+    
+            if request.FILES.get("banner"):
+                passeio.banner = request.FILES.get("banner")
+    
+            passeio.save()
+    
+            for f in request.FILES.getlist("imagens"):
+                ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
+    
+            return JsonResponse({"status": "ok", "id": passeio.id})
+    
+        except Exception as e:
+            print("[api_passeios POST] Erro:")
+            print(traceback.format_exc())
+            return JsonResponse({"erro": str(e)}, status=500)
+    
+    if request.method == "DELETE":
+        get_object_or_404(Passeio, id=passeio_id, hotel=hotel).delete()
+        return JsonResponse({"status": "removido"})
+    
+    return JsonResponse({"erro": "Método inválido"}, status=405)
 
 
 # =========================
@@ -431,7 +431,7 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
 @csrf_exempt
 @login_required
 def deletar_imagem(request, id):
-    if request.method != “DELETE”:
+    if request.method != "DELETE":
         return JsonResponse({“erro”: “Método inválido”}, status=400)
     try:
         imagem = get_object_or_404(ImagemPasseio, id=id)
@@ -449,7 +449,7 @@ def deletar_imagem(request, id):
 
 # =========================
 
-@api_view([‘POST’])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def criar_reserva(request, hotel_slug):
     try:
