@@ -179,7 +179,7 @@ def logout_view(request):
 
 @login_required
 def dashboard_home(request, hotel_slug):
-    return render(request, 'dashboard/dashboard_home.html', {‘hotel’: get_object_or_404(Hotel, slug=hotel_slug)})
+    return render(request, 'dashboard/dashboard_home.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_criar(request, hotel_slug):
@@ -238,21 +238,21 @@ def api_passeios(request, hotel_slug, passeio_id=None):
                 ],
         })
 
-    passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
-    return JsonResponse([{
-        "id":                 p.id,
-        "nome":               p.nome,
-        "descricao":          p.descricao,
-        "preco":              float(p.preco) if p.preco else 0,
-        "preco_sob_consulta": p.preco_sob_consulta,
-        "preco_por_pessoa":   p.preco_por_pessoa,
-        "banner":             get_media_url(p.banner),
-        "fotos": [
-            {"id": f.id, "url": get_media_url(f.arquivo)}
-            for f in p.fotos.all()
-            if get_media_url(f.arquivo)
-        ],
-    } for p in passeios], safe=False)
+        passeios = Passeio.objects.filter(hotel=hotel).prefetch_related('fotos')
+        return JsonResponse([{
+            "id":                 p.id,
+            "nome":               p.nome,
+            "descricao":          p.descricao,
+            "preco":              float(p.preco) if p.preco else 0,
+            "preco_sob_consulta": p.preco_sob_consulta,
+            "preco_por_pessoa":   p.preco_por_pessoa,
+            "banner":             get_media_url(p.banner),
+            "fotos": [
+                {"id": f.id, "url": get_media_url(f.arquivo)}
+                for f in p.fotos.all()
+                if get_media_url(f.arquivo)
+            ],
+        } for p in passeios], safe=False)
 
     if request.method == "POST":
         try:
