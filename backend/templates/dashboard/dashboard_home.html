@@ -15,6 +15,7 @@
 <body>
     <div class="layout">
 
+```
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
@@ -38,7 +39,7 @@
         <div class="topbar">
             <span class="topbar-title">Dashboard</span>
             <div style="display:flex;align-items:center;gap:10px;">
-                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-ver-hotel">
+                <a href="/?hotel={{ hotel.slug }}" target="_blank" class="btn-ver-hotel">
                     🌐 Ver site
                 </a>
                 <div class="hotel-badge">
@@ -62,7 +63,7 @@
                 <a href="/{{ hotel.slug }}/dashboard/cambio/" class="btn-action">
                     💱 Câmbio
                 </a>
-                <a href="/{{ hotel.slug }}/" target="_blank" class="btn-action btn-action-hotel">
+                <a href="/?hotel={{ hotel.slug }}" target="_blank" class="btn-action btn-action-hotel">
                     🌐 Página do Hotel ↗
                 </a>
             </div>
@@ -148,7 +149,7 @@
 </script>
 <script src="{% static 'js/dashboard.js' %}"></script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
-
+```
 
 </body>
 
