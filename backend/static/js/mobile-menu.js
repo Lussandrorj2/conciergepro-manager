@@ -53,6 +53,8 @@
     }
 
     function init() {
+        // Não rodar em páginas sem sidebar (ex: login)
+        if (!document.querySelector(".sidebar")) return;
         // 1. Backdrop
         if (!document.querySelector('.sidebar-backdrop')) {
             const backdrop = document.createElement('div');
