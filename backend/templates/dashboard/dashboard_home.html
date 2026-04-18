@@ -6,657 +6,34 @@
     <meta charset="UTF-8">
     <title>Dashboard — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 220px;
-            background: #111827;
-            border-right: 1px solid #1e293b;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 10;
-        }
-
-
-
-        /* 1. AS CORES TÊM QUE SER AS MESMAS (VARIÁVEIS) */
-        :root {
-            --bg-main: #0b0f19;
-            --bg-sidebar: #0f1626;
-            --bg-card: #121a2b;
-            --bg-hover: #1a2438;
-            --border: #1f2a40;
-            --border-light: #2a3754;
-            --text-main: #e6edf3;
-            --text-muted: #9fb0c7;
-            --text-soft: #6b7a90;
-            --gold: #c9a96e;
-            --primary: #22c55e;
-        }
-
-        /* 2. BASE IGUAL EM TUDO */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-        }
-
-        /* 3. SIDEBAR PADRÃO (O MESMO DO PRINT) */
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 24px 16px;
-            z-index: 1000;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 12px 30px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        nav {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-        }
-
-        nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            font-size: 14px;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: .2s;
-        }
-
-        nav a:hover {
-            background: var(--bg-hover);
-            color: var(--text-main);
-        }
-
-        nav a.active {
-            background: rgba(201, 169, 110, 0.1);
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        /* Ajuste para o conteúdo não ficar embaixo da sidebar */
-        .main {
-            margin-left: 240px;
-            width: calc(100% - 240px);
-        }
-
-        /* 4. SEUS CARDS E FOTOS (MANTENDO SEU DESIGN) */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 20px 18px;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        .logo-icon {
-            width: 30px;
-            height: 30px;
-            background: #059669;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .logo-text {
-            font-size: 15px;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-
-        nav {
-            display: flex;
-            flex-direction: column;
-            padding: 12px 0;
-            flex: 1;
-        }
-
-        nav a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 18px;
-            font-size: 13.5px;
-            color: #94a3b8;
-            text-decoration: none;
-            border-left: 2px solid transparent;
-            transition: .15s;
-        }
-
-        nav a:hover {
-            color: #e2e8f0;
-            background: #1e293b;
-        }
-
-        nav a.active {
-            color: #f1f5f9;
-            background: #1e293b;
-            border-left-color: #059669;
-            font-weight: 500;
-        }
-
-        nav a span.icon {
-            font-size: 15px;
-            width: 18px;
-            text-align: center;
-        }
-
-        .sidebar-footer {
-            padding: 16px 18px;
-            border-top: 1px solid #1e293b;
-        }
-
-        .logout-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #64748b;
-            text-decoration: none;
-            transition: .15s;
-        }
-
-        .logout-link:hover {
-            color: #94a3b8;
-        }
-
-        .main {
-            flex: 1;
-            margin-left: 220px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 28px;
-            background: #111827;
-            border-bottom: 1px solid #1e293b;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-        }
-
-        .topbar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-
-        .hotel-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-            background: #1e293b;
-            padding: 6px 12px;
-            border-radius: 8px;
-        }
-
-        .hotel-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #10b981;
-        }
-
-        .content {
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Botões de ação rápida */
-        .acoes-rapidas {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: #e2e8f0;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all .15s;
-        }
-
-        .btn-action:hover {
-            background: #059669;
-            border-color: #059669;
-            color: white;
-        }
-
-        .btn-action.destaque {
-            background: #059669;
-            border-color: #059669;
-            color: white;
-        }
-
-        .btn-action.destaque:hover {
-            background: #047857;
-        }
-
-        /* Stats */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-        }
-
-        .stat-card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 18px 20px;
-            border: 1px solid #263348;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 600;
-            color: #f1f5f9;
-            line-height: 1;
-        }
-
-        .stat-sub {
-            font-size: 11px;
-            color: #475569;
-            margin-top: 6px;
-        }
-
-        .stat-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        /* Dois painéis */
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: #1e293b;
-            border: 1px solid #263348;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            border-bottom: 1px solid #263348;
-        }
-
-        .panel-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .panel-link {
-            font-size: 12px;
-            color: #059669;
-            text-decoration: none;
-            transition: .15s;
-        }
-
-        .panel-link:hover {
-            color: #10b981;
-        }
-
-        /* Reservas recentes */
-        .reserva-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 18px;
-            border-bottom: 1px solid #1a2538;
-            transition: .15s;
-        }
-
-        .reserva-row:last-child {
-            border-bottom: none;
-        }
-
-        .reserva-row:hover {
-            background: #243040;
-        }
-
-        .reserva-avatar {
-            width: 36px;
-            height: 36px;
-            background: #064e3b;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: #34d399;
-            flex-shrink: 0;
-        }
-
-        .reserva-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .reserva-nome {
-            font-size: 13px;
-            font-weight: 500;
-            color: #e2e8f0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .reserva-detalhe {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .status-pill {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .status-confirmada {
-            background: #064e3b33;
-            color: #34d399;
-        }
-
-        .status-pendente {
-            background: #78350f33;
-            color: #fbbf24;
-        }
-
-        .status-cancelada {
-            background: #7f1d1d33;
-            color: #f87171;
-        }
-
-        /* Passeio rows */
-        .passeio-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 18px;
-            border-bottom: 1px solid #1a2538;
-            transition: .15s;
-        }
-
-        .passeio-row:last-child {
-            border-bottom: none;
-        }
-
-        .passeio-row:hover {
-            background: #243040;
-        }
-
-        .passeio-thumb {
-            width: 42px;
-            height: 42px;
-            border-radius: 8px;
-            background: #0f172a;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            overflow: hidden;
-        }
-
-        .passeio-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .passeio-row-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .passeio-row-nome {
-            font-size: 13px;
-            font-weight: 500;
-            color: #e2e8f0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .passeio-row-desc {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .passeio-row-preco {
-            font-size: 12px;
-            font-weight: 600;
-            color: #10b981;
-            flex-shrink: 0;
-        }
-
-        .empty-state {
-            padding: 32px;
-            text-align: center;
-            color: #475569;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        .empty-state a {
-            color: #059669;
-            text-decoration: none;
-        }
-
-        /* Checklist */
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 18px;
-            border-bottom: 1px solid #1a2538;
-        }
-
-        .check-item:last-child {
-            border-bottom: none;
-        }
-
-        .check-circle {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #334155;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 10px;
-        }
-
-        .check-circle.done {
-            background: #059669;
-            border-color: #059669;
-            color: white;
-        }
-
-        .check-circle.warn {
-            border-color: #f59e0b;
-            color: #f59e0b;
-        }
-
-        .check-text {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .check-label {
-            font-size: 13px;
-            color: #e2e8f0;
-        }
-
-        .check-sub {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .check-action {
-            font-size: 11px;
-            color: #059669;
-            text-decoration: none;
-            padding: 3px 8px;
-            border: 1px solid #059669;
-            border-radius: 6px;
-            white-space: nowrap;
-            transition: .15s;
-        }
-
-        .check-action:hover {
-            background: #059669;
-            color: white;
-        }
-
-        .loading {
-            color: #475569;
-            font-size: 13px;
-            padding: 20px 18px;
-        }
-
-        @media(max-width: 1024px) {
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .two-col {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="layout">
 
+        <!-- SIDEBAR -->
         <aside class="sidebar">
-            <h2>🔔 Concierge</h2>
+            <div class="sidebar-logo">
+                🔔 Concierge
+            </div>
             <nav>
-                <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+                <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
                 <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
                 <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
                 <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
                 <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
                 <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
                 <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-                <hr style="border-color:#1e293b;margin:12px 0;">
+                <hr>
                 <a href="/logout/">↩ Sair</a>
             </nav>
         </aside>
 
+        <!-- MAIN -->
         <main class="main">
+
+            <!-- TOPBAR -->
             <div class="topbar">
                 <span class="topbar-title">Dashboard</span>
                 <div class="hotel-badge">
@@ -665,6 +42,7 @@
                 </div>
             </div>
 
+            <!-- CONTENT -->
             <div class="content">
 
                 <!-- Ações rápidas -->
@@ -688,15 +66,15 @@
                             <div class="stat-value" id="total-passeios">--</div>
                             <div class="stat-sub" id="sub-sob-consulta"></div>
                         </div>
-                        <div class="stat-icon" style="background:#064e3b33">🗺️</div>
+                        <div class="stat-icon green">🗺️</div>
                     </div>
                     <div class="stat-card">
                         <div>
                             <div class="stat-label">Reservas hoje</div>
                             <div class="stat-value" id="reservas-hoje">--</div>
-                            <div class="stat-sub">passeios confirmados</div>
+                            <div class="stat-sub">confirmadas</div>
                         </div>
-                        <div class="stat-icon" style="background:#1e3a5f33">📅</div>
+                        <div class="stat-icon blue">📅</div>
                     </div>
                     <div class="stat-card">
                         <div>
@@ -704,7 +82,7 @@
                             <div class="stat-value" id="preco-medio">--</div>
                             <div class="stat-sub">passeios com preço fixo</div>
                         </div>
-                        <div class="stat-icon" style="background:#1e3a5f33">💰</div>
+                        <div class="stat-icon yellow">💰</div>
                     </div>
                     <div class="stat-card">
                         <div>
@@ -712,7 +90,7 @@
                             <div class="stat-value" id="data-hoje" style="font-size:16px;padding-top:4px"></div>
                             <div class="stat-sub">sistema operando normalmente</div>
                         </div>
-                        <div class="stat-icon" style="background:#78350f33">📅</div>
+                        <div class="stat-icon gold">🗓️</div>
                     </div>
                 </div>
 
@@ -726,7 +104,7 @@
                             <a href="/{{ hotel.slug }}/dashboard/reservas/" class="panel-link">Ver todas →</a>
                         </div>
                         <div id="lista-reservas-recentes">
-                            <div class="loading">Carregando...</div>
+                            <div class="loading">Carregando reservas</div>
                         </div>
                     </div>
 
@@ -737,7 +115,7 @@
                             <a href="/{{ hotel.slug }}/dashboard/listar/" class="panel-link">Ver todos →</a>
                         </div>
                         <div id="lista-passeios">
-                            <div class="loading">Carregando...</div>
+                            <div class="loading">Carregando passeios</div>
                         </div>
                     </div>
 
@@ -747,10 +125,10 @@
                 <div class="panel">
                     <div class="panel-header">
                         <span class="panel-title">⚙️ Configuração do hotel</span>
-                        <span id="check-progress" style="font-size:12px;color:#64748b"></span>
+                        <span id="check-progress" style="font-size:12px;color:var(--text-soft)"></span>
                     </div>
                     <div id="checklist">
-                        <div class="loading">Verificando...</div>
+                        <div class="loading">Verificando configurações</div>
                     </div>
                 </div>
 
@@ -786,17 +164,21 @@
                 document.getElementById("total-passeios").innerText = passeios.length;
 
                 const sobConsulta = passeios.filter(p => p.preco_sob_consulta).length;
-                if (sobConsulta) document.getElementById("sub-sob-consulta").innerText = `${sobConsulta} sob consulta`;
+                if (sobConsulta)
+                    document.getElementById("sub-sob-consulta").innerText = `${sobConsulta} sob consulta`;
 
                 const comPreco = passeios.filter(p => !p.preco_sob_consulta && p.preco > 0);
                 if (comPreco.length) {
                     const media = comPreco.reduce((s, p) => s + Number(p.preco), 0) / comPreco.length;
-                    document.getElementById("preco-medio").innerText = "R$ " + media.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+                    document.getElementById("preco-medio").innerText =
+                        "R$ " + media.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
                 }
 
                 // Reservas hoje
                 const hoje = new Date().toISOString().split('T')[0];
-                const reservasHoje = reservas.filter(r => (r.data_passeio || '').startsWith(hoje) && r.status === 'confirmada').length;
+                const reservasHoje = reservas.filter(
+                    r => (r.data_passeio || '').startsWith(hoje) && r.status === 'confirmada'
+                ).length;
                 document.getElementById("reservas-hoje").innerText = reservasHoje;
 
                 // Reservas recentes
@@ -805,28 +187,37 @@
                     listaRes.innerHTML = `<div class="empty-state">Nenhuma reserva ainda.</div>`;
                 } else {
                     const recentes = reservas.slice(0, 5);
-                    const statusClass = s => s === 'confirmada' ? 'status-confirmada' : s === 'cancelada' ? 'status-cancelada' : 'status-pendente';
-                    const statusLabel = s => s === 'confirmada' ? '✓' : s === 'cancelada' ? '✕' : '⏳';
+                    const statusClass = s =>
+                        s === 'confirmada' ? 'status-confirmada' :
+                        s === 'cancelada'  ? 'status-cancelada'  : 'status-pendente';
+                    const statusLabel = s =>
+                        s === 'confirmada' ? '✓ Confirmada' :
+                        s === 'cancelada'  ? '✕ Cancelada'  : '⏳ Pendente';
+
                     listaRes.innerHTML = recentes.map(r => {
                         const ini = (r.nome_cliente || '?').charAt(0).toUpperCase();
-                        const dataPass = r.data_passeio ? new Date(r.data_passeio).toLocaleDateString('pt-BR') : '—';
+                        const dataPass = r.data_passeio
+                            ? new Date(r.data_passeio).toLocaleDateString('pt-BR')
+                            : '—';
                         return `
-                <div class="reserva-row">
-                    <div class="reserva-avatar">${ini}</div>
-                    <div class="reserva-info">
-                        <div class="reserva-nome">${r.nome_cliente || '—'}</div>
-                        <div class="reserva-detalhe">${r.passeio_nome || r.passeio || 'Passeio'} · ${dataPass}</div>
-                    </div>
-                    <span class="status-pill ${statusClass(r.status)}">${statusLabel(r.status)}</span>
-                </div>`;
+                        <div class="reserva-row">
+                            <div class="reserva-avatar">${ini}</div>
+                            <div class="reserva-info">
+                                <div class="reserva-nome">${r.nome_cliente || '—'}</div>
+                                <div class="reserva-detalhe">${r.passeio_nome || r.passeio || 'Passeio'} · ${dataPass}</div>
+                            </div>
+                            <span class="status-pill ${statusClass(r.status)}">${statusLabel(r.status)}</span>
+                        </div>`;
                     }).join('');
                 }
 
                 // Lista passeios
                 const lista = document.getElementById("lista-passeios");
                 if (!passeios.length) {
-                    lista.innerHTML = `<div class="empty-state">Nenhum passeio criado ainda.<br>
-            <a href="/${hotelSlug}/dashboard/criar/">Criar agora →</a></div>`;
+                    lista.innerHTML = `<div class="empty-state">
+                        Nenhum passeio criado ainda.<br>
+                        <a href="/${hotelSlug}/dashboard/criar/">Criar agora →</a>
+                    </div>`;
                 } else {
                     lista.innerHTML = passeios.slice(0, 5).map(p => {
                         const imgSrc = p.banner || p.fotos?.[0]?.url;
@@ -834,14 +225,14 @@
                             ? `<div class="passeio-thumb"><img src="${imgSrc}" alt="${p.nome}"></div>`
                             : `<div class="passeio-thumb">🏖️</div>`;
                         return `
-                <div class="passeio-row">
-                    ${thumb}
-                    <div class="passeio-row-info">
-                        <div class="passeio-row-nome">${p.nome}</div>
-                        <div class="passeio-row-desc">${p.descricao || ""}</div>
-                    </div>
-                    <div class="passeio-row-preco">${formatPreco(p)}</div>
-                </div>`;
+                        <div class="passeio-row">
+                            ${thumb}
+                            <div class="passeio-row-info">
+                                <div class="passeio-row-nome">${p.nome}</div>
+                                <div class="passeio-row-desc">${p.descricao || ""}</div>
+                            </div>
+                            <div class="passeio-row-preco">${formatPreco(p)}</div>
+                        </div>`;
                     }).join("");
                 }
 
@@ -864,14 +255,18 @@
                     },
                     {
                         label: "Título da página inicial",
-                        sub: hotel.titulo_hero ? `"${hotel.titulo_hero.substring(0, 28)}..."` : "Título padrão em uso",
+                        sub: hotel.titulo_hero
+                            ? `"${hotel.titulo_hero.substring(0, 28)}..."`
+                            : "Título padrão em uso",
                         done: !!hotel.titulo_hero,
                         link: hotel.titulo_hero ? null : `/${hotelSlug}/dashboard/configuracoes/`,
                         linkLabel: "Definir"
                     },
                     {
                         label: "Passeios com foto",
-                        sub: semFoto.length ? `${semFoto.length} passeio(s) sem imagem` : "Todos com imagem",
+                        sub: semFoto.length
+                            ? `${semFoto.length} passeio(s) sem imagem`
+                            : "Todos com imagem",
                         done: passeios.length > 0 && semFoto.length === 0,
                         link: semFoto.length ? `/${hotelSlug}/dashboard/listar/` : null,
                         linkLabel: "Revisar"
@@ -882,15 +277,15 @@
                 document.getElementById("check-progress").innerText = `${feitos}/${checks.length} concluídos`;
 
                 document.getElementById("checklist").innerHTML = checks.map(c => `
-            <div class="check-item">
-                <div class="check-circle ${c.done ? "done" : "warn"}">${c.done ? "✓" : "!"}</div>
-                <div class="check-text">
-                    <div class="check-label">${c.label}</div>
-                    <div class="check-sub">${c.sub}</div>
-                </div>
-                ${c.link ? `<a href="${c.link}" class="check-action">${c.linkLabel}</a>` : ""}
-            </div>
-        `).join("");
+                    <div class="check-item">
+                        <div class="check-circle ${c.done ? 'done' : 'warn'}">${c.done ? '✓' : '!'}</div>
+                        <div class="check-text">
+                            <div class="check-label">${c.label}</div>
+                            <div class="check-sub">${c.sub}</div>
+                        </div>
+                        ${c.link ? `<a href="${c.link}" class="check-action">${c.linkLabel}</a>` : ""}
+                    </div>
+                `).join("");
 
             } catch (e) {
                 console.error("Erro ao carregar dashboard:", e);
