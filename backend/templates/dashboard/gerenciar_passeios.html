@@ -93,7 +93,8 @@
             const container = document.getElementById("lista");
 
             try {
-                const res = await fetch(`/api/${hotelSlug}/passeios/`);
+                const res = await fetch(`/api/admin/${hotelSlug}/passeios/`);
+
                 const passeios = await res.json();
 
                 document.getElementById('sub-lista').innerText =
