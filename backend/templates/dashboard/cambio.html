@@ -15,7 +15,6 @@
 <body>
 <div class="layout">
 
-```
 <!-- SIDEBAR -->
 <aside class="sidebar">
     <div class="sidebar-logo">🔔 Concierge</div>
@@ -137,7 +136,6 @@
 
     </div><!-- /content -->
 </main>
-```
 
 </div>
 
@@ -295,7 +293,7 @@
                             return `<tr>
                                 <td><span class="badge badge-confirmado">${op.moeda}</span></td>
                                 <td>${data}</td>
-                                <td>${Number(op.quantidade).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                                <td>${parseFloat(op.quantidade || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
                                 <td>${brl(op.cotacao_compra)}</td>
                                 <td>${brl(op.cotacao_venda)}</td>
                                 <td style="color:#f87171;font-weight:600;">${brl(pago)}</td>
