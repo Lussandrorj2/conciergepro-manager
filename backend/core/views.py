@@ -106,7 +106,7 @@ def detalhe_hotel(request, slug):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_passeios(request, hotel_slug):
-    hotel    = Hotel.objects.filter(slug=hotel_slug).first()
+    hotel    = get_object_or_404(Hotel, slug=hotel_slug)
     lang     = request.GET.get('lang', 'pt')
     passeios = Passeio.objects.filter(hotel=hotel, ativo=True).prefetch_related('fotos')
 
@@ -465,7 +465,7 @@ def criar_reserva(request, hotel_slug):
         recepcionista     = request.data.get("recepcionista", "")
         forma_pagamento   = request.data.get("forma_pagamento", "pendente")
     
-        agenda  = PasseioAgenda.objects.get(id=agenda_id)
+        agenda = get_object_or_404(PasseioAgenda, id=agenda_id)
         passeio = agenda.passeio
     
         if passeio.preco_sob_consulta:
