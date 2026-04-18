@@ -1,5 +1,7 @@
 {% load static %}
+
 <!DOCTYPE html>
+
 <html lang="pt-br">
 
 <head>
@@ -8,108 +10,224 @@
     <title>Câmbio — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── Cards mobile para lista de câmbio ── */
+        .cambio-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+```
+    .cambio-card {
+        background: var(--bg-card, #fff);
+        border-radius: var(--radius, 12px);
+        padding: 14px 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+        align-items: start;
+    }
+
+    .cambio-card-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        grid-column: 1;
+    }
+
+    .cambio-card-moeda {
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .cambio-card-data {
+        font-size: 12px;
+        color: var(--text-muted, #888);
+    }
+
+    .cambio-card-acoes {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-self: center;
+    }
+
+    .cambio-card-acoes button {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-editar {
+        background: #e8f4fd;
+    }
+
+    .btn-deletar {
+        background: #fdecea;
+    }
+
+    .cambio-card-valores {
+        grid-column: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        margin-top: 4px;
+    }
+
+    .cambio-val-item {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+    }
+
+    .cambio-val-label {
+        color: var(--text-muted, #888);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+
+    .cambio-val-num {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .cambio-val-num.red   { color: #f87171; }
+    .cambio-val-num.blue  { color: #38bdf8; }
+    .cambio-val-num.green { color: var(--green, #22c55e); }
+
+    /* Tabela desktop (hidden em telas pequenas) */
+    @media (max-width: 640px) {
+        .tabela-desktop { display: none !important; }
+    }
+
+    @media (min-width: 641px) {
+        .cambio-cards { display: none !important; }
+    }
+</style>
+```
+
 </head>
 
 <body>
 <div class="layout">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">🔔 Concierge</div>
-        <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-            <hr>
-            <a href="/logout/">↩ Sair</a>
-        </nav>
-    </aside>
+```
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo">🔔 Concierge</div>
+    <nav>
+        <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+        <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active">💱 Câmbio</a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+        <hr>
+        <a href="/logout/">↩ Sair</a>
+    </nav>
+</aside>
 
-    <!-- MAIN -->
-    <main class="main">
-        <div class="topbar">
-            <span class="topbar-title">💱 Gerenciamento de Câmbio</span>
-            <div class="hotel-badge">
-                <div class="hotel-dot"></div>
-                {{ hotel.nome }}
-            </div>
+<!-- MAIN -->
+<main class="main">
+    <div class="topbar">
+        <span class="topbar-title">💱 Gerenciamento de Câmbio</span>
+        <div class="hotel-badge">
+            <div class="hotel-dot"></div>
+            {{ hotel.nome }}
         </div>
+    </div>
 
-        <div class="content">
-            <div class="cambio-grid">
+    <div class="content">
+        <div class="cambio-grid">
 
-                <!-- FORMULÁRIO -->
-                <div class="card-form">
-                    <h3>Nova Transação</h3>
+            <!-- FORMULÁRIO -->
+            <div class="card-form">
+                <h3>Nova Transação</h3>
 
-                    <div class="moedas-rapidas">
-                        <button class="moeda-chip" onclick="selecionarMoeda('USD')">🇺🇸 USD</button>
-                        <button class="moeda-chip" onclick="selecionarMoeda('EUR')">🇪🇺 EUR</button>
-                        <button class="moeda-chip" onclick="selecionarMoeda('ARS')">🇦🇷 ARS</button>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Moeda</label>
-                        <select id="moeda" onchange="calcular()">
-                            <option value="USD">USD - Dólar</option>
-                            <option value="EUR">EUR - Euro</option>
-                            <option value="ARS">ARS - Peso</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Quantidade</label>
-                        <input type="number" id="valor" step="0.01" oninput="calcular()">
-                    </div>
-                    <div class="form-group">
-                        <label>Cotação Compra (Pago ao Hóspede)</label>
-                        <input type="number" id="cotacao_compra" step="0.01" oninput="calcular()">
-                    </div>
-                    <div class="form-group">
-                        <label>Cotação Venda (Repasse)</label>
-                        <input type="number" id="cotacao_venda" step="0.01" oninput="calcular()">
-                    </div>
-
-                    <div class="fluxo-resumo" id="fluxo-resumo">
-                        <div class="fluxo-linha"><span>Total Pago:</span><span id="res-compra">R$ 0,00</span></div>
-                        <div class="fluxo-linha"><span>Total Recebido:</span><span id="res-repasse">R$ 0,00</span></div>
-                        <div class="fluxo-lucro"><span>Lucro Estimado:</span><span id="res-lucro">R$ 0,00</span></div>
-                    </div>
-
-                    <button class="btn-registrar" onclick="registrar()">💾 Registrar Operação</button>
+                <div class="moedas-rapidas">
+                    <button class="moeda-chip" onclick="selecionarMoeda('USD')">🇺🇸 USD</button>
+                    <button class="moeda-chip" onclick="selecionarMoeda('EUR')">🇪🇺 EUR</button>
+                    <button class="moeda-chip" onclick="selecionarMoeda('ARS')">🇦🇷 ARS</button>
                 </div>
 
-                <!-- PAINEL DIREITO -->
-                <div class="painel-direito">
-                    <div class="stats-mini-row">
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Pago</div>
-                            <div class="stat-mini-value red" id="stat-pago">R$ 0,00</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Recebido</div>
-                            <div class="stat-mini-value blue" id="stat-recebido">R$ 0,00</div>
-                        </div>
-                        <div class="stat-mini">
-                            <div class="stat-mini-label">Lucro Período</div>
-                            <div class="stat-mini-value green" id="stat-lucro">R$ 0,00</div>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Moeda</label>
+                    <select id="moeda" onchange="calcular()">
+                        <option value="USD">USD - Dólar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="ARS">ARS - Peso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="valor" step="0.01" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Cotação Compra (Pago ao Hóspede)</label>
+                    <input type="number" id="cotacao_compra" step="0.01" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Cotação Venda (Repasse)</label>
+                    <input type="number" id="cotacao_venda" step="0.01" oninput="calcular()">
+                </div>
 
-                    <div class="tabela-container">
-                        <div id="lista-cambio"></div>
+                <div class="fluxo-resumo" id="fluxo-resumo">
+                    <div class="fluxo-linha"><span>Total Pago:</span><span id="res-compra">R$ 0,00</span></div>
+                    <div class="fluxo-linha"><span>Total Recebido:</span><span id="res-repasse">R$ 0,00</span></div>
+                    <div class="fluxo-lucro"><span>Lucro Estimado:</span><span id="res-lucro">R$ 0,00</span></div>
+                </div>
+
+                <button class="btn-registrar" onclick="registrar()">💾 Registrar Operação</button>
+            </div>
+
+            <!-- PAINEL DIREITO -->
+            <div class="painel-direito">
+                <div class="stats-mini-row">
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Pago</div>
+                        <div class="stat-mini-value red" id="stat-pago">R$ 0,00</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Recebido</div>
+                        <div class="stat-mini-value blue" id="stat-recebido">R$ 0,00</div>
+                    </div>
+                    <div class="stat-mini">
+                        <div class="stat-mini-label">Lucro Período</div>
+                        <div class="stat-mini-value green" id="stat-lucro">R$ 0,00</div>
                     </div>
                 </div>
 
+                <div class="tabela-container">
+                    <!-- Desktop: tabela tradicional -->
+                    <div id="lista-cambio" class="tabela-desktop"></div>
+
+                    <!-- Mobile: cards -->
+                    <div id="lista-cambio-cards" class="cambio-cards"></div>
+                </div>
             </div>
+
         </div>
-    </main>
+    </div>
+</main>
+```
+
 </div>
 
 <!-- MODAL EDIÇÃO -->
+
 <div class="modal-overlay" id="modal-edicao">
     <div class="modal" style="max-width:400px">
         <div class="modal-header">
@@ -120,25 +238,28 @@
             <input type="hidden" id="edit-id">
             <input type="hidden" id="edit-compra-total">
 
-            <div class="form-group">
-                <label>Moeda e Quantidade</label>
-                <div style="display:flex;gap:10px;">
-                    <input type="text" id="edit-moeda" disabled style="flex:1;opacity:0.6;">
-                    <input type="number" id="edit-valor" step="0.01" style="flex:1;">
-                </div>
-            </div>
-
-            <div class="form-group" style="background:var(--bg-main);padding:12px;border-radius:var(--radius-sm);">
-                <label style="color:var(--green);">Cotação de Revenda (Ex: 5,50)</label>
-                <input type="number" id="edit-cotacao-venda" step="0.01" oninput="preverLucro()" placeholder="5.50">
-                <div id="previa-lucro" style="font-size:11px;margin-top:8px;color:var(--text-muted);"></div>
+```
+        <div class="form-group">
+            <label>Moeda e Quantidade</label>
+            <div style="display:flex;gap:10px;">
+                <input type="text" id="edit-moeda" disabled style="flex:1;opacity:0.6;">
+                <input type="number" id="edit-valor" step="0.01" style="flex:1;">
             </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-            <button class="btn-save" onclick="salvarEdicao()">💾 Salvar Revenda</button>
+
+        <div class="form-group" style="background:var(--bg-main);padding:12px;border-radius:var(--radius-sm);">
+            <label style="color:var(--green);">Cotação de Revenda (Ex: 5,50)</label>
+            <input type="number" id="edit-cotacao-venda" step="0.01" oninput="preverLucro()" placeholder="5.50">
+            <div id="previa-lucro" style="font-size:11px;margin-top:8px;color:var(--text-muted);"></div>
         </div>
     </div>
+    <div class="modal-footer">
+        <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-save" onclick="salvarEdicao()">💾 Salvar Revenda</button>
+    </div>
+</div>
+```
+
 </div>
 
 <script>
@@ -181,15 +302,19 @@
     }
 
     async function carregar() {
-        const res  = await fetch(`/api/admin/${hotelSlug}/cambio/`);
+        const res   = await fetch(`/api/admin/${hotelSlug}/cambio/`);
         const lista = await res.json();
         let totalPago = 0, totalRecebido = 0, totalLucro = 0;
 
+        /* ── Desktop: tabela ── */
         let html = `<table>
             <thead><tr>
                 <th>Data</th><th>Moeda</th><th>Qtd</th>
-                <th>Pago (Hóspede)</th><th>Recebido (Venda)</th><th>Lucro</th><th>Ações</th>
+                <th>Pago</th><th>Recebido</th><th>Lucro</th><th>Ações</th>
             </tr></thead><tbody>`;
+
+        /* ── Mobile: cards ── */
+        let cardsHtml = '';
 
         lista.forEach(t => {
             const pago     = parseFloat(t.valor_reais || 0);
@@ -198,21 +323,58 @@
 
             totalPago += pago; totalRecebido += recebido; totalLucro += lucro;
 
+            const dataFmt = new Date(t.data).toLocaleDateString('pt-BR');
+            const qtdFmt  = parseFloat(t.valor).toFixed(2);
+
+            /* linha tabela desktop */
             html += `<tr>
-                <td>${new Date(t.data).toLocaleDateString('pt-BR')}</td>
+                <td>${dataFmt}</td>
                 <td><b>${t.moeda}</b></td>
-                <td>${parseFloat(t.valor).toFixed(2)}</td>
+                <td>${qtdFmt}</td>
                 <td style="color:#f87171">${fmt(pago)}</td>
                 <td style="color:#38bdf8">${recebido > 0 ? fmt(recebido) : '--'}</td>
                 <td style="color:var(--green);font-weight:600">${fmt(lucro)}</td>
                 <td>
-                    <button class="btn-acao" onclick="abrirEdicao(${t.id}, '${t.moeda}', ${t.valor}, ${pago}, ${t.cotacao_venda})">✏️</button>
+                    <button class="btn-acao" onclick="abrirEdicao(${t.id},'${t.moeda}',${t.valor},${pago},${t.cotacao_venda})">✏️</button>
                     <button class="btn-acao" onclick="deletar(${t.id})">🗑️</button>
                 </td>
             </tr>`;
+
+            /* card mobile */
+            cardsHtml += `
+            <div class="cambio-card">
+                <div class="cambio-card-top">
+                    <span class="cambio-card-moeda">${t.moeda}</span>
+                    <span class="cambio-card-data">${dataFmt} &bull; ${qtdFmt} un.</span>
+                </div>
+
+                <div class="cambio-card-acoes">
+                    <button class="btn-editar" title="Editar"
+                        onclick="abrirEdicao(${t.id},'${t.moeda}',${t.valor},${pago},${t.cotacao_venda})">✏️</button>
+                    <button class="btn-deletar" title="Excluir"
+                        onclick="deletar(${t.id})">🗑️</button>
+                </div>
+
+                <div class="cambio-card-valores">
+                    <div class="cambio-val-item">
+                        <span class="cambio-val-label">Pago</span>
+                        <span class="cambio-val-num red">${fmt(pago)}</span>
+                    </div>
+                    <div class="cambio-val-item">
+                        <span class="cambio-val-label">Recebido</span>
+                        <span class="cambio-val-num blue">${recebido > 0 ? fmt(recebido) : '--'}</span>
+                    </div>
+                    <div class="cambio-val-item">
+                        <span class="cambio-val-label">Lucro</span>
+                        <span class="cambio-val-num green">${fmt(lucro)}</span>
+                    </div>
+                </div>
+            </div>`;
         });
 
-        document.getElementById('lista-cambio').innerHTML = html + `</tbody></table>`;
+        document.getElementById('lista-cambio').innerHTML       = html + `</tbody></table>`;
+        document.getElementById('lista-cambio-cards').innerHTML = cardsHtml;
+
         document.getElementById('stat-pago').innerText     = fmt(totalPago);
         document.getElementById('stat-recebido').innerText = fmt(totalRecebido);
         document.getElementById('stat-lucro').innerText    = fmt(totalLucro);
@@ -229,10 +391,10 @@
     }
 
     function abrirEdicao(id, moeda, valor, pagoTotal, cotacaoVenda) {
-        document.getElementById('edit-id').value           = id;
-        document.getElementById('edit-moeda').value        = moeda;
-        document.getElementById('edit-valor').value        = valor;
-        document.getElementById('edit-compra-total').value = pagoTotal;
+        document.getElementById('edit-id').value            = id;
+        document.getElementById('edit-moeda').value         = moeda;
+        document.getElementById('edit-valor').value         = valor;
+        document.getElementById('edit-compra-total').value  = pagoTotal;
         document.getElementById('edit-cotacao-venda').value = cotacaoVenda || '';
         document.getElementById('modal-edicao').classList.add('open');
         preverLucro();
@@ -294,6 +456,8 @@
 
     document.addEventListener('DOMContentLoaded', carregar);
 </script>
+
 <script src="{% static 'js/mobile-menu.js' %}"></script>
+
 </body>
 </html>
