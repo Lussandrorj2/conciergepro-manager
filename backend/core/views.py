@@ -323,7 +323,6 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
 if request.method == "GET":
     ano = request.GET.get("ano", "")
     mes = request.GET.get("mes", "")
@@ -354,11 +353,14 @@ if request.method == "GET":
 
 if request.method == "POST":
     try:
-        moeda          = request.POST.get("moeda")
-        valor          = float(request.POST.get("valor") or 0)
-        cotacao_compra = float(request.POST.get("cotacao_compra") or request.POST.get("cotacao") or 0)
-        cotacao_venda  = float(request.POST.get("cotacao_venda") or 0)
-        valor_recebido = float(request.POST.get("valor_recebido") or 0)
+        # ✅ Lê JSON (enviado pelo frontend)
+        body = json.loads(request.body)
+        
+        moeda          = body.get("moeda")
+        valor          = float(body.get("quantidade") or body.get("valor") or 0)
+        cotacao_compra = float(body.get("cotacao_compra") or body.get("cotacao") or 0)
+        cotacao_venda  = float(body.get("cotacao_venda") or 0)
+        valor_recebido = float(body.get("valor_recebido") or 0)
         valor_pago     = valor * cotacao_compra
 
         valor_recebido_calc = valor * cotacao_venda if cotacao_venda else valor_pago
@@ -378,7 +380,7 @@ if request.method == "POST":
         return JsonResponse({"erro": str(e)}, status=500)
 
 return JsonResponse({"erro": "Método inválido"}, status=400)
-```
+
 
 # =========================
 
@@ -393,10 +395,10 @@ hotel = get_object_or_404(Hotel, slug=hotel_slug)
 if not _get_hotel_do_usuario(request, hotel):
 return JsonResponse({“erro”: “Sem permissão”}, status=403)
 
-```
+
 transacao = get_object_or_404(CambioTransacao, id=transacao_id, hotel=hotel)
 
-if request.method == "PUT":
+if request.method in ("PUT", "PATCH"):
     try:
         data           = json.loads(request.body)
         moeda          = data.get("moeda", transacao.moeda)
@@ -940,4 +942,3 @@ try:
 except Exception as e:
     print(traceback.format_exc())
     return JsonResponse({"erro": str(e)}, status=500)
-```
