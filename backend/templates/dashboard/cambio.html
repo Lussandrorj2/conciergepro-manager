@@ -226,7 +226,8 @@
         const compra = parseFloat(document.getElementById('cotacao_compra').value);
         const venda  = parseFloat(document.getElementById('cotacao_venda').value);
 
-        if (!qty || !compra || !venda) return toast('Preencha todos os campos.', true);
+        if (!qty || !compra) return toast('Preencha quantidade e cotação de compra.', true);
+
 
         try {
             const r = await fetch(API, {
