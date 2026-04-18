@@ -12,21 +12,21 @@
         rel="stylesheet">
     <style>
         :root {
-            --gold: #c9a96e;
-            --gold-light: #e8d5b0;
-            --dark: #0a0a0a;
-            --dark2: #111111;
-            --dark3: #1a1a1a;
-            --text: #f0ece4;
-            --text-muted: #8a8070;
-            --border: rgba(201, 169, 110, 0.15);
+            --gold:        #b5843a;
+            --gold-light:  #d4a95a;
+            --dark:        #ffffff;
+            --dark2:       #ffffff;
+            --dark3:       #f4f6f9;
+            --text:        #0f172a;
+            --text-muted:  #64748b;
+            --border:      rgba(181, 132, 58, 0.18);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: var(--dark);
+            background: #f4f6f9;
             color: var(--text);
             min-height: 100vh;
         }
@@ -71,7 +71,7 @@
             font-size: 11px;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: var(--gold);
+            color: var(--gold-light);
             margin-bottom: 16px;
             font-weight: 500;
         }
@@ -87,7 +87,7 @@
 
         #txt-hero-subtitle {
             font-size: 16px;
-            color: rgba(255,255,255,0.65);
+            color: rgba(255,255,255,0.75);
             font-weight: 300;
             line-height: 1.6;
         }
@@ -122,7 +122,7 @@
         }
 
         .lang-btn:hover { color: white; }
-        .lang-btn.active { background: var(--gold); color: var(--dark); }
+        .lang-btn.active { background: var(--gold); color: #fff; }
 
         /* ===== SCROLL HINT ===== */
         .scroll-hint {
@@ -133,7 +133,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.5);
             font-size: 11px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -143,7 +143,7 @@
             width: 40px;
             height: 1px;
             background: var(--gold);
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         /* ===== SECTION ===== */
@@ -167,7 +167,7 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--gold);
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
         }
 
@@ -201,27 +201,28 @@
 
         /* ===== CARD ===== */
         .card-passeio {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #ffffff;
+            border: 1px solid rgba(181,132,58,0.2);
             border-radius: 16px;
             overflow: hidden;
             transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
             flex: 0 0 320px;
             min-width: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
         }
 
         .card-passeio:hover {
             transform: translateY(-6px);
             border-color: var(--gold);
-            box-shadow: 0 20px 48px rgba(201,169,110,0.12);
+            box-shadow: 0 16px 40px rgba(181,132,58,0.15);
         }
 
         .card-img {
             position: relative;
             height: 220px;
             overflow: hidden;
-            background: var(--dark3);
+            background: #f0f0e8;
         }
 
         .card-img img {
@@ -238,7 +239,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
+            color: #ccc;
             font-size: 40px;
         }
 
@@ -246,14 +247,14 @@
             position: absolute;
             top: 16px;
             right: 16px;
-            background: rgba(0,0,0,0.75);
+            background: rgba(255,255,255,0.92);
             backdrop-filter: blur(8px);
-            color: var(--gold-light);
+            color: var(--gold);
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             padding: 5px 12px;
             border-radius: 20px;
-            border: 1px solid rgba(201,169,110,0.3);
+            border: 1px solid rgba(181,132,58,0.3);
         }
 
         .card-img-hover {
@@ -266,11 +267,11 @@
             transition: background 0.3s ease;
         }
 
-        .card-passeio:hover .card-img-hover { background: rgba(0,0,0,0.35); }
+        .card-passeio:hover .card-img-hover { background: rgba(0,0,0,0.3); }
 
         .card-img-hover span {
-            background: var(--gold);
-            color: var(--dark);
+            background: #fff;
+            color: var(--gold);
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 2px;
@@ -303,7 +304,7 @@
             line-height: 1.7;
             margin-bottom: 20px;
             display: -webkit-box;
-            
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -313,6 +314,8 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(181,132,58,0.12);
         }
 
         .carr-btn {
@@ -323,19 +326,19 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            border: 1px solid var(--border);
-            background: rgba(10,10,10,0.75);
-            backdrop-filter: blur(8px);
+            border: 1px solid rgba(181,132,58,0.3);
+            background: #fff;
             color: var(--gold);
             font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 12px rgba(0,0,0,.1);
         }
 
-        .carr-btn:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+        .carr-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
         .carr-btn:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
         .carr-prev { left: -22px; }
         .carr-next { right: -22px; }
@@ -351,7 +354,7 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--text-muted);
+            background: #cbd5e1;
             cursor: pointer;
             transition: background 0.2s, transform 0.2s;
             border: none;
@@ -362,11 +365,13 @@
 
         .card-preco {
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--gold);
+            font-family: 'Playfair Display', serif;
         }
 
         .card-preco small {
+            font-family: 'DM Sans', sans-serif;
             font-size: 11px;
             color: var(--text-muted);
             font-weight: 400;
@@ -375,7 +380,7 @@
 
         .btn-reservar {
             background: var(--gold);
-            color: var(--dark);
+            color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
@@ -383,12 +388,12 @@
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            transition: background 0.2s;
+            transition: filter 0.2s;
             white-space: nowrap;
             font-family: 'DM Sans', sans-serif;
         }
 
-        .btn-reservar:hover { background: var(--gold-light); }
+        .btn-reservar:hover { filter: brightness(1.1); }
 
         /* ===== ESTADOS ===== */
         .estado-vazio, .estado-erro {
@@ -406,7 +411,7 @@
 
         /* ===== SKELETON ===== */
         .skeleton {
-            background: linear-gradient(90deg, var(--dark3) 25%, #222 50%, var(--dark3) 75%);
+            background: linear-gradient(90deg, #f0f0ea 25%, #e8e4dc 50%, #f0f0ea 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             border-radius: 8px;
@@ -418,10 +423,11 @@
         }
 
         .card-skeleton {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid rgba(181,132,58,0.15);
             border-radius: 16px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
         }
 
         /* =========================================
@@ -431,8 +437,8 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(12px);
+            background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(8px);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -443,8 +449,8 @@
         .modal-overlay.open { display: flex; }
 
         .modal-detalhe {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid rgba(181,132,58,0.2);
             border-radius: 24px;
             width: 100%;
             max-width: 860px;
@@ -454,6 +460,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0,0,0,.15);
         }
 
         @keyframes slideUp {
@@ -465,7 +472,7 @@
             position: relative;
             height: 420px;
             overflow: hidden;
-            background: var(--dark3);
+            background: #f4f6f9;
             flex-shrink: 0;
         }
 
@@ -476,10 +483,7 @@
             will-change: transform;
         }
 
-        .det-foto-slide {
-            flex: 0 0 100%;
-            height: 100%;
-        }
+        .det-foto-slide { flex: 0 0 100%; height: 100%; }
 
         .det-foto-slide img {
             width: 100%;
@@ -494,18 +498,14 @@
             align-items: center;
             justify-content: center;
             font-size: 64px;
-            color: var(--text-muted);
+            color: #ccc;
         }
 
         .det-foto-wrap::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                to bottom,
-                rgba(0,0,0,0) 50%,
-                rgba(10,10,10,0.9) 100%
-            );
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%);
             pointer-events: none;
         }
 
@@ -517,19 +517,18 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(6px);
-            color: #fff;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.85);
+            color: var(--gold);
             font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
-        .det-foto-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+        .det-foto-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
         .det-foto-btn.prev  { left: 16px; }
         .det-foto-btn.next  { right: 16px; }
         .det-foto-btn:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
@@ -541,7 +540,7 @@
             z-index: 5;
             font-size: 11px;
             font-weight: 600;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.9);
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(6px);
             padding: 4px 10px;
@@ -581,10 +580,10 @@
             top: 16px;
             right: 16px;
             z-index: 20;
-            background: rgba(0,0,0,0.6);
+            background: rgba(255,255,255,0.9);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--text);
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -596,7 +595,7 @@
             transition: background 0.2s;
         }
 
-        .modal-close-det:hover { background: rgba(255,255,255,0.15); }
+        .modal-close-det:hover { background: #fff; }
 
         .det-body {
             padding: 32px 40px 36px;
@@ -611,7 +610,7 @@
             text-transform: uppercase;
             color: var(--gold);
             margin-bottom: 10px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .det-nome {
@@ -638,8 +637,8 @@
         }
 
         .det-chip {
-            background: var(--dark3);
-            border: 1px solid var(--border);
+            background: #f4f6f9;
+            border: 1px solid rgba(181,132,58,0.2);
             border-radius: 20px;
             padding: 5px 14px;
             font-size: 12px;
@@ -657,7 +656,7 @@
             justify-content: space-between;
             gap: 20px;
             padding-top: 24px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(181,132,58,0.15);
         }
 
         .det-preco {
@@ -678,7 +677,7 @@
 
         .btn-reservar-det {
             background: var(--gold);
-            color: var(--dark);
+            color: #fff;
             border: none;
             padding: 14px 32px;
             border-radius: 10px;
@@ -686,22 +685,19 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'DM Sans', sans-serif;
-            transition: background 0.2s, transform 0.2s;
+            transition: filter 0.2s, transform 0.2s;
             letter-spacing: 0.5px;
             flex-shrink: 0;
         }
 
-        .btn-reservar-det:hover {
-            background: var(--gold-light);
-            transform: scale(1.02);
-        }
+        .btn-reservar-det:hover { filter: brightness(1.1); transform: scale(1.02); }
 
         /* =========================================
            MODAL RESERVA (WHATSAPP)
         ========================================= */
         .modal-reserva {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid rgba(181,132,58,0.2);
             border-radius: 20px;
             width: 100%;
             max-width: 500px;
@@ -709,14 +705,15 @@
             position: relative;
             animation: slideUp 0.3s ease;
             margin: auto;
+            box-shadow: 0 24px 60px rgba(0,0,0,.12);
         }
 
         .modal-close {
             position: absolute;
             top: 16px;
             right: 16px;
-            background: var(--dark3);
-            border: 1px solid var(--border);
+            background: #f4f6f9;
+            border: 1px solid rgba(181,132,58,0.2);
             color: var(--text-muted);
             width: 32px;
             height: 32px;
@@ -729,7 +726,7 @@
             transition: background 0.2s;
         }
 
-        .modal-close:hover { background: rgba(255,255,255,0.08); }
+        .modal-close:hover { background: #e8edf4; }
 
         .btn-voltar-det {
             display: inline-flex;
@@ -754,6 +751,7 @@
             text-transform: uppercase;
             color: var(--gold);
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .modal-title {
@@ -767,13 +765,13 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(37,211,102,0.08);
-            border: 1px solid rgba(37,211,102,0.25);
+            background: rgba(37,211,102,0.07);
+            border: 1px solid rgba(37,211,102,0.2);
             border-radius: 10px;
             padding: 12px 16px;
             margin-bottom: 20px;
             font-size: 12px;
-            color: #4ade80;
+            color: #16a34a;
             line-height: 1.5;
         }
 
@@ -788,13 +786,14 @@
             text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            background: var(--dark3);
-            border: 1px solid var(--border);
+            background: #f4f6f9;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 12px 16px;
             color: var(--text);
@@ -807,8 +806,6 @@
         .form-group input:focus,
         .form-group select:focus { border-color: var(--gold); }
 
-        .form-group select option { background: var(--dark3); }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -816,8 +813,8 @@
         }
 
         .modal-resumo {
-            background: var(--dark3);
-            border: 1px solid var(--border);
+            background: #f4f6f9;
+            border: 1px solid rgba(181,132,58,0.2);
             border-radius: 10px;
             padding: 16px;
             margin-bottom: 20px;
@@ -838,9 +835,9 @@
             display: flex;
             justify-content: space-between;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--gold);
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(181,132,58,0.2);
             padding-top: 10px;
             margin-top: 10px;
         }
@@ -856,14 +853,14 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'DM Sans', sans-serif;
-            transition: background 0.2s;
+            transition: filter 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
 
-        .btn-confirmar:hover { background: #1ebe5a; }
+        .btn-confirmar:hover { filter: brightness(1.08); }
 
         /* ===== TOAST ===== */
         .toast-container {
@@ -877,17 +874,18 @@
         }
 
         .toast {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid rgba(181,132,58,0.3);
             color: var(--text);
             padding: 12px 20px;
             border-radius: 10px;
             font-size: 13px;
             animation: fadeIn 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,.1);
         }
 
-        .toast.success { border-color: #059669; color: #34d399; }
-        .toast.error   { border-color: #dc2626; color: #f87171; }
+        .toast.success { border-color: #16a34a; color: #15803d; }
+        .toast.error   { border-color: #dc2626; color: #b91c1c; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -910,13 +908,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 8px 24px rgba(37,211,102,0.3);
+            box-shadow: 0 8px 24px rgba(37,211,102,0.35);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         #wpp-main:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(37,211,102,0.4);
+            box-shadow: 0 12px 32px rgba(37,211,102,0.45);
         }
 
         /* =========================================
@@ -940,8 +938,8 @@
         }
 
         .filtro-mapa-btn {
-            background: var(--dark3);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             color: var(--text-muted);
             padding: 8px 18px;
             border-radius: 20px;
@@ -951,12 +949,12 @@
             font-family: 'DM Sans', sans-serif;
             transition: all 0.2s;
             white-space: nowrap;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
         }
 
         .filtro-mapa-btn:hover { border-color: var(--gold); color: var(--text); }
-        .filtro-mapa-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+        .filtro-mapa-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
-        /* Grade de cards de lugares */
         #mapa-cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -965,8 +963,8 @@
         }
 
         .lugar-card {
-            background: var(--dark2);
-            border: 1px solid var(--border);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 18px;
             cursor: pointer;
@@ -974,17 +972,18 @@
             display: flex;
             flex-direction: column;
             gap: 7px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
         }
 
         .lugar-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(201,169,110,0.4);
-            box-shadow: 0 12px 32px rgba(201,169,110,0.08);
+            border-color: rgba(181,132,58,0.4);
+            box-shadow: 0 10px 28px rgba(181,132,58,0.1);
         }
 
         .lugar-card.selecionado {
             border-color: var(--gold);
-            background: rgba(201,169,110,0.05);
+            background: rgba(181,132,58,0.04);
             box-shadow: 0 0 0 1px var(--gold);
         }
 
@@ -1024,27 +1023,19 @@
             gap: 3px;
         }
 
-        .lugar-distancia {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .lugar-distancia { font-size: 11px; color: var(--text-muted); }
 
-        /* Container do mapa */
         #mapa-container {
             border-radius: 16px;
             overflow: hidden;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             height: 500px;
-            background: var(--dark3);
+            background: #f4f6f9;
             position: relative;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06);
         }
 
-        #mapa-iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;
-        }
+        #mapa-iframe { width: 100%; height: 100%; border: 0; display: block; }
 
         #mapa-loading {
             position: absolute;
@@ -1052,7 +1043,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--dark3);
+            background: #f4f6f9;
             color: var(--text-muted);
             flex-direction: column;
             gap: 14px;
@@ -1066,7 +1057,7 @@
         .mapa-spinner {
             width: 36px;
             height: 36px;
-            border: 2px solid var(--border);
+            border: 2px solid #e2e8f0;
             border-top-color: var(--gold);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -1074,7 +1065,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Link direto GMaps */
         .lugar-card-link {
             display: inline-flex;
             align-items: center;
@@ -1084,15 +1074,15 @@
             text-decoration: none;
             margin-top: 6px;
             transition: opacity 0.2s;
+            font-weight: 600;
         }
 
         .lugar-card-link:hover { opacity: 0.7; }
 
-        /* Divider entre seções */
         .section-divider {
             width: 100%;
             height: 1px;
-            background: var(--border);
+            background: rgba(181,132,58,0.12);
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -1126,7 +1116,7 @@
 
 <body>
 
-    <!-- HERO -->
+    <!-- HERO — mantém dark para contraste com a imagem de fundo -->
     <section id="hero">
         <div id="hero-bg"></div>
 
@@ -1188,12 +1178,9 @@
         </div>
     </section>
 
-    <!-- DIVISOR -->
     <div class="section-divider"></div>
 
-    <!-- =========================================
-         MAPA TURÍSTICO
-    ========================================= -->
+    <!-- MAPA TURÍSTICO -->
     <section class="section" id="secao-mapa">
         <div class="mapa-section-head">
             <div>
@@ -1207,18 +1194,10 @@
             </div>
         </div>
 
-        <!-- Cards de lugares -->
         <div id="mapa-cards-grid"></div>
 
-        <!-- Iframe Google Maps -->
         <div id="mapa-container">
-            <iframe
-                id="mapa-iframe"
-                src=""
-                allowfullscreen=""
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+            <iframe id="mapa-iframe" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             <div id="mapa-loading">
                 <div class="mapa-spinner"></div>
                 <span id="mapa-loading-txt">Carregando mapa…</span>
@@ -1226,58 +1205,37 @@
         </div>
     </section>
 
-    <!-- =========================================
-         MODAL DETALHES DO PASSEIO
-    ========================================= -->
+    <!-- MODAL DETALHES -->
     <div class="modal-overlay" id="modalDetalhe">
         <div class="modal-detalhe">
-
             <button class="modal-close-det" onclick="fecharDetalhe()">✕</button>
-
             <div class="det-foto-wrap" id="det-foto-wrap">
                 <div class="det-foto-track" id="det-foto-track"></div>
-
                 <button class="det-foto-btn prev" id="det-foto-prev" onclick="detFotoMover(-1)">‹</button>
                 <button class="det-foto-btn next" id="det-foto-next" onclick="detFotoMover(1)">›</button>
-
                 <div class="det-foto-counter" id="det-foto-counter">1 / 1</div>
                 <div class="det-foto-thumbs"  id="det-foto-thumbs"></div>
             </div>
-
             <div class="det-body">
-                <div class="det-eyebrow" id="det-eyebrow">Passeio</div>
+                <div class="det-eyebrow" id="det-eyebrow">Experiência</div>
                 <h2 class="det-nome" id="det-nome">—</h2>
                 <p  class="det-desc" id="det-desc"></p>
-
                 <div class="det-chips" id="det-chips"></div>
-
                 <div class="det-footer">
-                    <div class="det-preco" id="det-preco">
-                        —
-                        <small id="det-preco-sub"></small>
-                    </div>
-                    <button class="btn-reservar-det" id="btn-reservar-det" onclick="abrirModalReservaDoDetalhe()">
-                        Reservar agora
-                    </button>
+                    <div class="det-preco" id="det-preco">—<small id="det-preco-sub"></small></div>
+                    <button class="btn-reservar-det" id="btn-reservar-det" onclick="abrirModalReservaDoDetalhe()">Reservar agora</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- =========================================
-         MODAL RESERVA / WHATSAPP
-    ========================================= -->
+    <!-- MODAL RESERVA -->
     <div class="modal-overlay" id="modalReserva">
         <div class="modal-reserva">
             <button class="modal-close" onclick="fecharModalReserva()">✕</button>
-
-            <button class="btn-voltar-det" onclick="voltarParaDetalhe()">
-                ← <span id="btn-voltar-txt">Voltar aos detalhes</span>
-            </button>
-
+            <button class="btn-voltar-det" onclick="voltarParaDetalhe()">← <span id="btn-voltar-txt">Voltar aos detalhes</span></button>
             <div class="modal-eyebrow" id="modal-eyebrow">Reserva</div>
             <h2 class="modal-title" id="modal-passeio-nome">—</h2>
-
             <div class="modal-aviso-wpp" id="modal-aviso-wpp">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -1285,7 +1243,6 @@
                 </svg>
                 Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label id="lbl-data">Data desejada</label>
@@ -1296,7 +1253,6 @@
                     <input type="time" id="res-horario">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label id="lbl-nome">Nome</label>
@@ -1307,27 +1263,15 @@
                     <input type="text" id="res-tel" placeholder="+55 21 99999-9999">
                 </div>
             </div>
-
             <div class="form-group">
                 <label id="lbl-qtd">Pessoas</label>
                 <input type="number" id="res-qtd" value="1" min="1" oninput="calcularTotal()">
             </div>
-
             <div class="modal-resumo" id="modal-resumo">
-                <div class="resumo-linha">
-                    <span id="resumo-label-passeio">Passeio</span>
-                    <span id="resumo-passeio">—</span>
-                </div>
-                <div class="resumo-linha">
-                    <span id="resumo-label-qtd">Pessoas</span>
-                    <span id="resumo-qtd">—</span>
-                </div>
-                <div class="resumo-total">
-                    <span id="resumo-label-total">Total</span>
-                    <span id="resumo-total-valor">—</span>
-                </div>
+                <div class="resumo-linha"><span id="resumo-label-passeio">Passeio</span><span id="resumo-passeio">—</span></div>
+                <div class="resumo-linha"><span id="resumo-label-qtd">Pessoas</span><span id="resumo-qtd">—</span></div>
+                <div class="resumo-total"><span id="resumo-label-total">Total</span><span id="resumo-total-valor">—</span></div>
             </div>
-
             <button class="btn-confirmar" id="btn-confirmar" onclick="confirmarReserva()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -1353,7 +1297,6 @@
         window.hotelSlug = "{{ hotel.slug|default:'' }}";
     </script>
     <script src="{% static 'js/concierge.js' %}"></script>
-
 
 </body>
 </html>
