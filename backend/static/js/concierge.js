@@ -958,11 +958,16 @@ function abrirModalLugar(id) {
             📍 Ver no Google Maps
         </a>`;
 
-    if (l.instagram) html += `
-        <a href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank" rel="noopener"
+    if (l.instagram) {
+        const igHref = l.instagram.startsWith('http')
+            ? l.instagram
+            : `https://instagram.com/${l.instagram.replace('@','')}`;
+        html += `
+        <a href="${igHref}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">
-            📸 ${l.instagram}
+            📸 Instagram
         </a>`;
+    }
 
     if (l.telefone) html += `
         <a href="https://wa.me/${l.telefone.replace(/\D/g,'')}" target="_blank" rel="noopener"
