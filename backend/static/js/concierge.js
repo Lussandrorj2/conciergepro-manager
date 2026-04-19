@@ -231,6 +231,13 @@ async function carregarHotel(lang) {
         const subtituloEl = document.getElementById('txt-hero-subtitle');
         if (tituloEl && data.titulo_hero)       tituloEl.innerText    = data.titulo_hero;
         if (subtituloEl && data.subtitulo_hero) subtituloEl.innerText = data.subtitulo_hero;
+        
+        if (data.lat && data.lng) {
+            HOTEL_LAT = data.lat;
+            HOTEL_LNG = data.lng;
+            MAPA_GERAL_SRC = `https://maps.google.com/maps?q=${HOTEL_LAT},${HOTEL_LNG}&z=15&output=embed`;
+        }
+
 
     } catch (error) {
         console.error('[carregarHotel] Erro:', error);
@@ -756,8 +763,10 @@ document.getElementById('modalLugar')?.addEventListener('click', function(e) {
 // ==========================================
 // MAPA
 // ==========================================
-const HOTEL_LAT = -22.98544266423526;
-const HOTEL_LNG = -43.20739229160829;
+let HOTEL_LAT = null;
+let HOTEL_LNG = null;
+let MAPA_GERAL_SRC = '';
+
 
 let LUGARES = [];
 
@@ -898,7 +907,7 @@ function carregarMapaIframe(src) {
 
 async function initMapa() {
     atualizarTextosMapa();
-    carregarMapaIframe(MAPA_GERAL_SRC);
+    if (MAPA_GERAL_SRC) carregarMapaIframe(MAPA_GERAL_SRC);
 
     try {
         const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
@@ -988,13 +997,16 @@ function fecharModalLugar() {
 // ==========================================
 // INIT
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === idiomaAtual);
     });
 
-    trocarIdioma(idiomaAtual);
-    initMapa();
+    await carregarHotel(idiomaAtual);
+    await Promise.all([
+        carregarPasseios(idiomaAtual),
+        initMapa(),
+    ]);
 });
 
 // ==========================================
