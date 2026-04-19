@@ -7,16 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Concierge Digital | {{ hotel.nome|default:"Bem-vindo" }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold:        #b5843a;
             --gold-light:  #d4a95a;
-            --dark:        #ffffff;
-            --dark2:       #ffffff;
-            --dark3:       #f4f6f9;
             --text:        #0f172a;
             --text-muted:  #64748b;
             --border:      rgba(181, 132, 58, 0.18);
@@ -80,16 +75,11 @@
             color: #475569;
             font-weight: 400;
         }
-        
-        .hero-trust .sep {
-            color: #cbd5e1;
-        }
-        
+
+        .hero-trust .sep { color: #cbd5e1; }
+
         @media (max-width: 480px) {
-            .hero-trust {
-                font-size: 12px;
-                gap: 4px 8px;
-            }
+            .hero-trust { font-size: 12px; gap: 4px 8px; }
         }
 
         .hero-eyebrow {
@@ -148,7 +138,6 @@
 
         .lang-btn:hover { color: white; }
         .lang-btn.active { background: var(--gold); color: #fff; }
-
 
         /* ===== SECTION ===== */
         .section {
@@ -423,7 +412,7 @@
 
         @keyframes shimmer {
             0%  { background-position: 200% 0; }
-            100%{ background-position: -200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .card-skeleton {
@@ -434,9 +423,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.06);
         }
 
-        /* =========================================
-           MODAL DETALHES DO PASSEIO
-        ========================================= */
+        /* ===== MODAIS ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -488,12 +475,7 @@
         }
 
         .det-foto-slide { flex: 0 0 100%; height: 100%; }
-
-        .det-foto-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .det-foto-slide img { width: 100%; height: 100%; object-fit: cover; }
 
         .det-foto-slide-empty {
             width: 100%;
@@ -696,9 +678,7 @@
 
         .btn-reservar-det:hover { filter: brightness(1.1); transform: scale(1.02); }
 
-        /* =========================================
-           MODAL RESERVA (WHATSAPP)
-        ========================================= */
+        /* ===== MODAL RESERVA ===== */
         .modal-reserva {
             background: #fff;
             border: 1px solid rgba(181,132,58,0.2);
@@ -921,9 +901,7 @@
             box-shadow: 0 12px 32px rgba(37,211,102,0.45);
         }
 
-        /* =========================================
-           MAPA TURÍSTICO
-        ========================================= */
+        /* ===== MAPA ===== */
         .mapa-section-head {
             display: flex;
             align-items: flex-end;
@@ -935,11 +913,7 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .filtros-mapa {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .filtros-mapa { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .filtro-mapa-btn {
             background: #fff;
@@ -1006,11 +980,7 @@
             line-height: 1.3;
         }
 
-        .lugar-info-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
+        .lugar-info-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 
         .lugar-meta {
             display: flex;
@@ -1019,14 +989,7 @@
             margin-top: 4px;
         }
 
-        .lugar-estrelas {
-            font-size: 12px;
-            color: var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
+        .lugar-estrelas { font-size: 12px; color: var(--gold); }
         .lugar-distancia { font-size: 11px; color: var(--text-muted); }
 
         #mapa-container {
@@ -1120,7 +1083,7 @@
 
 <body>
 
-    <!-- HERO — mantém dark para contraste com a imagem de fundo -->
+    <!-- HERO -->
     <section id="hero">
         <div id="hero-bg"></div>
 
@@ -1136,8 +1099,7 @@
             <h1 id="txt-hero-title">{{ hotel.titulo_hero|default:"Experiências Exclusivas" }}</h1>
             <p id="txt-hero-subtitle">{{ hotel.subtitulo_hero|default:"Selecione seu próximo destino" }}</p>
         </div>
-
-    </section> <!-- fecha o #hero -->
+    </section>
 
     <div class="hero-trust">
         <span>✓ Guias credenciados</span>
@@ -1213,7 +1175,7 @@
         </div>
     </section>
 
-    <!-- MODAL DETALHES -->
+    <!-- MODAL DETALHES DO PASSEIO -->
     <div class="modal-overlay" id="modalDetalhe">
         <div class="modal-detalhe">
             <button class="modal-close-det" onclick="fecharDetalhe()">✕</button>
@@ -1222,17 +1184,35 @@
                 <button class="det-foto-btn prev" id="det-foto-prev" onclick="detFotoMover(-1)">‹</button>
                 <button class="det-foto-btn next" id="det-foto-next" onclick="detFotoMover(1)">›</button>
                 <div class="det-foto-counter" id="det-foto-counter">1 / 1</div>
-                <div class="det-foto-thumbs"  id="det-foto-thumbs"></div>
+                <div class="det-foto-thumbs" id="det-foto-thumbs"></div>
             </div>
             <div class="det-body">
                 <div class="det-eyebrow" id="det-eyebrow">Experiência</div>
                 <h2 class="det-nome" id="det-nome">—</h2>
-                <p  class="det-desc" id="det-desc"></p>
+                <p class="det-desc" id="det-desc"></p>
                 <div class="det-chips" id="det-chips"></div>
                 <div class="det-footer">
                     <div class="det-preco" id="det-preco">—<small id="det-preco-sub"></small></div>
                     <button class="btn-reservar-det" id="btn-reservar-det" onclick="abrirModalReservaDoDetalhe()">Reservar agora</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LUGAR -->
+    <div class="modal-overlay" id="modalLugar">
+        <div class="modal-detalhe" style="max-width:500px;">
+            <button class="modal-close-det" onclick="fecharModalLugar()">✕</button>
+            <div style="padding:32px 36px;">
+                <div class="det-eyebrow" id="lugar-tipo"></div>
+                <h2 class="det-nome" id="lugar-nome" style="margin-bottom:12px;">—</h2>
+                <p class="det-desc" id="lugar-desc" style="margin-bottom:16px;"></p>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
+                    <div id="lugar-horario" style="font-size:13px;color:var(--text-muted);"></div>
+                    <div id="lugar-distancia" style="font-size:13px;color:var(--text-muted);"></div>
+                    <div id="lugar-estrelas" style="font-size:14px;color:var(--gold);margin-top:4px;"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;" id="lugar-contatos"></div>
             </div>
         </div>
     </div>
@@ -1305,21 +1285,6 @@
         window.hotelSlug = "{{ hotel.slug|default:'' }}";
     </script>
     <script src="{% static 'js/concierge.js' %}"></script>
-    <div class="modal-overlay" id="modalLugar">
-    <div class="modal-detalhe" style="max-width:500px;">
-        <button class="modal-close-det" onclick="fecharModalLugar()">✕</button>
-        <div style="padding:32px 36px;">
-            <div class="det-eyebrow" id="lugar-tipo">Restaurante</div>
-            <h2 class="det-nome" id="lugar-nome">—</h2>
-            <p class="det-desc" id="lugar-desc"></p>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
-                <div id="lugar-horario" style="font-size:13px;color:var(--text-muted);"></div>
-                <div id="lugar-distancia" style="font-size:13px;color:var(--text-muted);"></div>
-                <div id="lugar-estrelas" style="font-size:14px;color:var(--gold);"></div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px;" id="lugar-contatos"></div>
-        </div>
-    </div>
-</div>
+
 </body>
 </html>
