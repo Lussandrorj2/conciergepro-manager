@@ -34,7 +34,7 @@
         { icon: '🏠', label: 'Dashboard', key: '',           sub: ''            },
         { icon: '📅', label: 'Reservas',  key: 'reservas',   sub: 'reservas/'   },
         { icon: '🗺️', label: 'Passeios',  key: 'listar',     sub: 'listar/'     },
-        { icon: '💱', label: 'Câmbio',    key: 'cambio',     sub: 'cambio/'     },
+        { icon: '💵↔️💶', label: 'Câmbio',    key: 'cambio',     sub: 'cambio/'     },
         { icon: '📊', label: 'Relatórios',key: 'relatorios', sub: 'relatorios/' },
     ];
 
