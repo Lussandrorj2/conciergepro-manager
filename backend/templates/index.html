@@ -68,39 +68,29 @@
             max-width: 700px;
         }
 
-        .hero-badges {
+        .hero-trust {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            padding: 28px 24px 8px;
+            align-items: center;
+            justify-content: center;
+            gap: 6px 12px;
+            padding: 18px 24px 28px;
             background: #f4f6f9;
-            margin-top: -2px;
+            font-size: 13px;
+            color: #475569;
+            font-weight: 400;
         }
         
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ffffff;
-            border: 1px solid rgba(181,132,58,0.25);
-            color: #475569;
-            font-size: 12px;
-            font-weight: 500;
-            padding: 8px 18px;
-            border-radius: 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        .hero-trust .sep {
+            color: #cbd5e1;
         }
         
         @media (max-width: 480px) {
-            .hero-badges {
-                gap: 8px;
+            .hero-trust {
+                font-size: 12px;
+                gap: 4px 8px;
             }
-            .hero-badge {
-                font-size: 11px;
-                padding: 6px 12px;
-    }
-}
+        }
 
         .hero-eyebrow {
             font-size: 11px;
@@ -159,27 +149,6 @@
         .lang-btn:hover { color: white; }
         .lang-btn.active { background: var(--gold); color: #fff; }
 
-        /* ===== SCROLL HINT ===== */
-        .scroll-hint {
-            position: absolute;
-            bottom: 24px;
-            right: 48px;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .scroll-line {
-            width: 40px;
-            height: 1px;
-            background: var(--gold);
-            opacity: 0.6;
-        }
 
         /* ===== SECTION ===== */
         .section {
@@ -1168,15 +1137,14 @@
             <p id="txt-hero-subtitle">{{ hotel.subtitulo_hero|default:"Selecione seu próximo destino" }}</p>
         </div>
 
-        <div class="scroll-hint">
-            <span class="scroll-line"></span>
-            <span id="txt-scroll">Explorar</span>
-        </div>
-    </section>
-    <div class="hero-badges">
-        <span class="hero-badge">✓ Guias credenciados</span>
-        <span class="hero-badge">✓ Transporte seguro</span>
-        <span class="hero-badge">✓ Reserva pelo WhatsApp</span>
+    </section> <!-- fecha o #hero -->
+
+    <div class="hero-trust">
+        <span>✓ Guias credenciados</span>
+        <span class="sep">|</span>
+        <span>✓ Transporte seguro</span>
+        <span class="sep">|</span>
+        <span>✓ Reserva rápida pelo WhatsApp</span>
     </div>
 
     <!-- PASSEIOS -->
