@@ -904,7 +904,7 @@ async function initMapa() {
     carregarMapaIframe(MAPA_GERAL_SRC);
 
     try {
-        const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
+        const res = await fetch('/api/public/${hotelSlug}/lugares/');
         if (res.ok) {
             const dados = await res.json();
             LUGARES = dados.map(l => ({
@@ -945,30 +945,30 @@ function abrirModalLugar(id) {
     document.getElementById('lugar-tipo').innerText     = l.tipo === 'restaurante' ? '🍽 Restaurante' : '🛍 Compras';
     document.getElementById('lugar-nome').innerText     = nome;
     document.getElementById('lugar-desc').innerText     = desc || '';
-    document.getElementById('lugar-horario').innerHTML  = hor  ? `🕐 ${hor}` : '';
-    document.getElementById('lugar-distancia').innerHTML = dist ? `🚶 ${dist}` : '';
+    document.getElementById('lugar-horario').innerHTML  = hor  ? '🕐 ${hor}' : '';
+    document.getElementById('lugar-distancia').innerHTML = dist ? '🚶 ${dist}' : '';
     document.getElementById('lugar-estrelas').innerText = l.estrelas || '';
 
     const contatos = document.getElementById('lugar-contatos');
     let html = '';
 
-    if (l.mapaLink) html += `
+    if (l.mapaLink) html += '
         <a href="${l.mapaLink}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;">
             📍 Ver no Google Maps
-        </a>`;
+        </a>';
 
-    if (l.instagram) html += `
+    if (l.instagram) html += '
         <a href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;">
             📸 ${l.instagram}
-        </a>`;
+        </a>';
 
-    if (l.telefone) html += `
+    if (l.telefone) html += '
         <a href="https://wa.me/${l.telefone.replace(/\D/g,'')}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:10px;text-decoration:none;color:#16a34a;font-size:13px;font-weight:500;">
             💬 WhatsApp
-        </a>`;
+        </a>';
 
     contatos.innerHTML = html;
     document.getElementById('modalLugar').classList.add('open');
