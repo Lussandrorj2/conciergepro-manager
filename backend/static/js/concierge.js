@@ -869,10 +869,10 @@ function selecionarLugar(id) {
 }
 
 function gerarMapaSrc(lat, lng) {
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.005},${lat-0.005},${lng+0.005},${lat+0.005}&layer=mapnik&marker=${lat},${lng}`;
+    return `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
 }
 
-const MAPA_GERAL_SRC = `https://www.openstreetmap.org/export/embed.html?bbox=${HOTEL_LNG-0.01},${HOTEL_LAT-0.01},${HOTEL_LNG+0.01},${HOTEL_LAT+0.01}&layer=mapnik&marker=${HOTEL_LAT},${HOTEL_LNG}`;
+const MAPA_GERAL_SRC = `https://maps.google.com/maps?q=${HOTEL_LAT},${HOTEL_LNG}&z=15&output=embed`;
 
 function carregarMapaIframe(src) {
     const iframe  = document.getElementById('mapa-iframe');
