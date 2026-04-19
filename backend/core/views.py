@@ -9,7 +9,7 @@ import traceback
 from .models import (
 Hotel, Passeio, ImagemPasseio, Hero,
 Reserva, CambioTransacao, PasseioAgenda,
-ConfiguracaoDivisao, Adiantamento,
+ConfiguracaoDivisao, Adiantamento,LugarSugerido,
 )
 
 from rest_framework.decorators import api_view, permission_classes
