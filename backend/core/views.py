@@ -97,6 +97,8 @@ def detalhe_hotel(request, slug):
         "subtitulo_hero": subtitulo,
         "foto_capa":      get_media_url(hotel.foto_capa),
         "whatsapp":       hotel.whatsapp,
+        "lat":            hotel.lat,   # ← adicionar
+        "lng":            hotel.lng, 
     })
 
 
