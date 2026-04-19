@@ -883,7 +883,16 @@ def salvar_hero(request, hotel_slug):
             hotel.subtitulo_hero = subtitulo
         if whatsapp:
             hotel.whatsapp = whatsapp
-    
+        
+        lat = request.POST.get("lat", "").strip()
+        lng = request.POST.get("lng", "").strip()
+        if lat:
+            try: hotel.lat = float(lat)
+            except: pass
+        if lng:
+            try: hotel.lng = float(lng)
+            except: pass
+        
         banner = request.FILES.get('banner')
         if banner:
             hotel.foto_capa = banner
