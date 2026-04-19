@@ -1178,11 +1178,10 @@ function selecionarLugar(id) {
 
 // Gera URL do Google Maps embed para as coordenadas
 function gerarMapaSrc(lat, lng) {
-    return `https://www.google.com/maps/embed/v1/place?key=&q=${lat},${lng}`;
+    return `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
 }
 
-// Mapa geral centrado no hotel
-const MAPA_GERAL_SRC = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3675.5!2d${HOTEL_LNG}!3d${HOTEL_LAT}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr`;
+const MAPA_GERAL_SRC = `https://www.google.com/maps?q=${HOTEL_LAT},${HOTEL_LNG}&output=embed`;
 
 function carregarMapaIframe(src) {
     const iframe  = document.getElementById('mapa-iframe');
@@ -1206,10 +1205,25 @@ function carregarMapaIframe(src) {
     }
 }
 
-function initMapa() {
+// Substitua o array LUGARES e a função initMapa por isto:
+
+let LUGARES = []; // agora vem da API
+
+async function initMapa() {
     atualizarTextosMapa();
-    renderLugarCards();
     carregarMapaIframe(MAPA_GERAL_SRC);
+
+    try {
+        const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
+        if (res.ok) {
+            LUGARES = await res.json();
+        }
+    } catch(e) {
+        console.warn('Lugares da API não disponíveis:', e);
+    }
+
+    // Se não veio nada da API, mantém array vazio
+    renderLugarCards();
 
     if (LUGARES.length) {
         setTimeout(() => selecionarLugar(LUGARES[0].id), 600);
