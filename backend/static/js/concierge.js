@@ -324,7 +324,7 @@ async function carregarPasseios(lang) {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/${hotelSlug}/passeios/?lang=${lang}`);
+        const res = await fetch(`${API_BASE}/public/${hotelSlug}/passeios/?lang=${lang}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         listaPasseios = await res.json();
