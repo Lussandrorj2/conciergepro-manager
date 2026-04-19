@@ -907,6 +907,8 @@ def obter_hero(request, hotel_slug):
         "subtitulo": hotel.subtitulo_hero,
         "banner": get_media_url(hotel.foto_capa),
         "whatsapp": hotel.whatsapp or "",
+        "lat":       hotel.lat or "",   # ← adicionar
+        "lng":       hotel.lng or "",
     })
 
 @csrf_exempt
