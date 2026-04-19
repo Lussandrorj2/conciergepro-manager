@@ -914,6 +914,8 @@ async function initMapa() {
                 nome:       { pt: l.nome, en: l.nome, es: l.nome, fr: l.nome },
                 desc:       { pt: l.descricao, en: l.descricao, es: l.descricao, fr: l.descricao },
                 estrelas:   l.estrelas || '★★★★☆',
+                instagram:  l.instagram || '',
+                telefone:   l.telefone  || '',
                 dist:       { pt: l.distancia, en: l.distancia, es: l.distancia, fr: l.distancia },
                 horario:    { pt: l.horario, en: l.horario, es: l.horario, fr: l.horario },
                 mapaLink:   l.maps_link || '',
