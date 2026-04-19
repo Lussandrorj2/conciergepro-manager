@@ -357,6 +357,8 @@ class LugarSugerido(models.Model):
     ativo      = models.BooleanField(default=True)
     ordem      = models.IntegerField(default=0)
     criado_em  = models.DateTimeField(auto_now_add=True)
+    instagram  = models.CharField(max_length=100, blank=True)
+    telefone   = models.CharField(max_length=30, blank=True)
 
     class Meta:
         ordering = ['ordem', 'nome']
