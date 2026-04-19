@@ -26,7 +26,6 @@ let whatsappAtual = '5521999999999';
 let passeioAtual  = null;
 let listaPasseios = [];
 
-// Estado do carrossel de fotos no detalhe
 let detFotoIndex = 0;
 let detFotos     = [];
 
@@ -56,10 +55,10 @@ const i18n = {
         sucesso: 'Redirecionando para o WhatsApp!',
         sem_imagem: 'Sem imagem',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*';
-            if (data)    msg += ', na data *${data}*';
-            if (horario) msg += ' às *${horario}*';
-            msg += '. Poderia confirmar a disponibilidade?';
+            let msg = `Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*`;
+            if (data)    msg += `, na data *${data}*`;
+            if (horario) msg += ` às *${horario}*`;
+            msg += `. Poderia confirmar a disponibilidade?`;
             return msg;
         },
         aviso_wpp: 'Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.',
@@ -98,10 +97,10 @@ const i18n = {
         sucesso: 'Redirecting to WhatsApp!',
         sem_imagem: 'No image',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*';
-            if (data)    msg += ' on *${data}*';
-            if (horario) msg += ' at *${horario}*';
-            msg += '. Could you confirm availability?';
+            let msg = `Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*`;
+            if (data)    msg += ` on *${data}*`;
+            if (horario) msg += ` at *${horario}*`;
+            msg += `. Could you confirm availability?`;
             return msg;
         },
         aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
@@ -140,10 +139,10 @@ const i18n = {
         sucesso: '¡Redirigiendo al WhatsApp!',
         sem_imagem: 'Sin imagen',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = '¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*';
-            if (data)    msg += ' en la fecha *${data}*';
-            if (horario) msg += ' a las *${horario}*';
-            msg += '. ¿Podría confirmar disponibilidad?';
+            let msg = `¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*`;
+            if (data)    msg += ` en la fecha *${data}*`;
+            if (horario) msg += ` a las *${horario}*`;
+            msg += `. ¿Podría confirmar disponibilidad?`;
             return msg;
         },
         aviso_wpp: 'Será redirigido al WhatsApp del hotel para confirmar su reserva.',
@@ -182,10 +181,10 @@ const i18n = {
         sucesso: 'Redirection vers WhatsApp!',
         sem_imagem: 'Sans image',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*';
-            if (data)    msg += ' à la date *${data}*';
-            if (horario) msg += ' à *${horario}*';
-            msg += '. Pourriez-vous confirmer la disponibilité ?';
+            let msg = `Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*`;
+            if (data)    msg += ` à la date *${data}*`;
+            if (horario) msg += ` à *${horario}*`;
+            msg += `. Pourriez-vous confirmer la disponibilité ?`;
             return msg;
         },
         aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
@@ -212,19 +211,19 @@ function t(key) {
 async function carregarHotel(lang) {
     if (!hotelSlug) return;
     try {
-        const res = await fetch('${API_BASE}/hotel/${hotelSlug}/?lang=${lang}');
+        const res = await fetch(`${API_BASE}/hotel/${hotelSlug}/?lang=${lang}`);
         if (!res.ok) { console.warn('[carregarHotel] HTTP', res.status); return; }
         const data = await res.json();
 
         if (data.whatsapp) {
             whatsappAtual = data.whatsapp;
             const wppLink = document.getElementById('wpp-main');
-            if (wppLink) wppLink.href = 'https://wa.me/${data.whatsapp}';
+            if (wppLink) wppLink.href = `https://wa.me/${data.whatsapp}`;
         }
 
         const heroBg = document.getElementById('hero-bg');
         if (heroBg && data.foto_capa) {
-            heroBg.style.backgroundImage = 'url('${data.foto_capa}')';
+            heroBg.style.backgroundImage = `url('${data.foto_capa}')`;
             heroBg.style.opacity = '1';
         }
 
@@ -253,7 +252,7 @@ function carrosselAtualizar() {
     if (!track) return;
 
     const cardW = 320 + 24;
-    track.style.transform = 'translateX(-${carrIndex * cardW}px)';
+    track.style.transform = `translateX(-${carrIndex * cardW}px)`;
 
     if (btnPrev) btnPrev.disabled = carrIndex === 0;
     if (btnNext) btnNext.disabled = carrIndex >= carrTotal - carrVisiveis;
@@ -319,21 +318,21 @@ async function carregarPasseios(lang) {
     if (!track) return;
 
     if (!hotelSlug) {
-        track.innerHTML = '<div class="estado-vazio" style="flex:1"><span class="icon">🏖️</span><p>${t('vazio')}</p></div>';
+        track.innerHTML = `<div class="estado-vazio" style="flex:1"><span class="icon">🏖️</span><p>${t('vazio')}</p></div>`;
         return;
     }
 
     try {
-        const res = await fetch('${API_BASE}/public/${hotelSlug}/passeios/?lang=${lang}');
-        if (!res.ok) throw new Error('HTTP ${res.status}');
+        const res = await fetch(`${API_BASE}/public/${hotelSlug}/passeios/?lang=${lang}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         listaPasseios = await res.json();
 
         const countEl = document.getElementById('count-passeios');
-        if (countEl) countEl.innerText = '${listaPasseios.length} ${t('secao_label').toLowerCase()}';
+        if (countEl) countEl.innerText = `${listaPasseios.length} ${t('secao_label').toLowerCase()}`;
 
         if (!listaPasseios.length) {
-            track.innerHTML = '<div class="estado-vazio" style="flex:1"><span class="icon">🏖️</span><p>${t('vazio')}</p></div>';
+            track.innerHTML = `<div class="estado-vazio" style="flex:1"><span class="icon">🏖️</span><p>${t('vazio')}</p></div>`;
             return;
         }
 
@@ -346,7 +345,7 @@ async function carregarPasseios(lang) {
 
     } catch (e) {
         console.error('[carregarPasseios]', e);
-        track.innerHTML = '<div class="estado-erro" style="flex:1"><span class="icon">⚠️</span><p>${t('erro')}</p></div>';
+        track.innerHTML = `<div class="estado-erro" style="flex:1"><span class="icon">⚠️</span><p>${t('erro')}</p></div>`;
     }
 }
 
@@ -356,7 +355,7 @@ async function carregarPasseios(lang) {
 function renderCard(p) {
     const precoLabel = p.preco_sob_consulta
         ? t('sob_consulta')
-        : 'R$ ${Number(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}';
+        : `R$ ${Number(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
     const precoSub = p.preco_por_pessoa && !p.preco_sob_consulta ? t('por_pessoa') : '';
 
@@ -366,10 +365,10 @@ function renderCard(p) {
     const imgSrc = getImageUrl(p.banner || p.imagem || p.foto || p.foto_capa || p.image || primeiraFoto);
 
     const imgHTML = imgSrc
-        ? '<img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-img-empty\\'>🌊</div>'">'
-        : '<div class="card-img-empty">🌊</div>';
+        ? `<img src="${imgSrc}" alt="${p.nome}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-img-empty\\'>🌊</div>'">`
+        : `<div class="card-img-empty">🌊</div>`;
 
-    return '
+    return `
     <div class="card-passeio" onclick="abrirDetalhe(${p.id})">
         <div class="card-img">
             ${imgHTML}
@@ -382,14 +381,14 @@ function renderCard(p) {
             <div class="card-footer">
                 <div class="card-preco">
                     ${precoLabel}
-                    ${precoSub ? '<small>${precoSub}</small>' : ''}
+                    ${precoSub ? `<small>${precoSub}</small>` : ''}
                 </div>
                 <button class="btn-reservar" onclick="event.stopPropagation(); abrirDetalhe(${p.id})">
                     ${t('btn')}
                 </button>
             </div>
         </div>
-    </div>';
+    </div>`;
 }
 
 // ==========================================
@@ -416,7 +415,7 @@ function detFotoRender() {
     if (!track) return;
 
     if (!detFotos.length) {
-        track.innerHTML = '<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>';
+        track.innerHTML = `<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>`;
         if (thumbs)  thumbs.innerHTML    = '';
         if (counter) counter.textContent = '';
         if (btnPrev) btnPrev.style.display = 'none';
@@ -424,17 +423,17 @@ function detFotoRender() {
         return;
     }
 
-    track.innerHTML = detFotos.map(src => '
+    track.innerHTML = detFotos.map(src => `
         <div class="det-foto-slide">
             <img src="${src}" alt="" onerror="this.parentElement.innerHTML='<div class=\\'det-foto-slide-empty\\'>🌊</div>'">
-        </div>').join('');
+        </div>`).join('');
 
     if (thumbs) {
         thumbs.innerHTML = detFotos.length > 1
-            ? detFotos.map((src, i) => '
+            ? detFotos.map((src, i) => `
                 <div class="det-thumb ${i === detFotoIndex ? 'active' : ''}" onclick="detFotoIr(${i})">
                     <img src="${src}" alt="" onerror="this.style.display='none'">
-                </div>').join('')
+                </div>`).join('')
             : '';
     }
 
@@ -451,8 +450,8 @@ function detFotoAtualizar() {
     const btnNext = document.getElementById('det-foto-next');
     const thumbs  = document.querySelectorAll('.det-thumb');
 
-    if (track)   track.style.transform = 'translateX(-${detFotoIndex * 100}%)';
-    if (counter) counter.textContent   = '${detFotoIndex + 1} / ${detFotos.length}';
+    if (track)   track.style.transform = `translateX(-${detFotoIndex * 100}%)`;
+    if (counter) counter.textContent   = `${detFotoIndex + 1} / ${detFotos.length}`;
     if (btnPrev) btnPrev.disabled      = detFotoIndex === 0;
     if (btnNext) btnNext.disabled      = detFotoIndex >= detFotos.length - 1;
 
@@ -496,13 +495,13 @@ function abrirDetalhe(passeioId) {
     const chipsEl = document.getElementById('det-chips');
     if (chipsEl) {
         const chips = [];
-        if (p.duracao)   chips.push('⏱ <span>${p.duracao}</span>');
-        if (p.nivel)     chips.push('🎯 <span>${p.nivel}</span>');
-        if (p.inclui)    chips.push('✅ <span>${p.inclui}</span>');
-        if (p.saida)     chips.push('📍 <span>${p.saida}</span>');
-        if (p.idade_min) chips.push('👤 <span>A partir de ${p.idade_min} anos</span>');
-        if (p.idiomas)   chips.push('🌐 <span>${p.idiomas}</span>');
-        chipsEl.innerHTML     = chips.map(c => '<div class="det-chip">${c}</div>').join('');
+        if (p.duracao)   chips.push(`⏱ <span>${p.duracao}</span>`);
+        if (p.nivel)     chips.push(`🎯 <span>${p.nivel}</span>`);
+        if (p.inclui)    chips.push(`✅ <span>${p.inclui}</span>`);
+        if (p.saida)     chips.push(`📍 <span>${p.saida}</span>`);
+        if (p.idade_min) chips.push(`👤 <span>A partir de ${p.idade_min} anos</span>`);
+        if (p.idiomas)   chips.push(`🌐 <span>${p.idiomas}</span>`);
+        chipsEl.innerHTML     = chips.map(c => `<div class="det-chip">${c}</div>`).join('');
         chipsEl.style.display = chips.length ? '' : 'none';
     }
 
@@ -513,7 +512,7 @@ function abrirDetalhe(passeioId) {
             precoEl.childNodes[0].textContent = t('sob_consulta');
         } else {
             const val = Number(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            precoEl.childNodes[0].textContent = 'R$ ${val}';
+            precoEl.childNodes[0].textContent = `R$ ${val}`;
         }
     }
     if (precoSubEl) {
@@ -548,7 +547,7 @@ function initDetFotoSwipe() {
 }
 
 // ==========================================
-// ABRIR MODAL RESERVA A PARTIR DO DETALHE
+// MODAL RESERVA
 // ==========================================
 function abrirModalReservaDoDetalhe() {
     if (!passeioAtual) return;
@@ -628,7 +627,7 @@ function calcularTotal() {
     } else {
         const preco  = Number(passeioAtual.preco || 0);
         const total  = passeioAtual.preco_por_pessoa ? preco * qtd : preco;
-        totalStr = 'R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}';
+        totalStr = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     }
 
     document.getElementById('resumo-passeio').innerText     = passeioAtual.nome;
@@ -663,9 +662,9 @@ function confirmarReserva() {
     const msgFn    = t('wpp_msg');
     const mensagem = typeof msgFn === 'function'
         ? msgFn(nome, passeioAtual.nome, qtd, dataLabel, horario)
-        : 'Olá! Tenho interesse no passeio ${passeioAtual.nome} para ${qtd} pessoa(s).';
+        : `Olá! Tenho interesse no passeio ${passeioAtual.nome} para ${qtd} pessoa(s).`;
 
-    const url = 'https://wa.me/${whatsappAtual}?text=${encodeURIComponent(mensagem)}';
+    const url = `https://wa.me/${whatsappAtual}?text=${encodeURIComponent(mensagem)}`;
 
     mostrarToast(t('sucesso'), 'success');
     fecharModalReserva();
@@ -678,14 +677,14 @@ function confirmarReserva() {
 function mostrarToast(msg, tipo = '') {
     const container = document.getElementById('toasts');
     const toast     = document.createElement('div');
-    toast.className = 'toast ${tipo}';
+    toast.className = `toast ${tipo}`;
     toast.innerText = msg;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
 }
 
 // ==========================================
-// CSRF (admin)
+// CSRF
 // ==========================================
 function getCookie(name) {
     for (const c of document.cookie.split(';')) {
@@ -716,7 +715,7 @@ async function trocarIdioma(lang) {
     if (tituloSecao) tituloSecao.innerText = t('secao_titulo');
 
     if (countEl && listaPasseios.length) {
-        countEl.innerText = '${listaPasseios.length} ${t('secao_label').toLowerCase()}';
+        countEl.innerText = `${listaPasseios.length} ${t('secao_label').toLowerCase()}`;
     }
 
     atualizarTextosMapa();
@@ -728,12 +727,14 @@ async function trocarIdioma(lang) {
 }
 
 // ==========================================
-// FECHAR COM ESC / CLICK FORA
+// ESC / CLICK FORA
 // ==========================================
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         if (document.getElementById('modalReserva')?.classList.contains('open')) {
             voltarParaDetalhe();
+        } else if (document.getElementById('modalLugar')?.classList.contains('open')) {
+            fecharModalLugar();
         } else {
             fecharDetalhe();
         }
@@ -748,21 +749,23 @@ document.getElementById('modalReserva')?.addEventListener('click', function(e) {
     if (e.target === this) voltarParaDetalhe();
 });
 
-// ==========================================
-// MAPA TURÍSTICO — LUGARES REAIS (Ipanema Inn)
-// ==========================================
+document.getElementById('modalLugar')?.addEventListener('click', function(e) {
+    if (e.target === this) fecharModalLugar();
+});
 
+// ==========================================
+// MAPA
+// ==========================================
 const HOTEL_LAT = -22.98544266423526;
 const HOTEL_LNG = -43.20739229160829;
 
 let LUGARES = [];
 
-// Labels do mapa por idioma (inclui badge "Do Hotel")
 const MAPA_LABELS = {
-    pt: { restaurante: 'Restaurante', shopping: 'Compras', hotelBadge: '★ Do Hotel', hotelNome: '🏨 Hotel — Ipanema Inn', hotelInfo: 'Sua localização atual' },
-    en: { restaurante: 'Restaurant', shopping: 'Shopping', hotelBadge: '★ Hotel\'s Own', hotelNome: '🏨 Hotel — Ipanema Inn', hotelInfo: 'Your current location' },
-    es: { restaurante: 'Restaurante', shopping: 'Compras', hotelBadge: '★ Del Hotel', hotelNome: '🏨 Hotel — Ipanema Inn', hotelInfo: 'Tu ubicación actual' },
-    fr: { restaurante: 'Restaurant', shopping: 'Shopping', hotelBadge: "★ De l'Hôtel", hotelNome: '🏨 Hôtel — Ipanema Inn', hotelInfo: 'Votre position actuelle' },
+    pt: { restaurante: 'Restaurante', shopping: 'Compras', hotelBadge: '★ Do Hotel' },
+    en: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ Hotel's Own" },
+    es: { restaurante: 'Restaurante', shopping: 'Compras',  hotelBadge: '★ Del Hotel' },
+    fr: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ De l'Hôtel" },
 };
 
 let lugarFiltroAtivo   = 'todos';
@@ -816,30 +819,26 @@ function renderLugarCards() {
         : LUGARES.filter(l => l.tipo === lugarFiltroAtivo);
 
     if (!lista.length) {
-        grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">${t('vazio')}</div>';
+        grid.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">${t('vazio')}</div>`;
         return;
     }
 
     grid.innerHTML = lista.map(lugar => {
-        const nome       = lugar.nome[idiomaAtual] || lugar.nome['pt'];
-        const desc       = lugar.desc[idiomaAtual] || lugar.desc['pt'];
-        const dist       = lugar.dist[idiomaAtual] || lugar.dist['pt'];
-        const horario    = lugar.horario[idiomaAtual] || lugar.horario['pt'];
-        const tipoLabel  = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
-        const selecionado = lugarSelecionadoId === lugar.id ? ' selecionado' : '';
-        const hotelBadge = lugar.hotelProprio
-            ? '<div style="display:inline-block;background:var(--gold,#b5843a);color:#fff;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-top:2px;">${L_.hotelBadge}</div>'
-            : '';
+        const nome      = lugar.nome[idiomaAtual] || lugar.nome['pt'];
+        const desc      = lugar.desc[idiomaAtual] || lugar.desc['pt'];
+        const dist      = lugar.dist[idiomaAtual] || lugar.dist['pt'];
+        const horario   = lugar.horario[idiomaAtual] || lugar.horario['pt'];
+        const tipoLabel = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
+        const sel       = lugarSelecionadoId === lugar.id ? ' selecionado' : '';
 
-        return '
-        <div class="lugar-card${selecionado}${lugar.hotelProprio ? ' hotel-proprio' : ''}"
+        return `
+        <div class="lugar-card${sel}"
              onclick="abrirModalLugar(${lugar.id}); selecionarLugar(${lugar.id});"
              role="button" tabindex="0" aria-label="${nome}">
             <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
             <div class="lugar-nome">${nome}</div>
-            ${hotelBadge}
             <div class="lugar-info-desc">${desc}</div>
-            ${horario ? '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.4;">🕐 ${horario}</div>' : ''}
+            ${horario ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.4;">🕐 ${horario}</div>` : ''}
             <div class="lugar-meta">
                 <span class="lugar-estrelas">${lugar.estrelas}</span>
                 <span class="lugar-distancia">🚶 ${dist}</span>
@@ -851,7 +850,7 @@ function renderLugarCards() {
                onclick="event.stopPropagation()">
                 ↗ ${t('mapa_abrir')}
             </a>
-        </div>';
+        </div>`;
     }).join('');
 
     grid.querySelectorAll('.lugar-card').forEach(card => {
@@ -865,17 +864,15 @@ function selecionarLugar(id) {
     lugarSelecionadoId = id;
     const lugar = LUGARES.find(l => l.id === id);
     if (!lugar) return;
-
     renderLugarCards();
-    carregarMapaIframe(lugar.mapaSrc || gerarMapaSrc(lugar.lat, lugar.lng));
+    carregarMapaIframe(gerarMapaSrc(lugar.lat, lugar.lng));
 }
 
-// Gera URL do Google Maps embed para as coordenadas
 function gerarMapaSrc(lat, lng) {
-    return 'https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.005},${lat-0.005},${lng+0.005},${lat+0.005}&layer=mapnik&marker=${lat},${lng}';
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.005},${lat-0.005},${lng+0.005},${lat+0.005}&layer=mapnik&marker=${lat},${lng}`;
 }
 
-const MAPA_GERAL_SRC = 'https://www.openstreetmap.org/export/embed.html?bbox=${HOTEL_LNG-0.01},${HOTEL_LAT-0.01},${HOTEL_LNG+0.01},${HOTEL_LAT+0.01}&layer=mapnik&marker=${HOTEL_LAT},${HOTEL_LNG}';
+const MAPA_GERAL_SRC = `https://www.openstreetmap.org/export/embed.html?bbox=${HOTEL_LNG-0.01},${HOTEL_LAT-0.01},${HOTEL_LNG+0.01},${HOTEL_LAT+0.01}&layer=mapnik&marker=${HOTEL_LAT},${HOTEL_LNG}`;
 
 function carregarMapaIframe(src) {
     const iframe  = document.getElementById('mapa-iframe');
@@ -904,20 +901,20 @@ async function initMapa() {
     carregarMapaIframe(MAPA_GERAL_SRC);
 
     try {
-        const res = await fetch('/api/public/${hotelSlug}/lugares/');
+        const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
         if (res.ok) {
             const dados = await res.json();
             LUGARES = dados.map(l => ({
                 id:        l.id,
                 tipo:      l.tipo,
                 emoji:     l.tipo === 'restaurante' ? '🍽' : '🛍',
-                nome:      { pt: l.nome, en: l.nome, es: l.nome, fr: l.nome },
+                nome:      { pt: l.nome,      en: l.nome,      es: l.nome,      fr: l.nome },
                 desc:      { pt: l.descricao, en: l.descricao, es: l.descricao, fr: l.descricao },
                 estrelas:  l.estrelas || '★★★★☆',
                 instagram: l.instagram || '',
                 telefone:  l.telefone  || '',
                 dist:      { pt: l.distancia, en: l.distancia, es: l.distancia, fr: l.distancia },
-                horario:   { pt: l.horario, en: l.horario, es: l.horario, fr: l.horario },
+                horario:   { pt: l.horario,   en: l.horario,   es: l.horario,   fr: l.horario },
                 mapaLink:  l.maps_link || '',
                 lat:       l.lat,
                 lng:       l.lng,
@@ -933,6 +930,9 @@ async function initMapa() {
     }
 }
 
+// ==========================================
+// MODAL LUGAR
+// ==========================================
 function abrirModalLugar(id) {
     const l = LUGARES.find(x => x.id === id);
     if (!l) return;
@@ -942,33 +942,33 @@ function abrirModalLugar(id) {
     const dist = l.dist[idiomaAtual] || l.dist['pt'];
     const hor  = l.horario[idiomaAtual] || l.horario['pt'];
 
-    document.getElementById('lugar-tipo').innerText     = l.tipo === 'restaurante' ? '🍽 Restaurante' : '🛍 Compras';
-    document.getElementById('lugar-nome').innerText     = nome;
-    document.getElementById('lugar-desc').innerText     = desc || '';
-    document.getElementById('lugar-horario').innerHTML  = hor  ? '🕐 ${hor}' : '';
-    document.getElementById('lugar-distancia').innerHTML = dist ? '🚶 ${dist}' : '';
-    document.getElementById('lugar-estrelas').innerText = l.estrelas || '';
+    document.getElementById('lugar-tipo').innerText      = l.tipo === 'restaurante' ? '🍽 Restaurante' : '🛍 Compras';
+    document.getElementById('lugar-nome').innerText      = nome;
+    document.getElementById('lugar-desc').innerText      = desc || '';
+    document.getElementById('lugar-horario').innerHTML   = hor  ? `🕐 ${hor}` : '';
+    document.getElementById('lugar-distancia').innerHTML = dist ? `🚶 ${dist}` : '';
+    document.getElementById('lugar-estrelas').innerText  = l.estrelas || '';
 
     const contatos = document.getElementById('lugar-contatos');
     let html = '';
 
-    if (l.mapaLink) html += '
+    if (l.mapaLink) html += `
         <a href="${l.mapaLink}" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;">
+           style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">
             📍 Ver no Google Maps
-        </a>';
+        </a>`;
 
-    if (l.instagram) html += '
+    if (l.instagram) html += `
         <a href="https://instagram.com/${l.instagram.replace('@','')}" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;">
+           style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">
             📸 ${l.instagram}
-        </a>';
+        </a>`;
 
-    if (l.telefone) html += '
+    if (l.telefone) html += `
         <a href="https://wa.me/${l.telefone.replace(/\D/g,'')}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:10px;text-decoration:none;color:#16a34a;font-size:13px;font-weight:500;">
             💬 WhatsApp
-        </a>';
+        </a>`;
 
     contatos.innerHTML = html;
     document.getElementById('modalLugar').classList.add('open');
@@ -979,10 +979,6 @@ function fecharModalLugar() {
     document.getElementById('modalLugar').classList.remove('open');
     document.body.style.overflow = '';
 }
-
-window.fecharModalLugar = fecharModalLugar;
-
-
 
 // ==========================================
 // INIT
@@ -1014,3 +1010,4 @@ window.detFotoMover               = detFotoMover;
 window.detFotoIr                  = detFotoIr;
 window.filtrarMapa                = filtrarMapa;
 window.selecionarLugar            = selecionarLugar;
+window.fecharModalLugar           = fecharModalLugar;
