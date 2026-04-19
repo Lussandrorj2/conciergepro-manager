@@ -216,8 +216,9 @@ def dashboard_cambio(request, hotel_slug):
 # =========================
 
 @csrf_exempt
-@login_required
 def api_passeios(request, hotel_slug, passeio_id=None):
+    if not request.user.is_authenticated:
+        return JsonResponse({"erro": "Não autenticado"}, status=401)
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
 
     if request.method == "GET":
@@ -429,10 +430,9 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
 # =========================
 
 @csrf_exempt
-@login_required
 def deletar_imagem(request, id):
-    if request.method != "DELETE":
-        return JsonResponse({"erro": "Método inválido"}, status=400)
+    if not request.user.is_authenticated:
+        return JsonResponse({"erro": "Não autenticado"}, status=401)
     try:
         imagem = get_object_or_404(ImagemPasseio, id=id)
         if not _get_hotel_do_usuario(request, imagem.passeio.hotel):
