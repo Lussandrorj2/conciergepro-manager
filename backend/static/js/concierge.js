@@ -881,7 +881,7 @@ function gerarMapaSrc(lat, lng) {
     return `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
 }
 
-const MAPA_GERAL_SRC = `https://maps.google.com/maps?q=${HOTEL_LAT},${HOTEL_LNG}&z=15&output=embed`;
+
 
 function carregarMapaIframe(src) {
     const iframe  = document.getElementById('mapa-iframe');
