@@ -55,7 +55,7 @@ const i18n = {
         sucesso: 'Redirecionando para o WhatsApp!',
         sem_imagem: 'Sem imagem',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*';
+            let msg = `Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*`;
             if (data)    msg += ', na data *${data}*';
             if (horario) msg += ' às *${horario}*';
             msg += '. Poderia confirmar a disponibilidade?';
@@ -139,7 +139,7 @@ const i18n = {
         sucesso: '¡Redirigiendo al WhatsApp!',
         sem_imagem: 'Sin imagen',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = '¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*';
+            let msg = `¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*`;
             if (data)    msg += ' en la fecha *${data}*';
             if (horario) msg += ' a las *${horario}*';
             msg += '. ¿Podría confirmar disponibilidad?';
@@ -181,7 +181,7 @@ const i18n = {
         sucesso: 'Redirection vers WhatsApp!',
         sem_imagem: 'Sans image',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*';
+            let msg = `Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*`;
             if (data)    msg += ' à la date *${data}*';
             if (horario) msg += ' à *${horario}*';
             msg += '. Pourriez-vous confirmer la disponibilité ?';
