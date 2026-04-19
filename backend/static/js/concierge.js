@@ -833,7 +833,7 @@ function renderLugarCards() {
 
         return '
         <div class="lugar-card${selecionado}${lugar.hotelProprio ? ' hotel-proprio' : ''}"
-             onclick="selecionarLugar(${lugar.id})"
+             onclick="abrirModalLugar(${lugar.id}); selecionarLugar(${lugar.id});"
              role="button" tabindex="0" aria-label="${nome}">
             <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
             <div class="lugar-nome">${nome}</div>
