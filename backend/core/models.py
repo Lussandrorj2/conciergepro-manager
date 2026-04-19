@@ -337,3 +337,29 @@ class Adiantamento(models.Model):
 
     def __str__(self):
         return f"{self.recepcionista} — R$ {self.valor} ({self.mes_referencia})"
+
+class LugarSugerido(models.Model):
+    TIPO_CHOICES = [
+        ('restaurante', 'Restaurante'),
+        ('shopping', 'Shopping / Compras'),
+    ]
+
+    hotel      = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='lugares')
+    tipo       = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    nome       = models.CharField(max_length=200)
+    descricao  = models.CharField(max_length=300, blank=True)
+    estrelas   = models.CharField(max_length=10, blank=True, default='★★★★☆')
+    distancia  = models.CharField(max_length=50, blank=True)
+    horario    = models.CharField(max_length=200, blank=True)
+    maps_link  = models.URLField(blank=True)
+    lat        = models.FloatField(null=True, blank=True)
+    lng        = models.FloatField(null=True, blank=True)
+    ativo      = models.BooleanField(default=True)
+    ordem      = models.IntegerField(default=0)
+    criado_em  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['ordem', 'nome']
+
+    def __str__(self):
+        return f"{self.nome} ({self.hotel.nome})"
