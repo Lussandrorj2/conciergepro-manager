@@ -97,7 +97,7 @@ const i18n = {
         sucesso: 'Redirecting to WhatsApp!',
         sem_imagem: 'No image',
         wpp_msg: (nome, passeio, qtd, data, horario) => {
-            let msg = 'Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*';
+            let msg = `Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*`;
             if (data)    msg += ' on *${data}*';
             if (horario) msg += ' at *${horario}*';
             msg += '. Could you confirm availability?';
