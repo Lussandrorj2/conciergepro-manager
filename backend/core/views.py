@@ -30,7 +30,10 @@ def get_media_url(field):
     if not field:
         return None
     try:
-        return field.url
+        url = field.url
+        if url and url.startswith('http://'):
+            url = 'https://' + url[7:]
+        return url
     except Exception:
         return None
 
