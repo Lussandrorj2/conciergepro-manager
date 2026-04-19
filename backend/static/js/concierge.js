@@ -223,7 +223,7 @@ async function carregarHotel(lang) {
 
         const heroBg = document.getElementById('hero-bg');
         if (heroBg && data.foto_capa) {
-            heroBg.style.backgroundImage = 'url('${data.foto_capa}')';
+            heroBg.style.backgroundImage = `url('${data.foto_capa}')`;
             heroBg.style.opacity = '1';
         }
 
