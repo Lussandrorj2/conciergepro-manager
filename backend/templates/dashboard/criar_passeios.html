@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +8,8 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="layout">
-
         <aside class="sidebar">
             <div class="sidebar-logo">🔔 Concierge</div>
             <nav>
@@ -27,7 +24,6 @@
                 <a href="/logout/">↩ Sair</a>
             </nav>
         </aside>
-
         <main class="main">
             <div class="topbar">
                 <span class="topbar-title" id="titulo-pagina">Novo Passeio</span>
@@ -36,17 +32,13 @@
                     {{ hotel.nome }}
                 </div>
             </div>
-
             <div class="content">
                 <div class="form-card">
-                    <h2>🧳 Dados do Passeio</h2>
-
+                    <h2 id="form-titulo">🧳 Dados do Passeio</h2>
                     <label for="nome">Nome do passeio *</label>
                     <input type="text" id="nome" placeholder="Ex: Passeio de barco em Angra dos Reis">
-
                     <label for="descricao">Descrição</label>
                     <textarea id="descricao" placeholder="Descreva o passeio, o que está incluído, duração..."></textarea>
-
                     <div class="switch-group">
                         <label class="switch-row" for="preco_sob_consulta">
                             <input type="checkbox" id="preco_sob_consulta">
@@ -57,10 +49,8 @@
                             <span>Preço por pessoa</span>
                         </label>
                     </div>
-
                     <label for="preco">Preço (R$)</label>
                     <input type="number" id="preco" placeholder="Ex: 150.00" step="0.01" min="0">
-
                     <label>Imagens</label>
                     <div class="upload-area" onclick="document.getElementById('fotos').click()">
                         <p>📷 Clique para adicionar fotos</p>
@@ -68,12 +58,10 @@
                     </div>
                     <input type="file" id="fotos" multiple accept="image/*" hidden>
                     <div id="previewGaleria" class="preview-galeria"></div>
-
                     <div id="galeria-existente" hidden>
                         <label>Fotos existentes</label>
                         <div id="galeria-atual" class="galeria-atual"></div>
                     </div>
-
                     <button id="btn-salvar-passeio" class="btn-primary" style="margin-top:24px;padding:12px 28px;">
                         🚀 Salvar Passeio
                     </button>
@@ -85,6 +73,95 @@
     <script>
         window.hotelSlug = "{{ hotel.slug }}";
     </script>
+
+    <script>
+        const hotelSlug = window.hotelSlug;
+        let passeioEditandoId = null;
+
+        document.getElementById('fotos').addEventListener('change', function() {
+            const preview = document.getElementById('previewGaleria');
+            preview.innerHTML = '';
+            [...this.files].forEach(file => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                preview.appendChild(img);
+            });
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+
+        if (editId) {
+            passeioEditandoId = editId;
+            document.getElementById('titulo-pagina').innerText = 'Editar Passeio';
+            document.getElementById('form-titulo').innerText = '✏️ Editar Passeio';
+
+            fetch(`/api/admin/${hotelSlug}/passeios/${editId}/`)
+                .then(r => r.json())
+                .then(p => {
+                    document.getElementById('nome').value = p.nome || '';
+                    document.getElementById('descricao').value = p.descricao || '';
+                    document.getElementById('preco').value = p.preco || '';
+                    document.getElementById('preco_sob_consulta').checked = p.preco_sob_consulta;
+                    document.getElementById('preco_por_pessoa').checked = p.preco_por_pessoa;
+
+                    if (p.fotos && p.fotos.length) {
+                        document.getElementById('galeria-existente').hidden = false;
+                        document.getElementById('galeria-atual').innerHTML = p.fotos.map(f => `
+                            <div class="foto-item">
+                                <img src="${f.url}" alt="">
+                                <button class="foto-del" onclick="deletarFoto(${f.id}, this)">✕</button>
+                            </div>`).join('');
+                    }
+                });
+        }
+
+        document.getElementById('btn-salvar-passeio').addEventListener('click', async () => {
+            const nome = document.getElementById('nome').value.trim();
+            if (!nome) { alert('Nome obrigatório'); return; }
+
+            const btn = document.getElementById('btn-salvar-passeio');
+            btn.disabled = true;
+            btn.innerText = 'Salvando...';
+
+            const fd = new FormData();
+            fd.append('nome', nome);
+            fd.append('descricao', document.getElementById('descricao').value);
+            fd.append('preco', document.getElementById('preco').value || '0');
+            fd.append('preco_sob_consulta', document.getElementById('preco_sob_consulta').checked);
+            fd.append('preco_por_pessoa', document.getElementById('preco_por_pessoa').checked);
+
+            const fotos = document.getElementById('fotos').files;
+            for (const f of fotos) fd.append('imagens', f);
+
+            const url = passeioEditandoId
+                ? `/api/admin/${hotelSlug}/passeios/${passeioEditandoId}/`
+                : `/api/admin/${hotelSlug}/passeios/`;
+
+            try {
+                const res = await fetch(url, { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    alert('Passeio salvo!');
+                    window.location.href = `/${hotelSlug}/dashboard/listar/`;
+                } else {
+                    alert('Erro: ' + JSON.stringify(data));
+                }
+            } catch(e) {
+                alert('Erro ao salvar: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🚀 Salvar Passeio';
+            }
+        });
+
+        async function deletarFoto(id, btn) {
+            if (!confirm('Remover esta foto?')) return;
+            const res = await fetch(`/api/admin/imagem/${id}/`, { method: 'DELETE' });
+            if (res.ok) btn.parentElement.remove();
+        }
+    </script>
+
     <script src="{% static 'js/dashboard.js' %}"></script>
     <script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
