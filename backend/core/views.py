@@ -928,3 +928,59 @@ def forcar_traducao_hotel(request, hotel_slug):
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
+
+
+@login_required
+def dashboard_lugares(request, hotel_slug):
+    return render(request, 'dashboard/gerenciar_lugares.html', {
+        'hotel': get_object_or_404(Hotel, slug=hotel_slug)
+    })
+
+@csrf_exempt
+def api_lugares(request, hotel_slug, lugar_id=None):
+    if not request.user.is_authenticated:
+        return JsonResponse({"erro": "Não autenticado"}, status=401)
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+
+    if request.method == "GET":
+        lugares = LugarSugerido.objects.filter(hotel=hotel)
+        return JsonResponse([{
+            "id": l.id, "tipo": l.tipo, "nome": l.nome,
+            "descricao": l.descricao, "estrelas": l.estrelas,
+            "distancia": l.distancia, "horario": l.horario,
+            "maps_link": l.maps_link, "lat": l.lat, "lng": l.lng,
+            "ativo": l.ativo, "ordem": l.ordem,
+        } for l in lugares], safe=False)
+
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            if lugar_id:
+                l = get_object_or_404(LugarSugerido, id=lugar_id, hotel=hotel)
+            else:
+                l = LugarSugerido(hotel=hotel)
+            for campo in ['tipo','nome','descricao','estrelas','distancia','horario','maps_link','lat','lng','ativo','ordem']:
+                if campo in body:
+                    setattr(l, campo, body[campo])
+            l.save()
+            return JsonResponse({"status": "ok", "id": l.id})
+        except Exception as e:
+            return JsonResponse({"erro": str(e)}, status=500)
+
+    if request.method == "DELETE" and lugar_id:
+        get_object_or_404(LugarSugerido, id=lugar_id, hotel=hotel).delete()
+        return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"erro": "Método inválido"}, status=405)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_lugares_publico(request, hotel_slug):
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    lugares = LugarSugerido.objects.filter(hotel=hotel, ativo=True)
+    return Response([{
+        "id": l.id, "tipo": l.tipo, "nome": l.nome,
+        "descricao": l.descricao, "estrelas": l.estrelas,
+        "distancia": l.distancia, "horario": l.horario,
+        "maps_link": l.maps_link, "lat": l.lat, "lng": l.lng,
+    } for l in lugares])
