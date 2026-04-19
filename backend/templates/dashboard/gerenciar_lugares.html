@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lugares Sugeridos — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/" class="active">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <span class="topbar-title">🗺️ Lugares Sugeridos</span>
+                <div style="font-size:12px;color:var(--text-soft);margin-top:2px;">{{ hotel.nome }}</div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <a href="/{{ hotel.slug }}/dashboard/listar/" class="btn-secondary" style="padding:9px 16px;font-size:13px;">
+                    ← Voltar
+                </a>
+                <button class="btn-novo" onclick="abrirModal()">➕ Novo Lugar</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div style="display:flex;gap:8px;margin-bottom:20px;">
+                <button class="tab-btn active" onclick="filtrar('todos')" id="tab-todos">Todos</button>
+                <button class="tab-btn" onclick="filtrar('restaurante')" id="tab-restaurante">🍽 Restaurantes</button>
+                <button class="tab-btn" onclick="filtrar('shopping')" id="tab-shopping">🛍 Compras</button>
+            </div>
+
+            <div class="cards-grid" id="lista">
+                <div class="loading">Carregando lugares</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+    <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+            <h3 id="modal-titulo">Novo Lugar</h3>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Tipo *</label>
+                    <select id="f-tipo">
+                        <option value="restaurante">🍽 Restaurante</option>
+                        <option value="shopping">🛍 Shopping / Compras</option>
+                    </select>
+                </div>
+                <div class="form-group full">
+                    <label>Nome *</label>
+                    <input type="text" id="f-nome" placeholder="Ex: Zazá Bistrô Tropical">
+                </div>
+                <div class="form-group full">
+                    <label>Descrição</label>
+                    <input type="text" id="f-descricao" placeholder="Ex: Culinária criativa ✦ 4.6 ★">
+                </div>
+                <div class="form-group">
+                    <label>Estrelas</label>
+                    <select id="f-estrelas">
+                        <option value="★★★★★">★★★★★</option>
+                        <option value="★★★★☆">★★★★☆</option>
+                        <option value="★★★☆☆">★★★☆☆</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Distância</label>
+                    <input type="text" id="f-distancia" placeholder="Ex: 5 min a pé">
+                </div>
+                <div class="form-group full">
+                    <label>Horário</label>
+                    <input type="text" id="f-horario" placeholder="Ex: Seg–Sáb 12h–00h">
+                </div>
+                <div class="form-group full">
+                    <label>Link Google Maps</label>
+                    <input type="url" id="f-maps" placeholder="https://maps.google.com/?q=...">
+                </div>
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" id="f-lat" step="any" placeholder="-22.985">
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" id="f-lng" step="any" placeholder="-43.207">
+                </div>
+                <div class="form-group">
+                    <label>Ordem</label>
+                    <input type="number" id="f-ordem" value="0" min="0">
+                </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px;">
+                    <input type="checkbox" id="f-ativo" checked style="width:auto;">
+                    <label style="margin:0;text-transform:none;letter-spacing:0;font-size:13px;">Ativo</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-save" onclick="salvar()">💾 Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.hotelSlug = "{{ hotel.slug }}";
+    let editandoId = null;
+    let filtroAtivo = 'todos';
+    let todosLugares = [];
+
+    async function carregar() {
+        const res = await fetch(`/api/admin/${hotelSlug}/lugares/`);
+        todosLugares = await res.json();
+        renderizar();
+    }
+
+    function filtrar(tipo) {
+        filtroAtivo = tipo;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tipo).classList.add('active');
+        renderizar();
+    }
+
+    function renderizar() {
+        const lista = document.getElementById('lista');
+        const itens = filtroAtivo === 'todos' ? todosLugares : todosLugares.filter(l => l.tipo === filtroAtivo);
+
+        if (!itens.length) {
+            lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🗺️</div><p>Nenhum lugar cadastrado.</p></div>';
+            return;
+        }
+
+        lista.innerHTML = itens.map(l => `
+            <div class="passeio-card">
+                <div class="card-body">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                        <div>
+                            <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">
+                                ${l.tipo === 'restaurante' ? '🍽 Restaurante' : '🛍 Compras'}
+                            </div>
+                            <div class="card-nome">${l.nome}</div>
+                        </div>
+                        <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${l.ativo ? 'var(--green-dim)' : 'var(--red-dim)'};color:${l.ativo ? 'var(--green)' : '#f87171'};">
+                            ${l.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </div>
+                    <div class="card-desc">${l.descricao || ''}</div>
+                    <div style="font-size:12px;color:var(--text-soft);margin-bottom:4px;">
+                        ${l.estrelas || ''} ${l.distancia ? '· 🚶 ' + l.distancia : ''}
+                    </div>
+                    ${l.horario ? `<div style="font-size:11px;color:var(--text-soft);">🕐 ${l.horario}</div>` : ''}
+                    <div class="card-acoes" style="margin-top:14px;">
+                        <button class="btn-editar" onclick="editar(${l.id})">✏️ Editar</button>
+                        <button class="btn-excluir" onclick="excluir(${l.id}, '${l.nome.replace(/'/g,"\\'")}')">🗑️</button>
+                    </div>
+                </div>
+            </div>`).join('');
+    }
+
+    function abrirModal(dados = null) {
+        editandoId = dados ? dados.id : null;
+        document.getElementById('modal-titulo').innerText = dados ? 'Editar Lugar' : 'Novo Lugar';
+        document.getElementById('f-tipo').value      = dados?.tipo || 'restaurante';
+        document.getElementById('f-nome').value      = dados?.nome || '';
+        document.getElementById('f-descricao').value = dados?.descricao || '';
+        document.getElementById('f-estrelas').value  = dados?.estrelas || '★★★★☆';
+        document.getElementById('f-distancia').value = dados?.distancia || '';
+        document.getElementById('f-horario').value   = dados?.horario || '';
+        document.getElementById('f-maps').value      = dados?.maps_link || '';
+        document.getElementById('f-lat').value       = dados?.lat || '';
+        document.getElementById('f-lng').value       = dados?.lng || '';
+        document.getElementById('f-ordem').value     = dados?.ordem ?? 0;
+        document.getElementById('f-ativo').checked   = dados ? dados.ativo : true;
+        document.getElementById('modal').classList.add('open');
+    }
+
+    function editar(id) {
+        const l = todosLugares.find(x => x.id === id);
+        if (l) abrirModal(l);
+    }
+
+    function fecharModal() {
+        document.getElementById('modal').classList.remove('open');
+        editandoId = null;
+    }
+
+    async function salvar() {
+        const nome = document.getElementById('f-nome').value.trim();
+        if (!nome) { alert('Nome obrigatório'); return; }
+
+        const body = {
+            tipo:      document.getElementById('f-tipo').value,
+            nome,
+            descricao: document.getElementById('f-descricao').value,
+            estrelas:  document.getElementById('f-estrelas').value,
+            distancia: document.getElementById('f-distancia').value,
+            horario:   document.getElementById('f-horario').value,
+            maps_link: document.getElementById('f-maps').value,
+            lat:       parseFloat(document.getElementById('f-lat').value) || null,
+            lng:       parseFloat(document.getElementById('f-lng').value) || null,
+            ordem:     parseInt(document.getElementById('f-ordem').value) || 0,
+            ativo:     document.getElementById('f-ativo').checked,
+        };
+
+        const url = editandoId
+            ? `/api/admin/${hotelSlug}/lugares/${editandoId}/`
+            : `/api/admin/${hotelSlug}/lugares/`;
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        if (data.status === 'ok') {
+            fecharModal();
+            carregar();
+        } else {
+            alert('Erro: ' + JSON.stringify(data));
+        }
+    }
+
+    async function excluir(id, nome) {
+        if (!confirm(`Excluir "${nome}"?`)) return;
+        await fetch(`/api/admin/${hotelSlug}/lugares/${id}/`, { method: 'DELETE' });
+        carregar();
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
+
+    carregar();
+</script>
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+</body>
+</html>
