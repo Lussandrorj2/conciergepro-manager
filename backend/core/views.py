@@ -964,9 +964,11 @@ def api_lugares(request, hotel_slug, lugar_id=None):
                 l = get_object_or_404(LugarSugerido, id=lugar_id, hotel=hotel)
             else:
                 l = LugarSugerido(hotel=hotel)
-            for campo in ['tipo','nome','descricao','estrelas','distancia','horario','maps_link','lat','lng','ativo','ordem']:
+            for campo in ['tipo','nome','descricao','estrelas','distancia','horario',
+                          'maps_link','lat','lng','ativo','ordem','instagram','telefone']:
                 if campo in body:
                     setattr(l, campo, body[campo])
+
             l.save()
             return JsonResponse({"status": "ok", "id": l.id})
         except Exception as e:
