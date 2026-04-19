@@ -285,8 +285,11 @@ function carrosselMover(dir) {
 function carrosselCalcularVisiveis() {
     const viewport = document.getElementById('passeios');
     if (!viewport) return 3;
-    return Math.max(1, Math.floor(viewport.offsetWidth / (320 + 24)));
+    const w = viewport.offsetWidth;
+    if (w < 480) return 1;
+    return Math.max(1, Math.floor(w / (320 + 24)));
 }
+
 
 function initCarrosselDrag() {
     const el = document.getElementById('passeios');
