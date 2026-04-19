@@ -37,9 +37,14 @@
                     <span class="topbar-title">📋 Gerenciar Passeios</span>
                     <div style="font-size:12px;color:var(--text-soft);margin-top:2px;">{{ hotel.nome }}</div>
                 </div>
-                <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-novo">
-                    ➕ Novo Passeio
-                </a>
+                <div style="display:flex;gap:10px;">
+                    <a href="/{{ hotel.slug }}/dashboard/lugares/" class="btn-secondary" style="padding:9px 16px;font-size:13px;">
+                        🗺️ Lugares Sugeridos
+                    </a>
+                    <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-novo">
+                        ➕ Novo Passeio
+                    </a>
+                </div>
             </div>
 
             <div class="content">
