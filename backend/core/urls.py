@@ -46,6 +46,7 @@ urlpatterns = [
     # PASSEIOS (CRUD)
     # =========================
     path('api/admin/<slug:hotel_slug>/passeios/', views.api_passeios, name='api_passeios'),
+    path('api/admin/<slug:hotel_slug>/passeios/<int:passeio_id>/', views.api_passeios, name='api_passeios_detail'),
     path('api/public/<slug:hotel_slug>/passeios/', views.listar_passeios, name='api_passeios_detail'),
 
     # =========================
