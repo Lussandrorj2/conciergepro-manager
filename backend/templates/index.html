@@ -1056,23 +1056,25 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .hero-content { padding: 40px 24px; }
-            .section { padding: 48px 20px; }
-            .card-passeio { flex: 0 0 calc(100vw - 80px); }
-            .carr-prev { left: -14px; }
-            .carr-next { right: -14px; }
-            .form-row  { grid-template-columns: 1fr; }
-            .det-foto-wrap { height: 280px; }
-            .det-body { padding: 24px 20px 28px; }
-            .det-nome { font-size: 22px; }
-            .det-footer { flex-direction: column; align-items: flex-start; gap: 14px; }
-            .btn-reservar-det { width: 100%; text-align: center; }
-            .modal-detalhe { border-radius: 16px; }
-            .modal-reserva { padding: 28px 20px; }
-            #mapa-container { height: 340px; }
-            #mapa-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-            .mapa-section-head { flex-direction: column; align-items: flex-start; }
-        }
+    .hero-content { padding: 40px 24px; }
+    .section { padding: 48px 16px; }
+    .card-passeio { flex: 0 0 calc(100vw - 80px); }
+    .carr-prev { display: none; }
+    .carr-next { display: none; }
+    #passeios { justify-content: center; }
+    .form-row  { grid-template-columns: 1fr; }
+    .det-foto-wrap { height: 280px; }
+    .det-body { padding: 24px 20px 28px; }
+    .det-nome { font-size: 22px; }
+    .det-footer { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .btn-reservar-det { width: 100%; text-align: center; }
+    .modal-detalhe { border-radius: 16px; }
+    .modal-reserva { padding: 28px 20px; }
+    #mapa-container { height: 340px; }
+    #mapa-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .mapa-section-head { flex-direction: column; align-items: flex-start; }
+}
+
 
         @media (max-width: 480px) {
             .det-foto-wrap { height: 220px; }
