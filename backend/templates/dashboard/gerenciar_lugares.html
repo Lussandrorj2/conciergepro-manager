@@ -109,6 +109,15 @@
                     <label>Ordem</label>
                     <input type="number" id="f-ordem" value="0" min="0">
                 </div>
+                <div class="form-group full">
+                    <label>Instagram</label>
+                    <input type="text" id="f-instagram" placeholder="@nomerestaurante">
+                </div>
+                <div class="form-group full">
+                    <label>Telefone / WhatsApp</label>
+                    <input type="text" id="f-telefone" placeholder="+55 21 99999-9999">
+                </div>
+                
                 <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:20px;">
                     <input type="checkbox" id="f-ativo" checked style="width:auto;">
                     <label style="margin:0;text-transform:none;letter-spacing:0;font-size:13px;">Ativo</label>
@@ -189,6 +198,8 @@
         document.getElementById('f-maps').value      = dados?.maps_link || '';
         document.getElementById('f-lat').value       = dados?.lat || '';
         document.getElementById('f-lng').value       = dados?.lng || '';
+        document.getElementById('f-instagram').value = dados?.instagram || '';
+        document.getElementById('f-telefone').value  = dados?.telefone || '';
         document.getElementById('f-ordem').value     = dados?.ordem ?? 0;
         document.getElementById('f-ativo').checked   = dados ? dados.ativo : true;
         document.getElementById('modal').classList.add('open');
@@ -216,10 +227,13 @@
             distancia: document.getElementById('f-distancia').value,
             horario:   document.getElementById('f-horario').value,
             maps_link: document.getElementById('f-maps').value,
+            instagram: document.getElementById('f-instagram').value,
+            telefone:  document.getElementById('f-telefone').value,
             lat:       parseFloat(document.getElementById('f-lat').value) || null,
             lng:       parseFloat(document.getElementById('f-lng').value) || null,
             ordem:     parseInt(document.getElementById('f-ordem').value) || 0,
             ativo:     document.getElementById('f-ativo').checked,
+            
         };
 
         const url = editandoId
