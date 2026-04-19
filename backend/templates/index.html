@@ -1305,6 +1305,21 @@
         window.hotelSlug = "{{ hotel.slug|default:'' }}";
     </script>
     <script src="{% static 'js/concierge.js' %}"></script>
-
+    <div class="modal-overlay" id="modalLugar">
+    <div class="modal-detalhe" style="max-width:500px;">
+        <button class="modal-close-det" onclick="fecharModalLugar()">✕</button>
+        <div style="padding:32px 36px;">
+            <div class="det-eyebrow" id="lugar-tipo">Restaurante</div>
+            <h2 class="det-nome" id="lugar-nome">—</h2>
+            <p class="det-desc" id="lugar-desc"></p>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+                <div id="lugar-horario" style="font-size:13px;color:var(--text-muted);"></div>
+                <div id="lugar-distancia" style="font-size:13px;color:var(--text-muted);"></div>
+                <div id="lugar-estrelas" style="font-size:14px;color:var(--gold);"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="lugar-contatos"></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
