@@ -755,313 +755,7 @@ document.getElementById('modalReserva')?.addEventListener('click', function(e) {
 const HOTEL_LAT = -22.98544266423526;
 const HOTEL_LNG = -43.20739229160829;
 
-const LUGARES = [
-    // ── RESTAURANTES DO HOTEL (destaque) ──
-    {
-        id: 1, tipo: 'restaurante', emoji: '🌿', hotelProprio: true,
-        nome: { pt: 'Quitéria Rio', en: 'Quitéria Rio', es: 'Quitéria Rio', fr: 'Quitéria Rio' },
-        desc: {
-            pt: 'Restaurante do hotel. Cozinha brasileira autoral do chef David Cruz ✦ No local',
-            en: 'Hotel restaurant. Creative Brazilian cuisine by chef David Cruz ✦ On-site',
-            es: 'Restaurante del hotel. Cocina brasileña de autor del chef David Cruz ✦ En el local',
-            fr: "Restaurant de l'hôtel. Cuisine brésilienne créative du chef David Cruz ✦ Sur place"
-        },
-        estrelas: '★★★★★',
-        dist: { pt: 'No térreo do hotel', en: 'Hotel ground floor', es: 'Planta baja del hotel', fr: "Rez-de-chaussée de l'hôtel" },
-        horario: {
-            pt: 'Café: 7h–11:30 | Almoço e Jantar: 12h–22:30 (diário)',
-            en: 'Breakfast: 7–11:30am | Lunch & Dinner: 12–10:30pm (daily)',
-            es: 'Desayuno: 7–11:30h | Almuerzo y Cena: 12h–22:30h (diario)',
-            fr: 'Petit-déj: 7h–11h30 | Déjeuner et Dîner: 12h–22h30 (quotidien)'
-        },
-        mapaLink: 'https://maps.google.com/?q=Quitéria+Rio+Rua+Maria+Quitéria+27+Ipanema+Rio+de+Janeiro',
-        lat: -22.98544506756334, lng: -43.20727995127523
-    },
-    {
-        id: 2, tipo: 'restaurante', emoji: '🌊', hotelProprio: true,
-        nome: { pt: 'Arp Bar', en: 'Arp Bar', es: 'Arp Bar', fr: 'Arp Bar' },
-        desc: {
-            pt: 'Bar & restaurante beira-mar do Hotel Arpoador. Vista única do pôr do sol ✦ Top 100 EXAME',
-            en: 'Beachfront bar & restaurant at Hotel Arpoador. Unique sunset view ✦ Top 100 EXAME',
-            es: 'Bar & restaurante frente al mar del Hotel Arpoador. Vista única al atardecer ✦ Top 100 EXAME',
-            fr: 'Bar & restaurant en bord de mer du Hotel Arpoador. Vue unique sur le coucher de soleil ✦ Top 100 EXAME'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '10 min a pé', en: '10 min walk', es: '10 min a pie', fr: '10 min à pied' },
-        horario: {
-            pt: 'Café: 7h–11:30 | Seg–Sex 12:15–23h | Sáb 12:45–23h | Dom 12:45–22h',
-            en: 'Breakfast: 7–11:30am | Mon–Fri 12:15–11pm | Sat 12:45–11pm | Sun 12:45–10pm',
-            es: 'Desayuno: 7–11:30h | Lun–Vie 12:15–23h | Sáb 12:45–23h | Dom 12:45–22h',
-            fr: 'Petit-déj: 7h–11h30 | Lun–Ven 12h15–23h | Sam 12h45–23h | Dim 12h45–22h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Hotel+Arpoador+Rua+Francisco+Otaviano+177+Ipanema+Rio+de+Janeiro',
-        lat: -22.987833919316724, lng: -43.193849411853336
-    },
-
-    // ── RESTAURANTES DO BAIRRO ──
-    {
-        id: 3, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Zazá Bistrô Tropical', en: 'Zazá Bistrô Tropical', es: 'Zazá Bistrô Tropical', fr: 'Zazá Bistrô Tropical' },
-        desc: {
-            pt: 'Culinária criativa e tropical. Melhor ceviche de Ipanema ✦ 4.6 ★',
-            en: 'Creative tropical cuisine. Best ceviche in Ipanema ✦ 4.6 ★',
-            es: 'Cocina creativa y tropical. Mejor ceviche de Ipanema ✦ 4.6 ★',
-            fr: "Cuisine créative et tropicale. Meilleur ceviche d'Ipanema ✦ 4.6 ★"
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '8 min a pé', en: '8 min walk', es: '8 min a pie', fr: '8 min à pied' },
-        horario: {
-            pt: 'Seg–Sáb 12h–00:30 | Dom 12h–23:30',
-            en: 'Mon–Sat 12pm–12:30am | Sun 12pm–11:30pm',
-            es: 'Lun–Sáb 12h–00:30 | Dom 12h–23:30',
-            fr: 'Lun–Sam 12h–00h30 | Dim 12h–23h30'
-        },
-        mapaLink: 'https://maps.google.com/?q=Zazá+Bistrô+Tropical+Ipanema',
-        lat: -22.9854508, lng: -43.2049036
-    },
-    {
-        id: 4, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Pope Ipanema', en: 'Pope Ipanema', es: 'Pope Ipanema', fr: 'Pope Ipanema' },
-        desc: {
-            pt: 'Melhor italiano do Rio. Risoto de polvo imperdível ✦ 4.7 ★',
-            en: "Rio's best Italian. Must-try octopus risotto ✦ 4.7 ★",
-            es: 'Mejor italiano de Río. Risotto de pulpo imperdible ✦ 4.7 ★',
-            fr: 'Meilleur italien de Rio. Risotto de poulpe incontournable ✦ 4.7 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '8 min a pé', en: '8 min walk', es: '8 min a pie', fr: '8 min à pied' },
-        horario: {
-            pt: 'Ter–Sex 18h–00h | Sáb–Dom 12h–00h',
-            en: 'Tue–Fri 6pm–12am | Sat–Sun 12pm–12am',
-            es: 'Mar–Vie 18h–00h | Sáb–Dom 12h–00h',
-            fr: 'Mar–Ven 18h–00h | Sam–Dim 12h–00h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Pope+Ipanema+Rio',
-        lat: -22.9851157, lng: -43.2051654
-    },
-    {
-        id: 5, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Nino Cucina', en: 'Nino Cucina', es: 'Nino Cucina', fr: 'Nino Cucina' },
-        desc: {
-            pt: 'Autêntica cozinha italiana. Ambiente charmoso com terraço ✦ 4.7 ★',
-            en: 'Authentic Italian cuisine. Charming ambiance with terrace ✦ 4.7 ★',
-            es: 'Auténtica cocina italiana. Ambiente encantador con terraza ✦ 4.7 ★',
-            fr: 'Cuisine italienne authentique. Ambiance charmante avec terrasse ✦ 4.7 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '6 min a pé', en: '6 min walk', es: '6 min a pie', fr: '6 min à pied' },
-        horario: {
-            pt: 'Seg–Qui 12h–16h e 19h–00h | Sex–Sáb 12h–00h',
-            en: 'Mon–Thu 12–4pm & 7pm–12am | Fri–Sat 12pm–12am',
-            es: 'Lun–Jue 12h–16h y 19h–00h | Vie–Sáb 12h–00h',
-            fr: 'Lun–Jeu 12h–16h et 19h–00h | Ven–Sam 12h–00h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Nino+Cucina+Ipanema',
-        lat: -22.9828156, lng: -43.2088174
-    },
-    {
-        id: 6, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Nosso', en: 'Nosso', es: 'Nosso', fr: 'Nosso' },
-        desc: {
-            pt: 'Coquetéis premiados e menu autoral. Point do Ipanema ✦ 4.6 ★',
-            en: 'Award-winning cocktails and signature menu. Ipanema hotspot ✦ 4.6 ★',
-            es: 'Cócteles premiados y menú de autor. Punto de encuentro de Ipanema ✦ 4.6 ★',
-            fr: "Cocktails primés et menu signature. Point de rencontre d'Ipanema ✦ 4.6 ★"
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '2 min a pé', en: '2 min walk', es: '2 min a pie', fr: '2 min à pied' },
-        horario: {
-            pt: 'Ter–Sáb 18:30h–00:30 | Dom 18:30h–23h',
-            en: 'Tue–Sat 6:30pm–12:30am | Sun 6:30–11pm',
-            es: 'Mar–Sáb 18:30h–00:30 | Dom 18:30h–23h',
-            fr: 'Mar–Sam 18h30–00h30 | Dim 18h30–23h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Nosso+Restaurante+Ipanema',
-        lat: -22.9833517, lng: -43.2071758
-    },
-    {
-        id: 7, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Masserini Osteria di Mare', en: 'Masserini Osteria di Mare', es: 'Masserini Osteria di Mare', fr: 'Masserini Osteria di Mare' },
-        desc: {
-            pt: 'Frutos do mar com vista para a Praia de Ipanema ✦ 4.7 ★',
-            en: 'Seafood with views of Ipanema Beach ✦ 4.7 ★',
-            es: 'Mariscos con vista a la Playa de Ipanema ✦ 4.7 ★',
-            fr: "Fruits de mer avec vue sur la plage d'Ipanema ✦ 4.7 ★"
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '5 min a pé', en: '5 min walk', es: '5 min a pie', fr: '5 min à pied' },
-        horario: {
-            pt: 'Ter–Dom 12h–23h | Seg fechado',
-            en: 'Tue–Sun 12pm–11pm | Mon closed',
-            es: 'Mar–Dom 12h–23h | Lun cerrado',
-            fr: 'Mar–Dim 12h–23h | Lun fermé'
-        },
-        mapaLink: 'https://maps.google.com/?q=Masserini+Osteria+Ipanema',
-        lat: -22.9863290, lng: -43.2033205
-    },
-    {
-        id: 8, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Giuseppe Grill Leblon', en: 'Giuseppe Grill Leblon', es: 'Giuseppe Grill Leblon', fr: 'Giuseppe Grill Leblon' },
-        desc: {
-            pt: 'A melhor picanha do Rio. Recomendado pelo Michelin ✦ 4.6 ★',
-            en: "Rio's best picanha steak. Michelin recommended ✦ 4.6 ★",
-            es: 'La mejor picaña de Río. Recomendado por Michelin ✦ 4.6 ★',
-            fr: 'La meilleure picanha de Rio. Recommandé par le Michelin ✦ 4.6 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '15 min a pé', en: '15 min walk', es: '15 min a pie', fr: '15 min à pied' },
-        horario: {
-            pt: 'Seg–Sáb 12h–00h | Dom 12h–23h',
-            en: 'Mon–Sat 12pm–12am | Sun 12pm–11pm',
-            es: 'Lun–Sáb 12h–00h | Dom 12h–23h',
-            fr: 'Lun–Sam 12h–00h | Dim 12h–23h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Giuseppe+Grill+Leblon',
-        lat: -22.9835344, lng: -43.2230006
-    },
-    {
-        id: 9, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Babbo Osteria', en: 'Babbo Osteria', es: 'Babbo Osteria', fr: 'Babbo Osteria' },
-        desc: {
-            pt: 'Gnocchi de trufas e ambiente romântico no Ipanema ✦ 4.6 ★',
-            en: 'Truffle gnocchi and romantic ambiance in Ipanema ✦ 4.6 ★',
-            es: 'Gnocchi de trufas y ambiente romántico en Ipanema ✦ 4.6 ★',
-            fr: 'Gnocchi aux truffes et ambiance romantique à Ipanema ✦ 4.6 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '10 min a pé', en: '10 min walk', es: '10 min a pie', fr: '10 min à pied' },
-        horario: {
-            pt: 'Seg–Qui 12h–16h e 19h–23h | Sex–Sáb 19h–00h | Dom 12h–18h',
-            en: 'Mon–Thu 12–4pm & 7–11pm | Fri–Sat 7pm–12am | Sun 12–6pm',
-            es: 'Lun–Jue 12h–16h y 19h–23h | Vie–Sáb 19h–00h | Dom 12h–18h',
-            fr: 'Lun–Jeu 12h–16h et 19h–23h | Ven–Sam 19h–00h | Dim 12h–18h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Babbo+Osteria+Ipanema',
-        lat: -22.9826432, lng: -43.2122708
-    },
-    {
-        id: 10, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Le Blond', en: 'Le Blond', es: 'Le Blond', fr: 'Le Blond' },
-        desc: {
-            pt: 'Fusão franco-brasileira. Estrela Michelin no Leblon ✦ 4.6 ★',
-            en: 'French-Brazilian fusion. Michelin star in Leblon ✦ 4.6 ★',
-            es: 'Fusión franco-brasileña. Estrella Michelin en Leblon ✦ 4.6 ★',
-            fr: 'Fusion franco-brésilienne. Étoile Michelin à Leblon ✦ 4.6 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '18 min a pé', en: '18 min walk', es: '18 min a pie', fr: '18 min à pied' },
-        horario: {
-            pt: 'Seg–Sex 12h–16h e 18:30h–00h | Sáb–Dom 12h–00h',
-            en: 'Mon–Fri 12–4pm & 6:30pm–12am | Sat–Sun 12pm–12am',
-            es: 'Lun–Vie 12h–16h y 18:30h–00h | Sáb–Dom 12h–00h',
-            fr: 'Lun–Ven 12h–16h et 18h30–00h | Sam–Dim 12h–00h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Le+Blond+Leblon',
-        lat: -22.9862088, lng: -43.2281262
-    },
-    {
-        id: 11, tipo: 'restaurante', emoji: '🍽',
-        nome: { pt: 'Nola Leblon', en: 'Nola Leblon', es: 'Nola Leblon', fr: 'Nola Leblon' },
-        desc: {
-            pt: 'Menu contemporâneo premiado. Point da Rua Dias Ferreira ✦ 4.5 ★',
-            en: 'Award-winning contemporary menu. Dias Ferreira Street hotspot ✦ 4.5 ★',
-            es: 'Menú contemporáneo premiado. Punto de la Calle Dias Ferreira ✦ 4.5 ★',
-            fr: 'Menu contemporain primé. Lieu de rendez-vous Rua Dias Ferreira ✦ 4.5 ★'
-        },
-        estrelas: '★★★★☆',
-        dist: { pt: '20 min a pé', en: '20 min walk', es: '20 min a pie', fr: '20 min à pied' },
-        horario: {
-            pt: 'Seg–Ter 12h–00h | Qua–Sáb 12h–01h | Dom 12h–23h',
-            en: 'Mon–Tue 12pm–12am | Wed–Sat 12pm–1am | Sun 12pm–11pm',
-            es: 'Lun–Mar 12h–00h | Mié–Sáb 12h–01h | Dom 12h–23h',
-            fr: 'Lun–Mar 12h–00h | Mer–Sam 12h–01h | Dim 12h–23h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Nola+Leblon+Rio',
-        lat: -22.9840584, lng: -43.2274173
-    },
-
-    // ── SHOPPINGS ──
-    {
-        id: 12, tipo: 'shopping', emoji: '🛍',
-        nome: { pt: 'Shopping Leblon', en: 'Shopping Leblon', es: 'Shopping Leblon', fr: 'Shopping Leblon' },
-        desc: {
-            pt: 'O mall mais sofisticado do Rio. Marcas nacionais e internacionais ✦ 4.6 ★',
-            en: "Rio's most sophisticated mall. National and international brands ✦ 4.6 ★",
-            es: 'El centro comercial más sofisticado de Río. Marcas nacionales e internacionales ✦ 4.6 ★',
-            fr: 'Le centre commercial le plus sophistiqué de Rio. Marques nationales et internationales ✦ 4.6 ★'
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '12 min a pé', en: '12 min walk', es: '12 min a pie', fr: '12 min à pied' },
-        horario: {
-            pt: 'Seg–Sáb 10h–22h | Dom 12h–22h',
-            en: 'Mon–Sat 10am–10pm | Sun 12pm–10pm',
-            es: 'Lun–Sáb 10h–22h | Dom 12h–22h',
-            fr: 'Lun–Sam 10h–22h | Dim 12h–22h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Shopping+Leblon',
-        lat: -22.9824704, lng: -43.2168792
-    },
-    {
-        id: 13, tipo: 'shopping', emoji: '🛍',
-        nome: { pt: 'Rio Design Leblon', en: 'Rio Design Leblon', es: 'Rio Design Leblon', fr: 'Rio Design Leblon' },
-        desc: {
-            pt: 'Moda, decoração e gastronomia no coração do Leblon ✦ 4.5 ★',
-            en: 'Fashion, décor and dining in the heart of Leblon ✦ 4.5 ★',
-            es: 'Moda, decoración y gastronomía en el corazón de Leblon ✦ 4.5 ★',
-            fr: 'Mode, décoration et gastronomie au cœur de Leblon ✦ 4.5 ★'
-        },
-        estrelas: '★★★★☆',
-        dist: { pt: '14 min a pé', en: '14 min walk', es: '14 min a pie', fr: '14 min à pied' },
-        horario: {
-            pt: 'Seg–Sáb 10h–23h | Dom 12h–21h',
-            en: 'Mon–Sat 10am–11pm | Sun 12pm–9pm',
-            es: 'Lun–Sáb 10h–23h | Dom 12h–21h',
-            fr: 'Lun–Sam 10h–23h | Dim 12h–21h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Rio+Design+Leblon',
-        lat: -22.9833799, lng: -43.2185823
-    },
-    {
-        id: 14, tipo: 'shopping', emoji: '🛍',
-        nome: { pt: 'Galeria Ipanema 2000', en: 'Galeria Ipanema 2000', es: 'Galería Ipanema 2000', fr: 'Galeria Ipanema 2000' },
-        desc: {
-            pt: 'Moda autoral, biquínis e marcas exclusivas de Ipanema ✦ 4.7 ★',
-            en: 'Designer fashion, bikinis and exclusive Ipanema brands ✦ 4.7 ★',
-            es: 'Moda de autor, bikinis y marcas exclusivas de Ipanema ✦ 4.7 ★',
-            fr: "Mode d'auteur, bikinis et marques exclusives d'Ipanema ✦ 4.7 ★"
-        },
-        estrelas: '★★★★★',
-        dist: { pt: '5 min a pé', en: '5 min walk', es: '5 min a pie', fr: '5 min à pied' },
-        horario: {
-            pt: 'Seg–Sáb 09h–20h',
-            en: 'Mon–Sat 9am–8pm',
-            es: 'Lun–Sáb 09h–20h',
-            fr: 'Lun–Sam 9h–20h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Galeria+Ipanema+2000',
-        lat: -22.9841546, lng: -43.2115691
-    },
-    {
-        id: 15, tipo: 'shopping', emoji: '🛍',
-        nome: { pt: 'Forum de Ipanema', en: 'Forum de Ipanema', es: 'Forum de Ipanema', fr: 'Forum de Ipanema' },
-        desc: {
-            pt: 'Boutiques, lojas locais e clima vintage de Ipanema ✦ 4.4 ★',
-            en: "Boutiques, local shops and Ipanema's vintage vibe ✦ 4.4 ★",
-            es: 'Boutiques, tiendas locales y ambiente vintage de Ipanema ✦ 4.4 ★',
-            fr: "Boutiques, magasins locaux et ambiance vintage d'Ipanema ✦ 4.4 ★"
-        },
-        estrelas: '★★★★☆',
-        dist: { pt: '4 min a pé', en: '4 min walk', es: '4 min a pie', fr: '4 min à pied' },
-        horario: {
-            pt: 'Seg–Sex 08h–20h | Sáb 08h–18h',
-            en: 'Mon–Fri 8am–8pm | Sat 8am–6pm',
-            es: 'Lun–Vie 08h–20h | Sáb 08h–18h',
-            fr: 'Lun–Ven 8h–20h | Sam 8h–18h'
-        },
-        mapaLink: 'https://maps.google.com/?q=Forum+de+Ipanema',
-        lat: -22.9845092, lng: -43.2056211
-    },
-];
+let LUGARES = [];
 
 // Labels do mapa por idioma (inclui badge "Do Hotel")
 const MAPA_LABELS = {
@@ -1216,15 +910,26 @@ async function initMapa() {
     try {
         const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
         if (res.ok) {
-            LUGARES = await res.json();
+            const dados = await res.json();
+            LUGARES = dados.map(l => ({
+                id:         l.id,
+                tipo:       l.tipo,
+                emoji:      l.tipo === 'restaurante' ? '🍽' : '🛍',
+                nome:       { pt: l.nome, en: l.nome, es: l.nome, fr: l.nome },
+                desc:       { pt: l.descricao, en: l.descricao, es: l.descricao, fr: l.descricao },
+                estrelas:   l.estrelas || '★★★★☆',
+                dist:       { pt: l.distancia, en: l.distancia, es: l.distancia, fr: l.distancia },
+                horario:    { pt: l.horario, en: l.horario, es: l.horario, fr: l.horario },
+                mapaLink:   l.maps_link || '',
+                lat:        l.lat,
+                lng:        l.lng,
+            }));
         }
     } catch(e) {
-        console.warn('Lugares da API não disponíveis:', e);
+        console.warn('Lugares não carregados:', e);
     }
 
-    // Se não veio nada da API, mantém array vazio
     renderLugarCards();
-
     if (LUGARES.length) {
         setTimeout(() => selecionarLugar(LUGARES[0].id), 600);
     }
