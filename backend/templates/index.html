@@ -55,10 +55,11 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(to bottom,
-                    rgba(0,0,0,0.1) 0%,
-                    rgba(0,0,0,0.3) 40%,
-                    rgba(0,0,0,0.85) 100%);
-        }
+                rgba(0,0,0,0.05) 0%,
+                rgba(0,0,0,0.15) 30%,
+                rgba(0,0,0,0.55) 65%,
+                rgba(0,0,0,0.92) 100%);
+}
 
         .hero-content {
             position: relative;
@@ -66,6 +67,38 @@
             padding: 60px 48px;
             max-width: 700px;
         }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(8px);
+            color: rgba(255, 255, 255, 0.90);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 24px;
+            letter-spacing: 0.3px;
+        }
+        
+        @media (max-width: 480px) {
+            .hero-badges {
+                gap: 8px;
+            }
+            .hero-badge {
+                font-size: 11px;
+                padding: 6px 12px;
+    }
+}
 
         .hero-eyebrow {
             font-size: 11px;
@@ -1131,6 +1164,12 @@
             <div class="hero-eyebrow">Concierge Digital</div>
             <h1 id="txt-hero-title">{{ hotel.titulo_hero|default:"Experiências Exclusivas" }}</h1>
             <p id="txt-hero-subtitle">{{ hotel.subtitulo_hero|default:"Selecione seu próximo destino" }}</p>
+        </div>
+
+        <div class="hero-badges">
+            <span class="hero-badge">✓ Guias credenciados</span>
+            <span class="hero-badge">✓ Transporte seguro</span>
+            <span class="hero-badge">✓ Reserva pelo WhatsApp</span>
         </div>
 
         <div class="scroll-hint">
