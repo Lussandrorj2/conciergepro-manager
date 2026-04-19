@@ -950,6 +950,8 @@ def api_lugares(request, hotel_slug, lugar_id=None):
             "distancia": l.distancia, "horario": l.horario,
             "maps_link": l.maps_link, "lat": l.lat, "lng": l.lng,
             "ativo": l.ativo, "ordem": l.ordem,
+            "instagram": l.instagram,
+            "telefone":  l.telefone,
         } for l in lugares], safe=False)
 
     if request.method == "POST":
@@ -983,4 +985,6 @@ def api_lugares_publico(request, hotel_slug):
         "descricao": l.descricao, "estrelas": l.estrelas,
         "distancia": l.distancia, "horario": l.horario,
         "maps_link": l.maps_link, "lat": l.lat, "lng": l.lng,
+        "instagram": l.instagram,
+        "telefone":  l.telefone,
     } for l in lugares])
