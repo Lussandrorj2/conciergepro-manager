@@ -76,6 +76,11 @@ urlpatterns = [
     path('api/<slug:hotel_slug>/relatorios/comissoes/', views.relatorio_comissoes, name='relatorio_comissoes'),
     path('api/admin/<slug:hotel_slug>/divisao/', views.api_divisao, name='api_divisao'),
 
+    path('<slug:hotel_slug>/dashboard/lugares/', views.dashboard_lugares, name='dashboard_lugares'),
+    path('api/admin/<slug:hotel_slug>/lugares/', views.api_lugares, name='api_lugares'),
+    path('api/admin/<slug:hotel_slug>/lugares/<int:lugar_id>/', views.api_lugares, name='api_lugares_detail'),
+    path('api/public/<slug:hotel_slug>/lugares/', views.api_lugares_publico, name='api_lugares_publico'),
+
     # =========================
     # ADIANTAMENTOS  ← ESTAVA FALTANDO
     # =========================
