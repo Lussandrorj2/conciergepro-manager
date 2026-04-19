@@ -904,23 +904,23 @@ async function initMapa() {
     carregarMapaIframe(MAPA_GERAL_SRC);
 
     try {
-        const res = await fetch('/api/public/${hotelSlug}/lugares/');
+        const res = await fetch(`/api/public/${hotelSlug}/lugares/`);
         if (res.ok) {
             const dados = await res.json();
             LUGARES = dados.map(l => ({
-                id:         l.id,
-                tipo:       l.tipo,
-                emoji:      l.tipo === 'restaurante' ? '🍽' : '🛍',
-                nome:       { pt: l.nome, en: l.nome, es: l.nome, fr: l.nome },
-                desc:       { pt: l.descricao, en: l.descricao, es: l.descricao, fr: l.descricao },
-                estrelas:   l.estrelas || '★★★★☆',
-                instagram:  l.instagram || '',
-                telefone:   l.telefone  || '',
-                dist:       { pt: l.distancia, en: l.distancia, es: l.distancia, fr: l.distancia },
-                horario:    { pt: l.horario, en: l.horario, es: l.horario, fr: l.horario },
-                mapaLink:   l.maps_link || '',
-                lat:        l.lat,
-                lng:        l.lng,
+                id:        l.id,
+                tipo:      l.tipo,
+                emoji:     l.tipo === 'restaurante' ? '🍽' : '🛍',
+                nome:      { pt: l.nome, en: l.nome, es: l.nome, fr: l.nome },
+                desc:      { pt: l.descricao, en: l.descricao, es: l.descricao, fr: l.descricao },
+                estrelas:  l.estrelas || '★★★★☆',
+                instagram: l.instagram || '',
+                telefone:  l.telefone  || '',
+                dist:      { pt: l.distancia, en: l.distancia, es: l.distancia, fr: l.distancia },
+                horario:   { pt: l.horario, en: l.horario, es: l.horario, fr: l.horario },
+                mapaLink:  l.maps_link || '',
+                lat:       l.lat,
+                lng:       l.lng,
             }));
         }
     } catch(e) {
@@ -981,6 +981,8 @@ function fecharModalLugar() {
 }
 
 window.fecharModalLugar = fecharModalLugar;
+
+
 
 // ==========================================
 // INIT
