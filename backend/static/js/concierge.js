@@ -899,10 +899,6 @@ function carregarMapaIframe(src) {
     }
 }
 
-// Substitua o array LUGARES e a função initMapa por isto:
-
-let LUGARES = []; // agora vem da API
-
 async function initMapa() {
     atualizarTextosMapa();
     carregarMapaIframe(MAPA_GERAL_SRC);
