@@ -857,11 +857,14 @@ function renderLugarCards() {
     }).join('');
 
     grid.querySelectorAll('.lugar-card').forEach(card => {
-        card.addEventListener('keydown', e => {
-            if (e.key === 'Enter') card.click();
-        });
+    card.addEventListener('keydown', e => {
+        if (e.key === 'Enter') card.click();
     });
-}
+});
+
+// Resetar scroll ao re-renderizar (ex: ao trocar filtro)
+grid.scrollLeft = 0;
+
 
 function selecionarLugar(id) {
     lugarSelecionadoId = id;
