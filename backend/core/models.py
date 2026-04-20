@@ -51,8 +51,7 @@ class Hotel(models.Model):
     subtitulo_hero_fr = models.CharField(max_length=255, blank=True)
 
     whatsapp  = models.CharField(max_length=20, blank=True, null=True)
-    lat       = models.FloatField(null=True, blank=True)  # ← adicionar
-    lng       = models.FloatField(null=True, blank=True)  # ← adicionar
+    mapa_embed = models.TextField(blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
