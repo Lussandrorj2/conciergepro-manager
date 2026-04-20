@@ -90,24 +90,17 @@
                     <!-- LOCALIZAÇÃO -->
             <div class="card-config">
                 <div class="card-header">
-                    <h3>📍 Localização no Mapa</h3>
+                    <h3>📍 Mapa do Hotel</h3>
                     <button class="btn-save-config" id="btn-salvar-loc" onclick="salvarLocalizacao()">Salvar</button>
                 </div>
                 <p style="font-size:13px;color:#64748b;margin-bottom:16px;">
-                    Cole as coordenadas do hotel do Google Maps. Abra o Maps, clique no hotel e copie o par de números (ex: -22.9878, -43.1938).
+                    No Google Maps, clique em <strong>Compartilhar → Incorporar um mapa</strong>, copie apenas o valor do atributo <code>src="..."</code> e cole aqui.
                 </p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div>
-                        <label>Latitude</label>
-                        <input type="text" id="hotel-lat" placeholder="-22.9878347">
-                    </div>
-                    <div>
-                        <label>Longitude</label>
-                        <input type="text" id="hotel-lng" placeholder="-43.1938450">
-                    </div>
-                </div>
+                <label>Link Embed do Google Maps</label>
+                <input type="text" id="hotel-mapa-embed" placeholder="https://www.google.com/maps/embed?pb=...">
                 <div class="error-msg" id="loc-error"></div>
             </div>
+
 
 
         </div>
@@ -151,8 +144,7 @@
                 document.getElementById("placeholder").style.display = "none";
             }
             
-            if (data.lat) document.getElementById("hotel-lat").value = data.lat;
-            if (data.lng) document.getElementById("hotel-lng").value = data.lng;
+            if (data.mapa_embed) document.getElementById("hotel-mapa-embed").value = data.mapa_embed;
 
 
             if (data.whatsapp) {
@@ -163,7 +155,8 @@
         }
     }
     
-    async function salvarLocalizacao() {
+    // Substituir salvarLocalizacao:
+async function salvarLocalizacao() {
     const btn   = document.getElementById("btn-salvar-loc");
     const errEl = document.getElementById("loc-error");
     errEl.classList.remove("visible");
@@ -172,8 +165,7 @@
 
     try {
         const form = new FormData();
-        form.append("lat", document.getElementById("hotel-lat").value);
-        form.append("lng", document.getElementById("hotel-lng").value);
+        form.append("mapa_embed", document.getElementById("hotel-mapa-embed").value.trim());
 
         const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
             method: "POST",
@@ -182,7 +174,7 @@
         });
 
         if (!res.ok) { toast("❌ Erro ao salvar", "err"); return; }
-        toast("✔ Localização salva!", "ok");
+        toast("✔ Mapa salvo!", "ok");
     } catch(e) {
         toast("❌ Erro de conexão", "err");
     } finally {
@@ -190,6 +182,7 @@
         btn.textContent = "Salvar";
     }
 }
+
 
 
     // Salvar aparência (hero)
