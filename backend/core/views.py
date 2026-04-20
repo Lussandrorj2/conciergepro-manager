@@ -885,7 +885,13 @@ def salvar_hero(request, hotel_slug):
         
         mapa_embed = request.POST.get("mapa_embed", "").strip()
         if mapa_embed:
+            # Remove tags iframe se o usuário colar o código completo
+            import re
+            match = re.search(r'src=["\']([^"\']+)["\']', mapa_embed)
+            if match:
+                mapa_embed = match.group(1)
             hotel.mapa_embed = mapa_embed
+
         
         banner = request.FILES.get('banner')
         if banner:
