@@ -232,10 +232,8 @@ async function carregarHotel(lang) {
         if (tituloEl && data.titulo_hero)       tituloEl.innerText    = data.titulo_hero;
         if (subtituloEl && data.subtitulo_hero) subtituloEl.innerText = data.subtitulo_hero;
         
-        if (data.lat && data.lng) {
-            HOTEL_LAT = data.lat;
-            HOTEL_LNG = data.lng;
-            MAPA_GERAL_SRC = `https://maps.google.com/maps?q=${HOTEL_LAT},${HOTEL_LNG}&z=15&output=embed`;
+        if (data.mapa_embed) {
+            MAPA_GERAL_SRC = data.mapa_embed;
         }
 
 
@@ -766,8 +764,7 @@ document.getElementById('modalLugar')?.addEventListener('click', function(e) {
 // ==========================================
 // MAPA
 // ==========================================
-let HOTEL_LAT = null;
-let HOTEL_LNG = null;
+
 let MAPA_GERAL_SRC = '';
 
 
@@ -937,8 +934,8 @@ async function initMapa() {
     }
 
     renderLugarCards();
-    if (LUGARES.length) {
-        setTimeout(() => selecionarLugar(LUGARES[0].id), 600);
+    if (MAPA_GERAL_SRC && MAPA_GERAL_SRC.startsWith('http')) {
+        carregarMapaIframe(MAPA_GERAL_SRC);
     }
 }
 
