@@ -861,4 +861,18 @@ tr:hover td { background: #f8fafc; }
     .bottom-nav       { display: none !important; }
     .sidebar          { transform: none !important; }
     .main             { padding-bottom: 0 !important; }
+    
+    
+@media (max-width: 768px) {
+    input, select, textarea,
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .filter-bar input,
+    .filter-bar select,
+    .filtros-bar select {
+        font-size: 16px !important;
+    }
+}
+
 }
