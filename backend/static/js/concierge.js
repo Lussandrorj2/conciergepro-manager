@@ -436,14 +436,8 @@ function detFotoRender() {
             <img src="${src}" alt="" onerror="this.parentElement.innerHTML='<div class=\\'det-foto-slide-empty\\'>🌊</div>'">
         </div>`).join('');
 
-    if (thumbs) {
-        thumbs.innerHTML = detFotos.length > 1
-            ? detFotos.map((src, i) => `
-                <div class="det-thumb ${i === detFotoIndex ? 'active' : ''}" onclick="detFotoIr(${i})">
-                    <img src="${src}" alt="" onerror="this.style.display='none'">
-                </div>`).join('')
-            : '';
-    }
+    if (thumbs) thumbs.innerHTML = '';
+
 
     if (btnPrev) btnPrev.style.display = detFotos.length > 1 ? 'flex' : 'none';
     if (btnNext) btnNext.style.display = detFotos.length > 1 ? 'flex' : 'none';
