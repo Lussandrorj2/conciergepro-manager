@@ -97,8 +97,7 @@ def detalhe_hotel(request, slug):
         "subtitulo_hero": subtitulo,
         "foto_capa":      get_media_url(hotel.foto_capa),
         "whatsapp":       hotel.whatsapp,
-        "lat":            hotel.lat,   # ← adicionar
-        "lng":            hotel.lng, 
+        "mapa_embed": hotel.mapa_embed,
     })
 
 
@@ -884,14 +883,9 @@ def salvar_hero(request, hotel_slug):
         if whatsapp:
             hotel.whatsapp = whatsapp
         
-        lat = request.POST.get("lat", "").strip()
-        lng = request.POST.get("lng", "").strip()
-        if lat:
-            try: hotel.lat = float(lat)
-            except: pass
-        if lng:
-            try: hotel.lng = float(lng)
-            except: pass
+        mapa_embed = request.POST.get("mapa_embed", "").strip()
+        if mapa_embed:
+            hotel.mapa_embed = mapa_embed
         
         banner = request.FILES.get('banner')
         if banner:
@@ -916,8 +910,7 @@ def obter_hero(request, hotel_slug):
         "subtitulo": hotel.subtitulo_hero,
         "banner": get_media_url(hotel.foto_capa),
         "whatsapp": hotel.whatsapp or "",
-        "lat":       hotel.lat or "",   # ← adicionar
-        "lng":       hotel.lng or "",
+        "mapa_embed": hotel.mapa_embed or "",
     })
 
 @csrf_exempt
