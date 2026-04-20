@@ -34,7 +34,7 @@
         min-height: 100vh;
     }
 
-    /* ===== HERO — full bleed, sem bordas ou linha branca ===== */
+    /* ===== HERO — full bleed, sem linha branca ===== */
     #hero {
         position: relative;
         width: 100vw;
@@ -54,7 +54,6 @@
         background-color: #1a1008;
     }
 
-    /* gradiente termina exatamente na cor do body — sem linha branca */
     #hero-bg::after {
         content: '';
         position: absolute;
@@ -133,7 +132,7 @@
     .lang-btn:hover { color: white; }
     .lang-btn.active { background: var(--gold); color: #fff; }
 
-    /* ===== TRUST BAR — sem borda superior, integrada ao hero ===== */
+    /* ===== TRUST BAR ===== */
     .hero-trust {
         display: flex;
         flex-wrap: wrap;
@@ -184,8 +183,10 @@
 
     .section-count { font-size: 13px; color: var(--text-muted); }
 
-    /* ===== CARROSSEL PASSEIOS ===== */
-    .carrossel-wrapper { position: relative; }
+    /* ===== CARROSSEL PASSEIOS — desktop ===== */
+    .carrossel-wrapper {
+        position: relative;
+    }
 
     #passeios {
         display: flex;
@@ -204,7 +205,7 @@
         will-change: transform;
     }
 
-    /* ===== CARD PASSEIO — sombra expressiva ===== */
+    /* ===== CARD PASSEIO ===== */
     .card-passeio {
         background: #ffffff;
         border: 1px solid rgba(181,132,58,0.12);
@@ -976,7 +977,7 @@
         margin-bottom: 24px;
     }
 
-    /* ===== LUGAR CARD — expressivo com sombra ===== */
+    /* ===== LUGAR CARD ===== */
     .lugar-card {
         background: #fff;
         border: 1px solid rgba(181,132,58,0.18);
@@ -1105,30 +1106,106 @@
         margin: 0 auto;
     }
 
-    /* ===== RESPONSIVE — bloco único ===== */
+    /* ═══════════════════════════════════════
+       RESPONSIVE — bloco único unificado
+       Correção: carrosséis centralizados
+    ═══════════════════════════════════════ */
     @media (max-width: 768px) {
-        #hero { width: 100vw; }
-        .hero-content { padding: 0 20px 48px; }
-        .section { padding: 36px 16px; }
 
-        .card-passeio { flex: 0 0 calc(100vw - 72px); }
+        .section { padding: 36px 20px; }
+
+        /* ── Botões de seta ocultos no mobile ── */
         .carr-prev { display: none; }
         .carr-next { display: none; }
+
+        /* ── Wrapper sem overflow para não cortar ── */
+        .carrossel-wrapper {
+            padding: 0;
+            /* Sangra além do padding do .section para ir de borda a borda */
+            margin-left:  -20px;
+            margin-right: -20px;
+            width: calc(100% + 40px);
+        }
+
+        /* ── Viewport do carrossel de passeios ──
+           Usa scroll nativo + snap centralizado     */
         #passeios {
-            justify-content: flex-start;
-            margin-left: -16px;
-            margin-right: -16px;
-            padding-left: 16px;
             overflow-x: auto;
+            overflow-y: hidden;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            cursor: default;
+            user-select: none;
+            display: flex;
+            gap: 16px;
+            /* Padding simétrico: mostra peek do próximo card dos dois lados */
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 4px;
         }
-        #passeios::-webkit-scrollbar { display: none; }
-        #passeios-track { transition: none; }
-        .card-passeio { scroll-snap-align: start; }
-        .carrossel-wrapper { padding: 0; overflow: hidden; }
 
+        #passeios::-webkit-scrollbar { display: none; }
+
+        /* Track sem transição no mobile (scroll nativo) */
+        #passeios-track {
+            display: contents; /* cards ficam filhos diretos de #passeios */
+        }
+
+        /* Card ocupa ~85vw e snapeia no centro */
+        .card-passeio {
+            flex: 0 0 82vw;
+            max-width: 340px;
+            scroll-snap-align: center;
+        }
+
+        /* ── Dots abaixo do carrossel ── */
+        .carr-dots {
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        /* ── Carrossel de cards de lugares ──
+           Mesma lógica: borda a borda, snap centralizado */
+        #mapa-cards-grid {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 12px;
+            /* Sangra igual ao .section */
+            margin-left:  -20px;
+            margin-right: -20px;
+            width: calc(100% + 40px);
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+
+        #mapa-cards-grid::-webkit-scrollbar { display: none; }
+
+        .lugar-card {
+            flex: 0 0 72vw;
+            max-width: 280px;
+            scroll-snap-align: center;
+            min-height: 0;
+            justify-content: space-between;
+        }
+
+        /* Truncar descrição no mobile */
+        .lugar-info-desc {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Modal e formulários */
         .form-row { grid-template-columns: 1fr; }
         .det-foto-wrap { height: 280px; }
         .det-body { padding: 20px 16px 24px; }
@@ -1139,51 +1216,12 @@
         .modal-reserva { padding: 24px 16px; }
         #mapa-container { height: 280px; }
         .mapa-section-head { flex-direction: column; align-items: flex-start; }
-
-        /* Carrossel dos cards de lugares */
-        #mapa-cards-grid {
-            display: flex;
-            flex-direction: row;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 12px;
-            margin-left: -16px;
-            margin-right: -16px;
-            padding-left: 16px;
-            padding-right: 16px;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            align-items: stretch;
-        }
-
-        #mapa-cards-grid::-webkit-scrollbar { display: none; }
-
-        .lugar-card {
-            flex: 0 0 68vw;
-            max-width: 260px;
-            scroll-snap-align: start;
-            min-height: 0;
-            justify-content: space-between;
-        }
-
-        .lugar-info-desc {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .lugar-card > div[style*="font-size:11px"] {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
     }
 
     @media (max-width: 480px) {
         .det-foto-wrap { height: 230px; }
+        .card-passeio { flex: 0 0 88vw; }
+        .lugar-card { flex: 0 0 80vw; }
     }
 </style>
 
