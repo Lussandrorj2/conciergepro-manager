@@ -188,8 +188,6 @@
         document.getElementById('f-distancia').value = dados?.distancia || '';
         document.getElementById('f-horario').value   = dados?.horario || '';
         document.getElementById('f-maps').value      = dados?.maps_link || '';
-        document.getElementById('f-lat').value       = dados?.lat || '';
-        document.getElementById('f-lng').value       = dados?.lng || '';
         document.getElementById('f-instagram').value = dados?.instagram || '';
         document.getElementById('f-telefone').value  = dados?.telefone || '';
         document.getElementById('f-ordem').value     = dados?.ordem ?? 0;
@@ -221,8 +219,6 @@
             maps_link: document.getElementById('f-maps').value,
             instagram: document.getElementById('f-instagram').value,
             telefone:  document.getElementById('f-telefone').value,
-            lat:       parseFloat(document.getElementById('f-lat').value) || null,
-            lng:       parseFloat(document.getElementById('f-lng').value) || null,
             ordem:     parseInt(document.getElementById('f-ordem').value) || 0,
             ativo:     document.getElementById('f-ativo').checked,
             
