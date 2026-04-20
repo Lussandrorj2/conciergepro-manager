@@ -856,15 +856,15 @@ function renderLugarCards() {
         </div>`;
     }).join('');
 
-    grid.querySelectorAll('.lugar-card').forEach(card => {
-    card.addEventListener('keydown', e => {
-        if (e.key === 'Enter') card.click();
+        grid.querySelectorAll('.lugar-card').forEach(card => {
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter') card.click();
+        });
     });
-});
 
-// Resetar scroll ao re-renderizar (ex: ao trocar filtro)
-grid.scrollLeft = 0;
-
+    // Resetar scroll ao re-renderizar (ex: ao trocar filtro)
+    grid.scrollLeft = 0;
+}  // ← fecha renderLugarCards()
 
 function selecionarLugar(id) {
     lugarSelecionadoId = id;
