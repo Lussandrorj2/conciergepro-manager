@@ -940,6 +940,33 @@
             margin-bottom: 32px;
         }
 
+        /* Carrossel mobile para os cards de lugares */
+        @media (max-width: 768px) {
+            #mapa-cards-grid {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                gap: 12px;
+                margin-left: -16px;
+                margin-right: -16px;
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-bottom: 8px;
+            }
+        
+            #mapa-cards-grid::-webkit-scrollbar { display: none; }
+        
+            .lugar-card {
+                flex: 0 0 72vw;
+                max-width: 280px;
+                scroll-snap-align: start;
+            }
+        }
+
+
         .lugar-card {
             background: #fff;
             border: 1px solid #e2e8f0;
