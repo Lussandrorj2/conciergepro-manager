@@ -1119,6 +1119,32 @@ function renderLugarCards() {
     }, { once: true });
 }
 
+// Após initLc360Drag():
+if (isMobileView()) {
+    // Mobile: sync dots com scroll nativo
+    const track = document.getElementById('lc360-track');
+    if (track) {
+        track.addEventListener('scroll', () => {
+            const cards = track.querySelectorAll('.lugar-card-3d');
+            const trackRect = track.getBoundingClientRect();
+            let closest = 0, minDist = Infinity;
+            cards.forEach((card, i) => {
+                const rect = card.getBoundingClientRect();
+                const dist = Math.abs(rect.left + rect.width/2 - (trackRect.left + trackRect.width/2));
+                if (dist < minDist) { minDist = dist; closest = i; }
+            });
+            lc360Index = closest;
+            document.querySelectorAll('.lugares-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === closest);
+            });
+        }, { passive: true });
+    }
+    clearInterval(lc360Timer); // sem autoplay
+} else {
+    clearInterval(lc360Timer);
+}
+
+
 // ==========================================
 // atualizarTextosMapa
 // ==========================================
