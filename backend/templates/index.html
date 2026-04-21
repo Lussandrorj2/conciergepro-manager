@@ -1002,96 +1002,98 @@
     /* ═══════════════════════════════════════
        RESPONSIVE — bloco único
     ═══════════════════════════════════════ */
-    @media (max-width: 768px) {
-        .section { padding: 36px 20px; }
-        .carr-prev { display: none; }
-        .carr-next { display: none; }
+   @media (max-width: 768px) {
+    .section { padding: 36px 20px; }
+    .carr-prev { display: none; }
+    .carr-next { display: none; }
 
-        .carrossel-wrapper {
-            padding: 0;
-            margin-left: -20px;
-            margin-right: -20px;
-            width: calc(100% + 40px);
-        }
-
-        #passeios {
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            cursor: default;
-            user-select: none;
-            display: flex;
-            gap: 16px;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 4px;
-        }
-
-        #passeios::-webkit-scrollbar { display: none; }
-        #passeios-track { display: contents; }
-
-        .card-passeio {
-            flex: 0 0 82vw;
-            max-width: 340px;
-            scroll-snap-align: center;
-        }
-
-        .carr-dots { margin-top: 20px; padding: 0 20px; }
-
-        #mapa-cards-grid {
-            display: flex;
-            flex-direction: row;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 12px;
-            margin-left: -20px;
-            margin-right: -20px;
-            width: calc(100% + 40px);
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            align-items: stretch;
-        }
-
-        #mapa-cards-grid::-webkit-scrollbar { display: none; }
-
-        .lugar-card {
-            flex: 0 0 72vw;
-            max-width: 280px;
-            scroll-snap-align: center;
-            min-height: 0;
-            justify-content: space-between;
-        }
-
-        .lugar-info-desc {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .det-foto-wrap { height: 280px; }
-        .det-body { padding: 20px 16px 24px; }
-        .det-nome { font-size: 20px; }
-        .det-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
-        .btn-reservar-det { width: 100%; text-align: center; }
-        .modal-detalhe { border-radius: 16px; }
-        .modal-reserva { padding: 24px 20px 28px; }
-        #mapa-container { height: 280px; }
-        .mapa-section-head { flex-direction: column; align-items: flex-start; }
+    .carrossel-wrapper {
+        padding: 0;
+        margin-left: -20px;
+        margin-right: -20px;
+        width: calc(100% + 40px);
     }
 
-    @media (max-width: 480px) {
-        .det-foto-wrap { height: 230px; }
-        .card-passeio { flex: 0 0 88vw; }
-        .lugar-card { flex: 0 0 80vw; }
+    #passeios {
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        cursor: default;
+        user-select: none;
+        display: flex;
+        gap: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 4px;
     }
+
+    #passeios::-webkit-scrollbar { display: none; }
+
+    #passeios-track { display: flex; gap: 16px; }
+
+    .card-passeio {
+        flex: 0 0 82vw;
+        max-width: 340px;
+        scroll-snap-align: center;
+    }
+
+    .carr-dots { margin-top: 20px; padding: 0 20px; }
+
+    #mapa-cards-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 12px;
+        margin-left: -20px;
+        margin-right: -20px;
+        width: calc(100% + 40px);
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        align-items: stretch;
+    }
+
+    #mapa-cards-grid::-webkit-scrollbar { display: none; }
+
+    .lugar-card {
+        flex: 0 0 72vw;
+        max-width: 280px;
+        scroll-snap-align: center;
+        min-height: 0;
+        justify-content: space-between;
+    }
+
+    .lugar-info-desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .det-foto-wrap { height: 280px; }
+    .det-body { padding: 20px 16px 24px; }
+    .det-nome { font-size: 20px; }
+    .det-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .btn-reservar-det { width: 100%; text-align: center; }
+    .modal-detalhe { border-radius: 16px; }
+    .modal-reserva { padding: 24px 20px 28px; }
+    #mapa-container { height: 280px; }
+    .mapa-section-head { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+    .det-foto-wrap { height: 230px; }
+    .card-passeio { flex: 0 0 88vw; }
+    .lugar-card { flex: 0 0 80vw; }
+}
+
 </style>
 
 
