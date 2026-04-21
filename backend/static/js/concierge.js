@@ -1053,96 +1053,96 @@ function renderLugarCards() {
         const angDeg    = i * step;
 
         return `
-<div class="lugar-card-3d ${i === 0 ? 'is-active' : ''}"
-     id="lc360-card-${lugar.id}"
-     style="transform: rotateY(${angDeg}deg) translateZ(${radius}px);"
-     onclick="lc360Selecionar(${lugar.id}, ${i})"
-     role="button" tabindex="0" aria-label="${nome}">
-    <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
-    <div class="lugar-nome">${nome}</div>
-    <div class="lugar-info-desc">${desc}</div>
-    ${horario ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px;">🕐 ${horario}</div>` : ''}
-    <div class="lugar-meta">
-        <span class="lugar-estrelas">${lugar.estrelas}</span>
-        <span class="lugar-distancia">🚶 ${dist}</span>
-    </div>
-    <a class="lugar-card-link"
-       href="${lugar.mapaLink}"
-       target="_blank"
-       rel="noopener"
-       onclick="event.stopPropagation()">
-        ↗ ${t('mapa_abrir')}
-    </a>
-</div>`;
-    }).join('');
-
-    const dotsHTML = lista.map((_, i) =>
-        `<button class="lugares-dot ${i === 0 ? 'active' : ''}"
-                 onclick="lc360Ir(${i})" aria-label="Item ${i+1}"></button>`
-    ).join('');
-
-    grid.innerHTML = `
-<div class="lugares-carousel-outer" id="lc360-outer">
-    <button class="lugares-nav-btn prev" onclick="lc360Mover(-1)" aria-label="Anterior">‹</button>
-    <button class="lugares-nav-btn next" onclick="lc360Mover(1)"  aria-label="Próximo">›</button>
-    <div class="lugares-carousel-track-wrap">
-        <div class="lugares-carousel-track" id="lc360-track" style="transform: rotateY(0deg);">
-            ${cardsHTML}
+    <div class="lugar-card-3d ${i === 0 ? 'is-active' : ''}"
+         id="lc360-card-${lugar.id}"
+         style="transform: rotateY(${angDeg}deg) translateZ(${radius}px);"
+         onclick="lc360Selecionar(${lugar.id}, ${i})"
+         role="button" tabindex="0" aria-label="${nome}">
+        <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
+        <div class="lugar-nome">${nome}</div>
+        <div class="lugar-info-desc">${desc}</div>
+        ${horario ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px;">🕐 ${horario}</div>` : ''}
+        <div class="lugar-meta">
+            <span class="lugar-estrelas">${lugar.estrelas}</span>
+            <span class="lugar-distancia">🚶 ${dist}</span>
         </div>
-    </div>
-    <div class="lugares-dots" id="lc360-dots">${dotsHTML}</div>
-    <div class="lugares-hint" id="lc360-hint">← arraste para girar →</div>
-</div>`;
-
-    const wrap = grid.querySelector('.lugares-carousel-track-wrap');
-    if (wrap && isMobileView()) {
-        wrap.style.height = (Math.min(260, radius * 0.6) + 40) + 'px';
+        <a class="lugar-card-link"
+           href="${lugar.mapaLink}"
+           target="_blank"
+           rel="noopener"
+           onclick="event.stopPropagation()">
+            ↗ ${t('mapa_abrir')}
+        </a>
+    </div>`;
+        }).join('');
+    
+        const dotsHTML = lista.map((_, i) =>
+            `<button class="lugares-dot ${i === 0 ? 'active' : ''}"
+                     onclick="lc360Ir(${i})" aria-label="Item ${i+1}"></button>`
+        ).join('');
+    
+        grid.innerHTML = `
+    <div class="lugares-carousel-outer" id="lc360-outer">
+        <button class="lugares-nav-btn prev" onclick="lc360Mover(-1)" aria-label="Anterior">‹</button>
+        <button class="lugares-nav-btn next" onclick="lc360Mover(1)"  aria-label="Próximo">›</button>
+        <div class="lugares-carousel-track-wrap">
+            <div class="lugares-carousel-track" id="lc360-track" style="transform: rotateY(0deg);">
+                ${cardsHTML}
+            </div>
+        </div>
+        <div class="lugares-dots" id="lc360-dots">${dotsHTML}</div>
+        <div class="lugares-hint" id="lc360-hint">← arraste para girar →</div>
+    </div>`;
+    
+        const wrap = grid.querySelector('.lugares-carousel-track-wrap');
+        if (wrap && isMobileView()) {
+            wrap.style.height = (Math.min(260, radius * 0.6) + 40) + 'px';
+        }
+    
+        initLc360Drag();
+    
+        if (isMobileView()) {
+            lc360AutoPlay();
+        } else {
+            clearInterval(lc360Timer);
+        }
+    
+        window.addEventListener('resize', () => {
+            if (!isMobileView()) {
+                clearInterval(lc360Timer);
+                const track = document.getElementById('lc360-track');
+                if (track) track.style.transform = '';
+            } else {
+                lc360AplicarRotacao();
+                lc360AutoPlay();
+            }
+        }, { once: true });
     }
-
-    initLc360Drag();
-
+    
+    // Após initLc360Drag():
     if (isMobileView()) {
-        lc360AutoPlay();
+        // Mobile: sync dots com scroll nativo
+        const track = document.getElementById('lc360-track');
+        if (track) {
+            track.addEventListener('scroll', () => {
+                const cards = track.querySelectorAll('.lugar-card-3d');
+                const trackRect = track.getBoundingClientRect();
+                let closest = 0, minDist = Infinity;
+                cards.forEach((card, i) => {
+                    const rect = card.getBoundingClientRect();
+                    const dist = Math.abs(rect.left + rect.width/2 - (trackRect.left + trackRect.width/2));
+                    if (dist < minDist) { minDist = dist; closest = i; }
+                });
+                lc360Index = closest;
+                document.querySelectorAll('.lugares-dot').forEach((d, i) => {
+                    d.classList.toggle('active', i === closest);
+                });
+            }, { passive: true });
+        }
+        clearInterval(lc360Timer); // sem autoplay
     } else {
         clearInterval(lc360Timer);
     }
-
-    window.addEventListener('resize', () => {
-        if (!isMobileView()) {
-            clearInterval(lc360Timer);
-            const track = document.getElementById('lc360-track');
-            if (track) track.style.transform = '';
-        } else {
-            lc360AplicarRotacao();
-            lc360AutoPlay();
-        }
-    }, { once: true });
-}
-
-// Após initLc360Drag():
-if (isMobileView()) {
-    // Mobile: sync dots com scroll nativo
-    const track = document.getElementById('lc360-track');
-    if (track) {
-        track.addEventListener('scroll', () => {
-            const cards = track.querySelectorAll('.lugar-card-3d');
-            const trackRect = track.getBoundingClientRect();
-            let closest = 0, minDist = Infinity;
-            cards.forEach((card, i) => {
-                const rect = card.getBoundingClientRect();
-                const dist = Math.abs(rect.left + rect.width/2 - (trackRect.left + trackRect.width/2));
-                if (dist < minDist) { minDist = dist; closest = i; }
-            });
-            lc360Index = closest;
-            document.querySelectorAll('.lugares-dot').forEach((d, i) => {
-                d.classList.toggle('active', i === closest);
-            });
-        }, { passive: true });
-    }
-    clearInterval(lc360Timer); // sem autoplay
-} else {
-    clearInterval(lc360Timer);
-}
 
 
 // ==========================================
