@@ -33,19 +33,33 @@
         <main class="main">
 
             <div class="topbar">
-                <div>
-                    <span class="topbar-title">📋 Gerenciar Passeios</span>
-                    <div style="font-size:12px;color:var(--text-soft);margin-top:2px;">{{ hotel.nome }}</div>
+                <div class="topbar-left">
+                    <button class="hamburger-btn" aria-label="Abrir menu">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <span class="topbar-title">Gerenciar Passeios</span>
+                        <div style="font-size:11px;color:var(--text-soft);margin-top:1px;">{{ hotel.nome }}</div>
+                    </div>
                 </div>
-                <div style="display:flex;gap:10px;">
-                    <a href="/{{ hotel.slug }}/dashboard/lugares/" class="btn-secondary" style="padding:9px 16px;font-size:13px;">
-                        🗺️ Lugares Sugeridos
+            
+                <div class="topbar-right">
+                    <a href="/{{ hotel.slug }}/dashboard/lugares/" class="btn-ir-site" title="Lugares Sugeridos">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span class="btn-ir-site-label">Lugares</span>
                     </a>
-                    <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-novo">
-                        ➕ Novo Passeio
+                    <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-novo" style="padding:7px 14px;font-size:12px;">
+                        ➕ Novo
                     </a>
                 </div>
             </div>
+
 
             <div class="content">
 
