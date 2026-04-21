@@ -470,7 +470,10 @@
         document.getElementById('f-whatsapp').value                  = r.whatsapp || '';
         document.getElementById('f-status').value                    = r.status || 'pendente';
         document.getElementById('f-passeio').value                   = r.passeio || r.passeio_id || '';
-        document.getElementById('f-data').value                      = r.data_passeio || r.data || '';
+        const dataRaw = r.data_passeio || r.data || '';
+        document.getElementById('f-data').value = dataRaw && dataRaw !== '-'
+            ? dataRaw.split('/').reverse().join('-')   // "21/04/2026" → "2026-04-21"
+            : '';
         document.getElementById('f-horario').value                   = r.horario || '';
         document.getElementById('f-pessoas').value                   = r.numero_pessoas || 1;
         document.getElementById('f-valor-pessoa').value              = r.valor_por_pessoa || '';
