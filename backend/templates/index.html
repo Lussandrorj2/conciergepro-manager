@@ -10,6 +10,8 @@
     <title>Concierge Digital | {{ hotel.nome|default:"Bem-vindo" }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>    
     :root {
     --gold:        #b5843a;
     --gold-light:  #d4a95a;
@@ -191,19 +193,6 @@ body {
     gap: 24px;
     transition: transform 0.45s cubic-bezier(.25,.8,.25,1);
     will-change: transform;
-}
-
-/* ===== CARD ===== */
-.card-passeio {
-    background: #ffffff;
-    border: 1px solid rgba(181,132,58,0.2);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    flex: 0 0 320px;
-    min-width: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
 .card-passeio:hover {
@@ -936,26 +925,6 @@ body {
 .filtro-mapa-btn:hover { border-color: var(--gold); color: var(--text); }
 .filtro-mapa-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
-#mapa-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    margin-bottom: 32px;
-}
-
-.lugar-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 18px;
-    cursor: pointer;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.05);
-}
-
 .lugar-card:hover {
     transform: translateY(-4px);
     border-color: rgba(181,132,58,0.4);
@@ -1130,6 +1099,255 @@ body {
     #mapa-cards-grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* =========================================================
+   PATCH 1 — Sombras e efeitos nos cards de passeio
+   Substitua o bloco .card-passeio existente por este
+   ========================================================= */
+
+.card-passeio {
+    background: #ffffff;
+    border: 1px solid rgba(181,132,58,0.15);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(.25,.8,.25,1),
+                border-color 0.3s ease,
+                box-shadow 0.35s cubic-bezier(.25,.8,.25,1);
+    cursor: pointer;
+    flex: 0 0 320px;
+    min-width: 0;
+    /* Sombra base — sempre visível, sutil */
+    box-shadow:
+        0 2px 4px rgba(0,0,0,.04),
+        0 6px 16px rgba(0,0,0,.07),
+        0 0 0 0px rgba(181,132,58,0);
+}
+
+.card-passeio:hover {
+    transform: translateY(-10px) scale(1.015);
+    border-color: var(--gold);
+    /* Sombra hover — dourada profunda */
+    box-shadow:
+        0 4px 8px rgba(0,0,0,.06),
+        0 20px 48px rgba(181,132,58,0.22),
+        0 0 0 1px rgba(181,132,58,0.2);
+}
+
+/* Sombra interna na imagem para dar profundidade */
+.card-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 0;
+    box-shadow: inset 0 -60px 40px rgba(0,0,0,0.18);
+    pointer-events: none;
+}
+
+/* =========================================================
+   PATCH 2 — Carrossel 360° de lugares (restaurantes/compras)
+   Substitua o bloco #mapa-cards-grid e .lugar-card por estes
+   ========================================================= */
+
+/* Container do carrossel 360 */
+.lugares-carousel-outer {
+    position: relative;
+    width: 100%;
+    margin-bottom: 32px;
+    overflow: hidden;
+    padding: 16px 0 24px;
+}
+
+.lugares-carousel-track-wrap {
+    perspective: 1200px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lugares-carousel-track {
+    position: relative;
+    width: 220px;
+    height: 180px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.25,.8,.25,1);
+}
+
+/* Botões nav do 360 */
+.lugares-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(181,132,58,0.3);
+    background: #fff;
+    color: var(--gold);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(0,0,0,.1);
+    font-family: inherit;
+}
+
+.lugares-nav-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+.lugares-nav-btn.prev  { left: 8px; }
+.lugares-nav-btn.next  { right: 8px; }
+
+/* Dots do 360 */
+.lugares-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.lugares-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.lugares-dot.active {
+    background: var(--gold);
+    transform: scale(1.5);
+}
+
+/* Cards do 360 */
+.lugar-card-3d {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: box-shadow 0.4s ease;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.06),
+        0 8px 24px rgba(0,0,0,.08);
+    width: 220px;
+    height: 180px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.lugar-card-3d.is-active {
+    border-color: var(--gold);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.08),
+        0 16px 40px rgba(181,132,58,0.2),
+        0 0 0 1px rgba(181,132,58,0.2);
+}
+
+/* Mantém o estilo interno dos cards igual */
+.lugar-card-3d .lugar-tipo-badge {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.lugar-card-3d .lugar-nome {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.lugar-card-3d .lugar-info-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.lugar-card-3d .lugar-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.lugar-card-3d .lugar-estrelas { font-size: 11px; color: var(--gold); }
+.lugar-card-3d .lugar-distancia { font-size: 10px; color: var(--text-muted); }
+
+.lugar-card-3d .lugar-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.lugar-card-3d .lugar-card-link:hover { opacity: 0.7; }
+
+/* Indicador de rotação */
+.lugares-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+}
+
+/* =========================================================
+   PATCH 3 — Sombras no wrapper do carrossel principal
+   ========================================================= */
+
+/* Fade nas bordas do carrossel de passeios */
+.carrossel-wrapper::before,
+.carrossel-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.carrossel-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, #f4f6f9 0%, transparent 100%);
+}
+
+.carrossel-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, #f4f6f9 0%, transparent 100%);
+}
+
+/* Sombra interna do viewport do carrossel */
+#passeios {
+    /* Sombra lateral suave */
+    mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+}
+
+</style>
 
 </head>
 
