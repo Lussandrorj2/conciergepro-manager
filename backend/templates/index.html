@@ -1347,6 +1347,341 @@ body {
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
 }
 
+/* =========================================================
+   PATCH CSS — Passeios + Restaurantes 360°
+   Cole no final do CSS existente do concierge (index.html)
+   ========================================================= */
+
+/* ── REMOVE o branco dos lados do carrossel ── */
+#passeios {
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    overflow: visible !important;
+}
+
+.carrossel-wrapper::before,
+.carrossel-wrapper::after {
+    display: none !important;
+}
+
+/* ── SOMBRA nos cards de passeio ── */
+.card-passeio {
+    background: #ffffff;
+    border: 1px solid rgba(181,132,58,0.15);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(.25,.8,.25,1),
+                border-color 0.3s ease,
+                box-shadow 0.35s cubic-bezier(.25,.8,.25,1);
+    cursor: pointer;
+    flex: 0 0 320px;
+    min-width: 0;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.05),
+        0 8px 24px rgba(181,132,58,0.10),
+        0 1px 3px rgba(0,0,0,.04);
+}
+
+.card-passeio:hover {
+    transform: translateY(-10px) scale(1.018);
+    border-color: var(--gold);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.07),
+        0 24px 52px rgba(181,132,58,0.22),
+        0 0 0 1px rgba(181,132,58,0.18);
+}
+
+/* Sombra interna na imagem */
+.card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.22) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* =========================================================
+   RESTAURANTES 360° — layout moderno
+   ========================================================= */
+
+/* Grid de cards visíveis — 3 no desktop, 2 no mobile */
+.lugares-carousel-outer {
+    position: relative;
+    width: 100%;
+    padding: 8px 0 28px;
+}
+
+/* Track-wrap: perspectiva para o 360 */
+.lugares-carousel-track-wrap {
+    perspective: 1400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 260px !important;
+    position: relative;
+}
+
+/* Track 3D */
+.lugares-carousel-track {
+    position: relative;
+    width: 260px;
+    height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(.25,.8,.25,1);
+}
+
+/* Card 3D individual */
+.lugar-card-3d {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    border: 1.5px solid rgba(181,132,58,0.18);
+    border-radius: 20px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    width: 260px;
+    height: 220px;
+    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.06),
+        0 10px 28px rgba(0,0,0,.08);
+    transition: box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+/* Card ativo (frente) — dourado */
+.lugar-card-3d.is-active {
+    border-color: var(--gold);
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.08),
+        0 20px 48px rgba(181,132,58,0.22),
+        0 0 0 1.5px rgba(181,132,58,0.25);
+}
+
+.lugar-card-3d .lugar-tipo-badge {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.lugar-card-3d .lugar-nome {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+}
+
+.lugar-card-3d .lugar-info-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+}
+
+.lugar-card-3d .lugar-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid rgba(181,132,58,0.1);
+}
+
+.lugar-card-3d .lugar-estrelas {
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+.lugar-card-3d .lugar-distancia {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.lugar-card-3d .lugar-card-link {
+    font-size: 11px;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+    transition: opacity 0.2s;
+}
+
+.lugar-card-3d .lugar-card-link:hover { opacity: 0.7; }
+
+/* Botões nav do 360 */
+.lugares-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(181,132,58,0.25);
+    background: rgba(255,255,255,0.96);
+    color: var(--gold);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(181,132,58,0.12);
+    font-family: inherit;
+    backdrop-filter: blur(6px);
+}
+
+.lugares-nav-btn:hover {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(181,132,58,0.3);
+}
+
+.lugares-nav-btn.prev { left: 16px; }
+.lugares-nav-btn.next { right: 16px; }
+
+/* Dots */
+.lugares-dots {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 14px;
+}
+
+.lugares-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d4c5a9;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s, width 0.2s;
+}
+
+.lugares-dot.active {
+    background: var(--gold);
+    transform: scale(1.4);
+    width: 18px;
+    border-radius: 4px;
+}
+
+/* Hint de arraste */
+.lugares-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.8px;
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* ── DESKTOP: mostrar 3 cards lado a lado ── */
+/* Sobrepõe o 360 por um layout de grade no desktop */
+@media (min-width: 769px) {
+    .lugares-carousel-outer {
+        padding: 0 0 16px;
+    }
+
+    /* Esconde o 360 no desktop e usa layout de grade */
+    .lugares-carousel-track-wrap {
+        perspective: none;
+        height: auto !important;
+        overflow: visible;
+    }
+
+    .lugares-carousel-track {
+        position: static;
+        width: 100%;
+        height: auto;
+        transform: none !important;
+        transform-style: flat;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        transition: none;
+    }
+
+    .lugar-card-3d {
+        position: static;
+        width: 100%;
+        height: auto;
+        min-height: 200px;
+        transform: none !important;
+        backface-visibility: visible;
+        -webkit-backface-visibility: visible;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .lugar-card-3d:hover {
+        transform: translateY(-6px) !important;
+        border-color: var(--gold);
+        box-shadow:
+            0 4px 12px rgba(0,0,0,.08),
+            0 16px 40px rgba(181,132,58,0.18);
+    }
+
+    /* Esconde nav e hint no desktop */
+    .lugares-nav-btn,
+    .lugares-dots,
+    .lugares-hint { display: none !important; }
+
+    /* Reativa a interação de clique no lugar normal */
+    .lugar-card-3d.is-active {
+        border-color: rgba(181,132,58,0.18);
+        box-shadow:
+            0 2px 6px rgba(0,0,0,.06),
+            0 10px 28px rgba(0,0,0,.08);
+    }
+
+    /* Remove o autoplay no desktop */
+}
+
+/* ── MOBILE: 360° com 1 card centrado ── */
+@media (max-width: 768px) {
+    .lugares-carousel-track {
+        display: block;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.65s cubic-bezier(.25,.8,.25,1);
+    }
+
+    .lugar-card-3d {
+        position: absolute;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .lugares-nav-btn,
+    .lugares-dots,
+    .lugares-hint { display: flex; }
+
+    .lugares-dots { display: flex; }
+    .lugares-hint { display: block; }
+
+    .lugares-nav-btn.prev { left: 4px; }
+    .lugares-nav-btn.next { right: 4px; }
+}
+
 </style>
 
 </head>
