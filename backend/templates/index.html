@@ -19,7 +19,7 @@
             --border:      rgba(181, 132, 58, 0.18);
         }
 
-
+```
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -464,7 +464,7 @@
 
     .det-foto-wrap {
         position: relative;
-        height: 520px;
+        height: 420px;
         overflow: hidden;
         background: #f4f6f9;
         flex-shrink: 0;
@@ -943,33 +943,6 @@
         margin-bottom: 32px;
     }
 
-    /* Carrossel mobile para os cards de lugares */
-    @media (max-width: 768px) {
-        #mapa-cards-grid {
-            display: flex;
-            flex-direction: row;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            gap: 12px;
-            margin-left: -16px;
-            margin-right: -16px;
-            padding-left: 16px;
-            padding-right: 16px;
-            padding-bottom: 8px;
-        }
-    
-        #mapa-cards-grid::-webkit-scrollbar { display: none; }
-    
-        .lugar-card {
-            flex: 0 0 72vw;
-            max-width: 280px;
-            scroll-snap-align: start;
-        }
-    }
-
-
     .lugar-card {
         background: #fff;
         border: 1px solid #e2e8f0;
@@ -1094,7 +1067,7 @@
         #passeios { justify-content: flex-start; padding-left: 16px; }  /* ← mudar */
         .carrossel-wrapper { padding: 0; }  /* ← adicionar */
         .form-row  { grid-template-columns: 1fr; }
-        .det-foto-wrap { height: 380px; }
+        .det-foto-wrap { height: 280px; }
         .det-body { padding: 24px 20px 28px; }
         .det-nome { font-size: 22px; }
         .det-footer { flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -1109,17 +1082,17 @@
 
 
     @media (max-width: 480px) {
-        .det-foto-wrap { height: 300px; }
+        .det-foto-wrap { height: 220px; }
         #mapa-cards-grid { grid-template-columns: 1fr 1fr; }
     }
 </style>
-
+```
 
 </head>
 
 <body>
 
-
+```
 <!-- HERO -->
 <section id="hero">
     <div id="hero-bg"></div>
@@ -1221,6 +1194,7 @@
             <button class="det-foto-btn prev" id="det-foto-prev" onclick="detFotoMover(-1)">‹</button>
             <button class="det-foto-btn next" id="det-foto-next" onclick="detFotoMover(1)">›</button>
             <div class="det-foto-counter" id="det-foto-counter">1 / 1</div>
+            <div class="det-foto-thumbs" id="det-foto-thumbs"></div>
         </div>
         <div class="det-body">
             <div class="det-eyebrow" id="det-eyebrow">Experiência</div>
@@ -1321,7 +1295,7 @@
     window.hotelSlug = "{{ hotel.slug|default:'' }}";
 </script>
 <script src="{% static 'js/concierge.js' %}"></script>
-
+```
 
 </body>
 </html>
