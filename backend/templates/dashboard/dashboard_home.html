@@ -593,10 +593,19 @@ async function carregarReservasHoje() {
         const dataHoje = hoje();
 
         // Checa TODOS os campos de data possíveis que o backend pode retornar
+        // DEPOIS
         function getDataReserva(r) {
             const candidatos = [r.data_passeio, r.data, r.data_agendamento, r.date, r.scheduled_date, r.tour_date];
             for (const c of candidatos) {
-                if (c && String(c).length >= 10) return String(c).substring(0,10);
+                if (!c) continue;
+                const s = String(c);
+                // formato dd/mm/yyyy → converte para yyyy-mm-dd
+                if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) {
+                    const [d, m, a] = s.substring(0,10).split('/');
+                    return `${a}-${m}-${d}`;
+                }
+                // formato yyyy-mm-dd → usa direto
+                if (s.length >= 10) return s.substring(0,10);
             }
             return '';
         }
@@ -723,7 +732,12 @@ async function carregarAtividades() {
                 <td><span class="badge ${badgeCls}">${badgeLbl}</span></td>
                 <td style="color:var(--text-main)">${escHtml(a.desc)}</td>
                 <td style="color:${valorCor};font-weight:600">${valorStr}</td>
-                <td style="font-size:11px;color:var(--text-soft)">${a.data ? new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR') : '–'}</td>
+                <td style="font-size:11px;color:var(--text-soft)">${(() => {
+                    const s = String(a.data||'');
+                    if (!s || s === '-') return '–';
+                    if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.substring(0,10);
+                    return new Date(s+'T12:00:00').toLocaleDateString('pt-BR');
+                })()}</td>
             </tr>`;
         }).join('');
     } catch {
