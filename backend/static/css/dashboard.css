@@ -913,4 +913,51 @@ input, select, textarea,
 
 }
 
+.btn-ir-site {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.1); /* Efeito semi-transparente */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+    backdrop-filter: blur(4px); /* Desfoque de fundo */
+}
+
+.btn-ir-site:hover {
+    background: var(--gold); /* Ou a cor principal do seu tema */
+    color: #000;
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(181, 132, 58, 0.3);
+}
+
+/* Ajuste para o mobile: aumentar a área de toque */
+@media (max-width: 768px) {
+    .btn-ir-site {
+        margin-left: 0;
+        margin-top: 8px;
+        padding: 10px 16px;
+        width: 100%; /* Ocupa a largura toda no mobile se necessário */
+        justify-content: center;
+    }
+}
+
+.hotel-badge {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que o botão quebre para baixo no mobile se não couber */
+    background: var(--bg-hover);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 
