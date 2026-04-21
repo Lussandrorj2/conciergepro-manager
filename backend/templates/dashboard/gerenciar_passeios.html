@@ -48,15 +48,23 @@
                 </div>
             
                 <div class="topbar-right">
-                    <a href="/{{ hotel.slug }}/dashboard/lugares/" class="btn-ir-site" title="Lugares Sugeridos">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <span class="btn-ir-site-label">Lugares</span>
-                    </a>
-                    <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-novo" style="padding:7px 14px;font-size:12px;">
-                        ➕ Novo
-                    </a>
+                    <div class="topbar-actions-menu" id="actions-menu-wrap">
+                        <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                                <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                            </svg>
+                        </button>
+                        <div class="topbar-actions-dropdown" id="actions-dropdown">
+                            <a href="/{{ hotel.slug }}/dashboard/lugares/" class="actions-item">
+                                🗺️ Lugares Sugeridos
+                            </a>
+                            <a href="/{{ hotel.slug }}/dashboard/criar/" class="actions-item actions-item-destaque">
+                                ➕ Novo Passeio
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
