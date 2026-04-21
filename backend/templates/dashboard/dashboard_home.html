@@ -40,15 +40,15 @@
             <div class="stats-mini-row">
                 <div class="stat-mini">
                     <div class="stat-mini-label">Reservas Hoje</div>
-                    <div class="stat-mini-value blue">{{ reservas_hoje_count }}</div>
+                    <div class="stat-mini-value blue" id="dash-reservas-count">...</div>
                 </div>
                 <div class="stat-mini">
-                    <div class="stat-mini-label">Total Passeios</div>
-                    <div class="stat-mini-value green">{{ passeios_count }}</div>
+                    <div class="stat-mini-label">Lucro Câmbio</div>
+                    <div class="stat-mini-value green" id="dash-lucro-cambio">R$ 0,00</div>
                 </div>
                 <div class="stat-mini">
-                    <div class="stat-mini-label">Vendas (Mês)</div>
-                    <div class="stat-mini-value gold">R$ {{ total_vendas_mes|default:"0,00" }}</div>
+                    <div class="stat-mini-label">Passeios Ativos</div>
+                    <div class="stat-mini-value gold" id="dash-passeios-count">...</div>
                 </div>
             </div>
 
@@ -57,137 +57,179 @@
                 <div class="dashboard-main-col">
                     <div class="card-config">
                         <div class="card-header">
-                            <h3>📈 Desempenho de Vendas</h3>
+                            <h3>📈 Desempenho de Câmbio (Últimos Registros)</h3>
                         </div>
                         <canvas id="salesChart" height="120"></canvas>
                     </div>
 
                     <div class="card-config" style="margin-top: 20px;">
                         <div class="card-header">
-                            <h3>📅 Últimas Reservas</h3>
+                            <h3>📅 Últimas Atividades</h3>
                         </div>
                         <div class="tabela-scroll">
-                            <table>
+                            <table id="tabela-atividades">
                                 <thead>
                                     <tr>
-                                        <th>Hóspede</th>
-                                        <th>Passeio</th>
+                                        <th>Tipo</th>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
                                         <th>Data</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for reserva in ultimas_reservas %}
-                                    <tr>
-                                        <td><strong>{{ reserva.nome_hospede }}</strong></td>
-                                        <td>{{ reserva.passeio.titulo }}</td>
-                                        <td>{{ reserva.data_criacao|date:"d/m/Y" }}</td>
-                                        <td><span class="badge badge-confirmado">Confirmada</span></td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="4" style="text-align:center; padding: 20px; color: var(--text-soft);">Nenhuma reserva recente.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <div class="dashboard-side-col">
-                    <div class="card-config">
-                        <div class="card-header">
-                            <h3>📝 Lembretes</h3>
+                    <h3 style="font-size: 14px; color: var(--text-soft); margin-bottom: 15px; text-transform: uppercase;">📌 Lembretes</h3>
+                    
+                    <div class="trello-board">
+                        <div class="trello-card priority-high">
+                            <span class="trello-badge">Urgente</span>
+                            <p>Confirmar pick-up grupo Alemão (14:00)</p>
+                            <div class="trello-footer">🕒 Hoje</div>
                         </div>
-                        <div class="reminders-list">
-                            <div class="reminder-item">
-                                <div class="reminder-dot" style="background:#38bdf8"></div>
-                                <span>Verificar taxas de câmbio</span>
-                            </div>
-                            <div class="reminder-item">
-                                <div class="reminder-dot" style="background:#fbbf24"></div>
-                                <span>Confirmar pick-up das 14h</span>
-                            </div>
+
+                        <div class="trello-card priority-medium">
+                            <span class="trello-badge">Financeiro</span>
+                            <p>Atualizar cotação do Dólar no painel</p>
+                            <div class="trello-footer">📅 Pendente</div>
+                        </div>
+
+                        <div class="trello-card priority-low">
+                            <span class="trello-badge">Geral</span>
+                            <p>Verificar novos e-mails de reserva</p>
+                            <div class="trello-footer">✅ Ok</div>
                         </div>
                     </div>
                 </div>
 
-            </div> </div> </main>
+            </div> 
+        </div> 
+    </main>
 </div>
 
 <style>
-    /* Ajustes específicos para a Grid da Home */
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        gap: 20px;
-        align-items: start;
+    /* Estilos Mini Trello */
+    .trello-board { display: flex; flex-direction: column; gap: 12px; }
+    .trello-card {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 12px;
+        border-left: 4px solid var(--border-light);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    .trello-card.priority-high { border-left-color: #ef4444; }
+    .trello-card.priority-medium { border-left-color: #facc15; }
+    .trello-card.priority-low { border-left-color: #38bdf8; }
 
-    .reminder-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-light);
-        font-size: 14px;
+    .trello-badge {
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255,255,255,0.05);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--text-soft);
     }
+    .trello-card p { font-size: 13px; margin: 8px 0; color: #eee; line-height: 1.4; }
+    .trello-footer { font-size: 11px; color: var(--text-soft); border-top: 1px solid #2a2a2a; pt: 8px; margin-top: 5px; }
 
-    .reminder-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
+    /* Layout Grid */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
 
-    /* FIX MOBILE: Igual ao que você usou no Câmbio */
     @media (max-width: 1024px) {
-        .dashboard-grid {
-            display: flex !important;
-            flex-direction: column !important;
-        }
-
-        .dashboard-side-col {
-            order: 2;
-            width: 100%;
-        }
-
-        .dashboard-main-col {
-            order: 1;
-            width: 100%;
-        }
-
-        .tabela-scroll table {
-            min-width: 600px;
-        }
+        .dashboard-grid { display: flex; flex-direction: column; }
+        .dashboard-side-col { order: 1; }
+        .dashboard-main-col { order: 2; }
     }
 </style>
 
 <script>
-    // Inicialização do Gráfico (Exemplo estático)
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-            datasets: [{
-                label: 'Vendas (R$)',
-                data: [1200, 1900, 1500, 2100, 2400, 3200, 2800],
-                borderColor: '#c5a059',
-                backgroundColor: 'rgba(197, 160, 89, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                x: { grid: { display: false } }
+    const hotelSlug = "{{ hotel.slug }}";
+
+    async function carregarDadosHome() {
+        try {
+            // 1. Pega dados de Câmbio
+            const resCambio = await fetch(`/api/admin/${hotelSlug}/cambio/`);
+            const ops = await resCambio.json();
+            
+            let lucroTotal = 0;
+            let chartLabels = [];
+            let chartData = [];
+
+            ops.slice(0, 10).reverse().forEach(op => {
+                const pago = parseFloat(op.valor_pago || op.quantidade * op.cotacao_compra || 0);
+                const recebido = parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
+                lucroTotal += (recebido - pago);
+
+                chartLabels.push(new Date(op.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
+                chartData.push(recebido);
+            });
+
+            document.getElementById('dash-lucro-cambio').innerText = `R$ ${lucroTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+            // 2. Pega dados de Passeios
+            const resPasseios = await fetch(`/api/admin/${hotelSlug}/passeios/`);
+            const passeios = await resPasseios.json();
+            document.getElementById('dash-passeios-count').innerText = passeios.length;
+
+            // 3. Pega dados de Reservas (Ajuste o endpoint se necessário)
+            const resReservas = await fetch(`/api/admin/${hotelSlug}/reservas/`).catch(() => null);
+            if(resReservas) {
+                const reservas = await resReservas.json();
+                document.getElementById('dash-reservas-count').innerText = reservas.length;
             }
+
+            renderizarGrafico(chartLabels, chartData);
+            popularTabela(ops.slice(0, 5));
+
+        } catch (error) {
+            console.error("Erro ao alimentar dashboard:", error);
         }
-    });
+    }
+
+    function popularTabela(lista) {
+        const tbody = document.querySelector('#tabela-atividades tbody');
+        tbody.innerHTML = lista.map(item => `
+            <tr>
+                <td><span class="badge badge-confirmado">Câmbio</span></td>
+                <td>Compra de ${item.quantidade} ${item.moeda}</td>
+                <td>R$ ${parseFloat(item.valor_pago).toLocaleString('pt-BR')}</td>
+                <td style="font-size:11px;">${new Date(item.data).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderizarGrafico(labels, data) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Volume Câmbio (Entrada R$)',
+                    data: data,
+                    borderColor: '#c5a059',
+                    backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarDadosHome);
 </script>
 
 <script src="{% static 'js/mobile-menu.js' %}"></script>
