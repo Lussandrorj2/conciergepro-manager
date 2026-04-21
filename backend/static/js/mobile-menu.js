@@ -65,14 +65,19 @@
 
         // 2. Hamburguer na topbar
         const topbar = document.querySelector('.topbar');
-        if (topbar && !topbar.querySelector('.hamburger-btn')) {
+        // DEPOIS
+        const existingBtn = topbar?.querySelector('.hamburger-btn') || document.getElementById('hamburger-btn');
+        if (topbar && !existingBtn) {
             const btn = document.createElement('button');
             btn.className = 'hamburger-btn';
             btn.setAttribute('aria-label', 'Abrir menu');
             btn.innerHTML = '☰';
             btn.addEventListener('click', toggleSidebar);
             topbar.insertBefore(btn, topbar.firstChild);
+        } else if (existingBtn) {
+            existingBtn.addEventListener('click', toggleSidebar);
         }
+
 
         // 3. Bottom nav
         if (!document.querySelector('.bottom-nav')) {
