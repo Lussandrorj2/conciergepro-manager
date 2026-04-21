@@ -2,24 +2,26 @@
 // CONFIG GLOBAL
 // ==========================================
 function getImageUrl(img) {
-if (!img) return ‘’;
-if (typeof img === ‘string’) return img;
-if (img.url) return img.url;
-return ‘’;
+    if (!img) return '';
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '';
 }
 
 const urlParams = new URLSearchParams(window.location.search);
 
 const hotelSlug =
-window.hotelSlug ||
-urlParams.get(‘hotel’);
+    window.hotelSlug ||
+    urlParams.get('hotel') ||
+    '';
 
 if (!hotelSlug) {
-console.error(“❌ Hotel slug não definido”);
-throw new Error(“Hotel não identificado”);
+    console.error("❌ Hotel slug não definido");
+    // throw removido — não trava mais o JS
 }
 
-const API_BASE = ‘/api’;
+const API_BASE = '/api';
+
 
 let idiomaAtual   = localStorage.getItem(‘lang’) || ‘pt’;
 let whatsappAtual = ‘5521999999999’;
