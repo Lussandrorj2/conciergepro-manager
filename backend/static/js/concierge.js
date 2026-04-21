@@ -2,29 +2,27 @@
 // CONFIG GLOBAL
 // ==========================================
 function getImageUrl(img) {
-    if (!img) return '';
-    if (typeof img === 'string') return img;
-    if (img.url) return img.url;
-    return '';
+if (!img) return ‘’;
+if (typeof img === ‘string’) return img;
+if (img.url) return img.url;
+return ‘’;
 }
 
 const urlParams = new URLSearchParams(window.location.search);
 
 const hotelSlug =
-    window.hotelSlug ||
-    urlParams.get('hotel') ||
-    '';
+window.hotelSlug ||
+urlParams.get(‘hotel’);
 
 if (!hotelSlug) {
-    console.error("❌ Hotel slug não definido");
-    // throw removido — não trava mais o JS
+console.error(“❌ Hotel slug não definido”);
+throw new Error(“Hotel não identificado”);
 }
 
-const API_BASE = '/api';
+const API_BASE = ‘/api’;
 
-
-let idiomaAtual   = localStorage.getItem('lang') || 'pt';
-let whatsappAtual = '5521999999999';
+let idiomaAtual   = localStorage.getItem(‘lang’) || ‘pt’;
+let whatsappAtual = ‘5521999999999’;
 let passeioAtual  = null;
 let listaPasseios = [];
 
@@ -33,29 +31,29 @@ let detFotos     = [];
 
 const i18n = {
 pt: {
-btn: 'Ver detalhes',
-vazio: 'Nenhuma experiência disponível.',
-erro: 'Erro ao carregar.',
-explorar: 'Explorar',
-secao_label: 'Passeios',
-secao_titulo: 'Experiências disponíveis',
-sob_consulta: 'Sob consulta',
-por_pessoa: '/ pessoa',
-modal_eyebrow: 'Interesse no Passeio',
-det_eyebrow: 'Experiência',
-lbl_data: 'Data desejada',
-lbl_horario: 'Horário desejado',
-lbl_nome: 'Nome completo',
-lbl_tel: 'Telefone',
-lbl_qtd: 'Número de pessoas',
-resumo_passeio: 'Passeio',
-resumo_qtd: 'Pessoas',
-resumo_total: 'Total estimado',
-btn_confirmar: 'Falar no WhatsApp',
-btn_reservar_det: 'Reservar agora',
-btn_voltar: '← Voltar aos detalhes',
-sucesso: 'Redirecionando para o WhatsApp!',
-sem_imagem: 'Sem imagem',
+btn: ‘Ver detalhes’,
+vazio: ‘Nenhuma experiência disponível.’,
+erro: ‘Erro ao carregar.’,
+explorar: ‘Explorar’,
+secao_label: ‘Passeios’,
+secao_titulo: ‘Experiências disponíveis’,
+sob_consulta: ‘Sob consulta’,
+por_pessoa: ‘/ pessoa’,
+modal_eyebrow: ‘Interesse no Passeio’,
+det_eyebrow: ‘Experiência’,
+lbl_data: ‘Data desejada’,
+lbl_horario: ‘Horário desejado’,
+lbl_nome: ‘Nome completo’,
+lbl_tel: ‘Telefone’,
+lbl_qtd: ‘Número de pessoas’,
+resumo_passeio: ‘Passeio’,
+resumo_qtd: ‘Pessoas’,
+resumo_total: ‘Total estimado’,
+btn_confirmar: ‘Falar no WhatsApp’,
+btn_reservar_det: ‘Reservar agora’,
+btn_voltar: ‘← Voltar aos detalhes’,
+sucesso: ‘Redirecionando para o WhatsApp!’,
+sem_imagem: ‘Sem imagem’,
 wpp_msg: (nome, passeio, qtd, data, horario) => {
 let msg = `Olá! Me chamo *${nome}* e tenho interesse no passeio *${passeio}* para *${qtd} pessoa(s)*`;
 if (data)    msg += `, na data *${data}*`;
@@ -63,41 +61,41 @@ if (horario) msg += ` às *${horario}*`;
 msg += `. Poderia confirmar a disponibilidade?`;
 return msg;
 },
-aviso_wpp: 'Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.',
-campos_obrigatorios: 'Por favor, preencha seu nome.',
-mapa_label: 'Nos arredores',
-mapa_titulo: 'Restaurantes & Centros Comerciais',
-mapa_todos: 'Todos',
-mapa_restaurantes: '🍽 Restaurantes',
-mapa_compras: '🛍 Compras',
-mapa_carregando: 'Carregando mapa…',
-mapa_abrir: 'Ver no Google Maps ↗',
-mapa_ver: 'Ver no mapa',
+aviso_wpp: ‘Você será direcionado ao WhatsApp do hotel para confirmar sua reserva.’,
+campos_obrigatorios: ‘Por favor, preencha seu nome e telefone.’,
+mapa_label: ‘Nos arredores’,
+mapa_titulo: ‘Restaurantes & Centros Comerciais’,
+mapa_todos: ‘Todos’,
+mapa_restaurantes: ‘🍽 Restaurantes’,
+mapa_compras: ‘🛍 Compras’,
+mapa_carregando: ‘Carregando mapa…’,
+mapa_abrir: ‘Ver no Google Maps ↗’,
+mapa_ver: ‘Ver no mapa’,
 },
 en: {
-btn: 'See details',
-vazio: 'No tours found.',
-erro: 'Loading error.',
-explorar: 'Explore',
-secao_label: 'Tours',
-secao_titulo: 'Available experiences',
-sob_consulta: 'On request',
-por_pessoa: '/ person',
-modal_eyebrow: 'Tour Inquiry',
-det_eyebrow: 'Experience',
-lbl_data: 'Preferred date',
-lbl_horario: 'Preferred time',
-lbl_nome: 'Full name',
-lbl_tel: 'Phone',
-lbl_qtd: 'Number of guests',
-resumo_passeio: 'Tour',
-resumo_qtd: 'Guests',
-resumo_total: 'Estimated total',
-btn_confirmar: 'Chat on WhatsApp',
-btn_reservar_det: 'Book now',
-btn_voltar: '← Back to details',
-sucesso: 'Redirecting to WhatsApp!',
-sem_imagem: 'No image',
+btn: ‘See details’,
+vazio: ‘No tours found.’,
+erro: ‘Loading error.’,
+explorar: ‘Explore’,
+secao_label: ‘Tours’,
+secao_titulo: ‘Available experiences’,
+sob_consulta: ‘On request’,
+por_pessoa: ‘/ person’,
+modal_eyebrow: ‘Tour Inquiry’,
+det_eyebrow: ‘Experience’,
+lbl_data: ‘Preferred date’,
+lbl_horario: ‘Preferred time’,
+lbl_nome: ‘Full name’,
+lbl_tel: ‘Phone’,
+lbl_qtd: ‘Number of guests’,
+resumo_passeio: ‘Tour’,
+resumo_qtd: ‘Guests’,
+resumo_total: ‘Estimated total’,
+btn_confirmar: ‘Chat on WhatsApp’,
+btn_reservar_det: ‘Book now’,
+btn_voltar: ‘← Back to details’,
+sucesso: ‘Redirecting to WhatsApp!’,
+sem_imagem: ‘No image’,
 wpp_msg: (nome, passeio, qtd, data, horario) => {
 let msg = `Hello! My name is *${nome}* and I'm interested in the tour *${passeio}* for *${qtd} guest(s)*`;
 if (data)    msg += ` on *${data}*`;
@@ -105,41 +103,41 @@ if (horario) msg += ` at *${horario}*`;
 msg += `. Could you confirm availability?`;
 return msg;
 },
-aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
-campos_obrigatorios: 'Please fill in your name.',
-mapa_label: 'Nearby',
-mapa_titulo: 'Restaurants & Shopping',
-mapa_todos: 'All',
-mapa_restaurantes: '🍽 Restaurants',
-mapa_compras: '🛍 Shopping',
-mapa_carregando: 'Loading map…',
-mapa_abrir: 'View on Google Maps ↗',
-mapa_ver: 'View on map',
+aviso_wpp: “You will be redirected to the hotel’s WhatsApp to confirm your booking.”,
+campos_obrigatorios: ‘Please fill in your name and phone number.’,
+mapa_label: ‘Nearby’,
+mapa_titulo: ‘Restaurants & Shopping’,
+mapa_todos: ‘All’,
+mapa_restaurantes: ‘🍽 Restaurants’,
+mapa_compras: ‘🛍 Shopping’,
+mapa_carregando: ‘Loading map…’,
+mapa_abrir: ‘View on Google Maps ↗’,
+mapa_ver: ‘View on map’,
 },
 es: {
-btn: 'Ver detalles',
-vazio: 'No se encontraron tours.',
-erro: 'Error de carga.',
-explorar: 'Explorar',
-secao_label: 'Paseos',
-secao_titulo: 'Experiencias disponibles',
-sob_consulta: 'Bajo consulta',
-por_pessoa: '/ persona',
-modal_eyebrow: 'Consulta de Paseo',
-det_eyebrow: 'Experiencia',
-lbl_data: 'Fecha preferida',
-lbl_horario: 'Hora preferida',
-lbl_nome: 'Nombre completo',
-lbl_tel: 'Teléfono',
-lbl_qtd: 'Número de personas',
-resumo_passeio: 'Paseo',
-resumo_qtd: 'Personas',
-resumo_total: 'Total estimado',
-btn_confirmar: 'Hablar en WhatsApp',
-btn_reservar_det: 'Reservar ahora',
-btn_voltar: '← Volver a detalles',
-sucesso: '¡Redirigiendo al WhatsApp!',
-sem_imagem: 'Sin imagen',
+btn: ‘Ver detalles’,
+vazio: ‘No se encontraron tours.’,
+erro: ‘Error de carga.’,
+explorar: ‘Explorar’,
+secao_label: ‘Paseos’,
+secao_titulo: ‘Experiencias disponibles’,
+sob_consulta: ‘Bajo consulta’,
+por_pessoa: ‘/ persona’,
+modal_eyebrow: ‘Consulta de Paseo’,
+det_eyebrow: ‘Experiencia’,
+lbl_data: ‘Fecha preferida’,
+lbl_horario: ‘Hora preferida’,
+lbl_nome: ‘Nombre completo’,
+lbl_tel: ‘Teléfono’,
+lbl_qtd: ‘Número de personas’,
+resumo_passeio: ‘Paseo’,
+resumo_qtd: ‘Personas’,
+resumo_total: ‘Total estimado’,
+btn_confirmar: ‘Hablar en WhatsApp’,
+btn_reservar_det: ‘Reservar ahora’,
+btn_voltar: ‘← Volver a detalles’,
+sucesso: ‘¡Redirigiendo al WhatsApp!’,
+sem_imagem: ‘Sin imagen’,
 wpp_msg: (nome, passeio, qtd, data, horario) => {
 let msg = `¡Hola! Me llamo *${nome}* y estoy interesado/a en el paseo *${passeio}* para *${qtd} persona(s)*`;
 if (data)    msg += ` en la fecha *${data}*`;
@@ -147,41 +145,41 @@ if (horario) msg += ` a las *${horario}*`;
 msg += `. ¿Podría confirmar disponibilidad?`;
 return msg;
 },
-aviso_wpp: 'Será redirigido al WhatsApp del hotel para confirmar su reserva.',
-campos_obrigatorios: 'Por favor, complete su nombre.',
-mapa_label: 'Alrededores',
-mapa_titulo: 'Restaurantes & Centros Comerciales',
-mapa_todos: 'Todos',
-mapa_restaurantes: '🍽 Restaurantes',
-mapa_compras: '🛍 Compras',
-mapa_carregando: 'Cargando mapa…',
-mapa_abrir: 'Ver en Google Maps ↗',
-mapa_ver: 'Ver en el mapa',
+aviso_wpp: ‘Será redirigido al WhatsApp del hotel para confirmar su reserva.’,
+campos_obrigatorios: ‘Por favor, complete su nombre y teléfono.’,
+mapa_label: ‘Alrededores’,
+mapa_titulo: ‘Restaurantes & Centros Comerciales’,
+mapa_todos: ‘Todos’,
+mapa_restaurantes: ‘🍽 Restaurantes’,
+mapa_compras: ‘🛍 Compras’,
+mapa_carregando: ‘Cargando mapa…’,
+mapa_abrir: ‘Ver en Google Maps ↗’,
+mapa_ver: ‘Ver en el mapa’,
 },
 fr: {
-btn: 'Voir détails',
-vazio: 'Aucune visite trouvée.',
-erro: 'Erreur de chargement.',
-explorar: 'Explorer',
-secao_label: 'Visites',
-secao_titulo: 'Expériences disponibles',
-sob_consulta: 'Sur demande',
-por_pessoa: '/ personne',
-modal_eyebrow: 'Demande de Visite',
-det_eyebrow: 'Expérience',
-lbl_data: 'Date souhaitée',
-lbl_horario: 'Heure souhaitée',
-lbl_nome: 'Nom complet',
-lbl_tel: 'Téléphone',
-lbl_qtd: 'Nombre de personnes',
-resumo_passeio: 'Visite',
-resumo_qtd: 'Personnes',
-resumo_total: 'Total estimé',
-btn_confirmar: 'Contacter sur WhatsApp',
-btn_reservar_det: 'Réserver maintenant',
-btn_voltar: '← Retour aux détails',
-sucesso: 'Redirection vers WhatsApp!',
-sem_imagem: 'Sans image',
+btn: ‘Voir détails’,
+vazio: ‘Aucune visite trouvée.’,
+erro: ‘Erreur de chargement.’,
+explorar: ‘Explorer’,
+secao_label: ‘Visites’,
+secao_titulo: ‘Expériences disponibles’,
+sob_consulta: ‘Sur demande’,
+por_pessoa: ‘/ personne’,
+modal_eyebrow: ‘Demande de Visite’,
+det_eyebrow: ‘Expérience’,
+lbl_data: ‘Date souhaitée’,
+lbl_horario: ‘Heure souhaitée’,
+lbl_nome: ‘Nom complet’,
+lbl_tel: ‘Téléphone’,
+lbl_qtd: ‘Nombre de personnes’,
+resumo_passeio: ‘Visite’,
+resumo_qtd: ‘Personnes’,
+resumo_total: ‘Total estimé’,
+btn_confirmar: ‘Contacter sur WhatsApp’,
+btn_reservar_det: ‘Réserver maintenant’,
+btn_voltar: ‘← Retour aux détails’,
+sucesso: ‘Redirection vers WhatsApp!’,
+sem_imagem: ‘Sans image’,
 wpp_msg: (nome, passeio, qtd, data, horario) => {
 let msg = `Bonjour ! Je m'appelle *${nome}* et je suis intéressé(e) par la visite *${passeio}* pour *${qtd} personne(s)*`;
 if (data)    msg += ` à la date *${data}*`;
@@ -189,22 +187,22 @@ if (horario) msg += ` à *${horario}*`;
 msg += `. Pourriez-vous confirmer la disponibilité ?`;
 return msg;
 },
-aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
-campos_obrigatorios: 'Veuillez remplir votre nom.',
-mapa_label: 'Aux alentours',
-mapa_titulo: 'Restaurants & Centres Commerciaux',
-mapa_todos: 'Tous',
-mapa_restaurantes: '🍽 Restaurants',
-mapa_compras: '🛍 Shopping',
-mapa_carregando: 'Chargement de la carte…',
-mapa_abrir: 'Voir sur Google Maps ↗',
-mapa_ver: 'Voir sur la carte',
+aviso_wpp: “Vous serez redirigé vers le WhatsApp de l’hôtel pour confirmer votre réservation.”,
+campos_obrigatorios: ‘Veuillez remplir votre nom et numéro de téléphone.’,
+mapa_label: ‘Aux alentours’,
+mapa_titulo: ‘Restaurants & Centres Commerciaux’,
+mapa_todos: ‘Tous’,
+mapa_restaurantes: ‘🍽 Restaurants’,
+mapa_compras: ‘🛍 Shopping’,
+mapa_carregando: ‘Chargement de la carte…’,
+mapa_abrir: ‘Voir sur Google Maps ↗’,
+mapa_ver: ‘Voir sur la carte’,
 }
 };
 
 function t(key) {
-const lang = i18n[idiomaAtual] || i18n['pt'];
-return lang[key] !== undefined ? lang[key] : (i18n['pt'][key] || key);
+const lang = i18n[idiomaAtual] || i18n[‘pt’];
+return lang[key] !== undefined ? lang[key] : (i18n[‘pt’][key] || key);
 }
 
 // ==========================================
@@ -214,7 +212,7 @@ async function carregarHotel(lang) {
 if (!hotelSlug) return;
 try {
 const res = await fetch(`${API_BASE}/hotel/${hotelSlug}/?lang=${lang}`);
-if (!res.ok) { console.warn('[carregarHotel] HTTP', res.status); return; }
+if (!res.ok) { console.warn(’[carregarHotel] HTTP’, res.status); return; }
 const data = await res.json();
 
 ```
@@ -234,10 +232,11 @@ const data = await res.json();
     const subtituloEl = document.getElementById('txt-hero-subtitle');
     if (tituloEl && data.titulo_hero)       tituloEl.innerText    = data.titulo_hero;
     if (subtituloEl && data.subtitulo_hero) subtituloEl.innerText = data.subtitulo_hero;
-
+    
     if (data.mapa_embed) {
         MAPA_GERAL_SRC = data.mapa_embed;
     }
+
 
 } catch (error) {
     console.error('[carregarHotel] Erro:', error);
@@ -254,10 +253,10 @@ let carrVisiveis = 3;
 let carrTotal    = 0;
 
 function carrosselAtualizar() {
-const track   = document.getElementById('passeios-track');
-const btnPrev = document.getElementById('carr-prev');
-const btnNext = document.getElementById('carr-next');
-const dotsEl  = document.getElementById('carr-dots');
+const track   = document.getElementById(‘passeios-track’);
+const btnPrev = document.getElementById(‘carr-prev’);
+const btnNext = document.getElementById(‘carr-next’);
+const dotsEl  = document.getElementById(‘carr-dots’);
 if (!track) return;
 
 ```
@@ -288,7 +287,7 @@ carrosselAtualizar();
 }
 
 function carrosselCalcularVisiveis() {
-const viewport = document.getElementById('passeios');
+const viewport = document.getElementById(‘passeios’);
 if (!viewport) return 3;
 const w = viewport.offsetWidth;
 if (w < 480) return 1;
@@ -296,7 +295,7 @@ return Math.max(1, Math.floor(w / (320 + 24)));
 }
 
 function initCarrosselDrag() {
-const el = document.getElementById('passeios');
+const el = document.getElementById(‘passeios’);
 if (!el) return;
 let startX = 0, isDragging = false;
 
@@ -331,7 +330,7 @@ window.addEventListener('resize', () => {
 // PASSEIOS
 // ==========================================
 async function carregarPasseios(lang) {
-const track = document.getElementById('passeios-track');
+const track = document.getElementById(‘passeios-track’);
 if (!track) return;
 
 ```
@@ -374,7 +373,7 @@ try {
 // ==========================================
 function renderCard(p) {
 const precoLabel = p.preco_sob_consulta
-? t('sob_consulta')
+? t(‘sob_consulta’)
 : `R$ ${Number(p.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
 ```
@@ -430,18 +429,18 @@ return fotos;
 }
 
 function detFotoRender() {
-const track   = document.getElementById('det-foto-track');
-const thumbs  = document.getElementById('det-foto-thumbs');
-const counter = document.getElementById('det-foto-counter');
-const btnPrev = document.getElementById('det-foto-prev');
-const btnNext = document.getElementById('det-foto-next');
+const track   = document.getElementById(‘det-foto-track’);
+const thumbs  = document.getElementById(‘det-foto-thumbs’);
+const counter = document.getElementById(‘det-foto-counter’);
+const btnPrev = document.getElementById(‘det-foto-prev’);
+const btnNext = document.getElementById(‘det-foto-next’);
 if (!track) return;
 
 ```
 if (!detFotos.length) {
     track.innerHTML = `<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>`;
-    if (thumbs)  thumbs.innerHTML      = '';
-    if (counter) counter.textContent   = '';
+    if (thumbs)  thumbs.innerHTML    = '';
+    if (counter) counter.textContent = '';
     if (btnPrev) btnPrev.style.display = 'none';
     if (btnNext) btnNext.style.display = 'none';
     return;
@@ -452,7 +451,14 @@ track.innerHTML = detFotos.map(src => `
         <img src="${src}" alt="" onerror="this.parentElement.innerHTML='<div class=\\'det-foto-slide-empty\\'>🌊</div>'">
     </div>`).join('');
 
-if (thumbs) thumbs.innerHTML = '';
+if (thumbs) {
+    thumbs.innerHTML = detFotos.length > 1
+        ? detFotos.map((src, i) => `
+            <div class="det-thumb ${i === detFotoIndex ? 'active' : ''}" onclick="detFotoIr(${i})">
+                <img src="${src}" alt="" onerror="this.style.display='none'">
+            </div>`).join('')
+        : '';
+}
 
 if (btnPrev) btnPrev.style.display = detFotos.length > 1 ? 'flex' : 'none';
 if (btnNext) btnNext.style.display = detFotos.length > 1 ? 'flex' : 'none';
@@ -463,11 +469,11 @@ detFotoAtualizar();
 }
 
 function detFotoAtualizar() {
-const track   = document.getElementById('det-foto-track');
-const counter = document.getElementById('det-foto-counter');
-const btnPrev = document.getElementById('det-foto-prev');
-const btnNext = document.getElementById('det-foto-next');
-const thumbs  = document.querySelectorAll('.det-thumb');
+const track   = document.getElementById(‘det-foto-track’);
+const counter = document.getElementById(‘det-foto-counter’);
+const btnPrev = document.getElementById(‘det-foto-prev’);
+const btnNext = document.getElementById(‘det-foto-next’);
+const thumbs  = document.querySelectorAll(’.det-thumb’);
 
 ```
 if (track)   track.style.transform = `translateX(-${detFotoIndex * 100}%)`;
@@ -554,12 +560,12 @@ document.body.style.overflow = 'hidden';
 }
 
 function fecharDetalhe() {
-document.getElementById('modalDetalhe').classList.remove('open');
-document.body.style.overflow = '';
+document.getElementById(‘modalDetalhe’).classList.remove(‘open’);
+document.body.style.overflow = ‘’;
 }
 
 function initDetFotoSwipe() {
-const wrap = document.getElementById('det-foto-wrap');
+const wrap = document.getElementById(‘det-foto-wrap’);
 if (!wrap || wrap._swipeInit) return;
 wrap._swipeInit = true;
 
@@ -579,7 +585,7 @@ wrap.addEventListener('touchend',   e => {
 // ==========================================
 function abrirModalReservaDoDetalhe() {
 if (!passeioAtual) return;
-document.getElementById('modalDetalhe').classList.remove('open');
+document.getElementById(‘modalDetalhe’).classList.remove(‘open’);
 abrirModalReserva();
 }
 
@@ -588,40 +594,33 @@ if (!passeioAtual) return;
 const p = passeioAtual;
 
 ```
-// Atualiza textos com guarda — seguro mesmo se o elemento não existir no HTML
-const setEl = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.innerText = val;
-};
-
-document.getElementById('modal-eyebrow').innerText      = t('modal_eyebrow');
-document.getElementById('modal-passeio-nome').innerText = p.nome;
-
-setEl('lbl-data',    t('lbl_data'));
-setEl('lbl-horario', t('lbl_horario'));
-setEl('lbl-nome',    t('lbl_nome'));
-setEl('lbl-tel',     t('lbl_tel'));   // tolerante — não quebra se não existir
-setEl('lbl-qtd',     t('lbl_qtd'));
-
-setEl('resumo-label-passeio', t('resumo_passeio'));
-setEl('resumo-label-qtd',     t('resumo_qtd'));
-setEl('resumo-label-total',   t('resumo_total'));
+document.getElementById('modal-eyebrow').innerText        = t('modal_eyebrow');
+document.getElementById('modal-passeio-nome').innerText   = p.nome;
+document.getElementById('lbl-data').innerText             = t('lbl_data');
+document.getElementById('lbl-horario').innerText          = t('lbl_horario');
+document.getElementById('lbl-nome').innerText             = t('lbl_nome');
+document.getElementById('lbl-tel').innerText              = t('lbl_tel');
+document.getElementById('lbl-qtd').innerText              = t('lbl_qtd');
+document.getElementById('resumo-label-passeio').innerText = t('resumo_passeio');
+document.getElementById('resumo-label-qtd').innerText     = t('resumo_qtd');
+document.getElementById('resumo-label-total').innerText   = t('resumo_total');
 
 const btnVoltar = document.getElementById('btn-voltar-txt');
 if (btnVoltar) btnVoltar.textContent = t('btn_voltar').replace('← ', '');
 
 const avisoEl = document.getElementById('modal-aviso-wpp');
-if (avisoEl) avisoEl.textContent = t('aviso_wpp');
+if (avisoEl) {
+    const lastChild = avisoEl.lastChild;
+    if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
+        lastChild.textContent = ' ' + t('aviso_wpp');
+    }
+}
 
-// Limpa campos
 document.getElementById('res-nome').value    = '';
+document.getElementById('res-tel').value     = '';
 document.getElementById('res-qtd').value     = 1;
 document.getElementById('res-data').value    = '';
 document.getElementById('res-horario').value = '';
-
-const resTel = document.getElementById('res-tel');
-if (resTel) resTel.value = '';
-
 document.getElementById('modal-resumo').classList.remove('show');
 
 calcularTotal();
@@ -633,17 +632,17 @@ document.body.style.overflow = 'hidden';
 }
 
 function voltarParaDetalhe() {
-document.getElementById('modalReserva').classList.remove('open');
+document.getElementById(‘modalReserva’).classList.remove(‘open’);
 if (passeioAtual) {
-document.getElementById('modalDetalhe').classList.add('open');
+document.getElementById(‘modalDetalhe’).classList.add(‘open’);
 } else {
-document.body.style.overflow = '';
+document.body.style.overflow = ‘’;
 }
 }
 
 function fecharModalReserva() {
-document.getElementById('modalReserva').classList.remove('open');
-document.body.style.overflow = '';
+document.getElementById(‘modalReserva’).classList.remove(‘open’);
+document.body.style.overflow = ‘’;
 passeioAtual = null;
 }
 
@@ -664,8 +663,8 @@ let totalStr = '';
 if (passeioAtual.preco_sob_consulta) {
     totalStr = t('sob_consulta');
 } else {
-    const preco = Number(passeioAtual.preco || 0);
-    const total = passeioAtual.preco_por_pessoa ? preco * qtd : preco;
+    const preco  = Number(passeioAtual.preco || 0);
+    const total  = passeioAtual.preco_por_pessoa ? preco * qtd : preco;
     totalStr = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 }
 
@@ -681,14 +680,14 @@ resumo.classList.add('show');
 // CONFIRMAR → WHATSAPP
 // ==========================================
 function confirmarReserva() {
-const nome    = document.getElementById('res-nome').value.trim();
-const qtd     = parseInt(document.getElementById('res-qtd').value) || 1;
-const dataVal = document.getElementById('res-data').value;
-const horario = document.getElementById('res-horario').value;
+const nome     = document.getElementById(‘res-nome’).value.trim();
+const telefone = document.getElementById(‘res-tel’).value.trim();
+const qtd      = parseInt(document.getElementById(‘res-qtd’).value) || 1;
+const dataVal  = document.getElementById(‘res-data’).value;
+const horario  = document.getElementById(‘res-horario’).value;
 
 ```
-// Validação: apenas nome obrigatório
-if (!nome) {
+if (!nome || !telefone) {
     mostrarToast(t('campos_obrigatorios'), 'error');
     return;
 }
@@ -718,9 +717,9 @@ window.open(url, '_blank');
 // ==========================================
 // TOAST
 // ==========================================
-function mostrarToast(msg, tipo = '') {
-const container = document.getElementById('toasts');
-const toast     = document.createElement('div');
+function mostrarToast(msg, tipo = ‘’) {
+const container = document.getElementById(‘toasts’);
+const toast     = document.createElement(‘div’);
 toast.className = `toast ${tipo}`;
 toast.innerText = msg;
 container.appendChild(toast);
@@ -731,11 +730,11 @@ setTimeout(() => toast.remove(), 3500);
 // CSRF
 // ==========================================
 function getCookie(name) {
-for (const c of document.cookie.split(';')) {
-const [k, v] = c.trim().split('=');
+for (const c of document.cookie.split(’;’)) {
+const [k, v] = c.trim().split(’=’);
 if (k === name) return decodeURIComponent(v);
 }
-return '';
+return ‘’;
 }
 
 // ==========================================
@@ -743,7 +742,7 @@ return '';
 // ==========================================
 async function trocarIdioma(lang) {
 idiomaAtual = lang;
-localStorage.setItem('lang', lang);
+localStorage.setItem(‘lang’, lang);
 
 ```
 document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -776,11 +775,11 @@ await Promise.all([
 // ==========================================
 // ESC / CLICK FORA
 // ==========================================
-document.addEventListener('keydown', e => {
-if (e.key === 'Escape') {
-if (document.getElementById('modalReserva')?.classList.contains('open')) {
+document.addEventListener(‘keydown’, e => {
+if (e.key === ‘Escape’) {
+if (document.getElementById(‘modalReserva’)?.classList.contains(‘open’)) {
 voltarParaDetalhe();
-} else if (document.getElementById('modalLugar')?.classList.contains('open')) {
+} else if (document.getElementById(‘modalLugar’)?.classList.contains(‘open’)) {
 fecharModalLugar();
 } else {
 fecharDetalhe();
@@ -788,41 +787,43 @@ fecharDetalhe();
 }
 });
 
-document.getElementById('modalDetalhe')?.addEventListener('click', function(e) {
+document.getElementById(‘modalDetalhe’)?.addEventListener(‘click’, function(e) {
 if (e.target === this) fecharDetalhe();
 });
 
-document.getElementById('modalReserva')?.addEventListener('click', function(e) {
+document.getElementById(‘modalReserva’)?.addEventListener(‘click’, function(e) {
 if (e.target === this) voltarParaDetalhe();
 });
 
-document.getElementById('modalLugar')?.addEventListener('click', function(e) {
+document.getElementById(‘modalLugar’)?.addEventListener(‘click’, function(e) {
 if (e.target === this) fecharModalLugar();
 });
 
 // ==========================================
 // MAPA
 // ==========================================
-let MAPA_GERAL_SRC = '';
-let LUGARES        = [];
+
+let MAPA_GERAL_SRC = ‘’;
+
+let LUGARES = [];
 
 const MAPA_LABELS = {
-pt: { restaurante: 'Restaurante', shopping: 'Compras',  hotelBadge: '★ Do Hotel' },
-en: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ Hotel's Own" },
-es: { restaurante: 'Restaurante', shopping: 'Compras',  hotelBadge: '★ Del Hotel' },
-fr: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ De l'Hôtel" },
+pt: { restaurante: ‘Restaurante’, shopping: ‘Compras’,  hotelBadge: ‘★ Do Hotel’ },
+en: { restaurante: ‘Restaurant’,  shopping: ‘Shopping’, hotelBadge: “★ Hotel’s Own” },
+es: { restaurante: ‘Restaurante’, shopping: ‘Compras’,  hotelBadge: ‘★ Del Hotel’ },
+fr: { restaurante: ‘Restaurant’,  shopping: ‘Shopping’, hotelBadge: “★ De l’Hôtel” },
 };
 
-let lugarFiltroAtivo   = 'todos';
+let lugarFiltroAtivo   = ‘todos’;
 let lugarSelecionadoId = null;
 
 function atualizarTextosMapa() {
-const labelEl  = document.getElementById('label-mapa');
-const tituloEl = document.getElementById('titulo-mapa');
-const loadEl   = document.getElementById('mapa-loading-txt');
-const btnTodos = document.getElementById('filtro-todos');
-const btnRest  = document.getElementById('filtro-restaurante');
-const btnShop  = document.getElementById('filtro-shopping');
+const labelEl  = document.getElementById(‘label-mapa’);
+const tituloEl = document.getElementById(‘titulo-mapa’);
+const loadEl   = document.getElementById(‘mapa-loading-txt’);
+const btnTodos = document.getElementById(‘filtro-todos’);
+const btnRest  = document.getElementById(‘filtro-restaurante’);
+const btnShop  = document.getElementById(‘filtro-shopping’);
 
 ```
 if (labelEl)  labelEl.innerText  = t('mapa_label');
@@ -861,7 +862,7 @@ renderLugarCards();
 }
 
 function renderLugarCards() {
-const grid = document.getElementById('mapa-cards-grid');
+const grid = document.getElementById(‘mapa-cards-grid’);
 if (!grid) return;
 
 ```
@@ -910,8 +911,6 @@ grid.querySelectorAll('.lugar-card').forEach(card => {
         if (e.key === 'Enter') card.click();
     });
 });
-
-grid.scrollLeft = 0;
 ```
 
 }
@@ -929,8 +928,8 @@ return `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
 }
 
 function carregarMapaIframe(src) {
-const iframe  = document.getElementById('mapa-iframe');
-const loading = document.getElementById('mapa-loading');
+const iframe  = document.getElementById(‘mapa-iframe’);
+const loading = document.getElementById(‘mapa-loading’);
 if (!iframe) return;
 
 ```
@@ -1022,7 +1021,7 @@ if (l.mapaLink) html += `
 if (l.instagram) {
     const igHref = l.instagram.startsWith('http')
         ? l.instagram
-        : `https://instagram.com/${l.instagram.replace('@', '')}`;
+        : `https://instagram.com/${l.instagram.replace('@','')}`;
     html += `
     <a href="${igHref}" target="_blank" rel="noopener"
        style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">
@@ -1031,7 +1030,7 @@ if (l.instagram) {
 }
 
 if (l.telefone) html += `
-    <a href="https://wa.me/${l.telefone.replace(/\D/g, '')}" target="_blank" rel="noopener"
+    <a href="https://wa.me/${l.telefone.replace(/\D/g,'')}" target="_blank" rel="noopener"
        style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:10px;text-decoration:none;color:#16a34a;font-size:13px;font-weight:500;">
         💬 WhatsApp
     </a>`;
@@ -1044,16 +1043,16 @@ document.body.style.overflow = 'hidden';
 }
 
 function fecharModalLugar() {
-document.getElementById('modalLugar').classList.remove('open');
-document.body.style.overflow = '';
+document.getElementById(‘modalLugar’).classList.remove(‘open’);
+document.body.style.overflow = ‘’;
 }
 
 // ==========================================
 // INIT
 // ==========================================
-document.addEventListener('DOMContentLoaded', async () => {
-document.querySelectorAll('.lang-btn').forEach(btn => {
-btn.classList.toggle('active', btn.dataset.lang === idiomaAtual);
+document.addEventListener(‘DOMContentLoaded’, async () => {
+document.querySelectorAll(’.lang-btn’).forEach(btn => {
+btn.classList.toggle(‘active’, btn.dataset.lang === idiomaAtual);
 });
 
 ```
