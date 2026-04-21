@@ -419,11 +419,16 @@
     }
 
     function formatarData(iso) {
-        if (!iso) return '–';
+        if (!iso || iso === 'undefined' || iso === 'null') return '–';
+        
+        // Se vier no formato ISO (2026-04-21...)
         const s = String(iso).substring(0,10);
         const parts = s.split('-');
-        if (parts.length < 3) return iso;
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return iso; // Retorna o que veio se não conseguir formatar
     }
 
     function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
@@ -524,7 +529,11 @@
             if (nome && val > 0) pixObj[nome] = val;
         });
         const dataPag = document.getElementById('f-data-pagamento').value || null;
-        const dataVal = document.getElementById('f-data').value || null;
+        const dataVal = document.getElementById('f-data').value;
+        if (!dataVal) {
+            alert('A data do passeio é obrigatória!');
+            return;
+        }
         const payload = {
             nome_cliente:      document.getElementById('f-cliente').value.trim(),
             whatsapp:          document.getElementById('f-whatsapp').value.trim(),
