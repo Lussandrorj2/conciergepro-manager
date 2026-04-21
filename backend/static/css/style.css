@@ -1352,28 +1352,10 @@ body {
     background: linear-gradient(to left, #f4f6f9 0%, transparent 100%);
 }
 
-/* Sombra interna do viewport do carrossel */
-#passeios {
-    /* Sombra lateral suave 
-    mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
-}
-
 /* =========================================================
    PATCH CSS — Passeios + Restaurantes 360°
    Cole no final do CSS existente do concierge (index.html)
    ========================================================= */
-
-/* ── REMOVE o branco dos lados do carrossel ── */
-/*#passeios {
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    touch-action: pan-y;
-    overscroll-behavior-x: contain;
-
-    -webkit-overflow-scrolling: touch;
-}*/
 
 .carrossel-wrapper::before,
 .carrossel-wrapper::after {
