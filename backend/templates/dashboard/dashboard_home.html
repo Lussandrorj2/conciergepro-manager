@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Dashboard — {{ hotel.nome }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <style>
         /* ══════════════════════════════════════
@@ -18,9 +18,8 @@
 
     :root {
         --gold:      #b5843a;
-        --gold-lt:   #d4a95a;
-        --gold-dim:  rgba(181,132,58,0.12);
-        --bg:        #f4f5f7;
+        --gold-lt:   rgba(181,132,58,0.12);
+        --bg:        #f2f4f7;
         --surface:   #ffffff;
         --text:      #111827;
         --muted:     #6b7280;
@@ -29,13 +28,10 @@
         --green-dim: rgba(22,163,74,0.1);
         --amber:     #d97706;
         --amber-dim: rgba(217,119,6,0.1);
-        --red:       #dc2626;
-        --red-dim:   rgba(220,38,38,0.1);
         --blue:      #2563eb;
         --blue-dim:  rgba(37,99,235,0.08);
         --radius:    14px;
-        --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
-        --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+        --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
     }
 
     html, body {
@@ -44,27 +40,24 @@
         background: var(--bg);
         color: var(--text);
         -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
     }
 
     /* ══════════════════════════════════════
-       LAYOUT
+       LAYOUT DESKTOP
     ══════════════════════════════════════ */
-    .layout {
-        display: flex;
-        min-height: 100vh;
-    }
+    .layout { display: flex; min-height: 100vh; }
 
     /* ── Sidebar ── */
     .sidebar {
-        width: 220px;
+        width: 210px;
         background: var(--surface);
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        padding: 24px 16px;
+        padding: 20px 14px;
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         height: 100vh;
         z-index: 40;
         flex-shrink: 0;
@@ -72,93 +65,107 @@
 
     .sidebar-logo {
         font-family: 'Playfair Display', serif;
-        font-size: 18px;
+        font-size: 17px;
         font-weight: 700;
         color: var(--gold);
-        padding: 0 8px 24px;
+        padding: 0 6px 20px;
         border-bottom: 1px solid var(--border);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        margin-bottom: 14px;
     }
 
-    .sidebar nav {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        flex: 1;
-    }
+    .sidebar nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 
     .sidebar nav a {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        font-size: 14px;
+        gap: 9px;
+        padding: 9px 10px;
+        border-radius: 9px;
+        font-size: 13px;
         font-weight: 500;
         color: var(--muted);
         text-decoration: none;
-        transition: all 0.18s;
+        transition: all 0.15s;
     }
 
     .sidebar nav a:hover { background: var(--bg); color: var(--text); }
-    .sidebar nav a.active { background: var(--gold-dim); color: var(--gold); font-weight: 600; }
-    .sidebar nav hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+    .sidebar nav a.active { background: var(--gold-lt); color: var(--gold); font-weight: 600; }
+    .sidebar nav hr { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
 
     /* ── Main ── */
-    .main {
-        flex: 1;
-        margin-left: 220px;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
+    .main { flex: 1; margin-left: 210px; display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* ── Topbar ── */
+    /* ══════════════════════════════════════
+       TOPBAR — compacta, sem quebra
+    ══════════════════════════════════════ */
     .topbar {
         background: var(--surface);
         border-bottom: 1px solid var(--border);
-        padding: 16px 28px;
+        padding: 0 24px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 12px;
         position: sticky;
         top: 0;
         z-index: 30;
+        flex-wrap: nowrap;
     }
 
-    .topbar-left { display: flex; flex-direction: column; gap: 2px; }
-    .topbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
-    .topbar-date  { font-size: 13px; color: var(--muted); font-weight: 400; }
+    .topbar-left {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+        flex-shrink: 1;
+    }
 
-    .topbar-actions { display: flex; align-items: center; gap: 10px; }
-
-    /* Botão página do hotel — destaque dourado */
-    .btn-hotel-page {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: var(--gold);
-        color: #fff;
-        font-family: 'DM Sans', sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 9px 16px;
-        border-radius: 9px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        transition: filter 0.2s, transform 0.15s;
-        box-shadow: 0 3px 10px rgba(181,132,58,0.3);
+    .topbar-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
         white-space: nowrap;
     }
 
-    .btn-hotel-page:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .topbar-date {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-    .btn-secondary-sm {
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--green);
+        background: var(--green-dim);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    .status-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .btn-icon {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -168,45 +175,65 @@
         font-family: 'DM Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
-        padding: 9px 14px;
+        padding: 7px 13px;
         border-radius: 9px;
         text-decoration: none;
         cursor: pointer;
-        transition: all 0.18s;
+        transition: all 0.15s;
         white-space: nowrap;
     }
 
-    .btn-secondary-sm:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .btn-icon:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-lt); }
 
-    /* ── Content ── */
+    .btn-gold {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--gold);
+        color: #fff;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 9px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: filter 0.15s, transform 0.1s;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(181,132,58,0.28);
+    }
+
+    .btn-gold:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    /* ══════════════════════════════════════
+       CONTENT
+    ══════════════════════════════════════ */
     .content {
-        padding: 28px;
+        padding: 22px 24px 40px;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 20px;
     }
 
     /* ══════════════════════════════════════
-       CARDS DE MÉTRICAS
+       MÉTRICAS
     ══════════════════════════════════════ */
     .metrics-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 14px;
+        gap: 12px;
     }
 
     .metric-card {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        box-shadow: var(--shadow);
+        padding: 16px 18px 14px;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow);
     }
 
     .metric-card::before {
@@ -214,47 +241,44 @@
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 3px;
-        background: var(--accent-color, var(--gold));
+        background: var(--accent, var(--gold));
         border-radius: var(--radius) var(--radius) 0 0;
     }
 
-    .metric-card.blue   { --accent-color: var(--blue); }
-    .metric-card.green  { --accent-color: var(--green); }
-    .metric-card.amber  { --accent-color: var(--amber); }
-    .metric-card.gold   { --accent-color: var(--gold); }
-
-    .metric-label {
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--muted);
-    }
-
-    .metric-value {
-        font-size: 32px;
-        font-weight: 700;
-        color: var(--text);
-        line-height: 1;
-        font-family: 'Playfair Display', serif;
-    }
-
-    .metric-sub {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 2px;
-    }
+    .metric-card.blue   { --accent: var(--blue); }
+    .metric-card.green  { --accent: var(--green); }
+    .metric-card.amber  { --accent: var(--amber); }
+    .metric-card.gold   { --accent: var(--gold); }
 
     .metric-icon {
         position: absolute;
-        top: 18px;
-        right: 18px;
-        font-size: 22px;
-        opacity: 0.5;
+        top: 14px; right: 14px;
+        font-size: 20px;
+        opacity: 0.45;
     }
 
+    .metric-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 30px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .metric-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
     /* ══════════════════════════════════════
-       SEÇÕES
+       SEÇÃO GRID 2 COLUNAS
     ══════════════════════════════════════ */
     .section-grid {
         display: grid;
@@ -274,244 +298,35 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 18px 20px 14px;
+        padding: 15px 18px 13px;
         border-bottom: 1px solid var(--border);
     }
 
-    .card-header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .card-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--text);
-    }
-
-    .card-link {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--gold);
-        text-decoration: none;
-        transition: opacity 0.2s;
-    }
-
-    .card-link:hover { opacity: 0.7; }
-
-    .card-body { padding: 0; }
+    .card-header-left { display: flex; align-items: center; gap: 7px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .card-link { font-size: 12px; font-weight: 600; color: var(--gold); text-decoration: none; transition: opacity .2s; }
+    .card-link:hover { opacity: .7; }
 
     /* ══════════════════════════════════════
-       LISTA DE RESERVAS
-    ══════════════════════════════════════ */
-    .reserva-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 20px;
-        border-bottom: 1px solid var(--border);
-        transition: background 0.15s;
-    }
-
-    .reserva-item:last-child { border-bottom: none; }
-    .reserva-item:hover { background: var(--bg); }
-
-    .reserva-avatar {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--gold-dim);
-        color: var(--gold);
-        font-size: 14px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-family: 'Playfair Display', serif;
-    }
-
-    .reserva-info { flex: 1; min-width: 0; }
-
-    .reserva-nome {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .reserva-passeio {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 1px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .reserva-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-        flex-shrink: 0;
-    }
-
-    .badge {
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 10px;
-        border-radius: 999px;
-        white-space: nowrap;
-    }
-
-    .badge-green  { background: var(--green-dim);  color: var(--green); }
-    .badge-amber  { background: var(--amber-dim);  color: var(--amber); }
-    .badge-red    { background: var(--red-dim);    color: var(--red); }
-    .badge-blue   { background: var(--blue-dim);   color: var(--blue); }
-    .badge-gray   { background: var(--border);     color: var(--muted); }
-
-    .reserva-data {
-        font-size: 11px;
-        color: var(--muted);
-    }
-
-    /* Estado vazio */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 36px 20px;
-        gap: 8px;
-        color: var(--muted);
-    }
-
-    .empty-state-icon { font-size: 32px; }
-    .empty-state p { font-size: 13px; text-align: center; }
-
-    /* ══════════════════════════════════════
-       LISTA DE PASSEIOS
-    ══════════════════════════════════════ */
-    .passeio-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 12px 20px;
-        border-bottom: 1px solid var(--border);
-        transition: background 0.15s;
-    }
-
-    .passeio-item:last-child { border-bottom: none; }
-    .passeio-item:hover { background: var(--bg); }
-
-    .passeio-thumb {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        object-fit: cover;
-        background: var(--bg);
-        flex-shrink: 0;
-        border: 1px solid var(--border);
-    }
-
-    .passeio-thumb-placeholder {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        background: var(--gold-dim);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-
-    .passeio-info { flex: 1; min-width: 0; }
-
-    .passeio-nome {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .passeio-sub {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 1px;
-    }
-
-    .passeio-preco {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--gold);
-        flex-shrink: 0;
-    }
-
-    /* ══════════════════════════════════════
-       CONFIG CHECKLIST
-    ══════════════════════════════════════ */
-    .config-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 13px 20px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .config-item:last-child { border-bottom: none; }
-
-    .config-check {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-
-    .config-check.ok    { background: var(--green-dim); color: var(--green); }
-    .config-check.warn  { background: var(--amber-dim); color: var(--amber); }
-
-    .config-info { flex: 1; }
-    .config-label { font-size: 13px; font-weight: 600; color: var(--text); }
-    .config-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-    .config-progress {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--green);
-        flex-shrink: 0;
-    }
-
-    /* ══════════════════════════════════════
-       FILTROS DE RESERVAS
+       FILTROS
     ══════════════════════════════════════ */
     .filter-tabs {
         display: flex;
         gap: 6px;
-        padding: 12px 20px;
+        padding: 10px 18px;
         border-bottom: 1px solid var(--border);
     }
 
     .filter-tab {
         font-size: 12px;
         font-weight: 600;
-        padding: 5px 12px;
+        padding: 4px 12px;
         border-radius: 20px;
         border: 1px solid var(--border);
         background: transparent;
         color: var(--muted);
         cursor: pointer;
-        transition: all 0.18s;
+        transition: all .15s;
         font-family: 'DM Sans', sans-serif;
     }
 
@@ -519,35 +334,135 @@
     .filter-tab.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
     /* ══════════════════════════════════════
-       STATUS OPERACIONAL
+       LISTA RESERVAS
     ══════════════════════════════════════ */
-    .status-pill {
-        display: inline-flex;
+    .reserva-item {
+        display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--green);
-        background: var(--green-dim);
-        padding: 4px 10px;
+        gap: 12px;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+        transition: background .15s;
+    }
+
+    .reserva-item:last-child { border-bottom: none; }
+    .reserva-item:hover { background: var(--bg); }
+
+    .reserva-avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: var(--gold-lt);
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .reserva-info { flex: 1; min-width: 0; }
+    .reserva-nome { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .reserva-passeio { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .reserva-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+
+    .badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 9px;
         border-radius: 999px;
     }
 
-    .status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--green);
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-    }
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-amber  { background: var(--amber-dim);  color: var(--amber); }
+    .badge-gray   { background: var(--border);     color: var(--muted); }
+    .reserva-data { font-size: 11px; color: var(--muted); }
 
     /* ══════════════════════════════════════
-       MOBILE NAV BAR (bottom)
+       ESTADO VAZIO
+    ══════════════════════════════════════ */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+        gap: 8px;
+        color: var(--muted);
+    }
+
+    .empty-state-icon { font-size: 28px; }
+    .empty-state p { font-size: 13px; text-align: center; line-height: 1.5; }
+
+    /* ══════════════════════════════════════
+       LISTA PASSEIOS
+    ══════════════════════════════════════ */
+    .passeio-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 18px;
+        border-bottom: 1px solid var(--border);
+        transition: background .15s;
+    }
+
+    .passeio-item:last-child { border-bottom: none; }
+    .passeio-item:hover { background: var(--bg); }
+
+    .passeio-thumb {
+        width: 42px; height: 42px;
+        border-radius: 9px;
+        object-fit: cover;
+        background: var(--bg);
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+    }
+
+    .passeio-thumb-placeholder {
+        width: 42px; height: 42px;
+        border-radius: 9px;
+        background: var(--gold-lt);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .passeio-info { flex: 1; min-width: 0; }
+    .passeio-nome { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .passeio-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .passeio-preco { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       CONFIG CHECKLIST
+    ══════════════════════════════════════ */
+    .config-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .config-item:last-child { border-bottom: none; }
+
+    .config-check {
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    .config-check.ok   { background: var(--green-dim); color: var(--green); }
+    .config-check.warn { background: var(--amber-dim); color: var(--amber); }
+
+    .config-info { flex: 1; }
+    .config-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .config-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .config-progress { font-size: 12px; font-weight: 700; color: var(--green); flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       MOBILE NAV BAR
     ══════════════════════════════════════ */
     .mobile-nav {
         display: none;
@@ -556,7 +471,7 @@
         background: var(--surface);
         border-top: 1px solid var(--border);
         z-index: 50;
-        padding: 8px 0 env(safe-area-inset-bottom, 8px);
+        padding: 6px 0 env(safe-area-inset-bottom, 6px);
     }
 
     .mobile-nav-inner {
@@ -569,39 +484,69 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px;
+        gap: 2px;
         text-decoration: none;
         color: var(--muted);
         font-size: 10px;
         font-weight: 500;
-        padding: 4px 10px;
+        padding: 4px 8px;
         border-radius: 8px;
-        transition: color 0.2s;
+        transition: color .2s;
+        min-width: 52px;
     }
 
     .mobile-nav-item.active { color: var(--gold); }
-    .mobile-nav-item span { font-size: 20px; }
+    .mobile-nav-item .nav-icon { font-size: 19px; }
 
     /* ══════════════════════════════════════
        RESPONSIVE
     ══════════════════════════════════════ */
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
         .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-        .section-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
+        /* Esconde sidebar, ativa nav mobile */
         .sidebar { display: none; }
         .main { margin-left: 0; }
         .mobile-nav { display: block; }
-        .content { padding: 16px 16px 80px; gap: 16px; }
-        .topbar { padding: 14px 16px; }
+
+        /* Topbar mobile — tudo em uma linha */
+        .topbar {
+            padding: 0 14px;
+            height: 56px;
+            gap: 8px;
+        }
+
+        .topbar-title { font-size: 15px; }
+        .topbar-date  { font-size: 11px; }
+
+        /* Status pill some no mobile, sobra espaço */
+        .status-pill { display: none; }
+
+        /* Botão "Novo Passeio" vira só ícone */
+        .btn-novo-passeio .btn-label { display: none; }
+        .btn-novo-passeio { padding: 7px 10px; }
+
+        /* Botão "Página do Hotel" — texto curto */
+        .btn-pagina .btn-label-full { display: none; }
+        .btn-pagina .btn-label-short { display: inline; }
+
+        /* Content */
+        .content { padding: 14px 14px 80px; gap: 14px; }
+
+        /* Métricas 2 colunas */
         .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .metric-value { font-size: 26px; }
+        .metric-card { padding: 14px 14px 12px; }
+
+        /* Seção em coluna única */
+        .section-grid { grid-template-columns: 1fr; gap: 14px; }
     }
 
-    @media (max-width: 480px) {
-        .topbar-actions .btn-secondary-sm { display: none; }
+    @media (max-width: 400px) {
+        .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .metric-value { font-size: 22px; }
     }
 </style>
 
@@ -612,7 +557,7 @@
 <div class="layout">
 
 
-<!-- ══ SIDEBAR (desktop) ══ -->
+<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
     <div class="sidebar-logo">🔔 Concierge</div>
     <nav>
@@ -623,7 +568,7 @@
         <a href="/{{ hotel.slug }}/dashboard/lugares/">📍 Lugares</a>
         <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
         <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
         <hr>
         <a href="/logout/">↩ Sair</a>
     </nav>
@@ -634,20 +579,29 @@
 
     <!-- ── Topbar ── -->
     <div class="topbar">
+        <!-- Esquerda: título + data numa linha só -->
         <div class="topbar-left">
             <div class="topbar-title">Dashboard</div>
-            <div class="topbar-date" id="topbar-date">Carregando data…</div>
+            <div class="topbar-date" id="topbar-date">—</div>
         </div>
-        <div class="topbar-actions">
+
+        <!-- Direita: status + ações -->
+        <div class="topbar-right">
             <span class="status-pill">
                 <span class="status-dot"></span>
                 Sistema operando
             </span>
-            <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-secondary-sm">
-                ➕ Novo Passeio
+
+            <a href="/{{ hotel.slug }}/dashboard/criar/"
+               class="btn-icon btn-novo-passeio">
+                ➕ <span class="btn-label">Novo Passeio</span>
             </a>
-            <a href="/concierge/{{ hotel.slug }}/" target="_blank" class="btn-hotel-page">
-                🌐 Página do Hotel ↗
+
+            <a href="/concierge/{{ hotel.slug }}/" target="_blank"
+               class="btn-gold btn-pagina">
+                🌐
+                <span class="btn-label-full">Página do Hotel ↗</span>
+                <span class="btn-label-short" style="display:none;">Hotel ↗</span>
             </a>
         </div>
     </div>
@@ -655,14 +609,17 @@
     <!-- ── Content ── -->
     <div class="content">
 
-        <!-- ── Métricas do dia ── -->
+        <!-- Métricas -->
         <div class="metrics-grid">
 
             <div class="metric-card blue">
                 <div class="metric-icon">📅</div>
                 <div class="metric-label">Reservas Hoje</div>
                 <div class="metric-value">{{ reservas_hoje|default:"0" }}</div>
-                <div class="metric-sub">{{ confirmadas_hoje|default:"0" }} confirmadas · {{ pendentes_hoje|default:"0" }} pendentes</div>
+                <div class="metric-sub">
+                    {{ confirmadas_hoje|default:"0" }} confirmadas ·
+                    {{ pendentes_hoje|default:"0" }} pendentes
+                </div>
             </div>
 
             <div class="metric-card green">
@@ -675,7 +632,7 @@
             <div class="metric-card amber">
                 <div class="metric-icon">💰</div>
                 <div class="metric-label">Preço Médio</div>
-                <div class="metric-value" style="font-size:22px;">
+                <div class="metric-value" style="font-size:22px;margin-top:2px;">
                     {% if preco_medio %}R$ {{ preco_medio }}{% else %}--{% endif %}
                 </div>
                 <div class="metric-sub">passeios com preço fixo</div>
@@ -690,7 +647,7 @@
 
         </div>
 
-        <!-- ── Próximas Reservas + Passeios ── -->
+        <!-- Próximas Reservas + Passeios -->
         <div class="section-grid">
 
             <!-- Próximas Reservas -->
@@ -703,14 +660,13 @@
                     <a href="/{{ hotel.slug }}/dashboard/reservas/" class="card-link">Ver todas →</a>
                 </div>
 
-                <!-- Filtros -->
                 <div class="filter-tabs">
                     <button class="filter-tab active" onclick="filtrarReservas('todas', this)">Todas</button>
                     <button class="filter-tab" onclick="filtrarReservas('confirmada', this)">✅ Confirmadas</button>
                     <button class="filter-tab" onclick="filtrarReservas('pendente', this)">⏳ Pendentes</button>
                 </div>
 
-                <div class="card-body" id="lista-reservas">
+                <div id="lista-reservas">
                     {% if proximas_reservas %}
                         {% for r in proximas_reservas %}
                         <div class="reserva-item" data-status="{{ r.status }}">
@@ -724,8 +680,6 @@
                                     <span class="badge badge-green">Confirmada</span>
                                 {% elif r.status == 'pendente' %}
                                     <span class="badge badge-amber">Pendente</span>
-                                {% elif r.status == 'cancelada' %}
-                                    <span class="badge badge-red">Cancelada</span>
                                 {% else %}
                                     <span class="badge badge-gray">{{ r.status }}</span>
                                 {% endif %}
@@ -742,7 +696,7 @@
                 </div>
             </div>
 
-            <!-- Passeios Cadastrados -->
+            <!-- Passeios -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-header-left">
@@ -751,42 +705,41 @@
                     </div>
                     <a href="/{{ hotel.slug }}/dashboard/listar/" class="card-link">Ver todos →</a>
                 </div>
-                <div class="card-body">
-                    {% if passeios %}
-                        {% for p in passeios %}
-                        <div class="passeio-item">
-                            {% if p.banner or p.foto %}
-                                <img class="passeio-thumb"
-                                     src="{{ p.banner|default:p.foto }}"
-                                     alt="{{ p.nome }}"
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                <div class="passeio-thumb-placeholder" style="display:none">🌴</div>
-                            {% else %}
-                                <div class="passeio-thumb-placeholder">🌴</div>
-                            {% endif %}
-                            <div class="passeio-info">
-                                <div class="passeio-nome">{{ p.nome }}</div>
-                                <div class="passeio-sub">{{ p.descricao|truncatechars:40 }}</div>
-                            </div>
-                            <div class="passeio-preco">
-                                {% if p.preco_sob_consulta %}Sob consulta{% else %}R$ {{ p.preco }}{% endif %}
-                            </div>
+                {% if passeios %}
+                    {% for p in passeios %}
+                    <div class="passeio-item">
+                        {% if p.banner or p.foto %}
+                            <img class="passeio-thumb"
+                                 src="{{ p.banner|default:p.foto }}"
+                                 alt="{{ p.nome }}"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                            <div class="passeio-thumb-placeholder" style="display:none">🌴</div>
+                        {% else %}
+                            <div class="passeio-thumb-placeholder">🌴</div>
+                        {% endif %}
+                        <div class="passeio-info">
+                            <div class="passeio-nome">{{ p.nome }}</div>
+                            <div class="passeio-sub">{{ p.descricao|truncatechars:36 }}</div>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🌴</div>
-                            <p>Nenhum passeio cadastrado ainda.<br>
-                               <a href="/{{ hotel.slug }}/dashboard/criar/" style="color:var(--gold);font-weight:600;">Criar primeiro passeio →</a>
-                            </p>
+                        <div class="passeio-preco">
+                            {% if p.preco_sob_consulta %}Sob consulta{% else %}R$ {{ p.preco }}{% endif %}
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌴</div>
+                        <p>Nenhum passeio ainda.<br>
+                           <a href="/{{ hotel.slug }}/dashboard/criar/"
+                              style="color:var(--gold);font-weight:600;">Criar agora →</a>
+                        </p>
+                    </div>
+                {% endif %}
             </div>
 
         </div>
 
-        <!-- ── Configuração do Hotel ── -->
+        <!-- Configuração do Hotel -->
         <div class="card">
             <div class="card-header">
                 <div class="card-header-left">
@@ -795,79 +748,77 @@
                 </div>
                 <span class="config-progress">{{ config_completos|default:"0" }}/4 concluídos</span>
             </div>
-            <div class="card-body">
 
-                <div class="config-item">
-                    <div class="config-check {% if passeios_ativos %}ok{% else %}warn{% endif %}">
-                        {% if passeios_ativos %}✓{% else %}!{% endif %}
-                    </div>
-                    <div class="config-info">
-                        <div class="config-label">Passeios cadastrados</div>
-                        <div class="config-sub">{{ passeios_ativos|default:"0" }} passeio(s) ativo(s)</div>
-                    </div>
-                    <a href="/{{ hotel.slug }}/dashboard/listar/" class="card-link">Gerenciar →</a>
+            <div class="config-item">
+                <div class="config-check {% if passeios_ativos %}ok{% else %}warn{% endif %}">
+                    {% if passeios_ativos %}✓{% else %}!{% endif %}
                 </div>
-
-                <div class="config-item">
-                    <div class="config-check {% if hotel.foto_capa %}ok{% else %}warn{% endif %}">
-                        {% if hotel.foto_capa %}✓{% else %}!{% endif %}
-                    </div>
-                    <div class="config-info">
-                        <div class="config-label">Foto de capa</div>
-                        <div class="config-sub">{% if hotel.foto_capa %}Imagem definida{% else %}Sem imagem{% endif %}</div>
-                    </div>
-                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+                <div class="config-info">
+                    <div class="config-label">Passeios cadastrados</div>
+                    <div class="config-sub">{{ passeios_ativos|default:"0" }} passeio(s) ativo(s)</div>
                 </div>
-
-                <div class="config-item">
-                    <div class="config-check {% if hotel.titulo_hero %}ok{% else %}warn{% endif %}">
-                        {% if hotel.titulo_hero %}✓{% else %}!{% endif %}
-                    </div>
-                    <div class="config-info">
-                        <div class="config-label">Título da página</div>
-                        <div class="config-sub">{{ hotel.titulo_hero|default:"Não definido" }}</div>
-                    </div>
-                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
-                </div>
-
-                <div class="config-item">
-                    <div class="config-check {% if hotel.whatsapp %}ok{% else %}warn{% endif %}">
-                        {% if hotel.whatsapp %}✓{% else %}!{% endif %}
-                    </div>
-                    <div class="config-info">
-                        <div class="config-label">WhatsApp do hotel</div>
-                        <div class="config-sub">{% if hotel.whatsapp %}{{ hotel.whatsapp }}{% else %}Não configurado{% endif %}</div>
-                    </div>
-                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
-                </div>
-
+                <a href="/{{ hotel.slug }}/dashboard/listar/" class="card-link">Gerenciar →</a>
             </div>
+
+            <div class="config-item">
+                <div class="config-check {% if hotel.foto_capa %}ok{% else %}warn{% endif %}">
+                    {% if hotel.foto_capa %}✓{% else %}!{% endif %}
+                </div>
+                <div class="config-info">
+                    <div class="config-label">Foto de capa</div>
+                    <div class="config-sub">{% if hotel.foto_capa %}Imagem definida{% else %}Sem imagem{% endif %}</div>
+                </div>
+                <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+            </div>
+
+            <div class="config-item">
+                <div class="config-check {% if hotel.titulo_hero %}ok{% else %}warn{% endif %}">
+                    {% if hotel.titulo_hero %}✓{% else %}!{% endif %}
+                </div>
+                <div class="config-info">
+                    <div class="config-label">Título da página</div>
+                    <div class="config-sub">{{ hotel.titulo_hero|default:"Não definido" }}</div>
+                </div>
+                <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+            </div>
+
+            <div class="config-item">
+                <div class="config-check {% if hotel.whatsapp %}ok{% else %}warn{% endif %}">
+                    {% if hotel.whatsapp %}✓{% else %}!{% endif %}
+                </div>
+                <div class="config-info">
+                    <div class="config-label">WhatsApp do hotel</div>
+                    <div class="config-sub">{% if hotel.whatsapp %}{{ hotel.whatsapp }}{% else %}Não configurado{% endif %}</div>
+                </div>
+                <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+            </div>
+
         </div>
 
     </div><!-- /content -->
-</main><!-- /main -->
+</main>
 
 
 </div><!-- /layout -->
 
-<!-- ══ MOBILE NAV BAR ══ -->
+<!-- ══ MOBILE NAV ══ -->
 
 <nav class="mobile-nav">
     <div class="mobile-nav-inner">
         <a href="/{{ hotel.slug }}/dashboard/" class="mobile-nav-item active">
-            <span>🏠</span>Dashboard
+            <span class="nav-icon">🏠</span>Dashboard
         </a>
         <a href="/{{ hotel.slug }}/dashboard/reservas/" class="mobile-nav-item">
-            <span>📅</span>Reservas
+            <span class="nav-icon">📅</span>Reservas
         </a>
         <a href="/{{ hotel.slug }}/dashboard/listar/" class="mobile-nav-item">
-            <span>🗺️</span>Passeios
+            <span class="nav-icon">🗺️</span>Passeios
         </a>
         <a href="/{{ hotel.slug }}/dashboard/cambio/" class="mobile-nav-item">
-            <span>💱</span>Câmbio
+            <span class="nav-icon">💱</span>Câmbio
         </a>
         <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="mobile-nav-item">
-            <span>📊</span>Relatórios
+            <span class="nav-icon">📊</span>Relatórios
         </a>
     </div>
 </nav>
@@ -875,26 +826,25 @@
 <script src="{% static 'js/mobile-menu.js' %}"></script>
 
 <script>
-    // ── Data do dia ──
-    const dateEl = document.getElementById('topbar-date');
-    if (dateEl) {
+    // ── Data compacta na topbar ──
+    const el = document.getElementById('topbar-date');
+    if (el) {
         const now = new Date();
-        const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
-        dateEl.textContent = now.toLocaleDateString('pt-BR', opts);
+        // Formato curto para mobile: "ter., 21 abr."
+        // Formato longo para desktop: "terça-feira, 21 de abril de 2026"
+        const isDesktop = window.innerWidth > 768;
+        const opts = isDesktop
+            ? { weekday:'long', day:'numeric', month:'long', year:'numeric' }
+            : { weekday:'short', day:'numeric', month:'short' };
+        el.textContent = now.toLocaleDateString('pt-BR', opts);
     }
 
     // ── Filtro de reservas ──
     function filtrarReservas(status, btn) {
         document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        const itens = document.querySelectorAll('#lista-reservas .reserva-item');
-        itens.forEach(item => {
-            if (status === 'todas' || item.dataset.status === status) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
+        document.querySelectorAll('#lista-reservas .reserva-item').forEach(item => {
+            item.style.display = (status === 'todas' || item.dataset.status === status) ? '' : 'none';
         });
     }
 </script>
