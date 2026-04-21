@@ -112,7 +112,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # SEGURANÇA RENDER
 # -----------------------
 CSRF_TRUSTED_ORIGINS = [
-    "https://conciergepro-manager.onrender.com",
+    "https://conciergerio.up.railway.app",
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
