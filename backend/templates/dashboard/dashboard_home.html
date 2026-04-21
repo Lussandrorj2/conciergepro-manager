@@ -9,102 +9,104 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            align-items: start;
+            width: 100%; /* Garante que não transborde */
+        }
+        
+        /* Evita que tabelas quebrem o layout mobile */
+        .tabela-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+        
         /* ═══════════════════════════════
-   CORE LAYOUT (Desktop & General)
-   ═══════════════════════════════ */
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-.dash-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
-    align-items: start;
-    width: 100%; /* Garante que não transborde */
-}
-
-/* Evita que tabelas quebrem o layout mobile */
-.tabela-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-
-/* ═══════════════════════════════
-   MOBILE OVERRIDES (Abaixo de 1024px)
-   ═══════════════════════════════ */
-@media (max-width: 1024px) {
-    .layout {
-        flex-direction: column; /* Sidebar vai para cima ou some */
-    }
-
-    /* Se as outras páginas usam menu hambúrguer, você pode esconder a sidebar aqui */
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-    }
-
-    .dash-grid {
-        grid-template-columns: 1fr; /* Coluna única no mobile */
-    }
-
-    .dash-right {
-        position: static; /* Remove o sticky que quebra no mobile */
-        width: 100%;
-    }
-
-    /* KPIs: Ajuste para 2 colunas para não esmagar o texto */
-    .kpis-mes-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    /* Gráfico: Forçar a altura para não achatar */
-    #chart-mes-wrap {
-        height: 250px !important;
-    }
-
-    /* Padding da página */
-    .content {
-        padding: 10px;
-    }
-
-    /* Ajuste de cards para ocupar 100% */
-    .card-config {
-        margin-bottom: 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* Modal vira Bottom Sheet (Estilo App moderno) */
-    .modal {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0;
-        border-radius: 20px 20px 0 0;
-        position: fixed;
-        bottom: 0;
-    }
-
-    .modal-overlay {
-        align-items: flex-end;
-    }
-}
-
-/* Ajuste fino para telas muito pequenas (iPhone SE, etc) */
-@media (max-width: 480px) {
-    .kpis-mes-row {
-        grid-template-columns: 1fr; /* 1 coluna se for muito pequeno */
-    }
-    
-    .topbar-title {
-        font-size: 1.2rem;
-    }
-}
+           MOBILE OVERRIDES (Abaixo de 1024px)
+           ═══════════════════════════════ */
+        /* ═══════════════════════════════
+           MOBILE OVERRIDES (Abaixo de 768px)
+           ═══════════════════════════════ */
+        @media (max-width: 768px) {
+            /* 1. Remove a sidebar lateral para dar espaço ao conteúdo */
+            .sidebar {
+                display: none !important; 
+            }
+        
+            /* 2. Zera as margens e paddings do container principal */
+            .main {
+                margin-left: 0 !important;
+                width: 100% !important;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+        
+            /* 3. Ajusta a Topbar para não ter espaço sobrando em cima */
+            .topbar {
+                padding: 10px 16px;
+                height: auto;
+                min-height: 60px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: var(--bg-card);
+                border-bottom: 1px solid var(--border);
+            }
+        
+            /* 4. Ajusta o conteúdo para preencher a tela sem cortar */
+            .content {
+                padding: 12px 12px 100px !important; /* Padding embaixo para o menu não tampar */
+                gap: 12px;
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+        
+            /* 5. Força a coluna única e remove o "corte" lateral */
+            .dash-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100%;
+                gap: 12px;
+            }
+        
+            .dash-left, .dash-right {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        
+            /* 6. Melhora os KPIs para não ficarem esmagados */
+            .kpis-mes-row {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px;
+            }
+        
+            /* 7. Garante que o gráfico ocupe a largura certa */
+            #chart-mes-wrap {
+                height: 200px !important;
+                width: 100%;
+            }
+        
+            /* 8. Botão "Ir para home" mais compacto no mobile */
+            .btn-ir-site {
+                margin: 0;
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            .hotel-badge {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+        }
         
     </style>
     
@@ -130,13 +132,13 @@
     <main class="main">
         <div class="topbar">
             <span class="topbar-title">Visão Geral</span>
-            <div style="display:flex; gap:12px; align-items:center;">
+            <div style="display:flex; gap:8px; align-items:center;">
                 <div class="hotel-badge">
                     <div class="hotel-dot"></div>
                     {{ hotel.nome }}
                 </div>
                 
-                <a href="/{{ hotel.slug }}/" class="btn-ir-site">
+                <a href="{% url 'hotel_home' hotel.slug %}" class="btn-ir-site">
                     🌐 Ir para Concierge home
                 </a>
             </div>
