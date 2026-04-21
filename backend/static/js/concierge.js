@@ -563,11 +563,12 @@ function abrirModalReserva() {
 
     document.getElementById('modal-eyebrow').innerText        = t('modal_eyebrow');
     document.getElementById('modal-passeio-nome').innerText   = p.nome;
-    document.getElementById('lbl-data').innerText             = t('lbl_data');
-    document.getElementById('lbl-horario').innerText          = t('lbl_horario');
-    document.getElementById('lbl-nome').innerText             = t('lbl_nome');
-    document.getElementById('lbl-tel').innerText              = t('lbl_tel');
-    document.getElementById('lbl-qtd').innerText              = t('lbl_qtd');
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    setEl('lbl-data',    t('lbl_data'));
+    setEl('lbl-horario', t('lbl_horario'));
+    setEl('lbl-nome',    t('lbl_nome'));
+    setEl('lbl-tel',     t('lbl_tel'));   // seguro — não quebra se não existir
+    setEl('lbl-qtd',     t('lbl_qtd'));
     document.getElementById('resumo-label-passeio').innerText = t('resumo_passeio');
     document.getElementById('resumo-label-qtd').innerText     = t('resumo_qtd');
     document.getElementById('resumo-label-total').innerText   = t('resumo_total');
@@ -582,7 +583,8 @@ function abrirModalReserva() {
 
 
     document.getElementById('res-nome').value    = '';
-    document.getElementById('res-tel').value     = '';
+    const resTel = document.getElementById('res-tel');
+    if (resTel) resTel.value = '';
     document.getElementById('res-qtd').value     = 1;
     document.getElementById('res-data').value    = '';
     document.getElementById('res-horario').value = '';
