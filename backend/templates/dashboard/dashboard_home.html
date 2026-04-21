@@ -7,7 +7,7 @@
     <title>Dashboard — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -37,34 +37,49 @@
         </div>
 
         <div class="content">
-            <div class="stats-mini-row">
-                <div class="stat-mini">
-                    <div class="stat-mini-label">Reservas Hoje</div>
-                    <div class="stat-mini-value blue" id="dash-reservas-count">...</div>
-                </div>
-                <div class="stat-mini">
-                    <div class="stat-mini-label">Lucro Câmbio</div>
-                    <div class="stat-mini-value green" id="dash-lucro-cambio">R$ 0,00</div>
-                </div>
-                <div class="stat-mini">
-                    <div class="stat-mini-label">Passeios Ativos</div>
-                    <div class="stat-mini-value gold" id="dash-passeios-count">...</div>
-                </div>
-            </div>
 
-            <div class="dashboard-grid">
-                
-                <div class="dashboard-main-col">
+            <!-- GRID PRINCIPAL -->
+            <div class="dash-grid">
+
+                <!-- COLUNA ESQUERDA -->
+                <div class="dash-left">
+
+                    <!-- RESERVAS DO DIA -->
                     <div class="card-config">
                         <div class="card-header">
-                            <h3>📈 Desempenho de Câmbio (Últimos Registros)</h3>
+                            <h3>📅 Passeios Agendados para Hoje</h3>
+                            <span class="panel-badge" id="badge-hoje">Carregando...</span>
                         </div>
-                        <canvas id="salesChart" height="120"></canvas>
+                        <div id="reservas-hoje-container">
+                            <div class="loading">Carregando reservas...</div>
+                        </div>
                     </div>
 
-                    <div class="card-config" style="margin-top: 20px;">
+                    <!-- DESEMPENHO DO MÊS -->
+                    <div class="card-config">
                         <div class="card-header">
-                            <h3>📅 Últimas Atividades</h3>
+                            <h3>📈 Desempenho do Mês</h3>
+                            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                <span class="legenda-dot" style="background:#10b981"></span><span class="legenda-txt">Passeios</span>
+                                <span class="legenda-dot" style="background:#38bdf8"></span><span class="legenda-txt">Câmbio</span>
+                            </div>
+                        </div>
+                        <div class="kpis-mes-row" id="kpis-mes">
+                            <div class="kpi-mes"><div class="kpi-mes-label">Comissão Passeios</div><div class="kpi-mes-val green" id="km-passeios">R$ —</div></div>
+                            <div class="kpi-mes"><div class="kpi-mes-label">Lucro Câmbio</div><div class="kpi-mes-val blue" id="km-cambio">R$ —</div></div>
+                            <div class="kpi-mes"><div class="kpi-mes-label">Total do Mês</div><div class="kpi-mes-val gold" id="km-total">R$ —</div></div>
+                            <div class="kpi-mes"><div class="kpi-mes-label">Reservas Pagas</div><div class="kpi-mes-val" id="km-reservas" style="color:var(--text-main)">—</div></div>
+                        </div>
+                        <div style="position:relative;height:220px;margin-top:12px">
+                            <canvas id="chart-mes"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- ÚLTIMAS ATIVIDADES -->
+                    <div class="card-config">
+                        <div class="card-header">
+                            <h3>🕐 Últimas Atividades</h3>
+                            <span class="panel-badge" id="badge-atividades">—</span>
                         </div>
                         <div class="tabela-scroll">
                             <table id="tabela-atividades">
@@ -76,160 +91,625 @@
                                         <th>Data</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    </tbody>
+                                <tbody id="tbody-atividades">
+                                    <tr><td colspan="4"><div class="loading">Carregando...</div></td></tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
+
                 </div>
 
-                <div class="dashboard-side-col">
-                    <h3 style="font-size: 14px; color: var(--text-soft); margin-bottom: 15px; text-transform: uppercase;">📌 Lembretes</h3>
-                    
-                    <div class="trello-board">
-                        <div class="trello-card priority-high">
-                            <span class="trello-badge">Urgente</span>
-                            <p>Confirmar pick-up grupo Alemão (14:00)</p>
-                            <div class="trello-footer">🕒 Hoje</div>
-                        </div>
+                <!-- COLUNA DIREITA: LEMBRETES -->
+                <div class="dash-right">
+                    <div class="lembretes-header">
+                        <h3>📌 Lembretes</h3>
+                        <button class="btn-add-lembrete" onclick="abrirModalLembrete()">＋ Novo</button>
+                    </div>
 
-                        <div class="trello-card priority-medium">
-                            <span class="trello-badge">Financeiro</span>
-                            <p>Atualizar cotação do Dólar no painel</p>
-                            <div class="trello-footer">📅 Pendente</div>
-                        </div>
-
-                        <div class="trello-card priority-low">
-                            <span class="trello-badge">Geral</span>
-                            <p>Verificar novos e-mails de reserva</p>
-                            <div class="trello-footer">✅ Ok</div>
-                        </div>
+                    <div id="lembretes-lista">
+                        <div class="loading">Carregando...</div>
                     </div>
                 </div>
 
-            </div> 
-        </div> 
+            </div>
+        </div>
     </main>
 </div>
 
+<!-- MODAL LEMBRETE -->
+<div class="modal-overlay" id="modal-lembrete">
+    <div class="modal" style="max-width:460px">
+        <div class="modal-header">
+            <h3 id="modal-lembrete-titulo">Novo Lembrete</h3>
+            <button class="modal-close" onclick="fecharModalLembrete()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="lem-id"/>
+            <div class="form-group">
+                <label>Texto do Lembrete *</label>
+                <textarea id="lem-texto" placeholder="Descreva o lembrete..." style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Prioridade</label>
+                <select id="lem-prioridade">
+                    <option value="high">🔴 Urgente</option>
+                    <option value="medium" selected>🟡 Financeiro</option>
+                    <option value="low">🔵 Geral</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="lem-status">
+                    <option value="Hoje">🕒 Hoje</option>
+                    <option value="Pendente">📅 Pendente</option>
+                    <option value="Ok">✅ Ok</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModalLembrete()">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarLembrete()">💾 Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DELETE LEMBRETE -->
+<div class="modal-overlay" id="modal-del-lem">
+    <div class="modal" style="max-width:400px">
+        <div class="modal-header">
+            <h3>Excluir Lembrete</h3>
+            <button class="modal-close" onclick="fecharModal('modal-del-lem')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-muted);font-size:13px">Tem certeza que deseja excluir este lembrete? Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModal('modal-del-lem')">Cancelar</button>
+            <button class="btn btn-danger" onclick="executarDeleteLembrete()">🗑️ Excluir</button>
+        </div>
+    </div>
+</div>
+
 <style>
-    /* Estilos Mini Trello */
-    .trello-board { display: flex; flex-direction: column; gap: 12px; }
-    .trello-card {
-        background: #1e1e1e;
-        border-radius: 8px;
-        padding: 12px;
-        border-left: 4px solid var(--border-light);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .trello-card.priority-high { border-left-color: #ef4444; }
-    .trello-card.priority-medium { border-left-color: #facc15; }
-    .trello-card.priority-low { border-left-color: #38bdf8; }
+/* ── DASHBOARD GRID ── */
+.dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+}
 
-    .trello-badge {
-        font-size: 10px;
-        font-weight: 700;
-        background: rgba(255,255,255,0.05);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: var(--text-soft);
-    }
-    .trello-card p { font-size: 13px; margin: 8px 0; color: #eee; line-height: 1.4; }
-    .trello-footer { font-size: 11px; color: var(--text-soft); border-top: 1px solid #2a2a2a; pt: 8px; margin-top: 5px; }
+.dash-left { display: flex; flex-direction: column; gap: 20px; }
+.dash-right { position: sticky; top: 80px; }
 
-    /* Layout Grid */
-    .dashboard-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+@media (max-width: 1100px) {
+    .dash-grid { grid-template-columns: 1fr; }
+    .dash-right { position: static; }
+}
 
-    @media (max-width: 1024px) {
-        .dashboard-grid { display: flex; flex-direction: column; }
-        .dashboard-side-col { order: 1; }
-        .dashboard-main-col { order: 2; }
-    }
+/* ── LEGENDA ── */
+.legenda-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.legenda-txt { font-size: 11px; color: var(--text-soft); }
+
+/* ── KPIS MÊS ── */
+.kpis-mes-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+}
+@media (max-width: 768px) { .kpis-mes-row { grid-template-columns: repeat(2, 1fr); } }
+
+.kpi-mes {
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+}
+.kpi-mes-label { font-size: 10px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+.kpi-mes-val   { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.kpi-mes-val.green { color: var(--green); }
+.kpi-mes-val.blue  { color: #38bdf8; }
+.kpi-mes-val.gold  { color: var(--gold); }
+
+/* ── RESERVAS HOJE ── */
+.reserva-hoje-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+}
+.reserva-hoje-card:last-child { border-bottom: none; }
+.reserva-hoje-card:hover { background: var(--bg-hover); }
+
+.rh-hora {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 52px;
+    flex-shrink: 0;
+}
+.rh-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--green-glow);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+}
+.rh-info { flex: 1; min-width: 0; }
+.rh-cliente  { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rh-passeio  { font-size: 11.5px; color: var(--text-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rh-right { text-align: right; flex-shrink: 0; }
+.rh-pessoas  { font-size: 11px; color: var(--text-soft); }
+.rh-status   { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600; margin-top: 3px; }
+
+.empty-hoje {
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 13px;
+}
+.empty-hoje-icon { font-size: 28px; margin-bottom: 8px; opacity: .4; }
+
+/* ── LEMBRETES ── */
+.lembretes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.lembretes-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.btn-add-lembrete {
+    background: var(--gold-dim);
+    border: 1px solid rgba(181,132,58,.3);
+    color: var(--gold);
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+}
+.btn-add-lembrete:hover { background: rgba(181,132,58,.2); }
+
+#lembretes-lista { display: flex; flex-direction: column; gap: 10px; }
+
+.trello-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    border-left: 4px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    transition: var(--transition);
+}
+.trello-card:hover { border-color: var(--border-light); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.trello-card.priority-high   { border-left-color: #ef4444; }
+.trello-card.priority-medium { border-left-color: #facc15; }
+.trello-card.priority-low    { border-left-color: #38bdf8; }
+
+.trello-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+.trello-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--bg-hover);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+}
+.trello-card.priority-high   .trello-badge { background: rgba(239,68,68,.1);  color:#f87171; border-color:rgba(239,68,68,.2); }
+.trello-card.priority-medium .trello-badge { background: rgba(250,204,21,.1); color:#facc15; border-color:rgba(250,204,21,.2); }
+.trello-card.priority-low    .trello-badge { background: rgba(56,189,248,.1); color:#38bdf8; border-color:rgba(56,189,248,.2); }
+
+.trello-card-actions { display: flex; gap: 6px; }
+.btn-lem-edit { background: none; border: 1px solid var(--border); color: var(--text-soft); width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.btn-lem-edit:hover { background: var(--bg-hover); color: var(--gold); border-color: var(--gold); }
+.btn-lem-del  { background: none; border: 1px solid var(--border); color: var(--text-soft); width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.btn-lem-del:hover  { background: var(--red-dim); color: #f87171; border-color: rgba(239,68,68,.3); }
+
+.trello-card p { font-size: 13px; color: var(--text-main); line-height: 1.5; margin: 4px 0 8px; }
+
+.trello-footer {
+    font-size: 11px;
+    color: var(--text-soft);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+/* ── TABELA ATIVIDADES ── */
+#tabela-atividades { min-width: 520px; }
 </style>
 
 <script>
-    const hotelSlug = "{{ hotel.slug }}";
+const hotelSlug = "{{ hotel.slug }}";
+Chart.defaults.color       = '#6b7a90';
+Chart.defaults.borderColor = '#e2e8f0';
 
-    async function carregarDadosHome() {
-        try {
-            // 1. Pega dados de Câmbio
-            const resCambio = await fetch(`/api/admin/${hotelSlug}/cambio/`);
-            const ops = await resCambio.json();
-            
-            let lucroTotal = 0;
-            let chartLabels = [];
-            let chartData = [];
+let lembretes      = [];
+let deleteLemId    = null;
+let chartMes       = null;
+let editLemId      = null;
 
-            ops.slice(0, 10).reverse().forEach(op => {
-                const pago = parseFloat(op.valor_pago || op.quantidade * op.cotacao_compra || 0);
-                const recebido = parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
-                lucroTotal += (recebido - pago);
+/* ══ UTILS ══ */
+function fmt(v) { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function hoje()  { return new Date().toISOString().substring(0,10); }
 
-                chartLabels.push(new Date(op.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
-                chartData.push(recebido);
-            });
+function hojeLabel() {
+    return new Date().toLocaleDateString('pt-BR', {weekday:'long',day:'2-digit',month:'long'});
+}
 
-            document.getElementById('dash-lucro-cambio').innerText = `R$ ${lucroTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+/* ══ LEMBRETES ══ */
+const LS_KEY = `lembretes_${hotelSlug}`;
 
-            // 2. Pega dados de Passeios
-            const resPasseios = await fetch(`/api/admin/${hotelSlug}/passeios/`);
-            const passeios = await resPasseios.json();
-            document.getElementById('dash-passeios-count').innerText = passeios.length;
+function carregarLembretes() {
+    try { lembretes = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+    catch { lembretes = []; }
+    if (!lembretes.length) {
+        lembretes = [
+            { id: Date.now()+1, texto: 'Confirmar pick-up grupo Alemão (14:00)', prioridade: 'high',   status: 'Hoje'    },
+            { id: Date.now()+2, texto: 'Atualizar cotação do Dólar no painel',   prioridade: 'medium', status: 'Pendente' },
+            { id: Date.now()+3, texto: 'Verificar novos e-mails de reserva',      prioridade: 'low',    status: 'Ok'       },
+        ];
+        salvarLembretesLS();
+    }
+    renderLembretes();
+}
 
-            // 3. Pega dados de Reservas (Ajuste o endpoint se necessário)
-            const resReservas = await fetch(`/api/admin/${hotelSlug}/reservas/`).catch(() => null);
-            if(resReservas) {
-                const reservas = await resReservas.json();
-                document.getElementById('dash-reservas-count').innerText = reservas.length;
-            }
+function salvarLembretesLS() {
+    localStorage.setItem(LS_KEY, JSON.stringify(lembretes));
+}
 
-            renderizarGrafico(chartLabels, chartData);
-            popularTabela(ops.slice(0, 5));
+const PRIORIDADE_LABEL = { high:'Urgente', medium:'Financeiro', low:'Geral' };
+const STATUS_ICON      = { Hoje:'🕒', Pendente:'📅', Ok:'✅' };
 
-        } catch (error) {
-            console.error("Erro ao alimentar dashboard:", error);
+function renderLembretes() {
+    const cont = document.getElementById('lembretes-lista');
+    if (!lembretes.length) {
+        cont.innerHTML = `<div class="empty-hoje"><div class="empty-hoje-icon">📌</div><p>Nenhum lembrete.</p></div>`;
+        return;
+    }
+    cont.innerHTML = lembretes.map(l => `
+        <div class="trello-card priority-${l.prioridade}" id="lem-${l.id}">
+            <div class="trello-card-top">
+                <span class="trello-badge">${PRIORIDADE_LABEL[l.prioridade]||'Geral'}</span>
+                <div class="trello-card-actions">
+                    <button class="btn-lem-edit" onclick="editarLembrete(${l.id})" title="Editar">✏️</button>
+                    <button class="btn-lem-del"  onclick="confirmarDeleteLembrete(${l.id})" title="Excluir">🗑️</button>
+                </div>
+            </div>
+            <p>${escHtml(l.texto)}</p>
+            <div class="trello-footer">${STATUS_ICON[l.status]||''} ${l.status}</div>
+        </div>`).join('');
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function abrirModalLembrete() {
+    editLemId = null;
+    document.getElementById('modal-lembrete-titulo').textContent = 'Novo Lembrete';
+    document.getElementById('lem-id').value        = '';
+    document.getElementById('lem-texto').value     = '';
+    document.getElementById('lem-prioridade').value= 'medium';
+    document.getElementById('lem-status').value    = 'Pendente';
+    document.getElementById('modal-lembrete').classList.add('open');
+}
+
+function fecharModalLembrete() {
+    document.getElementById('modal-lembrete').classList.remove('open');
+}
+
+function editarLembrete(id) {
+    const l = lembretes.find(x => x.id === id);
+    if (!l) return;
+    editLemId = id;
+    document.getElementById('modal-lembrete-titulo').textContent = 'Editar Lembrete';
+    document.getElementById('lem-id').value         = l.id;
+    document.getElementById('lem-texto').value      = l.texto;
+    document.getElementById('lem-prioridade').value = l.prioridade;
+    document.getElementById('lem-status').value     = l.status;
+    document.getElementById('modal-lembrete').classList.add('open');
+}
+
+function salvarLembrete() {
+    const texto = document.getElementById('lem-texto').value.trim();
+    if (!texto) { alert('Informe o texto do lembrete.'); return; }
+    const prio   = document.getElementById('lem-prioridade').value;
+    const status = document.getElementById('lem-status').value;
+    if (editLemId) {
+        const idx = lembretes.findIndex(x => x.id === editLemId);
+        if (idx >= 0) lembretes[idx] = { ...lembretes[idx], texto, prioridade: prio, status };
+    } else {
+        lembretes.push({ id: Date.now(), texto, prioridade: prio, status });
+    }
+    salvarLembretesLS();
+    renderLembretes();
+    fecharModalLembrete();
+}
+
+function confirmarDeleteLembrete(id) {
+    deleteLemId = id;
+    document.getElementById('modal-del-lem').classList.add('open');
+}
+
+function executarDeleteLembrete() {
+    if (!deleteLemId) return;
+    lembretes = lembretes.filter(l => l.id !== deleteLemId);
+    salvarLembretesLS();
+    renderLembretes();
+    fecharModal('modal-del-lem');
+    deleteLemId = null;
+}
+
+function fecharModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+/* ══ RESERVAS DO DIA ══ */
+async function carregarReservasHoje() {
+    const badge = document.getElementById('badge-hoje');
+    const cont  = document.getElementById('reservas-hoje-container');
+    try {
+        const res  = await fetch(`/api/admin/${hotelSlug}/reservas/`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('inválido');
+        const dataHoje = hoje();
+        const deHoje   = data.filter(r => {
+            const d = r.data_passeio || r.data || '';
+            return d.substring(0,10) === dataHoje && r.status !== 'cancelado';
+        }).sort((a,b) => (a.horario||'').localeCompare(b.horario||''));
+
+        badge.textContent = `${deHoje.length} passeio(s)`;
+
+        if (!deHoje.length) {
+            cont.innerHTML = `
+                <div class="empty-hoje">
+                    <div class="empty-hoje-icon">🌴</div>
+                    <p>Nenhum passeio agendado para hoje<br>
+                    <span style="font-size:11px;opacity:.6">${hojeLabel()}</span></p>
+                </div>`;
+            return;
         }
-    }
 
-    function popularTabela(lista) {
-        const tbody = document.querySelector('#tabela-atividades tbody');
-        tbody.innerHTML = lista.map(item => `
-            <tr>
-                <td><span class="badge badge-confirmado">Câmbio</span></td>
-                <td>Compra de ${item.quantidade} ${item.moeda}</td>
-                <td>R$ ${parseFloat(item.valor_pago).toLocaleString('pt-BR')}</td>
-                <td style="font-size:11px;">${new Date(item.data).toLocaleDateString()}</td>
-            </tr>
-        `).join('');
-    }
+        const statusClass = { pendente:'status-pendente', confirmado:'status-confirmada', pago:'status-confirmada' };
+        const statusLabel = { pendente:'Pendente', confirmado:'Confirmado', pago:'Pago' };
 
-    function renderizarGrafico(labels, data) {
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
+        cont.innerHTML = deHoje.map(r => {
+            const ini  = (r.nome_cliente||'?').charAt(0).toUpperCase();
+            const hora = r.horario ? r.horario.substring(0,5) : '—:—';
+            const sc   = statusClass[r.status]||'status-pendente';
+            const sl   = statusLabel[r.status]||r.status;
+            return `
+            <div class="reserva-hoje-card">
+                <div class="rh-hora">${hora}</div>
+                <div class="rh-avatar">${ini}</div>
+                <div class="rh-info">
+                    <div class="rh-cliente">${escHtml(r.nome_cliente||'–')}</div>
+                    <div class="rh-passeio">${escHtml(r.passeio_nome||r.passeio_titulo||'–')} · ${r.numero_pessoas||1} pessoa(s)</div>
+                </div>
+                <div class="rh-right">
+                    <span class="status-pill ${sc}">${sl}</span>
+                    ${r.whatsapp ? `<div class="rh-pessoas" style="margin-top:4px"><a href="https://wa.me/${r.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:#25d366;font-size:11px">💬 WhatsApp</a></div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        badge.textContent = 'erro';
+        cont.innerHTML = `<div class="empty-hoje"><p style="color:#f87171">Erro ao carregar reservas.</p></div>`;
+    }
+}
+
+/* ══ ÚLTIMAS ATIVIDADES ══ */
+async function carregarAtividades() {
+    const tbody = document.getElementById('tbody-atividades');
+    const badge = document.getElementById('badge-atividades');
+    try {
+        const [resCambio, resReservas] = await Promise.all([
+            fetch(`/api/admin/${hotelSlug}/cambio/`),
+            fetch(`/api/admin/${hotelSlug}/reservas/`),
+        ]);
+        const cambios  = await resCambio.json();
+        const reservas = await resReservas.json();
+
+        const atividades = [];
+
+        if (Array.isArray(cambios)) {
+            cambios.slice(0,8).forEach(op => {
+                atividades.push({
+                    tipo:  'cambio',
+                    desc:  `Câmbio ${op.quantidade||op.valor||''} ${op.moeda||''}`,
+                    valor: parseFloat(op.valor_pago||op.valor_reais||0),
+                    data:  op.data,
+                });
+            });
+        }
+
+        if (Array.isArray(reservas)) {
+            reservas.filter(r => r.status === 'pago').slice(0,8).forEach(r => {
+                atividades.push({
+                    tipo:  'reserva',
+                    desc:  `Reserva: ${r.nome_cliente||'–'} — ${r.passeio_nome||r.passeio_titulo||'–'}`,
+                    valor: parseFloat(r.comissao_recepcao||0),
+                    data:  r.data_pagamento||r.data_passeio||r.data||'',
+                });
+            });
+        }
+
+        atividades.sort((a,b) => (b.data||'').localeCompare(a.data||''));
+        const top = atividades.slice(0,10);
+        badge.textContent = `${top.length} registros`;
+
+        if (!top.length) {
+            tbody.innerHTML = `<tr><td colspan="4"><div class="empty" style="padding:24px">Nenhuma atividade ainda.</div></td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = top.map(a => {
+            const dtStr = a.data ? new Date(a.data+'T12:00:00').toLocaleDateString('pt-BR') : '–';
+            const badgeCls = a.tipo === 'cambio' ? 'badge-confirmado' : 'badge-pago';
+            const badgeLbl = a.tipo === 'cambio' ? 'Câmbio' : 'Passeio';
+            return `<tr>
+                <td><span class="badge ${badgeCls}">${badgeLbl}</span></td>
+                <td style="color:var(--text-main)">${escHtml(a.desc)}</td>
+                <td style="color:var(--green);font-weight:600">R$ ${fmt(a.valor)}</td>
+                <td style="font-size:11px;color:var(--text-soft)">${dtStr}</td>
+            </tr>`;
+        }).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#f87171;padding:16px">Erro ao carregar atividades.</td></tr>`;
+    }
+}
+
+/* ══ DESEMPENHO DO MÊS ══ */
+async function carregarDesempenhoMes() {
+    try {
+        const now    = new Date();
+        const ano    = now.getFullYear();
+        const mes    = String(now.getMonth()+1).padStart(2,'0');
+        const mesRef = `${ano}-${mes}`;
+
+        const [resCambio, resReservas] = await Promise.all([
+            fetch(`/api/admin/${hotelSlug}/cambio/?ano=${ano}&mes=${parseInt(mes)}`),
+            fetch(`/api/admin/${hotelSlug}/reservas/`),
+        ]);
+        const cambios  = await resCambio.json();
+        const reservas = await resReservas.json();
+
+        /* Comissão passeios do mês */
+        let comissaoMes = 0;
+        const reservasMes = Array.isArray(reservas) ? reservas.filter(r => {
+            if (r.status !== 'pago') return false;
+            const ref = r.mes_referencia || (r.data_pagamento ? r.data_pagamento.slice(0,7) : '');
+            return ref === mesRef;
+        }) : [];
+        reservasMes.forEach(r => { comissaoMes += parseFloat(r.comissao_recepcao||0); });
+
+        /* Lucro câmbio do mês */
+        let lucroMes = 0;
+        if (Array.isArray(cambios)) {
+            cambios.forEach(t => {
+                const compra  = parseFloat(t.valor_reais||0);
+                const repasse = parseFloat(t.valor_recebido||0);
+                const v       = parseFloat(t.valor||0);
+                const cv      = parseFloat(t.cotacao_venda||0);
+                const rep2    = repasse > 0 ? repasse : (cv > 0 ? v*cv : 0);
+                lucroMes     += rep2 > 0 ? rep2 - compra : parseFloat(t.lucro||0);
+            });
+        }
+
+        document.getElementById('km-passeios').textContent = `R$ ${fmt(comissaoMes)}`;
+        document.getElementById('km-cambio').textContent   = `R$ ${fmt(lucroMes)}`;
+        document.getElementById('km-total').textContent    = `R$ ${fmt(comissaoMes+lucroMes)}`;
+        document.getElementById('km-reservas').textContent = reservasMes.length;
+
+        /* Gráfico por dia do mês */
+        const diasNoMes = new Date(ano, parseInt(mes), 0).getDate();
+        const labelsDias = Array.from({length:diasNoMes},(_,i)=>`${String(i+1).padStart(2,'0')}/${mes}`);
+        const dadosPass  = new Array(diasNoMes).fill(0);
+        const dadosCamb  = new Array(diasNoMes).fill(0);
+
+        reservasMes.forEach(r => {
+            const dp  = r.data_pagamento||r.data_passeio||r.data||'';
+            const dia = parseInt((dp||'').substring(8,10),10);
+            if (dia >= 1 && dia <= diasNoMes) dadosPass[dia-1] += parseFloat(r.comissao_recepcao||0);
+        });
+        if (Array.isArray(cambios)) {
+            cambios.forEach(t => {
+                const dia = parseInt((t.data||'').substring(8,10),10);
+                if (dia >= 1 && dia <= diasNoMes) {
+                    const compra  = parseFloat(t.valor_reais||0);
+                    const repasse = parseFloat(t.valor_recebido||0);
+                    const v       = parseFloat(t.valor||0);
+                    const cv      = parseFloat(t.cotacao_venda||0);
+                    const rep2    = repasse > 0 ? repasse : (cv > 0 ? v*cv : 0);
+                    dadosCamb[dia-1] += rep2 > 0 ? rep2 - compra : parseFloat(t.lucro||0);
+                }
+            });
+        }
+
+        if (chartMes) chartMes.destroy();
+        chartMes = new Chart(document.getElementById('chart-mes').getContext('2d'), {
+            type: 'bar',
             data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Volume Câmbio (Entrada R$)',
-                    data: data,
-                    borderColor: '#c5a059',
-                    backgroundColor: 'rgba(197, 160, 89, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
+                labels: labelsDias,
+                datasets: [
+                    {
+                        label: 'Passeios (Comissão R$)',
+                        data: dadosPass,
+                        backgroundColor: 'rgba(16,185,129,0.55)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Câmbio (Lucro R$)',
+                        data: dadosCamb,
+                        backgroundColor: 'rgba(56,189,248,0.55)',
+                        borderColor: '#38bdf8',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        yAxisID: 'y',
+                    },
+                ]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { font: { size: 11 }, color: '#6b7a90', padding: 12 } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.dataset.label}: R$ ${fmt(ctx.parsed.y)}`
+                        }
+                    }
+                },
                 scales: {
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
+                    x: {
+                        grid: { color: '#e2e8f0' },
+                        ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }
+                    },
+                    y: {
+                        grid: { color: '#e2e8f0' },
+                        ticks: { color: '#6b7a90', font: { size: 10 }, callback: v => 'R$ '+v.toLocaleString('pt-BR') }
+                    }
                 }
             }
         });
-    }
 
-    document.addEventListener('DOMContentLoaded', carregarDadosHome);
+    } catch(e) {
+        console.error('Erro desempenho:', e);
+    }
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', () => {
+    carregarLembretes();
+    carregarReservasHoje();
+    carregarAtividades();
+    carregarDesempenhoMes();
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    });
+});
 </script>
 
 <script src="{% static 'js/mobile-menu.js' %}"></script>
