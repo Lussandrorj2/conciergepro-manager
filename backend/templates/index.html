@@ -183,7 +183,8 @@ body {
     gap: 24px;
     overflow: hidden;
     cursor: grab;
-    user-select: none;
+    touch-action: pan-y;
+    overscroll-behavior-x: contain;
 }
 
 #passeios.dragging { cursor: grabbing; }
