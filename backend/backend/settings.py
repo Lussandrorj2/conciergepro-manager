@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -----------------------
 # SEGURANÇA
 # -----------------------
-DEBUG = False
+DEBUG = True
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 ALLOWED_HOSTS = ["*"]
 
