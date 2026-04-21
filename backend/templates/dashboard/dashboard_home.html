@@ -63,40 +63,58 @@
         <!-- Métricas -->
         <div class="stats-row">
 
-            <div class="metric-card blue">
-                <div class="metric-icon">📅</div>
-                <div class="metric-label">Reservas Hoje</div>
-                <div class="metric-value">{{ reservas_hoje|default:"0" }}</div>
-                <div class="metric-sub">
-                    {{ confirmadas_hoje|default:"0" }} confirmadas ·
-                    {{ pendentes_hoje|default:"0" }} pendentes
-                </div>
-            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">📅</div>
+    <div class="stats-row">
 
-            <div class="metric-card green">
-                <div class="metric-icon">🗺️</div>
-                <div class="metric-label">Passeios Ativos</div>
-                <div class="metric-value">{{ passeios_ativos|default:"0" }}</div>
-                <div class="metric-sub">{{ passeios_sob_consulta|default:"0" }} sob consulta</div>
+    <!-- Reservas -->
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Reservas Hoje</div>
+            <div class="stat-value">{{ reservas_hoje|default:"0" }}</div>
+            <div class="stat-sub">
+                {{ confirmadas_hoje|default:"0" }} confirmadas ·
+                {{ pendentes_hoje|default:"0" }} pendentes
             </div>
-
-            <div class="metric-card amber">
-                <div class="metric-icon">💰</div>
-                <div class="metric-label">Preço Médio</div>
-                <div class="metric-value" style="font-size:22px;margin-top:2px;">
-                    {% if preco_medio %}R$ {{ preco_medio }}{% else %}--{% endif %}
-                </div>
-                <div class="metric-sub">passeios com preço fixo</div>
-            </div>
-
-            <div class="metric-card gold">
-                <div class="metric-icon">📊</div>
-                <div class="metric-label">Esta Semana</div>
-                <div class="metric-value">{{ reservas_semana|default:"0" }}</div>
-                <div class="metric-sub">reservas nos últimos 7 dias</div>
-            </div>
-
         </div>
+        <div class="stat-icon blue">📅</div>
+    </div>
+
+    <!-- Passeios -->
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Passeios Ativos</div>
+            <div class="stat-value">{{ passeios_ativos|default:"0" }}</div>
+            <div class="stat-sub">
+                {{ passeios_sob_consulta|default:"0" }} sob consulta
+            </div>
+        </div>
+        <div class="stat-icon green">🗺️</div>
+    </div>
+
+    <!-- Preço -->
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Preço Médio</div>
+            <div class="stat-value">
+                {% if preco_medio %}R$ {{ preco_medio }}{% else %}--{% endif %}
+            </div>
+            <div class="stat-sub">passeios com preço fixo</div>
+        </div>
+        <div class="stat-icon gold">💰</div>
+    </div>
+
+    <!-- Semana -->
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Esta Semana</div>
+            <div class="stat-value">{{ reservas_semana|default:"0" }}</div>
+            <div class="stat-sub">reservas nos últimos 7 dias</div>
+        </div>
+        <div class="stat-icon blue">📊</div>
+    </div>
+
+</div>
 
         <!-- Próximas Reservas + Passeios -->
         <div class="two-col">
