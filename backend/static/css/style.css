@@ -1718,4 +1718,16 @@ body {
 .modal-reserva * {
     max-width: 100%;
 }
+
+.carrossel-wrapper::before,
+.carrossel-wrapper::after {
+    display: none !important;
+    background: none !important;
+    content: none !important;
 }
+
+#passeios {
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+}
+
