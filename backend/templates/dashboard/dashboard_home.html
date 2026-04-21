@@ -9,7 +9,7 @@
     <title>Dashboard — {{ hotel.nome }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-<style>
+<"--style>
         /* ══════════════════════════════════════
            RESET + VARIÁVEIS
         ══════════════════════════════════════ */
@@ -548,31 +548,26 @@
         .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .metric-value { font-size: 22px; }
     }
-</style>
+</style -->
 
 
 </head>
 <body>
-
     <div class="layout">
-    
-    
-    <!-- ══ SIDEBAR ══ -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">🔔 Concierge</div>
-        <nav>
-            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Passeios</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Novo Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/lugares/">📍 Lugares</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-            <hr>
-            <a href="/logout/">↩ Sair</a>
-        </nav>
-    </aside>
+        <aside class="sidebar">
+            <div class="sidebar-logo">🔔 Concierge</div>
+            <nav>
+                <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+                <a href="/{{ hotel.slug }}/dashboard/criar/" class="active">➕ Criar Passeio</a>
+                <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+                <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+                <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+                <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+                <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+                <hr>
+                <a href="/logout/">↩ Sair</a>
+            </nav>
+        </aside>xxx
 
 <!-- ══ MAIN ══ -->
 <main class="main">
