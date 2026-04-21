@@ -1713,3 +1713,11 @@ body {
     -webkit-mask-image: none !important;
 }
 
+.det-foto-counter,
+.det-foto-thumbs,
+.det-thumb,
+.card-preco-badge {
+    display: none !important;
+}
+
+
