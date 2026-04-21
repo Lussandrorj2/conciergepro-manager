@@ -9,7 +9,7 @@
     <title>Dashboard — {{ hotel.nome }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <style>
+<style>
         /* ══════════════════════════════════════
            RESET + VARIÁVEIS
         ══════════════════════════════════════ */
@@ -554,25 +554,25 @@
 </head>
 <body>
 
-<div class="layout">
-
-
-<!-- ══ SIDEBAR ══ -->
-<aside class="sidebar">
-    <div class="sidebar-logo">🔔 Concierge</div>
-    <nav>
-        <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
-        <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-        <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Passeios</a>
-        <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Novo Passeio</a>
-        <a href="/{{ hotel.slug }}/dashboard/lugares/">📍 Lugares</a>
-        <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-        <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-        <hr>
-        <a href="/logout/">↩ Sair</a>
-    </nav>
-</aside>
+    <div class="layout">
+    
+    
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Passeios</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Novo Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/lugares/">📍 Lugares</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
 
 <!-- ══ MAIN ══ -->
 <main class="main">
