@@ -500,8 +500,8 @@ function carregarLembretes() {
 
 function salvarLS() { localStorage.setItem(LS_KEY, JSON.stringify(lembretes)); }
 
-const PRIO_LABEL  = { high:'Urgente', medium:'Financeiro', low:'Geral' };
-const STATUS_ICON = { Hoje:'🕒', Pendente:'📅', Ok:'✅' };
+const PRIO_LABEL  = { high:'🔴 Pendente', medium:'🟡 Andamento', low:'🟢 Concluído' };
+const STATUS_ICON = { Pendente:'', Andamento:'', Concluído:'' };
 
 function renderLembretes() {
     const cont = document.getElementById('lembretes-lista');
@@ -542,6 +542,7 @@ function editarLembrete(id) {
     document.getElementById('lem-id').value         = l.id;
     document.getElementById('lem-texto').value      = l.texto;
     document.getElementById('lem-prioridade').value = l.prioridade;
+    document.getElementById('modal-lembrete').classList.add('open');
 }
 
 function salvarLembrete() {
