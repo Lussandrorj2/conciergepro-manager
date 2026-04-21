@@ -12,6 +12,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>    
+    html, body {
+    overflow-x: hidden;
+    }
+    
     :root {
     --gold:        #b5843a;
     --gold-light:  #d4a95a;
@@ -1031,11 +1035,32 @@ body {
 @media (max-width: 768px) {
     .hero-content { padding: 40px 24px; }
     .section { padding: 48px 16px; }
-    .card-passeio { flex: 0 0 calc(100vw - 80px); }
+
+    .card-passeio {
+        flex: 0 0 85%;
+        max-width: 85%;
+    }
+
     .carr-prev { display: none; }
     .carr-next { display: none; }
-    #passeios { justify-content: flex-start; padding-left: 16px; }
+
+    #passeios {
+        justify-content: flex-start;
+
+        padding-left: 16px;
+        padding-right: 16px;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        touch-action: pan-y;
+        overscroll-behavior-x: contain;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
     .carrossel-wrapper { padding: 0; }
+}
 
     /* Modal detalhe */
     .det-foto-wrap { height: 280px; }
@@ -1354,11 +1379,15 @@ body {
    ========================================================= */
 
 /* ── REMOVE o branco dos lados do carrossel ── */
-#passeios {
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-    overflow: visible !important;
-}
+/*#passeios {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    touch-action: pan-y;
+    overscroll-behavior-x: contain;
+
+    -webkit-overflow-scrolling: touch;
+}*/
 
 .carrossel-wrapper::before,
 .carrossel-wrapper::after {
@@ -1607,7 +1636,6 @@ body {
     .lugares-carousel-track-wrap {
         perspective: none;
         height: auto !important;
-        overflow: visible;
     }
 
     .lugares-carousel-track {
