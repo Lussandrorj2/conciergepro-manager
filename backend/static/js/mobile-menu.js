@@ -115,6 +115,19 @@
             });
         });
     }
+    
+        // ── Dropdown de ações da topbar ──
+    window.toggleActionsMenu = function () {
+        document.getElementById('actions-dropdown')?.classList.toggle('open');
+    };
+    
+    document.addEventListener('click', function (e) {
+        const wrap = document.getElementById('actions-menu-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            document.getElementById('actions-dropdown')?.classList.remove('open');
+        }
+    });
+
 
     // Fecha ao redimensionar para desktop
     let resizeTimer;
