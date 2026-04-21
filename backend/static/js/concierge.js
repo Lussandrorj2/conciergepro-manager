@@ -577,11 +577,9 @@ function abrirModalReserva() {
 
     const avisoEl = document.getElementById('modal-aviso-wpp');
     if (avisoEl) {
-        const lastChild = avisoEl.lastChild;
-        if (lastChild && lastChild.nodeType === Node.TEXT_NODE) {
-            lastChild.textContent = ' ' + t('aviso_wpp');
-        }
+        avisoEl.textContent = t('aviso_wpp');
     }
+
 
     document.getElementById('res-nome').value    = '';
     document.getElementById('res-tel').value     = '';
@@ -648,10 +646,11 @@ function confirmarReserva() {
     const dataVal  = document.getElementById('res-data').value;
     const horario  = document.getElementById('res-horario').value;
 
-    if (!nome || !telefone) {
+    if (!nome) {
         mostrarToast(t('campos_obrigatorios'), 'error');
         return;
     }
+
 
     let dataLabel = '';
     if (dataVal) {
