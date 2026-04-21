@@ -117,26 +117,66 @@ a { text-decoration: none; color: inherit; }
    TOPBAR
 ========================= */
 .topbar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    height: 56px;
     background: var(--bg-sidebar);
     border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 50;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    gap: 12px;
 }
 
-.topbar-title { font-size: 15px; font-weight: 600; color: var(--text-main); letter-spacing: -0.2px; }
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.topbar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+}
 
 .hotel-badge {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12.5px; color: var(--text-muted);
-    background: var(--bg-hover); border: 1px solid var(--border);
-    padding: 6px 14px; border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .hotel-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--green); flex-shrink: 0;
-    box-shadow: 0 0 6px var(--green);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+    animation: pulse-dot 2.4s ease-in-out infinite;
 }
 
 /* =========================
@@ -418,6 +458,10 @@ input[type=checkbox] { accent-color: var(--gold); width: 16px; height: 16px; cur
 .skeleton { background: linear-gradient(90deg,var(--bg-card) 25%,var(--border) 50%,var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: var(--radius-sm); }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(22,163,74,0.5); }
+    50%       { box-shadow: 0 0 0 4px rgba(22,163,74,0); }
+}
 /* =========================
    FILTER BAR
 ========================= */
@@ -916,26 +960,24 @@ input, select, textarea,
 .btn-ir-site {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.1); /* Efeito semi-transparente */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: var(--text-main);
+    gap: 6px;
+    padding: 6px 13px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(181,132,58,0.25);
+    border-radius: 999px;
+    color: var(--gold);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
-    margin-left: 10px;
-    backdrop-filter: blur(4px); /* Desfoque de fundo */
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-ir-site:hover {
-    background: var(--gold); /* Ou a cor principal do seu tema */
-    color: #000;
+    background: var(--gold);
+    color: #fff;
     border-color: var(--gold);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(181, 132, 58, 0.3);
 }
 
 /* Ajuste para o mobile: aumentar a área de toque */
@@ -947,6 +989,13 @@ input, select, textarea,
         width: 100%; /* Ocupa a largura toda no mobile se necessário */
         justify-content: center;
     }
+}
+
+@media (max-width: 768px) {
+    .topbar { padding: 0 14px; height: 52px; }
+    .hotel-badge { max-width: 120px; font-size: 11px; }
+    .btn-ir-site-label { display: none; }
+    .btn-ir-site { padding: 7px 10px; }
 }
 
 .hotel-badge {
