@@ -105,7 +105,7 @@ if (horario) msg += ` at *${horario}*`;
 msg += `. Could you confirm availability?`;
 return msg;
 },
-aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.”,
+aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
 campos_obrigatorios: 'Please fill in your name.',
 mapa_label: 'Nearby',
 mapa_titulo: 'Restaurants & Shopping',
@@ -189,7 +189,7 @@ if (horario) msg += ` à *${horario}*`;
 msg += `. Pourriez-vous confirmer la disponibilité ?`;
 return msg;
 },
-aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.”,
+aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
 campos_obrigatorios: 'Veuillez remplir votre nom.',
 mapa_label: 'Aux alentours',
 mapa_titulo: 'Restaurants & Centres Commerciaux',
@@ -808,9 +808,9 @@ let LUGARES        = [];
 
 const MAPA_LABELS = {
 pt: { restaurante: 'Restaurante', shopping: 'Compras',  hotelBadge: '★ Do Hotel' },
-en: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ Hotel's Own” },
+en: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ Hotel's Own" },
 es: { restaurante: 'Restaurante', shopping: 'Compras',  hotelBadge: '★ Del Hotel' },
-fr: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ De l'Hôtel” },
+fr: { restaurante: 'Restaurant',  shopping: 'Shopping', hotelBadge: "★ De l'Hôtel" },
 };
 
 let lugarFiltroAtivo   = 'todos';
