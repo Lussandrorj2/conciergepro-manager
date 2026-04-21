@@ -1318,9 +1318,11 @@
 
 <script>
     window.hotelSlug = "{{ hotel.slug|default:'' }}";
+    console.log('1. window.hotelSlug =', window.hotelSlug);
+    console.log('2. URL hotel param =', new URLSearchParams(window.location.search).get('hotel'));
 </script>
-
 <script src="{% static 'js/concierge.js' %}"></script>
+
 
 </body>
 </html>
