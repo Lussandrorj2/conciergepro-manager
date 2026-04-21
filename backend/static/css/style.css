@@ -1354,7 +1354,7 @@ body {
 
 /* Sombra interna do viewport do carrossel */
 #passeios {
-    /* Sombra lateral suave */
+    /* Sombra lateral suave 
     mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
 }
