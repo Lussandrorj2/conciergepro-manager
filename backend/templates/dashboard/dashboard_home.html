@@ -138,9 +138,10 @@
                     <div class="hotel-dot"></div>
                     <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100px;">{{ hotel.nome }}</span>span>
                 </div>
-                <a href="/{{ hotel.slug }}/" class="btn-ir-site">
+                <a href="{% url 'detalhe_hotel' hotel.slug %}" class="btn-ir-site">
                     🌐 home
                 </a>
+
 
             </div>
         </div>
