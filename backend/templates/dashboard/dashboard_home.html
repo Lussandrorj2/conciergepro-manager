@@ -529,7 +529,6 @@ function abrirModalLembrete() {
     document.getElementById('lem-id').value         = '';
     document.getElementById('lem-texto').value      = '';
     document.getElementById('lem-prioridade').value = 'medium';
-    document.getElementById('lem-status').value     = 'Pendente';
     document.getElementById('modal-lembrete').classList.add('open');
 }
 
@@ -544,7 +543,6 @@ function editarLembrete(id) {
     document.getElementById('lem-texto').value      = l.texto;
     document.getElementById('lem-prioridade').value = l.prioridade;
     document.getElementById('lem-status').value     = l.status;
-    document.getElementById('modal-lembrete').classList.add('open');
 }
 
 function salvarLembrete() {
