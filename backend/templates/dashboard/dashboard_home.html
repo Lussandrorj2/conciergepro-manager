@@ -30,9 +30,15 @@
     <main class="main">
         <div class="topbar">
             <span class="topbar-title">Visão Geral</span>
-            <div class="hotel-badge">
-                <div class="hotel-dot"></div>
-                {{ hotel.nome }}
+            <div style="display:flex; gap:12px; align-items:center;">
+                <div class="hotel-badge">
+                    <div class="hotel-dot"></div>
+                    {{ hotel.nome }}
+                </div>
+                
+                <a href="/{{ hotel.slug }}/" class="btn-ir-site">
+                    🌐 Ir para Concierge home
+                </a>
             </div>
         </div>
 
