@@ -8,6 +8,106 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* ═══════════════════════════════
+   CORE LAYOUT (Desktop & General)
+   ═══════════════════════════════ */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+    width: 100%; /* Garante que não transborde */
+}
+
+/* Evita que tabelas quebrem o layout mobile */
+.tabela-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+/* ═══════════════════════════════
+   MOBILE OVERRIDES (Abaixo de 1024px)
+   ═══════════════════════════════ */
+@media (max-width: 1024px) {
+    .layout {
+        flex-direction: column; /* Sidebar vai para cima ou some */
+    }
+
+    /* Se as outras páginas usam menu hambúrguer, você pode esconder a sidebar aqui */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 10px;
+    }
+
+    .dash-grid {
+        grid-template-columns: 1fr; /* Coluna única no mobile */
+    }
+
+    .dash-right {
+        position: static; /* Remove o sticky que quebra no mobile */
+        width: 100%;
+    }
+
+    /* KPIs: Ajuste para 2 colunas para não esmagar o texto */
+    .kpis-mes-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* Gráfico: Forçar a altura para não achatar */
+    #chart-mes-wrap {
+        height: 250px !important;
+    }
+
+    /* Padding da página */
+    .content {
+        padding: 10px;
+    }
+
+    /* Ajuste de cards para ocupar 100% */
+    .card-config {
+        margin-bottom: 15px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Modal vira Bottom Sheet (Estilo App moderno) */
+    .modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
+        position: fixed;
+        bottom: 0;
+    }
+
+    .modal-overlay {
+        align-items: flex-end;
+    }
+}
+
+/* Ajuste fino para telas muito pequenas (iPhone SE, etc) */
+@media (max-width: 480px) {
+    .kpis-mes-row {
+        grid-template-columns: 1fr; /* 1 coluna se for muito pequeno */
+    }
+    
+    .topbar-title {
+        font-size: 1.2rem;
+    }
+}
+        
+    </style>
+    
 </head>
 <body>
 <div class="layout">
@@ -76,7 +176,7 @@
                             <div class="kpi-mes"><div class="kpi-mes-label">Total do Mês</div><div class="kpi-mes-val gold" id="km-total">R$ —</div></div>
                             <div class="kpi-mes"><div class="kpi-mes-label">Reservas Pagas</div><div class="kpi-mes-val" id="km-reservas" style="color:var(--text-main)">—</div></div>
                         </div>
-                        <div style="position:relative;height:220px;margin-top:12px">
+                        <div id="chart-mes-wrap" style="position:relative; height:220px; margin-top:12px">
                             <canvas id="chart-mes"></canvas>
                         </div>
                     </div>
