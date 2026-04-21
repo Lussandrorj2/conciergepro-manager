@@ -551,7 +551,8 @@ function salvarLembrete() {
     const texto = document.getElementById('lem-texto').value.trim();
     if (!texto) { alert('Informe o texto do lembrete.'); return; }
     const prio   = document.getElementById('lem-prioridade').value;
-    const status = document.getElementById('lem-status').value;
+    const PRIO_STATUS = { high: 'Pendente', medium: 'Andamento', low: 'Concluído' };
+    const status = PRIO_STATUS[prio] || 'Pendente';
     if (editLemId) {
         const idx = lembretes.findIndex(x => x.id === editLemId);
         if (idx >= 0) lembretes[idx] = { ...lembretes[idx], texto, prioridade:prio, status };
