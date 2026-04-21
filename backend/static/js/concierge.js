@@ -451,8 +451,14 @@ track.innerHTML = detFotos.map(src => `
         <img src="${src}" alt="" onerror="this.parentElement.innerHTML='<div class=\\'det-foto-slide-empty\\'>🌊</div>'">
     </div>`).join('');
 
-if (thumbs) thumbs.innerHTML = '';
-
+if (thumbs) {
+    thumbs.innerHTML = detFotos.length > 1
+        ? detFotos.map((src, i) => `
+            <div class="det-thumb ${i === detFotoIndex ? 'active' : ''}" onclick="detFotoIr(${i})">
+                <img src="${src}" alt="" onerror="this.style.display='none'">
+            </div>`).join('')
+        : '';
+}
 
 if (btnPrev) btnPrev.style.display = detFotos.length > 1 ? 'flex' : 'none';
 if (btnNext) btnNext.style.display = detFotos.length > 1 ? 'flex' : 'none';
@@ -901,15 +907,13 @@ grid.innerHTML = lista.map(lugar => {
 }).join('');
 
 grid.querySelectorAll('.lugar-card').forEach(card => {
-card.addEventListener('keydown', e => {
-    if (e.key === 'Enter') card.click();
+    card.addEventListener('keydown', e => {
+        if (e.key === 'Enter') card.click();
+    });
 });
 ```
 
-});
-
-// Resetar scroll ao re-renderizar (ex: ao trocar filtro)
-grid.scrollLeft = 0;
+}
 
 function selecionarLugar(id) {
 lugarSelecionadoId = id;
