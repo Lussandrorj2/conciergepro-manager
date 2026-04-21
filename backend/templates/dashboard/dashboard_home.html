@@ -3,55 +3,77 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Visão Geral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Dashboard — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="layout">
-    {% include 'includes/sidebar_dashboard.html' %}
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
 
     <main class="main">
         <div class="topbar">
-            <span class="topbar-title">Painel de Controle</span>
-            <div class="hotel-badge">{{ hotel.nome }}</div>
+            <span class="topbar-title">Visão Geral</span>
+            <div class="hotel-badge">
+                <div class="hotel-dot"></div>
+                {{ hotel.nome }}
+            </div>
         </div>
 
         <div class="content">
             <div class="stats-mini-row">
                 <div class="stat-mini">
-                    <div class="stat-mini-label">Passeios Hoje</div>
-                    <div class="stat-mini-value blue" id="count-passeios-dia">0</div>
+                    <div class="stat-mini-label">Reservas Hoje</div>
+                    <div class="stat-mini-value blue" id="dash-reservas-count">...</div>
                 </div>
                 <div class="stat-mini">
-                    <div class="stat-mini-label">Lucro Câmbio (Mês)</div>
-                    <div class="stat-mini-value green" id="lucro-cambio-mes">R$ 0,00</div>
+                    <div class="stat-mini-label">Lucro Câmbio</div>
+                    <div class="stat-mini-value green" id="dash-lucro-cambio">R$ 0,00</div>
                 </div>
                 <div class="stat-mini">
-                    <div class="stat-mini-label">Vendas Passeios (Mês)</div>
-                    <div class="stat-mini-value gold" id="vendas-passeios-mes">R$ 0,00</div>
+                    <div class="stat-mini-label">Passeios Ativos</div>
+                    <div class="stat-mini-value gold" id="dash-passeios-count">...</div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
+                
                 <div class="dashboard-main-col">
                     <div class="card-config">
-                        <h3>📊 Desempenho Mensal (Câmbio vs Passeios)</h3>
-                        <canvas id="monthlyChart" height="100"></canvas>
+                        <div class="card-header">
+                            <h3>📈 Desempenho de Câmbio (Últimos Registros)</h3>
+                        </div>
+                        <canvas id="salesChart" height="120"></canvas>
                     </div>
 
                     <div class="card-config" style="margin-top: 20px;">
-                        <h3>📅 Últimas Atividades</h3>
+                        <div class="card-header">
+                            <h3>📅 Últimas Atividades</h3>
+                        </div>
                         <div class="tabela-scroll">
                             <table id="tabela-atividades">
                                 <thead>
                                     <tr>
-                                        <th>Data/Hora</th>
-                                        <th>Categoria</th>
+                                        <th>Tipo</th>
                                         <th>Descrição</th>
                                         <th>Valor</th>
+                                        <th>Data</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -62,93 +84,154 @@
                 </div>
 
                 <div class="dashboard-side-col">
-                    <div class="section-header">
-                        <h3>📌 Lembretes</h3>
-                        <button onclick="adicionarLembrete()" class="btn-add">+</button>
-                    </div>
+                    <h3 style="font-size: 14px; color: var(--text-soft); margin-bottom: 15px; text-transform: uppercase;">📌 Lembretes</h3>
                     
-                    <div id="lista-lembretes" class="trello-board">
+                    <div class="trello-board">
+                        <div class="trello-card priority-high">
+                            <span class="trello-badge">Urgente</span>
+                            <p>Confirmar pick-up grupo Alemão (14:00)</p>
+                            <div class="trello-footer">🕒 Hoje</div>
                         </div>
+
+                        <div class="trello-card priority-medium">
+                            <span class="trello-badge">Financeiro</span>
+                            <p>Atualizar cotação do Dólar no painel</p>
+                            <div class="trello-footer">📅 Pendente</div>
+                        </div>
+
+                        <div class="trello-card priority-low">
+                            <span class="trello-badge">Geral</span>
+                            <p>Verificar novos e-mails de reserva</p>
+                            <div class="trello-footer">✅ Ok</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+
+            </div> 
+        </div> 
     </main>
 </div>
 
 <style>
-    .btn-add { background: var(--gold); border: none; color: #000; border-radius: 4px; cursor: pointer; padding: 2px 8px; font-weight: bold; }
-    .trello-card { background: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--gold); position: relative; }
-    .trello-card input, .trello-card textarea { background: transparent; border: none; color: #fff; width: 100%; outline: none; }
-    .trello-card .delete-btn { position: absolute; top: 5px; right: 5px; color: #ff4444; cursor: pointer; font-size: 12px; }
-    .dashboard-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; margin-top: 20px; }
+    /* Estilos Mini Trello */
+    .trello-board { display: flex; flex-direction: column; gap: 12px; }
+    .trello-card {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 12px;
+        border-left: 4px solid var(--border-light);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .trello-card.priority-high { border-left-color: #ef4444; }
+    .trello-card.priority-medium { border-left-color: #facc15; }
+    .trello-card.priority-low { border-left-color: #38bdf8; }
+
+    .trello-badge {
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255,255,255,0.05);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--text-soft);
+    }
+    .trello-card p { font-size: 13px; margin: 8px 0; color: #eee; line-height: 1.4; }
+    .trello-footer { font-size: 11px; color: var(--text-soft); border-top: 1px solid #2a2a2a; pt: 8px; margin-top: 5px; }
+
+    /* Layout Grid */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+
+    @media (max-width: 1024px) {
+        .dashboard-grid { display: flex; flex-direction: column; }
+        .dashboard-side-col { order: 1; }
+        .dashboard-main-col { order: 2; }
+    }
 </style>
 
 <script>
-    // Carregar dados iniciais
-    async function initDashboard() {
-        const hotelSlug = "{{ hotel.slug }}";
-        
-        // Simulação de busca de dados reais das suas APIs
-        const data = await fetch(`/api/admin/${hotelSlug}/resumo-mensal/`).then(r => r.json());
-        
-        // Atualiza KPIs
-        document.getElementById('count-passeios-dia').innerText = data.passeios_hoje || 0;
-        document.getElementById('lucro-cambio-mes').innerText = `R$ ${data.lucro_cambio.toLocaleString('pt-BR')}`;
-        document.getElementById('vendas-passeios-mes').innerText = `R$ ${data.vendas_passeios.toLocaleString('pt-BR')}`;
+    const hotelSlug = "{{ hotel.slug }}";
 
-        renderChart(data.labels, data.valores_cambio, data.valores_passeios);
-        carregarLembretes();
+    async function carregarDadosHome() {
+        try {
+            // 1. Pega dados de Câmbio
+            const resCambio = await fetch(`/api/admin/${hotelSlug}/cambio/`);
+            const ops = await resCambio.json();
+            
+            let lucroTotal = 0;
+            let chartLabels = [];
+            let chartData = [];
+
+            ops.slice(0, 10).reverse().forEach(op => {
+                const pago = parseFloat(op.valor_pago || op.quantidade * op.cotacao_compra || 0);
+                const recebido = parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
+                lucroTotal += (recebido - pago);
+
+                chartLabels.push(new Date(op.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
+                chartData.push(recebido);
+            });
+
+            document.getElementById('dash-lucro-cambio').innerText = `R$ ${lucroTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+            // 2. Pega dados de Passeios
+            const resPasseios = await fetch(`/api/admin/${hotelSlug}/passeios/`);
+            const passeios = await resPasseios.json();
+            document.getElementById('dash-passeios-count').innerText = passeios.length;
+
+            // 3. Pega dados de Reservas (Ajuste o endpoint se necessário)
+            const resReservas = await fetch(`/api/admin/${hotelSlug}/reservas/`).catch(() => null);
+            if(resReservas) {
+                const reservas = await resReservas.json();
+                document.getElementById('dash-reservas-count').innerText = reservas.length;
+            }
+
+            renderizarGrafico(chartLabels, chartData);
+            popularTabela(ops.slice(0, 5));
+
+        } catch (error) {
+            console.error("Erro ao alimentar dashboard:", error);
+        }
     }
 
-    // Gráfico comparativo de desempenho
-    function renderChart(labels, dataCambio, dataPasseios) {
-        const ctx = document.getElementById('monthlyChart').getContext('2d');
+    function popularTabela(lista) {
+        const tbody = document.querySelector('#tabela-atividades tbody');
+        tbody.innerHTML = lista.map(item => `
+            <tr>
+                <td><span class="badge badge-confirmado">Câmbio</span></td>
+                <td>Compra de ${item.quantidade} ${item.moeda}</td>
+                <td>R$ ${parseFloat(item.valor_pago).toLocaleString('pt-BR')}</td>
+                <td style="font-size:11px;">${new Date(item.data).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderizarGrafico(labels, data) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [
-                    { label: 'Câmbio', data: dataCambio, borderColor: '#4caf50', tension: 0.3 },
-                    { label: 'Passeios', data: dataPasseios, borderColor: '#c5a059', tension: 0.3 }
-                ]
+                datasets: [{
+                    label: 'Volume Câmbio (Entrada R$)',
+                    data: data,
+                    borderColor: '#c5a059',
+                    backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
             },
-            options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
         });
     }
 
-    // Gerenciamento de Lembretes (LocalStorage para persistência simples)
-    function carregarLembretes() {
-        const list = JSON.parse(localStorage.getItem('lembretes') || '[]');
-        const container = document.getElementById('lista-lembretes');
-        container.innerHTML = list.map((l, i) => `
-            <div class="trello-card">
-                <span class="delete-btn" onclick="removerLembrete(${i})">✖</span>
-                <textarea onchange="editarLembrete(${i}, this.value)">${l}</textarea>
-            </div>
-        `).join('');
-    }
-
-    function adicionarLembrete() {
-        const list = JSON.parse(localStorage.getItem('lembretes') || '[]');
-        list.push("Novo lembrete...");
-        localStorage.setItem('lembretes', JSON.stringify(list));
-        carregarLembretes();
-    }
-
-    function editarLembrete(index, valor) {
-        const list = JSON.parse(localStorage.getItem('lembretes') || '[]');
-        list[index] = valor;
-        localStorage.setItem('lembretes', JSON.stringify(list));
-    }
-
-    function removerLembrete(index) {
-        const list = JSON.parse(localStorage.getItem('lembretes') || '[]');
-        list.splice(index, 1);
-        localStorage.setItem('lembretes', JSON.stringify(list));
-        carregarLembretes();
-    }
-
-    window.onload = initDashboard;
+    document.addEventListener('DOMContentLoaded', carregarDadosHome);
 </script>
+
+<script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
 </html>
