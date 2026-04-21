@@ -798,7 +798,6 @@ function selecionarLugar(id) {
     lugarSelecionadoId = id;
     const lugar = LUGARES.find(l => l.id === id);
     if (!lugar) return;
-    renderLugarCards();
     carregarMapaIframe(gerarMapaSrc(lugar.lat, lugar.lng));
 }
 
@@ -918,120 +917,8 @@ function fecharModalLugar() {
 }
 
 // ==========================================
-// CARROSSEL 360° DE LUGARES
-// Substitua a função renderLugarCards() inteira no concierge.js
+// CARROSSEL 360° — estado global (único)
 // ==========================================
-
-// Estado do carrossel 360
-let lc360Index  = 0;
-let lc360Total  = 0;
-let lc360Angle  = 0;      // ângulo atual em graus
-let lc360IsDrag = false;
-let lc360StartX = 0;
-let lc360Timer  = null;
-
-const CARD_ANGLE_STEP = 360 / 8; // slots fixos — redistribuído dinamicamente
-
-function lc360AnglePorItem(total) {
-    return total > 0 ? 360 / total : 360;
-}
-
-function lc360AplicarRotacao() {
-    const track = document.getElementById('lc360-track');
-    if (!track) return;
-    const step  = lc360AnglePorItem(lc360Total);
-    const angle = -lc360Index * step;
-    track.style.transform = `rotateY(${angle}deg)`;
-
-    // Atualiza classe is-active nos cards
-    const lista = lugarFiltroAtivo === 'todos'
-        ? LUGARES
-        : LUGARES.filter(l => l.tipo === lugarFiltroAtivo);
-
-    lista.forEach((lugar, i) => {
-        const card = document.getElementById(`lc360-card-${lugar.id}`);
-        if (card) card.classList.toggle('is-active', i === lc360Index);
-    });
-
-    // Atualiza dots
-    document.querySelectorAll('.lugares-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === lc360Index);
-    });
-}
-
-function lc360Mover(dir) {
-    lc360Index = (lc360Index + dir + lc360Total) % lc360Total;
-    lc360AplicarRotacao();
-    lc360ResetAutoPlay();
-}
-
-function lc360Ir(index) {
-    lc360Index = index;
-    lc360AplicarRotacao();
-    lc360ResetAutoPlay();
-}
-
-function lc360Selecionar(lugarId, index) {
-    lc360Index = index;
-    lc360AplicarRotacao();
-    abrirModalLugar(lugarId);
-    lc360ResetAutoPlay();
-}
-
-function lc360AutoPlay() {
-    clearInterval(lc360Timer);
-    lc360Timer = setInterval(() => {
-        if (!document.hidden && lc360Total > 1) lc360Mover(1);
-    }, 4000);
-}
-
-function lc360ResetAutoPlay() {
-    clearInterval(lc360Timer);
-    lc360Timer = setInterval(() => {
-        if (!document.hidden && lc360Total > 1) lc360Mover(1);
-    }, 4000);
-}
-
-function initLc360Drag() {
-    const outer = document.getElementById('lc360-outer');
-    if (!outer || outer._dragInit) return;
-    outer._dragInit = true;
-
-    let startX = 0, moved = false;
-
-    const onStart = e => {
-        lc360IsDrag = true;
-        startX      = e.touches ? e.touches[0].clientX : e.clientX;
-        moved       = false;
-        clearInterval(lc360Timer);
-    };
-    const onEnd = e => {
-        if (!lc360IsDrag) return;
-        lc360IsDrag = false;
-        const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-        const diff = startX - endX;
-        if (Math.abs(diff) > 30) {
-            lc360Mover(diff > 0 ? 1 : -1);
-        }
-        lc360ResetAutoPlay();
-    };
-
-    outer.addEventListener('mousedown',  onStart);
-    outer.addEventListener('touchstart', onStart, { passive: true });
-    outer.addEventListener('mouseup',    onEnd);
-    outer.addEventListener('touchend',   onEnd);
-
-    // Pausa autoplay quando mouse sobre o carrossel
-    outer.addEventListener('mouseenter', () => clearInterval(lc360Timer));
-    outer.addEventListener('mouseleave', () => lc360ResetAutoPlay());
-}
-
-// ==========================================
-// renderLugarCards — VERSÃO FINAL
-// Desktop: grid 3 colunas | Mobile: 360°
-// Substitui a função renderLugarCards() no concierge.js
-// ==========================================
-
 let lc360Index  = 0;
 let lc360Total  = 0;
 let lc360IsDrag = false;
@@ -1041,115 +928,6 @@ function isMobileView() { return window.innerWidth <= 768; }
 
 function lc360AnglePorItem(total) {
     return total > 0 ? 360 / total : 360;
-}
-
-function renderLugarCards() {
-    const grid = document.getElementById('mapa-cards-grid');
-    if (!grid) return;
-
-    const L_    = MAPA_LABELS[idiomaAtual] || MAPA_LABELS['pt'];
-    const lista = lugarFiltroAtivo === 'todos'
-        ? LUGARES
-        : LUGARES.filter(l => l.tipo === lugarFiltroAtivo);
-
-    if (!lista.length) {
-        grid.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">${t('vazio')}</div>`;
-        lc360Total = 0;
-        return;
-    }
-
-    lc360Total = lista.length;
-    lc360Index = 0;
-
-    const step   = lc360AnglePorItem(lc360Total);
-    const radius = Math.max(280, Math.round(165 / Math.tan(Math.PI / Math.max(lc360Total, 2))));
-
-    const cardsHTML = lista.map((lugar, i) => {
-        const nome      = lugar.nome[idiomaAtual] || lugar.nome['pt'];
-        const desc      = lugar.desc[idiomaAtual] || lugar.desc['pt'];
-        const dist      = lugar.dist[idiomaAtual] || lugar.dist['pt'];
-        const horario   = lugar.horario[idiomaAtual] || lugar.horario['pt'];
-        const tipoLabel = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
-        const angDeg    = i * step;
-
-        // No desktop transform é sobrescrito por CSS (none)
-        // No mobile usa o 3D
-        return `
-<div class="lugar-card-3d ${i === 0 ? 'is-active' : ''}"
-     id="lc360-card-${lugar.id}"
-     style="transform: rotateY(${angDeg}deg) translateZ(${radius}px);"
-     onclick="lc360Selecionar(${lugar.id}, ${i})"
-     role="button" tabindex="0" aria-label="${nome}">
-    <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
-    <div class="lugar-nome">${nome}</div>
-    <div class="lugar-info-desc">${desc}</div>
-    ${horario ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px;">🕐 ${horario}</div>` : ''}
-    <div class="lugar-meta">
-        <span class="lugar-estrelas">${lugar.estrelas}</span>
-        <span class="lugar-distancia">🚶 ${dist}</span>
-    </div>
-    <a class="lugar-card-link"
-       href="${lugar.mapaLink}"
-       target="_blank"
-       rel="noopener"
-       onclick="event.stopPropagation()">
-        ↗ ${t('mapa_abrir')}
-    </a>
-</div>`;
-    }).join('');
-
-    const dotsHTML = lista.map((_, i) =>
-        `<button class="lugares-dot ${i === 0 ? 'active' : ''}"
-                 onclick="lc360Ir(${i})" aria-label="Item ${i+1}"></button>`
-    ).join('');
-
-    grid.innerHTML = `
-<div class="lugares-carousel-outer" id="lc360-outer">
-    <button class="lugares-nav-btn prev" onclick="lc360Mover(-1)" aria-label="Anterior">‹</button>
-    <button class="lugares-nav-btn next" onclick="lc360Mover(1)"  aria-label="Próximo">›</button>
-    <div class="lugares-carousel-track-wrap">
-        <div class="lugares-carousel-track" id="lc360-track" style="transform: rotateY(0deg);">
-            ${cardsHTML}
-        </div>
-    </div>
-    <div class="lugares-dots" id="lc360-dots">${dotsHTML}</div>
-    <div class="lugares-hint" id="lc360-hint">← arraste para girar →</div>
-</div>`;
-
-    // Altura do track-wrap só importa no mobile
-    const wrap = grid.querySelector('.lugares-carousel-track-wrap');
-    if (wrap && isMobileView()) {
-        wrap.style.height = (Math.min(260, radius * 0.6) + 40) + 'px';
-    }
-
-    initLc360Drag();
-
-    // Autoplay só no mobile
-    if (isMobileView()) {
-        lc360AutoPlay();
-    } else {
-        clearInterval(lc360Timer);
-        // No desktop: clique abre o modal normalmente
-        grid.querySelectorAll('.lugar-card-3d').forEach((card, i) => {
-            const lugar = lista[i];
-            card.addEventListener('click', () => {
-                abrirModalLugar(lugar.id);
-                selecionarLugar(lugar.id);
-            });
-        });
-    }
-
-    // Recalcula ao redimensionar
-    window.addEventListener('resize', () => {
-        if (!isMobileView()) {
-            clearInterval(lc360Timer);
-            const track = document.getElementById('lc360-track');
-            if (track) track.style.transform = '';
-        } else {
-            lc360AplicarRotacao();
-            lc360AutoPlay();
-        }
-    }, { once: true });
 }
 
 function lc360AplicarRotacao() {
@@ -1243,7 +1021,106 @@ function initLc360Drag() {
 }
 
 // ==========================================
-// atualizarTextosMapa — versão final
+// renderLugarCards — Desktop: grid 3 col | Mobile: 360°
+// ==========================================
+function renderLugarCards() {
+    const grid = document.getElementById('mapa-cards-grid');
+    if (!grid) return;
+
+    const L_    = MAPA_LABELS[idiomaAtual] || MAPA_LABELS['pt'];
+    const lista = lugarFiltroAtivo === 'todos'
+        ? LUGARES
+        : LUGARES.filter(l => l.tipo === lugarFiltroAtivo);
+
+    if (!lista.length) {
+        grid.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">${t('vazio')}</div>`;
+        lc360Total = 0;
+        return;
+    }
+
+    lc360Total = lista.length;
+    lc360Index = 0;
+
+    const step   = lc360AnglePorItem(lc360Total);
+    const radius = Math.max(280, Math.round(165 / Math.tan(Math.PI / Math.max(lc360Total, 2))));
+
+    const cardsHTML = lista.map((lugar, i) => {
+        const nome      = lugar.nome[idiomaAtual] || lugar.nome['pt'];
+        const desc      = lugar.desc[idiomaAtual] || lugar.desc['pt'];
+        const dist      = lugar.dist[idiomaAtual] || lugar.dist['pt'];
+        const horario   = lugar.horario[idiomaAtual] || lugar.horario['pt'];
+        const tipoLabel = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
+        const angDeg    = i * step;
+
+        return `
+<div class="lugar-card-3d ${i === 0 ? 'is-active' : ''}"
+     id="lc360-card-${lugar.id}"
+     style="transform: rotateY(${angDeg}deg) translateZ(${radius}px);"
+     onclick="lc360Selecionar(${lugar.id}, ${i})"
+     role="button" tabindex="0" aria-label="${nome}">
+    <div class="lugar-tipo-badge">${lugar.emoji} ${tipoLabel}</div>
+    <div class="lugar-nome">${nome}</div>
+    <div class="lugar-info-desc">${desc}</div>
+    ${horario ? `<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px;">🕐 ${horario}</div>` : ''}
+    <div class="lugar-meta">
+        <span class="lugar-estrelas">${lugar.estrelas}</span>
+        <span class="lugar-distancia">🚶 ${dist}</span>
+    </div>
+    <a class="lugar-card-link"
+       href="${lugar.mapaLink}"
+       target="_blank"
+       rel="noopener"
+       onclick="event.stopPropagation()">
+        ↗ ${t('mapa_abrir')}
+    </a>
+</div>`;
+    }).join('');
+
+    const dotsHTML = lista.map((_, i) =>
+        `<button class="lugares-dot ${i === 0 ? 'active' : ''}"
+                 onclick="lc360Ir(${i})" aria-label="Item ${i+1}"></button>`
+    ).join('');
+
+    grid.innerHTML = `
+<div class="lugares-carousel-outer" id="lc360-outer">
+    <button class="lugares-nav-btn prev" onclick="lc360Mover(-1)" aria-label="Anterior">‹</button>
+    <button class="lugares-nav-btn next" onclick="lc360Mover(1)"  aria-label="Próximo">›</button>
+    <div class="lugares-carousel-track-wrap">
+        <div class="lugares-carousel-track" id="lc360-track" style="transform: rotateY(0deg);">
+            ${cardsHTML}
+        </div>
+    </div>
+    <div class="lugares-dots" id="lc360-dots">${dotsHTML}</div>
+    <div class="lugares-hint" id="lc360-hint">← arraste para girar →</div>
+</div>`;
+
+    const wrap = grid.querySelector('.lugares-carousel-track-wrap');
+    if (wrap && isMobileView()) {
+        wrap.style.height = (Math.min(260, radius * 0.6) + 40) + 'px';
+    }
+
+    initLc360Drag();
+
+    if (isMobileView()) {
+        lc360AutoPlay();
+    } else {
+        clearInterval(lc360Timer);
+    }
+
+    window.addEventListener('resize', () => {
+        if (!isMobileView()) {
+            clearInterval(lc360Timer);
+            const track = document.getElementById('lc360-track');
+            if (track) track.style.transform = '';
+        } else {
+            lc360AplicarRotacao();
+            lc360AutoPlay();
+        }
+    }, { once: true });
+}
+
+// ==========================================
+// atualizarTextosMapa
 // ==========================================
 function atualizarTextosMapa() {
     const labelEl  = document.getElementById('label-mapa');
@@ -1300,9 +1177,6 @@ window.detFotoMover               = detFotoMover;
 window.detFotoIr                  = detFotoIr;
 window.filtrarMapa                = filtrarMapa;
 window.selecionarLugar            = selecionarLugar;
-window.lc360Mover                 = lc360Mover;
-window.lc360Ir                    = lc360Ir;
-window.lc360Selecionar            = lc360Selecionar;
 window.lc360Mover                 = lc360Mover;
 window.lc360Ir                    = lc360Ir;
 window.lc360Selecionar            = lc360Selecionar;
