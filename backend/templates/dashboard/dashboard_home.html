@@ -3,153 +3,901 @@
 <!DOCTYPE html>
 
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Dashboard — {{ hotel.nome }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ══════════════════════════════════════
+           RESET + VARIÁVEIS
+        ══════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    :root {
+        --gold:      #b5843a;
+        --gold-lt:   #d4a95a;
+        --gold-dim:  rgba(181,132,58,0.12);
+        --bg:        #f4f5f7;
+        --surface:   #ffffff;
+        --text:      #111827;
+        --muted:     #6b7280;
+        --border:    #e5e7eb;
+        --green:     #16a34a;
+        --green-dim: rgba(22,163,74,0.1);
+        --amber:     #d97706;
+        --amber-dim: rgba(217,119,6,0.1);
+        --red:       #dc2626;
+        --red-dim:   rgba(220,38,38,0.1);
+        --blue:      #2563eb;
+        --blue-dim:  rgba(37,99,235,0.08);
+        --radius:    14px;
+        --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    html, body {
+        height: 100%;
+        font-family: 'DM Sans', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══════════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════════ */
+    .layout {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+        width: 220px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 40;
+        flex-shrink: 0;
+    }
+
+    .sidebar-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--gold);
+        padding: 0 8px 24px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+    }
+
+    .sidebar nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted);
+        text-decoration: none;
+        transition: all 0.18s;
+    }
+
+    .sidebar nav a:hover { background: var(--bg); color: var(--text); }
+    .sidebar nav a.active { background: var(--gold-dim); color: var(--gold); font-weight: 600; }
+    .sidebar nav hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+    /* ── Main ── */
+    .main {
+        flex: 1;
+        margin-left: 220px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+    }
+
+    .topbar-left { display: flex; flex-direction: column; gap: 2px; }
+    .topbar-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    .topbar-date  { font-size: 13px; color: var(--muted); font-weight: 400; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+    /* Botão página do hotel — destaque dourado */
+    .btn-hotel-page {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--gold);
+        color: #fff;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 16px;
+        border-radius: 9px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: filter 0.2s, transform 0.15s;
+        box-shadow: 0 3px 10px rgba(181,132,58,0.3);
+        white-space: nowrap;
+    }
+
+    .btn-hotel-page:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    .btn-secondary-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 9px 14px;
+        border-radius: 9px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+    }
+
+    .btn-secondary-sm:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    /* ── Content ── */
+    .content {
+        padding: 28px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* ══════════════════════════════════════
+       CARDS DE MÉTRICAS
+    ══════════════════════════════════════ */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .metric-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--accent-color, var(--gold));
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .metric-card.blue   { --accent-color: var(--blue); }
+    .metric-card.green  { --accent-color: var(--green); }
+    .metric-card.amber  { --accent-color: var(--amber); }
+    .metric-card.gold   { --accent-color: var(--gold); }
+
+    .metric-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .metric-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .metric-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .metric-icon {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        font-size: 22px;
+        opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════════
+       SEÇÕES
+    ══════════════════════════════════════ */
+    .section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px 14px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .card-link {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gold);
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+
+    .card-link:hover { opacity: 0.7; }
+
+    .card-body { padding: 0; }
+
+    /* ══════════════════════════════════════
+       LISTA DE RESERVAS
+    ══════════════════════════════════════ */
+    .reserva-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+
+    .reserva-item:last-child { border-bottom: none; }
+    .reserva-item:hover { background: var(--bg); }
+
+    .reserva-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--gold-dim);
+        color: var(--gold);
+        font-size: 14px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .reserva-info { flex: 1; min-width: 0; }
+
+    .reserva-nome {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .reserva-passeio {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .reserva-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-amber  { background: var(--amber-dim);  color: var(--amber); }
+    .badge-red    { background: var(--red-dim);    color: var(--red); }
+    .badge-blue   { background: var(--blue-dim);   color: var(--blue); }
+    .badge-gray   { background: var(--border);     color: var(--muted); }
+
+    .reserva-data {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    /* Estado vazio */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 36px 20px;
+        gap: 8px;
+        color: var(--muted);
+    }
+
+    .empty-state-icon { font-size: 32px; }
+    .empty-state p { font-size: 13px; text-align: center; }
+
+    /* ══════════════════════════════════════
+       LISTA DE PASSEIOS
+    ══════════════════════════════════════ */
+    .passeio-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+
+    .passeio-item:last-child { border-bottom: none; }
+    .passeio-item:hover { background: var(--bg); }
+
+    .passeio-thumb {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        object-fit: cover;
+        background: var(--bg);
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+    }
+
+    .passeio-thumb-placeholder {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--gold-dim);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .passeio-info { flex: 1; min-width: 0; }
+
+    .passeio-nome {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .passeio-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 1px;
+    }
+
+    .passeio-preco {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--gold);
+        flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════
+       CONFIG CHECKLIST
+    ══════════════════════════════════════ */
+    .config-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .config-item:last-child { border-bottom: none; }
+
+    .config-check {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .config-check.ok    { background: var(--green-dim); color: var(--green); }
+    .config-check.warn  { background: var(--amber-dim); color: var(--amber); }
+
+    .config-info { flex: 1; }
+    .config-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .config-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .config-progress {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--green);
+        flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════
+       FILTROS DE RESERVAS
+    ══════════════════════════════════════ */
+    .filter-tabs {
+        display: flex;
+        gap: 6px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .filter-tab {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.18s;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .filter-tab:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-tab.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+    /* ══════════════════════════════════════
+       STATUS OPERACIONAL
+    ══════════════════════════════════════ */
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--green);
+        background: var(--green-dim);
+        padding: 4px 10px;
+        border-radius: 999px;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    /* ══════════════════════════════════════
+       MOBILE NAV BAR (bottom)
+    ══════════════════════════════════════ */
+    .mobile-nav {
+        display: none;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        z-index: 50;
+        padding: 8px 0 env(safe-area-inset-bottom, 8px);
+    }
+
+    .mobile-nav-inner {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 8px;
+        transition: color 0.2s;
+    }
+
+    .mobile-nav-item.active { color: var(--gold); }
+    .mobile-nav-item span { font-size: 20px; }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 900px) {
+        .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        .section-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar { display: none; }
+        .main { margin-left: 0; }
+        .mobile-nav { display: block; }
+        .content { padding: 16px 16px 80px; gap: 16px; }
+        .topbar { padding: 14px 16px; }
+        .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .metric-value { font-size: 26px; }
+    }
+
+    @media (max-width: 480px) {
+        .topbar-actions .btn-secondary-sm { display: none; }
+    }
+</style>
+
+
 </head>
-
 <body>
-    <div class="layout">
+
+<div class="layout">
 
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">🔔 Concierge</div>
-        <nav>
-            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-            <hr>
-            <a href="/logout/">↩ Sair</a>
-        </nav>
-    </aside>
+<!-- ══ SIDEBAR (desktop) ══ -->
+<aside class="sidebar">
+    <div class="sidebar-logo">🔔 Concierge</div>
+    <nav>
+        <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Passeios</a>
+        <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Novo Passeio</a>
+        <a href="/{{ hotel.slug }}/dashboard/lugares/">📍 Lugares</a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
+        <hr>
+        <a href="/logout/">↩ Sair</a>
+    </nav>
+</aside>
 
-    <!-- MAIN -->
-    <main class="main">
+<!-- ══ MAIN ══ -->
+<main class="main">
 
-        <!-- TOPBAR -->
-        <div class="topbar">
-            <span class="topbar-title">Dashboard</span>
-            <div style="display:flex;align-items:center;gap:10px;">
-                <a href="/?hotel={{ hotel.slug }}" target="_blank" class="btn-ver-hotel">
-                    🌐 Ver site
-                </a>
-                <div class="hotel-badge">
-                    <div class="hotel-dot"></div>
-                    {{ hotel.nome }}
-                </div>
-            </div>
+    <!-- ── Topbar ── -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-title">Dashboard</div>
+            <div class="topbar-date" id="topbar-date">Carregando data…</div>
         </div>
+        <div class="topbar-actions">
+            <span class="status-pill">
+                <span class="status-dot"></span>
+                Sistema operando
+            </span>
+            <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-secondary-sm">
+                ➕ Novo Passeio
+            </a>
+            <a href="/concierge/{{ hotel.slug }}/" target="_blank" class="btn-hotel-page">
+                🌐 Página do Hotel ↗
+            </a>
+        </div>
+    </div>
 
-        <!-- CONTENT -->
-        <div class="content">
+    <!-- ── Content ── -->
+    <div class="content">
 
-            <!-- Ações rápidas -->
-            <div class="acoes-rapidas">
-                <a href="/{{ hotel.slug }}/dashboard/reservas/" class="btn-action destaque">
-                    📅 Ver Todas as Reservas
-                </a>
-                <a href="/{{ hotel.slug }}/dashboard/criar/" class="btn-action">
-                    ➕ Novo Passeio
-                </a>
-                <a href="/{{ hotel.slug }}/dashboard/cambio/" class="btn-action">
-                    💱 Câmbio
-                </a>
-                <a href="/?hotel={{ hotel.slug }}" target="_blank" class="btn-action btn-action-hotel">
-                    🌐 Página do Hotel ↗
-                </a>
+        <!-- ── Métricas do dia ── -->
+        <div class="metrics-grid">
+
+            <div class="metric-card blue">
+                <div class="metric-icon">📅</div>
+                <div class="metric-label">Reservas Hoje</div>
+                <div class="metric-value">{{ reservas_hoje|default:"0" }}</div>
+                <div class="metric-sub">{{ confirmadas_hoje|default:"0" }} confirmadas · {{ pendentes_hoje|default:"0" }} pendentes</div>
             </div>
 
-            <!-- STATS -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Passeios ativos</div>
-                        <div class="stat-value" id="total-passeios">--</div>
-                        <div class="stat-sub" id="sub-sob-consulta"></div>
-                    </div>
-                    <div class="stat-icon green">🗺️</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Reservas hoje</div>
-                        <div class="stat-value" id="reservas-hoje">--</div>
-                        <div class="stat-sub">confirmadas</div>
-                    </div>
-                    <div class="stat-icon blue">📅</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Preço médio</div>
-                        <div class="stat-value" id="preco-medio">--</div>
-                        <div class="stat-sub">passeios com preço fixo</div>
-                    </div>
-                    <div class="stat-icon yellow">💰</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Hoje</div>
-                        <div class="stat-value" id="data-hoje" style="font-size:16px;padding-top:4px"></div>
-                        <div class="stat-sub">sistema operando normalmente</div>
-                    </div>
-                    <div class="stat-icon gold">🗓️</div>
-                </div>
+            <div class="metric-card green">
+                <div class="metric-icon">🗺️</div>
+                <div class="metric-label">Passeios Ativos</div>
+                <div class="metric-value">{{ passeios_ativos|default:"0" }}</div>
+                <div class="metric-sub">{{ passeios_sob_consulta|default:"0" }} sob consulta</div>
             </div>
 
-            <!-- PAINEL DUPLO -->
-            <div class="two-col">
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">📅 Reservas Recentes</span>
-                        <a href="/{{ hotel.slug }}/dashboard/reservas/" class="panel-link">Ver todas →</a>
-                    </div>
-                    <div id="lista-reservas-recentes">
-                        <div class="loading">Carregando reservas</div>
-                    </div>
+            <div class="metric-card amber">
+                <div class="metric-icon">💰</div>
+                <div class="metric-label">Preço Médio</div>
+                <div class="metric-value" style="font-size:22px;">
+                    {% if preco_medio %}R$ {{ preco_medio }}{% else %}--{% endif %}
                 </div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <span class="panel-title">🗺️ Passeios Cadastrados</span>
-                        <a href="/{{ hotel.slug }}/dashboard/listar/" class="panel-link">Ver todos →</a>
-                    </div>
-                    <div id="lista-passeios">
-                        <div class="loading">Carregando passeios</div>
-                    </div>
-                </div>
-
+                <div class="metric-sub">passeios com preço fixo</div>
             </div>
 
-            <!-- CHECKLIST -->
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">⚙️ Configuração do hotel</span>
-                    <span id="check-progress" style="font-size:12px;color:var(--text-soft)"></span>
-                </div>
-                <div id="checklist">
-                    <div class="loading">Verificando configurações</div>
-                </div>
+            <div class="metric-card gold">
+                <div class="metric-icon">📊</div>
+                <div class="metric-label">Esta Semana</div>
+                <div class="metric-value">{{ reservas_semana|default:"0" }}</div>
+                <div class="metric-sub">reservas nos últimos 7 dias</div>
             </div>
 
         </div>
-    </main>
-</div>
 
-<script>
-    window.hotelSlug = "{{ hotel.slug }}";
-</script>
-<script src="{% static 'js/dashboard.js' %}"></script>
+        <!-- ── Próximas Reservas + Passeios ── -->
+        <div class="section-grid">
+
+            <!-- Próximas Reservas -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <span>📅</span>
+                        <span class="card-title">Próximas Reservas</span>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/reservas/" class="card-link">Ver todas →</a>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filtrarReservas('todas', this)">Todas</button>
+                    <button class="filter-tab" onclick="filtrarReservas('confirmada', this)">✅ Confirmadas</button>
+                    <button class="filter-tab" onclick="filtrarReservas('pendente', this)">⏳ Pendentes</button>
+                </div>
+
+                <div class="card-body" id="lista-reservas">
+                    {% if proximas_reservas %}
+                        {% for r in proximas_reservas %}
+                        <div class="reserva-item" data-status="{{ r.status }}">
+                            <div class="reserva-avatar">{{ r.nome|slice:":1"|upper }}</div>
+                            <div class="reserva-info">
+                                <div class="reserva-nome">{{ r.nome }}</div>
+                                <div class="reserva-passeio">{{ r.passeio.nome }} · {{ r.pessoas }} pessoa(s)</div>
+                            </div>
+                            <div class="reserva-right">
+                                {% if r.status == 'confirmada' %}
+                                    <span class="badge badge-green">Confirmada</span>
+                                {% elif r.status == 'pendente' %}
+                                    <span class="badge badge-amber">Pendente</span>
+                                {% elif r.status == 'cancelada' %}
+                                    <span class="badge badge-red">Cancelada</span>
+                                {% else %}
+                                    <span class="badge badge-gray">{{ r.status }}</span>
+                                {% endif %}
+                                <span class="reserva-data">{{ r.data_passeio|date:"d/m" }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>Nenhuma reserva próxima.<br>As confirmadas e pendentes aparecerão aqui.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Passeios Cadastrados -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <span>🗺️</span>
+                        <span class="card-title">Passeios Cadastrados</span>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/listar/" class="card-link">Ver todos →</a>
+                </div>
+                <div class="card-body">
+                    {% if passeios %}
+                        {% for p in passeios %}
+                        <div class="passeio-item">
+                            {% if p.banner or p.foto %}
+                                <img class="passeio-thumb"
+                                     src="{{ p.banner|default:p.foto }}"
+                                     alt="{{ p.nome }}"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                <div class="passeio-thumb-placeholder" style="display:none">🌴</div>
+                            {% else %}
+                                <div class="passeio-thumb-placeholder">🌴</div>
+                            {% endif %}
+                            <div class="passeio-info">
+                                <div class="passeio-nome">{{ p.nome }}</div>
+                                <div class="passeio-sub">{{ p.descricao|truncatechars:40 }}</div>
+                            </div>
+                            <div class="passeio-preco">
+                                {% if p.preco_sob_consulta %}Sob consulta{% else %}R$ {{ p.preco }}{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌴</div>
+                            <p>Nenhum passeio cadastrado ainda.<br>
+                               <a href="/{{ hotel.slug }}/dashboard/criar/" style="color:var(--gold);font-weight:600;">Criar primeiro passeio →</a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Configuração do Hotel ── -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <span>⚙️</span>
+                    <span class="card-title">Configuração do Hotel</span>
+                </div>
+                <span class="config-progress">{{ config_completos|default:"0" }}/4 concluídos</span>
+            </div>
+            <div class="card-body">
+
+                <div class="config-item">
+                    <div class="config-check {% if passeios_ativos %}ok{% else %}warn{% endif %}">
+                        {% if passeios_ativos %}✓{% else %}!{% endif %}
+                    </div>
+                    <div class="config-info">
+                        <div class="config-label">Passeios cadastrados</div>
+                        <div class="config-sub">{{ passeios_ativos|default:"0" }} passeio(s) ativo(s)</div>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/listar/" class="card-link">Gerenciar →</a>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-check {% if hotel.foto_capa %}ok{% else %}warn{% endif %}">
+                        {% if hotel.foto_capa %}✓{% else %}!{% endif %}
+                    </div>
+                    <div class="config-info">
+                        <div class="config-label">Foto de capa</div>
+                        <div class="config-sub">{% if hotel.foto_capa %}Imagem definida{% else %}Sem imagem{% endif %}</div>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-check {% if hotel.titulo_hero %}ok{% else %}warn{% endif %}">
+                        {% if hotel.titulo_hero %}✓{% else %}!{% endif %}
+                    </div>
+                    <div class="config-info">
+                        <div class="config-label">Título da página</div>
+                        <div class="config-sub">{{ hotel.titulo_hero|default:"Não definido" }}</div>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-check {% if hotel.whatsapp %}ok{% else %}warn{% endif %}">
+                        {% if hotel.whatsapp %}✓{% else %}!{% endif %}
+                    </div>
+                    <div class="config-info">
+                        <div class="config-label">WhatsApp do hotel</div>
+                        <div class="config-sub">{% if hotel.whatsapp %}{{ hotel.whatsapp }}{% else %}Não configurado{% endif %}</div>
+                    </div>
+                    <a href="/{{ hotel.slug }}/dashboard/configuracoes/" class="card-link">Editar →</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</main><!-- /main -->
+
+
+</div><!-- /layout -->
+
+<!-- ══ MOBILE NAV BAR ══ -->
+
+<nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+        <a href="/{{ hotel.slug }}/dashboard/" class="mobile-nav-item active">
+            <span>🏠</span>Dashboard
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/" class="mobile-nav-item">
+            <span>📅</span>Reservas
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/" class="mobile-nav-item">
+            <span>🗺️</span>Passeios
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="mobile-nav-item">
+            <span>💱</span>Câmbio
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="mobile-nav-item">
+            <span>📊</span>Relatórios
+        </a>
+    </div>
+</nav>
+
 <script src="{% static 'js/mobile-menu.js' %}"></script>
 
-</body>
+<script>
+    // ── Data do dia ──
+    const dateEl = document.getElementById('topbar-date');
+    if (dateEl) {
+        const now = new Date();
+        const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+        dateEl.textContent = now.toLocaleDateString('pt-BR', opts);
+    }
 
+    // ── Filtro de reservas ──
+    function filtrarReservas(status, btn) {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const itens = document.querySelectorAll('#lista-reservas .reserva-item');
+        itens.forEach(item => {
+            if (status === 'todas' || item.dataset.status === status) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
 </html>
