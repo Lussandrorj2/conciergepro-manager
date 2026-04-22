@@ -79,9 +79,9 @@ var i18n = {
     resumo_passeio: 'Visite', resumo_qtd: 'Personnes', resumo_total: 'Total estime',
     btn_confirmar: 'Contacter sur WhatsApp', btn_reservar_det: 'Reserver maintenant',
     btn_voltar: 'Retour aux details', sucesso: 'Redirection vers WhatsApp!', sem_imagem: 'Sans image',
-    wpp_msg: function(n,p,q,d,h){ var m='Bonjour ! Je m'appelle *”+n+”* et je suis interesse par la visite *”+p+'* pour *'+q+' personne(s)*'; if(d) m+=' a la date *'+d+'*'; if(h) m+=' a *'+h+'*'; m+='. Pourriez-vous confirmer la disponibilite ?'; return m; },
-    aviso_wpp: 'Vous serez redirige vers le WhatsApp de l'hotel pour confirmer votre reservation.”,
-    campos_obrigatorios: 'Veuillez remplir votre nom et numero de telephone.',
+    wpp_msg: function(n,p,q,d,h){ var m="Bonjour ! Je m'appelle *"+n+"* et je suis interesse par la visite *"+p+"* pour *"+q+" personne(s)*"; if(d) m+=" a la date *"+d+"*"; if(h) m+=" a *"+h+"*"; m+=". Pourriez-vous confirmer la disponibilite ?"; return m; },
+    aviso_wpp: "Vous serez redirige vers le WhatsApp de l'hotel pour confirmer votre reservation.",
+    campos_obrigatorios: "Veuillez remplir votre nom et numero de telephone.",
     mapa_label: 'Aux alentours', mapa_titulo: 'Restaurants & Centres Commerciaux',
     mapa_todos: 'Tous', mapa_restaurantes: 'Restaurants', mapa_compras: 'Shopping',
     mapa_carregando: 'Chargement de la carte…', mapa_abrir: 'Voir sur Google Maps', mapa_ver: 'Voir sur la carte'
