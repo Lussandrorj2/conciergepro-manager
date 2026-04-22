@@ -918,82 +918,89 @@ function fecharModalLugar() {
 }
 
 // ==========================================
-// CARROSSEL 360 LUGARES
+// CARROSSEL LUGARES (simples, igual aos passeios)
 // ==========================================
-var lc360Index  = 0;
-var lc360Total  = 0;
-var lc360IsDrag = false;
-var lc360Timer  = null;
+var lugarCarrIndex    = 0;
+var lugarCarrVisiveis = 3;
+var lugarCarrTotal    = 0;
 
-function isMobileView() { return window.innerWidth <= 768; }
-
-function lc360AnglePorItem(total) {
-    return total > 0 ? 360 / total : 360;
+function lugarCarrCalcularVisiveis() {
+    var vp = document.getElementById('lugares-viewport');
+    if (!vp) return 3;
+    var w = vp.offsetWidth;
+    if (w < 480) return 1;
+    return Math.max(1, Math.floor(w / (300 + 20)));
 }
 
-function lc360AplicarRotacao() {
-    if (isMobileView()) return;
-    var track = document.getElementById('lc360-track');
+function lugarCarrAtualizar() {
+    var track   = document.getElementById('lugares-track');
+    var btnPrev = document.getElementById('lugares-prev');
+    var btnNext = document.getElementById('lugares-next');
+    var dotsEl  = document.getElementById('lugares-dots');
     if (!track) return;
-    var step  = lc360AnglePorItem(lc360Total);
-    var angle = -lc360Index * step;
-    track.style.transform = 'rotateY(' + angle + 'deg)';
 
-    var lista = lugarFiltroAtivo === 'todos'
-        ? LUGARES
-        : LUGARES.filter(function(l) { return l.tipo === lugarFiltroAtivo; });
+    var cardW = 300 + 20;
+    track.style.transform = 'translateX(-' + (lugarCarrIndex * cardW) + 'px)';
 
-    lista.forEach(function(lugar, i) {
-        var card = document.getElementById('lc360-card-' + lugar.id);
-        if (card) card.classList.toggle('is-active', i === lc360Index);
-    });
+    if (btnPrev) btnPrev.disabled = lugarCarrIndex === 0;
+    if (btnNext) btnNext.disabled = lugarCarrIndex >= lugarCarrTotal - lugarCarrVisiveis;
 
-    document.querySelectorAll('.lugares-dot').forEach(function(d, i) {
-        d.classList.toggle('active', i === lc360Index);
-    });
+    if (dotsEl) {
+        dotsEl.innerHTML = '';
+        var numDots = Math.max(1, lugarCarrTotal - lugarCarrVisiveis + 1);
+        for (var i = 0; i < numDots; i++) {
+            var d = document.createElement('button');
+            d.className = 'lugares-dot' + (i === lugarCarrIndex ? ' active' : '');
+            d.setAttribute('aria-label', 'Item ' + (i + 1));
+            d.onclick = (function(idx) {
+                return function() { lugarCarrIndex = idx; lugarCarrAtualizar(); };
+            })(i);
+            dotsEl.appendChild(d);
+        }
+    }
 }
 
 function lc360Mover(dir) {
-    lc360Index = (lc360Index + dir + lc360Total) % lc360Total;
-    lc360AplicarRotacao();
+    var max = Math.max(0, lugarCarrTotal - lugarCarrVisiveis);
+    lugarCarrIndex = Math.min(max, Math.max(0, lugarCarrIndex + dir));
+    lugarCarrAtualizar();
 }
 
 function lc360Ir(index) {
-    lc360Index = index;
-    lc360AplicarRotacao();
+    lugarCarrIndex = index;
+    lugarCarrAtualizar();
 }
 
-function lc360Selecionar(lugarId, index) {
-    if (!isMobileView()) {
-        lc360Index = index;
-        lc360AplicarRotacao();
-    }
+function lc360Selecionar(lugarId) {
     abrirModalLugar(lugarId);
     selecionarLugar(lugarId);
 }
 
-function initLc360Drag() {
-    var outer = document.getElementById('lc360-outer');
-    if (!outer || outer._dragInit) return;
-    outer._dragInit = true;
-    if (isMobileView()) return;
+function initLugarDrag() {
+    var vp = document.getElementById('lugares-viewport');
+    if (!vp || vp._dragInit) return;
+    vp._dragInit = true;
 
-    var startX = 0;
+    var startX = 0, isDragging = false;
 
     var onStart = function(e) {
-        lc360IsDrag = true;
+        isDragging = true;
         startX = e.touches ? e.touches[0].clientX : e.clientX;
+        vp.classList.add('dragging');
     };
     var onEnd = function(e) {
-        if (!lc360IsDrag) return;
-        lc360IsDrag = false;
+        if (!isDragging) return;
+        isDragging = false;
+        vp.classList.remove('dragging');
         var endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
         var diff = startX - endX;
-        if (Math.abs(diff) > 30) lc360Mover(diff > 0 ? 1 : -1);
+        if (Math.abs(diff) > 50) lc360Mover(diff > 0 ? 1 : -1);
     };
 
-    outer.addEventListener('mousedown', onStart);
-    outer.addEventListener('mouseup',   onEnd);
+    vp.addEventListener('mousedown',  onStart);
+    vp.addEventListener('touchstart', onStart, { passive: true });
+    vp.addEventListener('mouseup',    onEnd);
+    vp.addEventListener('touchend',   onEnd);
 }
 
 // ==========================================
@@ -1010,85 +1017,60 @@ function renderLugarCards() {
 
     if (!lista.length) {
         grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">' + t('vazio') + '</div>';
-        lc360Total = 0;
+        lugarCarrTotal = 0;
         return;
     }
 
-    lc360Total = lista.length;
-    lc360Index = 0;
-
-    var step   = lc360AnglePorItem(lc360Total);
-    var radius = Math.max(280, Math.round(165 / Math.tan(Math.PI / Math.max(lc360Total, 2))));
+    lugarCarrTotal    = lista.length;
+    lugarCarrIndex    = 0;
+    lugarCarrVisiveis = lugarCarrCalcularVisiveis();
 
     var cardsHTML = '';
     for (var i = 0; i < lista.length; i++) {
-        var lugar    = lista[i];
-        var nome     = lugar.nome[idiomaAtual] || lugar.nome['pt'];
-        var desc     = lugar.desc[idiomaAtual] || lugar.desc['pt'];
-        var dist     = lugar.dist[idiomaAtual] || lugar.dist['pt'];
-        var horario  = lugar.horario[idiomaAtual] || lugar.horario['pt'];
-        var tipoLabel= lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
-        var angDeg   = i * step;
-        var horHTML  = horario ? '<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px;">🕐 ' + horario + '</div>' : '';
+        var lugar     = lista[i];
+        var nome      = lugar.nome[idiomaAtual] || lugar.nome['pt'];
+        var desc      = lugar.desc[idiomaAtual] || lugar.desc['pt'];
+        var dist      = lugar.dist[idiomaAtual] || lugar.dist['pt'];
+        var horario   = lugar.horario[idiomaAtual] || lugar.horario['pt'];
+        var tipoLabel = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
+        var horHTML   = horario ? '<div class="lugar-horario-txt">🕐 ' + horario + '</div>' : '';
 
         cardsHTML +=
-            '<div class="lugar-card-3d ' + (i === 0 ? 'is-active' : '') + '"' +
-            ' id="lc360-card-' + lugar.id + '"' +
-            ' style="transform: rotateY(' + angDeg + 'deg) translateZ(' + radius + 'px);"' +
-            ' onclick="lc360Selecionar(' + lugar.id + ', ' + i + ')"' +
+            '<div class="lugar-card"' +
+            ' onclick="lc360Selecionar(' + lugar.id + ')"' +
             ' role="button" tabindex="0" aria-label="' + nome + '">' +
                 '<div class="lugar-tipo-badge">' + lugar.emoji + ' ' + tipoLabel + '</div>' +
                 '<div class="lugar-nome">' + nome + '</div>' +
-                '<div class="lugar-info-desc">' + desc + '</div>' +
+                '<div class="lugar-info-desc">' + (desc || '') + '</div>' +
                 horHTML +
                 '<div class="lugar-meta">' +
                     '<span class="lugar-estrelas">' + lugar.estrelas + '</span>' +
-                    '<span class="lugar-distancia">🚶 ' + dist + '</span>' +
+                    '<span>🚶 ' + (dist || '') + '</span>' +
                 '</div>' +
-                '<a class="lugar-card-link" href="' + lugar.mapaLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ' + t('mapa_abrir') + '</a>' +
+                (lugar.mapaLink ? '<a class="lugar-card-link" href="' + lugar.mapaLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ' + t('mapa_abrir') + '</a>' : '') +
             '</div>';
     }
 
-    var dotsHTML = '';
-    for (var j = 0; j < lista.length; j++) {
-        dotsHTML += '<button class="lugares-dot ' + (j === 0 ? 'active' : '') + '" onclick="lc360Ir(' + j + ')" aria-label="Item ' + (j + 1) + '"></button>';
-    }
-
     grid.innerHTML =
-        '<div class="lugares-carousel-outer" id="lc360-outer">' +
-            '<button class="lugares-nav-btn prev" onclick="lc360Mover(-1)" aria-label="Anterior">&#x2039;</button>' +
-            '<button class="lugares-nav-btn next" onclick="lc360Mover(1)"  aria-label="Próximo">&#x203a;</button>' +
-            '<div class="lugares-carousel-track-wrap">' +
-                '<div class="lugares-carousel-track" id="lc360-track" style="transform: rotateY(0deg);">' +
+        '<div class="lugares-carrossel-wrapper">' +
+            '<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" aria-label="Anterior" disabled>&#x2039;</button>' +
+            '<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)"  aria-label="Próximo">&#x203a;</button>' +
+            '<div class="lugares-viewport" id="lugares-viewport">' +
+                '<div class="lugares-track" id="lugares-track">' +
                     cardsHTML +
                 '</div>' +
             '</div>' +
-            '<div class="lugares-dots" id="lc360-dots">' + dotsHTML + '</div>' +
-            '<div class="lugares-hint" id="lc360-hint">← ' + t('explorar') + ' →</div>' +
+            '<div class="lugares-dots" id="lugares-dots"></div>' +
         '</div>';
 
-    initLc360Drag();
+    lugarCarrVisiveis = lugarCarrCalcularVisiveis();
+    lugarCarrAtualizar();
+    initLugarDrag();
 
-    if (isMobileView()) {
-        clearInterval(lc360Timer);
-        var track = document.getElementById('lc360-track');
-        if (track) {
-            track.addEventListener('scroll', function() {
-                var cards     = track.querySelectorAll('.lugar-card-3d');
-                var trackRect = track.getBoundingClientRect();
-                var closest = 0, minDist = Infinity;
-                cards.forEach(function(card, i) {
-                    var rect = card.getBoundingClientRect();
-                    var dist = Math.abs(rect.left + rect.width / 2 - (trackRect.left + trackRect.width / 2));
-                    if (dist < minDist) { minDist = dist; closest = i; }
-                });
-                lc360Index = closest;
-                document.querySelectorAll('.lugares-dot').forEach(function(d, i) {
-                    d.classList.toggle('active', i === closest);
-                });
-            }, { passive: true });
-        }
-    }
+    window.addEventListener('resize', function() {
+        lugarCarrVisiveis = lugarCarrCalcularVisiveis();
+        lugarCarrAtualizar();
+    });
 }
 
 // ==========================================
@@ -1101,7 +1083,6 @@ function atualizarTextosMapa() {
     var btnTodos = document.getElementById('filtro-todos');
     var btnRest  = document.getElementById('filtro-restaurante');
     var btnShop  = document.getElementById('filtro-shopping');
-    var hintEl   = document.getElementById('lc360-hint');
 
     if (labelEl)  labelEl.innerText  = t('mapa_label');
     if (tituloEl) tituloEl.innerText = t('mapa_titulo');
@@ -1109,7 +1090,6 @@ function atualizarTextosMapa() {
     if (btnTodos) btnTodos.innerText = t('mapa_todos');
     if (btnRest)  btnRest.innerText  = t('mapa_restaurantes');
     if (btnShop)  btnShop.innerText  = t('mapa_compras');
-    if (hintEl)   hintEl.textContent = '← ' + t('explorar') + ' →';
 
     if (document.getElementById('mapa-cards-grid')) {
         renderLugarCards();
