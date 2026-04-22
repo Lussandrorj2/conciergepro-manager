@@ -475,6 +475,7 @@ body {
     position: relative;
     box-shadow: var(--shadow-modal);
     animation: slideUp 0.3s ease;
+    -webkit-overflow-scrolling: touch;
 }
 
 @keyframes slideUp {
@@ -703,6 +704,7 @@ body {
     animation: slideUp 0.3s ease;
     max-height: 90vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-close {
@@ -1162,53 +1164,203 @@ body {
 }
 
 /* ==========================================
-   RESPONSIVO
+   RESPONSIVO — ESTILO APP NATIVO
    ========================================== */
 @media (max-width: 768px) {
-    .hero-content { padding: 80px 24px 60px; }
-    .section { padding: 48px 16px; }
 
-    .section-head { flex-direction: column; align-items: flex-start; }
+    /* --- layout geral --- */
+    .hero-content { padding: 80px 20px 56px; }
+    .section      { padding: 40px 16px; }
+    .section-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .mapa-section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+    #mapa-container { height: 260px; border-radius: 12px; }
 
-    .mapa-section-head { flex-direction: column; align-items: flex-start; }
-    #mapa-container { height: 280px; }
+    /* --- carrossel passeios --- */
+    .carr-prev { left: 4px; }
+    .carr-next { right: 4px; }
+    .carr-btn  { width: 36px; height: 36px; font-size: 18px; }
+    .card-passeio { flex: 0 0 82vw; }
 
-    .carr-prev { left: -12px; }
-    .carr-next { right: -12px; }
+    /* --- overlay mobile: escurece e empurra sheet para cima --- */
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+        background: rgba(0,0,0,0.55);
+    }
 
-    .card-passeio { flex: 0 0 85vw; }
-
+    /* -------------------------------------------------------
+       BOTTOM SHEET — detalhe do passeio
+    ------------------------------------------------------- */
     .modal-detalhe {
-        border-radius: 16px 16px 0 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        max-height: 90vh;
+        width: 100%;
+        max-width: 100%;
+        max-height: 92svh;
         margin: 0;
-        border-radius: 20px 20px 0 0;
+        border-radius: 24px 24px 0 0;
+        animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+        /* alça de drag no topo */
+        padding-top: 4px;
     }
 
+    .modal-detalhe::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: #d1d5db;
+        border-radius: 2px;
+        margin: 8px auto 0;
+    }
+
+    .det-foto-wrap {
+        height: 240px;
+        border-radius: 0;           /* sem radius: sheet já tem no topo */
+    }
+
+    .modal-close-det {
+        top: 20px;
+        right: 16px;
+        background: rgba(0,0,0,0.45);
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .det-body { padding: 20px 20px 40px; }
+
+    .det-nome { font-size: 22px; }
+
+    .det-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .btn-reservar-det {
+        width: 100%;
+        text-align: center;
+        padding: 16px;
+        font-size: 16px;
+    }
+
+    /* -------------------------------------------------------
+       BOTTOM SHEET — formulário de reserva
+    ------------------------------------------------------- */
     .modal-reserva {
-        border-radius: 20px 20px 0 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        max-height: 90vh;
-        padding: 28px 20px 32px;
+        width: 100%;
+        max-width: 100%;
+        max-height: 94svh;
+        margin: 0;
+        border-radius: 24px 24px 0 0;
+        padding: 0 0 env(safe-area-inset-bottom, 24px);
+        animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+        display: flex;
+        flex-direction: column;
     }
 
-    .form-row { grid-template-columns: 1fr; }
+    /* alça no topo da reserva */
+    .modal-reserva::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: #d1d5db;
+        border-radius: 2px;
+        margin: 10px auto 0;
+        flex-shrink: 0;
+    }
 
-    .det-foto-wrap { height: 220px; }
-    .det-body { padding: 20px 20px 28px; }
+    /* área scrollável dentro da reserva */
+    .modal-reserva > *:not(:first-child) {
+        /* deixa o pseudo-element ocupar espaço sem afetar filhos */
+    }
 
-    .lugares-carousel-outer { min-height: 180px; }
+    /* cabeçalho da reserva fixo */
+    .modal-reserva .btn-voltar-det,
+    .modal-reserva .modal-eyebrow,
+    .modal-reserva .modal-title,
+    .modal-reserva .modal-aviso-wpp {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .modal-reserva .btn-voltar-det { padding-top: 16px; margin-bottom: 12px; }
+    .modal-reserva .modal-title    { font-size: 18px; margin-bottom: 14px; }
+
+    /* scroll interno */
+    .modal-reserva .form-row,
+    .modal-reserva .form-group,
+    .modal-reserva .modal-resumo,
+    .modal-reserva .btn-confirmar {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .modal-reserva .btn-confirmar {
+        margin-bottom: 20px;
+        padding: 16px;
+        font-size: 16px;
+        border-radius: 14px;
+    }
+
+    /* campos empilhados */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+
+    .form-group input {
+        padding: 14px 14px;
+        font-size: 16px;      /* evita zoom automático no iOS */
+        border-radius: 12px;
+        background: #f8f9fb;
+        border-color: #e9ecef;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    /* resumo */
+    .modal-resumo {
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+
+    /* modal de lugar */
+    .modal-detalhe[style*="max-width:500px"],
+    .modal-overlay #modalLugar .modal-detalhe {
+        border-radius: 24px 24px 0 0;
+        max-height: 80svh;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* filtros mapa */
+    .filtros-mapa {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+    .filtros-mapa::-webkit-scrollbar { display: none; }
+    .filtro-mapa-btn { flex-shrink: 0; font-size: 12px; padding: 7px 14px; }
+
+    /* lugares */
+    .lugar-card { flex: 0 0 80vw; }
+    .lugares-nav-btn { display: none; }
+
+    /* modal close no lugar */
+    .modal-close { top: 14px; right: 14px; }
+}
+
+/* animação bottom sheet */
+@keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
 }
 
 @media (max-width: 480px) {
     .lang-bar { top: 12px; right: 12px; }
-    .filtros-mapa { gap: 6px; }
-    .filtro-mapa-btn { padding: 6px 12px; font-size: 11px; }
+    #txt-hero-title { font-size: clamp(28px, 9vw, 40px); }
 }
