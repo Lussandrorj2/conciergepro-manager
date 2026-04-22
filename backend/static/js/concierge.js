@@ -869,10 +869,21 @@ if (document.getElementById('mapa-cards-grid')) renderLugarCards();
 // INIT
 // ==========================================
 document.addEventListener('DOMContentLoaded', async function() {
-document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.lang===idiomaAtual); });
-await carregarHotel(idiomaAtual);
-await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.lang === idiomaAtual);
+    });
+    try {
+        await carregarHotel(idiomaAtual);
+    } catch(e) {
+        console.error('carregarHotel falhou:', e);
+    }
+    try {
+        await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
+    } catch(e) {
+        console.error('carregarPasseios/initMapa falhou:', e);
+    }
 });
+
 
 // EXPORTS
 window.trocarIdioma=trocarIdioma; window.abrirModal=abrirModal; window.abrirDetalhe=abrirDetalhe;
