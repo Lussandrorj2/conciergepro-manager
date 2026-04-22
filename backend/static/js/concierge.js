@@ -297,7 +297,7 @@ async function carregarPasseios(lang) {
     
     
     if (!hotelSlug) {
-        track.innerHTML = '<div class='estado-vazio'><span class='icon'>&#127958;</span><p>' + t('vazio') + '</p></div>';
+        track.innerHTML = "<div class='estado-vazio'><span class='icon'>&#127958;</span><p>" + t('vazio') + "</p></div>";
         return;
     }
     
