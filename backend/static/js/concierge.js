@@ -712,27 +712,33 @@ function initLugarDrag() {
 }
 
 function renderLugarCards() {
-    var grid = document.getElementById('mapa-cards-grid');
-    if (!grid) return;
-    var L_ = MAPA_LABELS[idiomaAtual]||MAPA_LABELS['pt'];
-    var lista = lugarFiltroAtivo==='todos' ? LUGARES : LUGARES.filter(function(l){return l.tipo===lugarFiltroAtivo;});
-    if (!lista.length) { grid.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">'+t('vazio')+'</div>'; lugarCarrTotal=0; return; }
-    lugarCarrTotal=lista.length; lugarCarrIndex=0; lugarCarrVisiveis=lugarCarrCalcularVisiveis();
+    // DEPOIS — substitua por:
     var cardsHTML = lista.map(function(lugar){
         var nome=lugar.nome[idiomaAtual]||lugar.nome['pt'];
         var desc=lugar.desc[idiomaAtual]||lugar.desc['pt'];
         var dist=lugar.dist[idiomaAtual]||lugar.dist['pt'];
         var hor=lugar.horario[idiomaAtual]||lugar.horario['pt'];
         var tl=lugar.tipo==='restaurante'?L_.restaurante:L_.shopping;
-        return '<div class="lugar-card" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">'+
-            '<div class="lugar-tipo-badge">'+lugar.emoji+' '+tl+'</div>'+
-            '<div class="lugar-nome">'+nome+'</div>'+
-            '<div class="lugar-info-desc">'+(desc||'')+'</div>'+
-            (hor?'<div class="lugar-horario-txt">🕐 '+hor+'</div>':'')+
-            '<div class="lugar-meta"><span class="lugar-estrelas">'+lugar.estrelas+'</span><span>🚶 '+(dist||'')+'</span></div>'+
-            (lugar.mapaLink?'<a class="lugar-card-link" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ '+t('mapa_abrir')+'</a>':'')+
+        // Estrelas visuais (converte "★★★★☆" em HTML colorido)
+        var starsHTML = (lugar.estrelas||'').replace(/★/g,'<span class="star filled">★</span>').replace(/☆/g,'<span class="star empty">☆</span>');
+        return '<div class="lugar-card-v2" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">'+
+            '<div class="lc2-header">'+
+                '<div class="lc2-badge">'+lugar.emoji+' '+tl+'</div>'+
+                (lugar.mapaLink?'<a class="lc2-maps-btn" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver no Google Maps">↗</a>':'')+
+            '</div>'+
+            '<div class="lc2-nome">'+nome+'</div>'+
+            '<div class="lc2-desc">'+(desc||'')+'</div>'+
+            '<div class="lc2-divider"></div>'+
+            '<div class="lc2-footer">'+
+                '<div class="lc2-meta-col">'+
+                    '<div class="lc2-stars">'+starsHTML+'</div>'+
+                    (hor?'<div class="lc2-horario">🕐 '+hor+'</div>':'')+
+                '</div>'+
+                (dist?'<div class="lc2-dist"><span class="lc2-dist-icon">🚶</span><span>'+dist+'</span></div>':'')+
+            '</div>'+
         '</div>';
     }).join('');
+
     grid.innerHTML = '<div class="lugares-carrossel-wrapper">'+
         '<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" disabled>&#x2039;</button>'+
         '<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)">&#x203a;</button>'+
