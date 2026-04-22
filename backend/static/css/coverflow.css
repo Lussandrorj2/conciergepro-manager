@@ -1,228 +1,282 @@
 /* ==========================================
-   COVERFLOW CAROUSEL — POSITION ABSOLUTE
-   ========================================== */
+COVERFLOW CAROUSEL — POSITION ABSOLUTE
+Cards centralizados, transform 3D via JS
+========================================== */
 
+/* Viewport com perspectiva */
 #passeios {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    cursor: grab;
-    padding: 24px 0 40px;
-    perspective: 1100px;
-    perspective-origin: 50% 40%;
-    -webkit-perspective: 1100px;
+overflow: hidden;
+position: relative;
+cursor: grab;
+padding: 24px 0 40px;
+perspective: 900px;
+perspective-origin: 50% 40%;
+-webkit-perspective: 900px;
 }
 
 #passeios.dragging { cursor: grabbing; }
 
+/* Track vira container relativo, sem flex */
 #passeios-track {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 490px;
-    overflow: visible;
+display: block !important;
+position: relative;
+height: 490px;
+transform: none !important;
+transition: none !important;
 }
 
+/* ==========================================
+CARD — absolute, centrado
+========================================== */
 .card-passeio {
-    position: absolute !important;
-    top: 0;
-    left: 50%;
-    width: 280px;
-    margin: 0 !important;
-    flex: none !important;
-    background: var(--white);
-    border: 1px solid var(--gold-dim);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(15,23,42,0.12);
-    transition:
-        transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-        box-shadow 0.5s ease,
-        opacity    0.5s ease,
-        filter     0.5s ease;
-    will-change: transform, opacity, filter;
-    transform-origin: center center;
-    transform-style: preserve-3d;
-    filter: brightness(0.72) saturate(0.55);
-    opacity: 0.68;
+position: absolute !important;
+top: 0;
+left: 50%;
+width: 280px;
+margin: 0 !important;
+flex: none !important;
+
+
+background: var(--white);
+border: 1px solid var(--gold-dim);
+border-radius: var(--radius-card);
+overflow: hidden;
+cursor: pointer;
+box-shadow: 0 8px 32px rgba(15,23,42,0.12);
+
+transition:
+    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.5s ease,
+    opacity    0.5s ease,
+    filter     0.5s ease;
+
+will-change: transform, opacity, filter;
+transform-origin: center center;
+transform-style: preserve-3d;
+
+filter: brightness(0.72) saturate(0.55);
+opacity: 0.68;
+
+
 }
 
 .card-passeio.coverflow-active {
-    filter: brightness(1) saturate(1) !important;
-    opacity: 1 !important;
-    box-shadow:
-        0 24px 60px rgba(181,132,58,0.28),
-        0 6px 20px rgba(15,23,42,0.14) !important;
-    border-color: rgba(181,132,58,0.45) !important;
+filter: brightness(1) saturate(1) !important;
+opacity: 1 !important;
+box-shadow:
+0 24px 60px rgba(181,132,58,0.28),
+0 6px 20px rgba(15,23,42,0.14) !important;
+border-color: rgba(181,132,58,0.45) !important;
 }
 
+/* –– imagem –– */
 .card-img {
-    height: 205px;
-    overflow: hidden;
-    position: relative;
-    background: #e2e8f0;
+height: 205px;
+overflow: hidden;
+position: relative;
+background: #e2e8f0;
 }
 
 .card-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    filter: none !important;
-    mix-blend-mode: normal !important;
-    opacity: 1 !important;
-    transition: transform 0.5s;
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+filter: none !important;
+mix-blend-mode: normal !important;
+opacity: 1 !important;
+transition: transform 0.5s;
 }
 
 .card-passeio.coverflow-active .card-img img {
-    transform: scale(1.04);
+transform: scale(1.04);
 }
 
 .card-img-empty {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 40px;
+background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
 }
 
 .card-img-hover {
-    position: absolute;
-    inset: 0;
-    background: rgba(181,132,58,0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
+position: absolute;
+inset: 0;
+background: rgba(181,132,58,0.55);
+display: flex;
+align-items: center;
+justify-content: center;
+opacity: 0;
+transition: opacity 0.3s;
+pointer-events: none;
 }
-
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 .card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
 
-.card-preco-badge { display: none !important; }
+.card-preco-badge {
+position: absolute;
+top: 12px;
+left: 12px;
+background: rgba(0,0,0,0.6);
+backdrop-filter: blur(6px);
+color: #fff;
+font-size: 12px;
+font-weight: 600;
+padding: 5px 12px;
+border-radius: 20px;
+z-index: 2;
+}
 
+/* –– corpo –– */
 .card-body { padding: 20px 22px 22px; }
 
 .card-nome {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    margin-bottom: 8px;
-    line-height: 1.3;
+font-family: ‘Playfair Display’, serif;
+font-size: 18px;
+margin-bottom: 8px;
+line-height: 1.3;
 }
 
 .card-desc {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 16px;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+font-size: 13px;
+color: var(–text-muted);
+margin-bottom: 16px;
+line-height: 1.5;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
 }
 
 .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 10px;
 }
 
 .card-preco {
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--gold);
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
+font-size: 19px;
+font-weight: 700;
+color: var(–gold);
+display: flex;
+flex-direction: column;
+line-height: 1.2;
 }
-.card-preco small { font-size:11px; font-weight:400; color:var(--text-muted); }
+.card-preco small { font-size:11px; font-weight:400; color:var(–text-muted); }
 
 .btn-reservar {
-    background: var(--gold);
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: background 0.2s;
+background: var(–gold);
+color: #fff;
+border: none;
+padding: 10px 18px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 13px;
+font-weight: 500;
+white-space: nowrap;
+transition: background 0.2s;
 }
-.btn-reservar:hover { background: var(--gold-light); }
+.btn-reservar:hover { background: var(–gold-light); }
 
+/* skeleton escondido no coverflow */
 .card-skeleton { display: none !important; }
 
+/* ==========================================
+BOTÕES NAV
+========================================== */
 .carrossel-wrapper { position: relative; }
 
 .carr-btn {
-    position: absolute;
-    top: calc(50% - 20px);
-    transform: translateY(-50%);
-    z-index: 30;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: none;
-    background: var(--white);
-    color: var(--gold);
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(15,23,42,0.14);
-    transition: background 0.2s, color 0.2s, opacity 0.2s;
+position: absolute;
+top: calc(50% - 20px);
+transform: translateY(-50%);
+z-index: 30;
+width: 44px;
+height: 44px;
+border-radius: 50%;
+border: none;
+background: var(–white);
+color: var(–gold);
+font-size: 22px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 4px 16px rgba(15,23,42,0.14);
+transition: background 0.2s, color 0.2s, opacity 0.2s;
 }
-.carr-btn:hover:not(:disabled) { background: var(--gold); color: #fff; }
-.carr-btn:disabled { opacity: 0.2; cursor: default; }
+.carr-btn:hover:not(:disabled) { background: var(–gold); color: #fff; }
+.carr-btn:disabled              { opacity: 0.2; cursor: default; }
 .carr-prev { left: 8px; }
 .carr-next { right: 8px; }
 
+/* ==========================================
+DOTS
+========================================== */
 .carr-dots {
-    display: flex;
-    justify-content: center;
-    gap: 7px;
-    margin-top: 8px;
+display: flex;
+justify-content: center;
+gap: 7px;
+margin-top: 8px;
 }
 
 .carr-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(181,132,58,0.25);
-    cursor: pointer;
-    transition: all 0.3s;
-    padding: 0;
+width: 7px; height: 7px;
+border-radius: 50%;
+border: none;
+background: rgba(181,132,58,0.25);
+cursor: pointer;
+transition: all 0.3s;
+padding: 0;
 }
 .carr-dot.active {
-    background: var(--gold);
-    width: 26px;
-    border-radius: 4px;
+background: var(–gold);
+width: 26px;
+border-radius: 4px;
 }
 
+/* ==========================================
+MOBILE ≤ 768px
+========================================== */
 @media (max-width: 768px) {
-    #passeios {
-        padding: 16px 0 28px;
-        perspective: 800px;
-        -webkit-perspective: 800px;
-    }
-    #passeios-track { height: 460px; }
-    .card-passeio { width: 74vw; max-width: 290px; }
-    .card-img  { height: 185px; }
-    .card-body { padding: 16px 18px 20px; }
-    .card-nome { font-size: 17px; }
-    .carr-btn  { display: none; }
+#passeios {
+padding: 16px 0 28px;
+perspective: 700px;
+-webkit-perspective: 700px;
+}
+
+
+#passeios-track { height: 460px; }
+
+.card-passeio {
+    width: 74vw;
+    max-width: 290px;
+}
+
+.card-img  { height: 185px; }
+.card-body { padding: 16px 18px 20px; }
+.card-nome { font-size: 17px; }
+
+/* nav escondido — usa swipe */
+.carr-btn  { display: none; }
+
+
 }
 
 @media (max-width: 480px) {
-    #passeios-track { height: 440px; }
-    .card-passeio { width: 80vw; max-width: 270px; }
-    .card-img { height: 170px; }
+#passeios-track { height: 440px; }
+
+
+.card-passeio {
+    width: 80vw;
+    max-width: 270px;
+}
+
+.card-img { height: 170px; }
+
+
 }
