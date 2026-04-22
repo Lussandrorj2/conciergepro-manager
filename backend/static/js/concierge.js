@@ -2,19 +2,19 @@
 // CONFIG GLOBAL
 // ==========================================
 function getImageUrl(img) {
-    if (!img) return "';
-    if (typeof img === "string') return img;
+    if (!img) return '';
+    if (typeof img === 'string') return img;
     if (img.url) return img.url;
-    return "';
+    return '';
 }
 
 var urlParams  = new URLSearchParams(window.location.search);
-var hotelSlug  = window.hotelSlug || urlParams.get("hotel');
-if (!hotelSlug) console.error("Hotel slug nao definido');
+var hotelSlug  = window.hotelSlug || urlParams.get('hotel');
+if (!hotelSlug) console.error('Hotel slug nao definido');
 
-var API_BASE      = "/api';
-var idiomaAtual   = localStorage.getItem("lang') || "pt';
-var whatsappAtual = "5521999999999';
+var API_BASE      = '/api';
+var idiomaAtual   = localStorage.getItem('lang') || 'pt';
+var whatsappAtual = '5521999999999';
 var passeioAtual  = null;
 var listaPasseios = [];
 var detFotoIndex  = 0;
@@ -22,75 +22,75 @@ var detFotos      = [];
 
 var i18n = {
     pt: {
-    btn: "Ver detalhes', vazio: "Nenhuma experiencia disponivel.', erro: "Erro ao carregar.',
-    explorar: "Explorar', secao_label: "Passeios', secao_titulo: "Experiencias disponiveis',
-    sob_consulta: "Sob consulta', por_pessoa: "/ pessoa', modal_eyebrow: "Interesse no Passeio',
-    det_eyebrow: "Experiencia', lbl_data: "Data desejada', lbl_horario: "Horario desejado',
-    lbl_nome: "Nome completo', lbl_tel: "Telefone', lbl_qtd: "Numero de pessoas',
-    resumo_passeio: "Passeio', resumo_qtd: "Pessoas', resumo_total: "Total estimado',
-    btn_confirmar: "Falar no WhatsApp', btn_reservar_det: "Reservar agora',
-    btn_voltar: "Voltar aos detalhes', sucesso: "Redirecionando para o WhatsApp!',
-    sem_imagem: "Sem imagem',
-    wpp_msg: function(n,p,q,d,h){ var m="Ola! Me chamo *'+n+'* e tenho interesse no passeio *'+p+'* para *'+q+' pessoa(s)*'; if(d) m+=', na data *'+d+'*'; if(h) m+=' as *'+h+'*'; m+='. Poderia confirmar a disponibilidade?'; return m; },
-    aviso_wpp: "Voce sera direcionado ao WhatsApp do hotel para confirmar sua reserva.',
-    campos_obrigatorios: "Por favor, preencha seu nome e telefone.',
-    mapa_label: "Nos arredores', mapa_titulo: "Restaurantes & Centros Comerciais',
-    mapa_todos: "Todos', mapa_restaurantes: "Restaurantes', mapa_compras: "Compras',
-    mapa_carregando: "Carregando mapa…', mapa_abrir: "Ver no Google Maps', mapa_ver: "Ver no mapa'
+    btn: 'Ver detalhes', vazio: 'Nenhuma experiencia disponivel.', erro: 'Erro ao carregar.',
+    explorar: 'Explorar', secao_label: 'Passeios', secao_titulo: 'Experiencias disponiveis',
+    sob_consulta: 'Sob consulta', por_pessoa: '/ pessoa', modal_eyebrow: 'Interesse no Passeio',
+    det_eyebrow: 'Experiencia', lbl_data: 'Data desejada', lbl_horario: 'Horario desejado',
+    lbl_nome: 'Nome completo', lbl_tel: 'Telefone', lbl_qtd: 'Numero de pessoas',
+    resumo_passeio: 'Passeio', resumo_qtd: 'Pessoas', resumo_total: 'Total estimado',
+    btn_confirmar: 'Falar no WhatsApp', btn_reservar_det: 'Reservar agora',
+    btn_voltar: 'Voltar aos detalhes', sucesso: 'Redirecionando para o WhatsApp!',
+    sem_imagem: 'Sem imagem',
+    wpp_msg: function(n,p,q,d,h){ var m=Ola! Me chamo *'+n+'* e tenho interesse no passeio *'+p+'* para *'+q+' pessoa(s)*'; if(d) m+=', na data *'+d+'*'; if(h) m+=' as *'+h+'*'; m+='. Poderia confirmar a disponibilidade?'; return m; },
+    aviso_wpp: 'Voce sera direcionado ao WhatsApp do hotel para confirmar sua reserva.',
+    campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
+    mapa_label: 'Nos arredores', mapa_titulo: 'Restaurantes & Centros Comerciais',
+    mapa_todos: 'Todos', mapa_restaurantes: 'Restaurantes', mapa_compras: 'Compras',
+    mapa_carregando: 'Carregando mapa…', mapa_abrir: 'Ver no Google Maps', mapa_ver: 'Ver no mapa'
     },
     en: {
-    btn: "See details', vazio: "No tours found.', erro: "Loading error.',
-    explorar: "Explore', secao_label: "Tours', secao_titulo: "Available experiences',
-    sob_consulta: "On request', por_pessoa: "/ person', modal_eyebrow: "Tour Inquiry',
-    det_eyebrow: "Experience', lbl_data: "Preferred date', lbl_horario: "Preferred time',
-    lbl_nome: "Full name', lbl_tel: "Phone', lbl_qtd: "Number of guests',
-    resumo_passeio: "Tour', resumo_qtd: "Guests', resumo_total: "Estimated total',
-    btn_confirmar: "Chat on WhatsApp', btn_reservar_det: "Book now',
-    btn_voltar: "Back to details', sucesso: "Redirecting to WhatsApp!', sem_imagem: "No image',
-    wpp_msg: function(n,p,q,d,h){ var m="Hello! My name is *'+n+”* and I'm interested in the tour *”+p+'* for *'+q+' guest(s)*'; if(d) m+=' on *'+d+'*'; if(h) m+=' at *'+h+'*'; m+='. Could you confirm availability?'; return m; },
-    aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.”,
-    campos_obrigatorios: "Please fill in your name and phone number.',
-    mapa_label: "Nearby', mapa_titulo: "Restaurants & Shopping',
-    mapa_todos: "All', mapa_restaurantes: "Restaurants', mapa_compras: "Shopping',
-    mapa_carregando: "Loading map…', mapa_abrir: "View on Google Maps', mapa_ver: "View on map'
+    btn: 'See details', vazio: "No tours found.', erro: 'Loading error.',
+    explorar: 'Explore', secao_label: 'Tours', secao_titulo: 'Available experiences',
+    sob_consulta: 'On request', por_pessoa: '/ person', modal_eyebrow: 'Tour Inquiry',
+    det_eyebrow: 'Experience', lbl_data: 'Preferred date', lbl_horario: 'Preferred time',
+    lbl_nome: 'Full name', lbl_tel: 'Phone', lbl_qtd: 'Number of guests',
+    resumo_passeio: 'Tour', resumo_qtd: 'Guests', resumo_total: 'Estimated total',
+    btn_confirmar: 'Chat on WhatsApp', btn_reservar_det: 'Book now',
+    btn_voltar: 'Back to details', sucesso: 'Redirecting to WhatsApp!', sem_imagem: 'No image',
+    wpp_msg: function(n,p,q,d,h){ var m='Hello! My name is *'+n+”* and I'm interested in the tour *”+p+'* for *'+q+' guest(s)*'; if(d) m+=' on *'+d+'*'; if(h) m+=' at *'+h+'*'; m+='. Could you confirm availability?'; return m; },
+    aviso_wpp: 'You will be redirected to the hotel's WhatsApp to confirm your booking.”,
+    campos_obrigatorios: 'Please fill in your name and phone number.',
+    mapa_label: 'Nearby', mapa_titulo: 'Restaurants & Shopping',
+    mapa_todos: 'All', mapa_restaurantes: 'Restaurants', mapa_compras: 'Shopping',
+    mapa_carregando: 'Loading map…', mapa_abrir: 'View on Google Maps', mapa_ver: 'View on map'
     },
     es: {
-    btn: "Ver detalles', vazio: "No se encontraron tours.', erro: "Error de carga.',
-    explorar: "Explorar', secao_label: "Paseos', secao_titulo: "Experiencias disponibles',
-    sob_consulta: "Bajo consulta', por_pessoa: "/ persona', modal_eyebrow: "Consulta de Paseo',
-    det_eyebrow: "Experiencia', lbl_data: "Fecha preferida', lbl_horario: "Hora preferida',
-    lbl_nome: "Nombre completo', lbl_tel: "Telefono', lbl_qtd: "Numero de personas',
-    resumo_passeio: "Paseo', resumo_qtd: "Personas', resumo_total: "Total estimado',
-    btn_confirmar: "Hablar en WhatsApp', btn_reservar_det: "Reservar ahora',
-    btn_voltar: "Volver a detalles', sucesso: "Redirigiendo al WhatsApp!', sem_imagem: "Sin imagen',
-    wpp_msg: function(n,p,q,d,h){ var m="Hola! Me llamo *'+n+'* y estoy interesado en el paseo *'+p+'* para *'+q+' persona(s)*'; if(d) m+=' en la fecha *'+d+'*'; if(h) m+=' a las *'+h+'*'; m+='. Podria confirmar disponibilidad?'; return m; },
-    aviso_wpp: "Sera redirigido al WhatsApp del hotel para confirmar su reserva.',
-    campos_obrigatorios: "Por favor, complete su nombre y telefono.',
-    mapa_label: "Alrededores', mapa_titulo: "Restaurantes & Centros Comerciales',
-    mapa_todos: "Todos', mapa_restaurantes: "Restaurantes', mapa_compras: "Compras',
-    mapa_carregando: "Cargando mapa…', mapa_abrir: "Ver en Google Maps', mapa_ver: "Ver en el mapa'
+    btn: 'Ver detalles', vazio: 'No se encontraron tours.', erro: 'Error de carga.',
+    explorar: 'Explorar', secao_label: 'Paseos', secao_titulo: 'Experiencias disponibles',
+    sob_consulta: 'Bajo consulta', por_pessoa: '/ persona', modal_eyebrow: 'Consulta de Paseo',
+    det_eyebrow: 'Experiencia', lbl_data: 'Fecha preferida', lbl_horario: 'Hora preferida',
+    lbl_nome: 'Nombre completo', lbl_tel: 'Telefono', lbl_qtd: 'Numero de personas',
+    resumo_passeio: 'Paseo', resumo_qtd: 'Personas', resumo_total: 'Total estimado',
+    btn_confirmar: 'Hablar en WhatsApp', btn_reservar_det: 'Reservar ahora',
+    btn_voltar: 'Volver a detalles', sucesso: 'Redirigiendo al WhatsApp!', sem_imagem: 'Sin imagen',
+    wpp_msg: function(n,p,q,d,h){ var m='Hola! Me llamo *'+n+'* y estoy interesado en el paseo *'+p+'* para *'+q+' persona(s)*'; if(d) m+=' en la fecha *'+d+'*'; if(h) m+=' a las *'+h+'*'; m+='. Podria confirmar disponibilidad?'; return m; },
+    aviso_wpp: 'Sera redirigido al WhatsApp del hotel para confirmar su reserva.',
+    campos_obrigatorios: 'Por favor, complete su nombre y telefono.',
+    mapa_label: 'Alrededores', mapa_titulo: 'Restaurantes & Centros Comerciales',
+    mapa_todos: 'Todos', mapa_restaurantes: 'Restaurantes', mapa_compras: 'Compras',
+    mapa_carregando: 'Cargando mapa…', mapa_abrir: 'Ver en Google Maps', mapa_ver: 'Ver en el mapa'
     },
     fr: {
-    btn: "Voir details', vazio: "Aucune visite trouvee.', erro: "Erreur de chargement.',
-    explorar: "Explorer', secao_label: "Visites', secao_titulo: "Experiences disponibles',
-    sob_consulta: "Sur demande', por_pessoa: "/ personne', modal_eyebrow: "Demande de Visite',
-    det_eyebrow: "Experience', lbl_data: "Date souhaitee', lbl_horario: "Heure souhaitee',
-    lbl_nome: "Nom complet', lbl_tel: "Telephone', lbl_qtd: "Nombre de personnes',
-    resumo_passeio: "Visite', resumo_qtd: "Personnes', resumo_total: "Total estime',
-    btn_confirmar: "Contacter sur WhatsApp', btn_reservar_det: "Reserver maintenant',
-    btn_voltar: "Retour aux details', sucesso: "Redirection vers WhatsApp!', sem_imagem: "Sans image',
-    wpp_msg: function(n,p,q,d,h){ var m="Bonjour ! Je m'appelle *”+n+”* et je suis interesse par la visite *”+p+'* pour *'+q+' personne(s)*'; if(d) m+=' a la date *'+d+'*'; if(h) m+=' a *'+h+'*'; m+='. Pourriez-vous confirmer la disponibilite ?'; return m; },
-    aviso_wpp: "Vous serez redirige vers le WhatsApp de l'hotel pour confirmer votre reservation.”,
-    campos_obrigatorios: "Veuillez remplir votre nom et numero de telephone.',
-    mapa_label: "Aux alentours', mapa_titulo: "Restaurants & Centres Commerciaux',
-    mapa_todos: "Tous', mapa_restaurantes: "Restaurants', mapa_compras: "Shopping',
-    mapa_carregando: "Chargement de la carte…', mapa_abrir: "Voir sur Google Maps', mapa_ver: "Voir sur la carte'
+    btn: 'Voir details', vazio: 'Aucune visite trouvee.', erro: 'Erreur de chargement.',
+    explorar: 'Explorer', secao_label: 'Visites', secao_titulo: 'Experiences disponibles',
+    sob_consulta: 'Sur demande', por_pessoa: '/ personne', modal_eyebrow: 'Demande de Visite',
+    det_eyebrow: 'Experience', lbl_data: 'Date souhaitee', lbl_horario: 'Heure souhaitee',
+    lbl_nome: 'Nom complet', lbl_tel: 'Telephone', lbl_qtd: 'Nombre de personnes',
+    resumo_passeio: 'Visite', resumo_qtd: 'Personnes', resumo_total: 'Total estime',
+    btn_confirmar: 'Contacter sur WhatsApp', btn_reservar_det: 'Reserver maintenant',
+    btn_voltar: 'Retour aux details', sucesso: 'Redirection vers WhatsApp!', sem_imagem: 'Sans image',
+    wpp_msg: function(n,p,q,d,h){ var m='Bonjour ! Je m'appelle *”+n+”* et je suis interesse par la visite *”+p+'* pour *'+q+' personne(s)*'; if(d) m+=' a la date *'+d+'*'; if(h) m+=' a *'+h+'*'; m+='. Pourriez-vous confirmer la disponibilite ?'; return m; },
+    aviso_wpp: 'Vous serez redirige vers le WhatsApp de l'hotel pour confirmer votre reservation.”,
+    campos_obrigatorios: 'Veuillez remplir votre nom et numero de telephone.',
+    mapa_label: 'Aux alentours', mapa_titulo: 'Restaurants & Centres Commerciaux',
+    mapa_todos: 'Tous', mapa_restaurantes: 'Restaurants', mapa_compras: 'Shopping',
+    mapa_carregando: 'Chargement de la carte…', mapa_abrir: 'Voir sur Google Maps', mapa_ver: 'Voir sur la carte'
     }
 };
 
 function t(key) {
-    var lang = i18n[idiomaAtual] || i18n["pt'];
-    return lang[key] !== undefined ? lang[key] : (i18n["pt'][key] || key);
+    var lang = i18n[idiomaAtual] || i18n['pt'];
+    return lang[key] !== undefined ? lang[key] : (i18n['pt'][key] || key);
 }
 
 // ==========================================
@@ -99,21 +99,21 @@ function t(key) {
 async function carregarHotel(lang) {
     if (!hotelSlug) return;
     try {
-        var res = await fetch(API_BASE + "/hotel/' + hotelSlug + "/?lang=' + lang);
+        var res = await fetch(API_BASE + '/hotel/' + hotelSlug + '/?lang=' + lang);
         if (!res.ok) return;
         var data = await res.json();
         if (data.whatsapp) {
             whatsappAtual = data.whatsapp;
-            var wl = document.getElementById("wpp-main');
-            if (wl) wl.href = "https://wa.me/' + data.whatsapp;
+            var wl = document.getElementById('wpp-main');
+            if (wl) wl.href = 'https://wa.me/' + data.whatsapp;
         }
-        var bg = document.getElementById("hero-bg');
+        var bg = document.getElementById('hero-bg');
         if (bg && data.foto_capa) {
-            bg.style.backgroundImage = "url('” + data.foto_capa + "')”;
-            bg.style.opacity = "1';
+            bg.style.backgroundImage = 'url('” + data.foto_capa + '')”;
+            bg.style.opacity = '1';
         }
-        var t1 = document.getElementById("txt-hero-title');
-        var t2 = document.getElementById("txt-hero-subtitle');
+        var t1 = document.getElementById('txt-hero-title');
+        var t2 = document.getElementById('txt-hero-subtitle');
         if (t1 && data.titulo_hero)    t1.innerText = data.titulo_hero;
         if (t2 && data.subtitulo_hero) t2.innerText = data.subtitulo_hero;
         if (data.mapa_embed) MAPA_GERAL_SRC = data.mapa_embed;
@@ -146,10 +146,10 @@ function coverflowGetConfig() {
 }
 
 function coverflowAtualizar() {
-    var track   = document.getElementById("passeios-track');
-    var btnPrev = document.getElementById("carr-prev');
-    var btnNext = document.getElementById("carr-next');
-    var dotsEl  = document.getElementById("carr-dots');
+    var track   = document.getElementById('passeios-track');
+    var btnPrev = document.getElementById('carr-prev');
+    var btnNext = document.getElementById('carr-next');
+    var dotsEl  = document.getElementById('carr-dots');
     if (!track) return;
 
 
@@ -229,7 +229,7 @@ function coverflowIr(idx) {
 }
 
 function initCarrosselDrag() {
-    var el = document.getElementById("passeios');
+    var el = document.getElementById('passeios');
     if (!el || el._dragInit) return;
     el._dragInit = true;
     
@@ -282,22 +282,22 @@ function initCarrosselDrag() {
     
 }
     
-document.addEventListener("keydown', function(e) {
+document.addEventListener('keydown', function(e) {
     if (document.querySelector('.modal-overlay.open')) return;
-    if (e.key === "ArrowLeft')  carrosselMover(-1);
-    if (e.key === "ArrowRight') carrosselMover(1);
+    if (e.key === 'ArrowLeft')  carrosselMover(-1);
+    if (e.key === 'ArrowRight') carrosselMover(1);
 });
 
 // ==========================================
 // PASSEIOS
 // ==========================================
 async function carregarPasseios(lang) {
-    var track = document.getElementById("passeios-track');
+    var track = document.getElementById('passeios-track');
     if (!track) return;
     
     
     if (!hotelSlug) {
-        track.innerHTML = '<div class="estado-vazio"><span class="icon">&#127958;</span><p>' + t('vazio') + '</p></div>';
+        track.innerHTML = '<div class='estado-vazio'><span class='icon'>&#127958;</span><p>' + t('vazio') + '</p></div>';
         return;
     }
     
@@ -310,7 +310,7 @@ async function carregarPasseios(lang) {
         if (countEl) countEl.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
     
         if (!listaPasseios.length) {
-            track.innerHTML = '<div class="estado-vazio"><span class="icon">&#127958;</span><p>' + t('vazio') + '</p></div>';
+            track.innerHTML = '<div class='estado-vazio'><span class='icon'>&#127958;</span><p>' + t('vazio') + '</p></div>';
             return;
         }
     
@@ -327,7 +327,7 @@ async function carregarPasseios(lang) {
     
     } catch(e) {
         console.error('[carregarPasseios]', e);
-        track.innerHTML = '<div class="estado-erro"><span class="icon">&#9888;</span><p>' + t('erro') + '</p></div>';
+        track.innerHTML = '<div class='estado-erro'><span class='icon'>&#9888;</span><p>' + t('erro') + '</p></div>';
     }
 }
 
@@ -348,7 +348,7 @@ function renderCard(p) {
     var imgSrc = getImageUrl(p.banner || p.imagem || p.foto || p.foto_capa || p.image || primeiraFoto);
 
     var imgHTML = imgSrc
-        ? '<img src="' + imgSrc + '" alt="' + escapeHTML(p.nome) + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'card-img-empty\\\'>&#127754;</div>\'">'
+        ? '<img src='' + imgSrc + '' alt='' + escapeHTML(p.nome) + '' loading='lazy' onerror="this.parentElement.innerHTML=\'<div class=\\\'card-img-empty\\\'>&#127754;</div>\'">'
         : '<div class="card-img-empty">🌊</div>';
 
     var precoSubHTML = precoSub ? '<small>' + precoSub + '</small>' : '';
