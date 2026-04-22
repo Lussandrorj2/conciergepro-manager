@@ -31,7 +31,7 @@ var i18n = {
     btn_confirmar: 'Falar no WhatsApp', btn_reservar_det: 'Reservar agora',
     btn_voltar: 'Voltar aos detalhes', sucesso: 'Redirecionando para o WhatsApp!',
     sem_imagem: 'Sem imagem',
-    wpp_msg: function(n,p,q,d,h){ var m=Ola! Me chamo *'+n+'* e tenho interesse no passeio *'+p+'* para *'+q+' pessoa(s)*'; if(d) m+=', na data *'+d+'*'; if(h) m+=' as *'+h+'*'; m+='. Poderia confirmar a disponibilidade?'; return m; },
+    wpp_msg: function(n,p,q,d,h){ var m='Ola! Me chamo *'+n+'* e tenho interesse no passeio *'+p+'* para *'+q+' pessoa(s)*'; if(d) m+=', na data *'+d+'*'; if(h) m+=' as *'+h+'*'; m+='. Poderia confirmar a disponibilidade?'; return m; },
     aviso_wpp: 'Voce sera direcionado ao WhatsApp do hotel para confirmar sua reserva.',
     campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
     mapa_label: 'Nos arredores', mapa_titulo: 'Restaurantes & Centros Comerciais',
