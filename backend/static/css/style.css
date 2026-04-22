@@ -1178,9 +1178,10 @@ body {
 }
 
 /* ==========================================
-   RESPONSIVO MOBILE — SUBSTITUA O BLOCO
-   @media (max-width: 768px) INTEIRO por este
+   SUBSTITUA TODO O BLOCO @media (max-width: 768px)
+   e os blocos abaixo dele até o fim do arquivo
    ========================================== */
+
 @media (max-width: 768px) {
 
     /* --- layout geral --- */
@@ -1206,116 +1207,154 @@ body {
     .card-nome     { font-size: 18px; }
 
     /* -------------------------------------------------------
-       OVERLAY — fundo escuro, centralizado verticalmente
-       para o card flutuar igual ao modelo de referência
+       OVERLAY — centralizado, card flutua no meio
+       Igual ao modelo Vercel (imagens 3 e 4 de referência)
     ------------------------------------------------------- */
     .modal-overlay {
-        align-items: flex-end;          /* bottom sheet: ancora na base */
+        align-items: center;
         justify-content: center;
-        padding: 0;                     /* sem padding — sheet vai até a borda */
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(6px);
-        overflow-y: hidden;             /* scroll fica DENTRO do modal */
+        padding: 16px;
+        background: rgba(0,0,0,0.65);
+        backdrop-filter: blur(8px);
+        overflow-y: auto;
     }
 
     /* -------------------------------------------------------
-       BOTTOM SHEET — detalhe do passeio
-       Igual às imagens 3 e 4 do modelo de referência:
-       card sobe por baixo, bordas arredondadas no topo,
-       alça de drag, foto sem border-radius
+       MODAL DETALHE — card flutuante centralizado
+       com bordas arredondadas em TODOS os lados
+       foto com border-radius no topo igual ao Vercel
     ------------------------------------------------------- */
     .modal-detalhe {
         width: 100%;
         max-width: 100%;
-        max-height: 92svh;
-        margin: 0;
-        border-radius: 24px 24px 0 0;
-        animation: sheetUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-        padding-top: 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        max-height: 88svh;
+        margin: auto;
+        border-radius: 20px;            /* bordas em todos os lados */
+        animation: slideUp 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        overflow: hidden;               /* foto respeita o border-radius */
         display: flex;
         flex-direction: column;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.35);
     }
 
-    /* alça de drag */
-    .modal-detalhe::before {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 4px;
-        background: #d1d5db;
-        border-radius: 2px;
-        margin: 12px auto 0;
-        flex-shrink: 0;
-    }
+    /* sem alça de drag — é card, não bottom sheet */
+    .modal-detalhe::before { display: none; }
 
-    /* foto ocupa toda a largura, sem bordas */
+    /* foto com border-radius no topo, igual ao Vercel */
     .det-foto-wrap {
-        height: 260px;
-        border-radius: 0;
+        height: 240px;
+        border-radius: 0;               /* overflow:hidden no pai já recorta */
         flex-shrink: 0;
         background: #111;
     }
 
-    /* imagem limpa — sem nenhum filtro de cor */
+    /* imagem limpa */
     .det-foto-slide img {
         filter: none !important;
         opacity: 1 !important;
         mix-blend-mode: normal !important;
     }
 
-    /* botão fechar reposicionado para o topo da sheet */
+    /* botão fechar: canto superior direito da foto */
     .modal-close-det {
-        top: 20px;
-        right: 16px;
-        background: rgba(0,0,0,0.55);
+        top: 14px;
+        right: 14px;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(8px);
         width: 34px;
         height: 34px;
         font-size: 14px;
     }
 
-    .det-body { padding: 20px 20px 40px; }
-    .det-nome { font-size: 22px; }
+    /* corpo do modal */
+    .det-body {
+        padding: 20px 24px 28px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+    }
 
-    /* rodapé: preço em cima, botão embaixo */
+    .det-eyebrow {
+        font-size: 10px;
+        letter-spacing: 4px;
+        margin-bottom: 8px;
+    }
+
+    .det-nome {
+        font-size: 24px;
+        margin-bottom: 16px;
+    }
+
+    /* divisor igual ao Vercel */
+    .det-nome {
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 16px;
+    }
+
+    /* preço grande + / pessoa inline */
+    .det-preco {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gold);
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-bottom: 20px;
+    }
+
+    .det-preco small {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    /* rodapé: botão ocupa largura total, sem preço ao lado */
     .det-footer {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: 0;
+        padding-top: 0;
+        border-top: none;               /* divisor já está no nome */
     }
 
+    /* esconde o preço do footer (já está acima) */
+    .det-footer .det-preco { display: none; }
+
+    /* botão Reservar agora — fundo dourado, largura total */
     .btn-reservar-det {
         width: 100%;
         text-align: center;
         padding: 16px;
         font-size: 16px;
-        border-radius: 14px;
+        font-weight: 700;
+        border-radius: 12px;
+        background: var(--gold);
+        color: #fff;
+        letter-spacing: 0.3px;
     }
 
     /* -------------------------------------------------------
        BOTTOM SHEET — formulário de reserva
-       Igual imagem 4: campos empilhados, resumo e botão
-       WhatsApp visíveis sem corte
+       Este SIM é bottom sheet, igual imagem 4 de referência
     ------------------------------------------------------- */
     .modal-reserva {
         width: 100%;
         max-width: 100%;
-        /* 94svh garante que o botão Reservar apareça */
         max-height: 94svh;
         margin: 0;
         border-radius: 24px 24px 0 0;
-        /* padding-bottom respeita o botão home do iPhone */
         padding: 0 0 env(safe-area-inset-bottom, 24px);
         animation: sheetUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
         display: flex;
         flex-direction: column;
-        /* scroll interno — todo conteúdo acessível */
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        /* ancora na base quando o overlay está flex-end */
+        align-self: flex-end;
     }
 
-    /* alça de drag no topo da reserva */
+    /* alça de drag */
     .modal-reserva::before {
         content: '';
         display: block;
@@ -1327,7 +1366,7 @@ body {
         flex-shrink: 0;
     }
 
-    /* padding lateral uniforme nos elementos do formulário */
+    /* padding lateral dos elementos */
     .modal-reserva .btn-voltar-det,
     .modal-reserva .modal-eyebrow,
     .modal-reserva .modal-title,
@@ -1336,17 +1375,9 @@ body {
         padding-right: 20px;
     }
 
-    .modal-reserva .btn-voltar-det {
-        padding-top: 16px;
-        margin-bottom: 12px;
-    }
+    .modal-reserva .btn-voltar-det { padding-top: 16px; margin-bottom: 12px; }
+    .modal-reserva .modal-title    { font-size: 18px; margin-bottom: 14px; }
 
-    .modal-reserva .modal-title {
-        font-size: 18px;
-        margin-bottom: 14px;
-    }
-
-    /* form rows e grupos também recebem margem lateral */
     .modal-reserva .form-row,
     .modal-reserva .form-group,
     .modal-reserva .modal-resumo,
@@ -1360,18 +1391,13 @@ body {
         padding: 16px;
         font-size: 16px;
         border-radius: 14px;
-        /* garante largura correta com as margens laterais */
         width: calc(100% - 40px);
     }
 
-    /* campos empilhados — sem grade de 2 colunas */
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
+    /* campos empilhados */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
 
-    /* CRÍTICO: font-size 16px previne zoom automático no iOS */
+    /* CRÍTICO: 16px previne zoom automático no iOS */
     .form-group input {
         padding: 14px 16px;
         font-size: 16px !important;
@@ -1382,7 +1408,6 @@ body {
         appearance: none;
     }
 
-    /* todos os tipos de input precisam de 16px no iOS */
     input[type="date"],
     input[type="time"],
     input[type="text"],
@@ -1393,25 +1418,20 @@ body {
         appearance: none;
     }
 
-    .form-group label {
-        font-size: 11px;
-        margin-bottom: 6px;
-    }
+    .form-group label { font-size: 11px; margin-bottom: 6px; }
+    .modal-resumo     { border-radius: 14px; padding: 14px 16px; }
 
-    .modal-resumo {
-        border-radius: 14px;
-        padding: 14px 16px;
-    }
-
-    /* modal de lugar: também bottom sheet */
+    /* modal de lugar */
     #modalLugar .modal-detalhe {
-        border-radius: 24px 24px 0 0;
+        border-radius: 20px;
         max-height: 80svh;
         width: 100%;
         max-width: 100%;
+        margin: auto;
     }
+    #modalLugar .modal-detalhe::before { display: none; }
 
-    /* filtros mapa: scroll horizontal sem barra visível */
+    /* filtros mapa */
     .filtros-mapa {
         width: 100%;
         display: flex;
@@ -1425,18 +1445,10 @@ body {
     .filtros-mapa::-webkit-scrollbar { display: none; }
     .filtro-mapa-btn { flex-shrink: 0; font-size: 12px; padding: 7px 14px; }
 
-    /* lugares */
-    .lugar-card    { flex: 0 0 80vw; }
+    .lugar-card      { flex: 0 0 80vw; }
     .lugares-nav-btn { display: none; }
 
-    /* whatsapp fixo */
-    #wpp-main {
-        bottom: 16px;
-        right: 16px;
-        padding: 12px 18px;
-        font-size: 13px;
-    }
-
+    #wpp-main { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 13px; }
     .toast-container { right: 12px; bottom: 80px; }
 }
 
@@ -1450,21 +1462,27 @@ body {
     .card-passeio  { flex: 0 0 calc(100vw - 32px); }
     .card-skeleton { flex: 0 0 calc(100vw - 32px); }
     .card-img      { height: 185px; }
-    .det-foto-wrap { height: 230px; }
+    .det-foto-wrap { height: 200px; }
     .section       { padding: 28px 12px 36px; }
     .section-title { font-size: 20px; }
 }
 
 /* ==========================================
-   ANIMAÇÃO BOTTOM SHEET
+   ANIMAÇÃO — card sobe do centro
    ========================================== */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* bottom sheet sobe da base */
 @keyframes sheetUp {
     from { transform: translateY(100%); }
     to   { transform: translateY(0); }
 }
 
 /* ==========================================
-   SAFE AREA — iPhone com notch/Dynamic Island
+   SAFE AREA — iPhone notch/Dynamic Island
    ========================================== */
 @supports (padding: env(safe-area-inset-bottom)) {
     #wpp-main {
