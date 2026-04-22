@@ -11,11 +11,10 @@
     width: 100%;
     cursor: grab;
     padding: 24px 0 40px;
-    perspective: 900px;
+    perspective: 1100px;
     perspective-origin: 50% 40%;
-    -webkit-perspective: 900px;
+    -webkit-perspective: 1100px;
 }
-
 
 #passeios.dragging { cursor: grabbing; }
 
@@ -23,13 +22,12 @@
 #passeios-track {
     display: block !important;
     position: relative;
-    width: 100%;          /* garante que left:50% seja sempre do wrapper */
+    width: 100%;
     height: 490px;
     transform: none !important;
     transition: none !important;
     overflow: visible;
 }
-
 
 /* ==========================================
    CARD — absolute, centrado
@@ -105,6 +103,7 @@
     background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
 }
 
+/* ---- HOVER OVERLAY — apenas no card ativo ao fazer hover ---- */
 .card-img-hover {
     position: absolute;
     inset: 0;
@@ -116,21 +115,15 @@
     transition: opacity 0.3s;
     pointer-events: none;
 }
+
+/* Overlay só aparece no card ativo ao passar o mouse */
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 .card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
 
+/* ---- BADGE DE PREÇO REMOVIDO DA FOTO ---- */
+/* O .card-preco-badge fica oculto na foto; o preço aparece apenas no corpo do card */
 .card-preco-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 12px;
-    border-radius: 20px;
-    z-index: 2;
+    display: none !important;
 }
 
 /* ---- corpo ---- */
@@ -248,8 +241,8 @@
 @media (max-width: 768px) {
     #passeios {
         padding: 16px 0 28px;
-        perspective: 700px;
-        -webkit-perspective: 700px;
+        perspective: 800px;
+        -webkit-perspective: 800px;
     }
 
     #passeios-track { height: 460px; }
