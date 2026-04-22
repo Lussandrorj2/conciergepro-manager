@@ -158,13 +158,12 @@ function coverflowAtualizar() {
 
         card.classList.toggle('coverflow-active', diff === 0);
 
-        // ✅ USA A LARGURA REAL DO CARD DO DOM (não o valor JS)
+        // Lê a largura REAL do card no DOM (respeita CSS: 74vw, 80vw, 280px)
         var cardW = card.offsetWidth || coverflowGetCardWidth();
 
         var baseX   = -(cardW / 2);
         var offsetX = diff * cardW * cfg.gap;
-
-        var rotY    = diff < 0 ?  cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
+        var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
         var transZ  = diff === 0 ? 0 : cfg.transZ * Math.min(absD, 2);
         var scale   = diff === 0 ? cfg.scaleActive : Math.max(0.75, cfg.scaleSide - (absD - 1) * 0.06);
         var opacity = diff === 0 ? 1 : Math.max(0.3, 0.72 - (absD - 1) * 0.18);
@@ -173,7 +172,7 @@ function coverflowAtualizar() {
         var zIndex  = 20 - absD;
 
         if (absD > 4) {
-            card.style.visibility = 'hidden';
+            card.style.visibility    = 'hidden';
             card.style.pointerEvents = 'none';
             return;
         }
@@ -186,12 +185,12 @@ function coverflowAtualizar() {
         card.style.transform     = [
             'translateX(' + (baseX + offsetX) + 'px)',
             'translateZ(' + transZ + 'px)',
-            'rotateY(' + rotY + 'deg)',
-            'scale(' + scale + ')'
+            'rotateY('    + rotY   + 'deg)',
+            'scale('      + scale  + ')'
         ].join(' ');
     });
 
-    // Ajusta altura do track pelo card ativo
+    // Altura dinâmica baseada no card ativo
     var activeCard = cards[carrIndex];
     if (activeCard) {
         var h = activeCard.offsetHeight;
@@ -203,15 +202,16 @@ function coverflowAtualizar() {
 
     if (dotsEl) {
         dotsEl.innerHTML = '';
-        for (var i = 0; i < carrTotal; i++) {
+        for (var j = 0; j < carrTotal; j++) {
             var d = document.createElement('button');
-            d.className = 'carr-dot' + (i === carrIndex ? ' active' : '');
-            d.setAttribute('aria-label', 'Item ' + (i + 1));
-            d.onclick = (function(idx){ return function(){ coverflowIr(idx); }; })(i);
+            d.className = 'carr-dot' + (j === carrIndex ? ' active' : '');
+            d.setAttribute('aria-label', 'Item ' + (j + 1));
+            d.onclick = (function(idx){ return function(){ coverflowIr(idx); }; })(j);
             dotsEl.appendChild(d);
         }
     }
 }
+
 
 
 function carrosselMover(dir) {
