@@ -233,18 +233,6 @@ body {
 .carr-prev { left: -22px; }
 .carr-next { right: -22px; }
 
-#passeios {
-    overflow: hidden;
-    cursor: grab;
-}
-
-#passeios.dragging { cursor: grabbing; }
-
-#passeios-track {
-    display: flex;
-    gap: 24px;
-    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
 
 .carr-dots {
     display: flex;
@@ -273,17 +261,6 @@ body {
 /* ==========================================
    CARD PASSEIO
    ========================================== */
-.card-passeio {
-    background: var(--white);
-    border: 1px solid var(--gold-dim);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-    cursor: pointer;
-    flex: 0 0 320px;
-    box-shadow: var(--shadow-card);
-}
-
 .card-passeio:hover {
     transform: translateY(-8px);
     border-color: var(--gold);
@@ -305,8 +282,6 @@ body {
     /* CRITICAL: Remove any color overlay/filter from the image itself */
     filter: none;
 }
-
-.card-passeio:hover .card-img img { transform: scale(1.05); }
 
 .card-img-empty {
     width: 100%;
@@ -406,11 +381,6 @@ body {
     font-weight: 500;
     white-space: nowrap;
     transition: background 0.2s, transform 0.15s;
-}
-
-.btn-reservar:hover {
-    background: var(--gold-light);
-    transform: translateY(-1px);
 }
 
 /* ==========================================
@@ -1490,7 +1460,5 @@ body {
     }
     .modal-reserva {
         padding-bottom: env(safe-area-inset-bottom);
-    }
-}
     }
 }
