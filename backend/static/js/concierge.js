@@ -47,8 +47,8 @@ lbl_nome: 'Full name', lbl_tel: 'Phone', lbl_qtd: 'Number of guests',
 resumo_passeio: 'Tour', resumo_qtd: 'Guests', resumo_total: 'Estimated total',
 btn_confirmar: 'Chat on WhatsApp', btn_reservar_det: 'Book now',
 btn_voltar: '← Back to details', sucesso: 'Redirecting to WhatsApp!', sem_imagem: 'No image',
-wpp_msg: function(n,p,q,d,h){var m='Hello! My name is *'+n+”* and I'm interested in the tour *”+p+'* for *'+q+'guest(s)*';if(d)m+='on *'+d+'*';if(h)m+='at *'+h+'*';m+='. Could you confirm availability?';return m;},
-aviso_wpp: “You will be redirected to the hotel's WhatsApp to confirm your booking.”,
+wpp_msg: function(n,p,q,d,h){var m='Hello! My name is *'+n+"* and I'm interested in the tour *"+p+'* for *'+q+'guest(s)*';if(d)m+='on *'+d+'*';if(h)m+='at *'+h+'*';m+='. Could you confirm availability?';return m;},
+aviso_wpp: “You will be redirected to the hotel's WhatsApp to confirm your booking.",
 campos_obrigatorios: 'Please fill in your name and phone number.',
 mapa_label: 'Nearby', mapa_titulo: 'Restaurants & Shopping',
 mapa_todos: 'All', mapa_restaurantes: '🍽 Restaurants', mapa_compras: '🛍 Shopping',
@@ -79,8 +79,8 @@ lbl_nome: 'Nom complet', lbl_tel: 'Téléphone', lbl_qtd: 'Nombre de personnes',
 resumo_passeio: 'Visite', resumo_qtd: 'Personnes', resumo_total: 'Total estimé',
 btn_confirmar: 'Contacter sur WhatsApp', btn_reservar_det: 'Réserver maintenant',
 btn_voltar: '← Retour aux détails', sucesso: 'Redirection vers WhatsApp!', sem_imagem: 'Sans image',
-wpp_msg: function(n,p,q,d,h){var m=“Bonjour ! Je m'appelle *”+n+”* et je suis intéressé(e) par la visite *”+p+'* pour *'+q+'personne(s)*';if(d)m+='à la date *'+d+'*';if(h)m+='à *'+h+'*';m+='. Pourriez-vous confirmer la disponibilité ?';return m;},
-aviso_wpp: “Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.”,
+wpp_msg: function(n,p,q,d,h){var m=“Bonjour ! Je m'appelle *"+n+"* et je suis intéressé(e) par la visite *"+p+'* pour *'+q+'personne(s)*';if(d)m+='à la date *'+d+'*';if(h)m+='à *'+h+'*';m+='. Pourriez-vous confirmer la disponibilité ?';return m;},
+aviso_wpp: “Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
 campos_obrigatorios: 'Veuillez remplir votre nom et numéro de téléphone.',
 mapa_label: 'Aux alentours', mapa_titulo: 'Restaurants & Centres Commerciaux',
 mapa_todos: 'Tous', mapa_restaurantes: '🍽 Restaurants', mapa_compras: '🛍 Shopping',
@@ -108,7 +108,7 @@ var wl = document.getElementById('wpp-main');
 if (wl) wl.href = 'https://wa.me/'+ data.whatsapp;
 }
 var bg = document.getElementById('hero-bg');
-if (bg && data.foto_capa) { bg.style.backgroundImage = 'url(''+ data.foto_capa + '')'; bg.style.opacity = '1'; }
+if (bg && data.foto_capa) { bg.style.backgroundImage = 'url(' + data.foto_capa + ')'; }
 var t1 = document.getElementById('txt-hero-title');
 var t2 = document.getElementById('txt-hero-subtitle');
 if (t1 && data.titulo_hero)    t1.innerText = data.titulo_hero;
@@ -636,9 +636,9 @@ var MAPA_GERAL_SRC = '';
 var LUGARES = [];
 var MAPA_LABELS = {
 pt:{restaurante:'Restaurante',shopping:'Compras',hotelBadge:'★ Do Hotel'},
-en:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ Hotel's Own”},
+en:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ Hotel's Own"},
 es:{restaurante:'Restaurante',shopping:'Compras',hotelBadge:'★ Del Hotel'},
-fr:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ De l'Hôtel”}
+fr:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ De l'Hôtel"}
 };
 var lugarFiltroAtivo = 'todos';
 var lugarSelecionadoId = null;
