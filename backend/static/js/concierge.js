@@ -238,81 +238,222 @@ async function carregarHotel(lang) {
 }
 
 // ==========================================
-// CARROSSEL PRINCIPAL
+// COVERFLOW CAROUSEL
 // ==========================================
 var carrIndex    = 0;
-var carrVisiveis = 3;
 var carrTotal    = 0;
 
-function carrosselAtualizar() {
+// Configurações do efeito 3D
+var COVERFLOW_CONFIG = {
+    cardWidth:    300,   // largura base do card (px)
+    cardGap:      20,    // espaço entre cards
+    rotateY:      42,    // graus de rotação lateral
+    translateZ:  -80,    // profundidade dos cards laterais (px)
+    scaleActive:  1.08,  // escala do card central
+    scaleSide:    0.88,  // escala dos cards laterais
+    offsetX:      220,   // quanto os laterais se afastam do centro (px)
+};
+
+function coverflowAtualizar() {
     var track   = document.getElementById('passeios-track');
     var btnPrev = document.getElementById('carr-prev');
     var btnNext = document.getElementById('carr-next');
     var dotsEl  = document.getElementById('carr-dots');
+
     if (!track) return;
 
-    var cardW = 320 + 24;
-    track.style.transform = 'translateX(-' + (carrIndex * cardW) + 'px)';
+    var cards   = track.querySelectorAll('.card-passeio');
+    var cfg     = COVERFLOW_CONFIG;
+    var isMobile = window.innerWidth <= 768;
 
+    // Ajusta config para mobile
+    if (isMobile) {
+        cfg = Object.assign({}, COVERFLOW_CONFIG, {
+            rotateY:   36,
+            translateZ: -60,
+            offsetX:   Math.min(window.innerWidth * 0.58, 220),
+            scaleActive: 1.05,
+            scaleSide:   0.84,
+        });
+    }
+
+    cards.forEach(function(card, i) {
+        var diff = i - carrIndex;
+        var absD = Math.abs(diff);
+
+        // Remove active de todos
+        card.classList.remove('coverflow-active');
+
+        var rotY      = 0;
+        var transX    = 0;
+        var transZ    = 0;
+        var scale     = cfg.scaleSide;
+        var zIndex    = 10 - absD;
+        var opacity   = 1;
+        var brightness= 0.82;
+        var saturate  = 0.7;
+
+        if (diff === 0) {
+            // Card central
+            card.classList.add('coverflow-active');
+            rotY       = 0;
+            transX     = 0;
+            transZ     = 0;
+            scale      = cfg.scaleActive;
+            zIndex     = 20;
+            opacity    = 1;
+            brightness = 1;
+            saturate   = 1;
+        } else if (diff > 0) {
+            // Cards à direita
+            rotY    = -cfg.rotateY;
+            transX  = cfg.offsetX * Math.min(diff, 2.5);
+            transZ  = cfg.translateZ * Math.min(absD, 2);
+            opacity = Math.max(0.35, 1 - absD * 0.22);
+            brightness = Math.max(0.55, 0.82 - absD * 0.1);
+        } else {
+            // Cards à esquerda
+            rotY    = cfg.rotateY;
+            transX  = -cfg.offsetX * Math.min(absD, 2.5);
+            transZ  = cfg.translateZ * Math.min(absD, 2);
+            opacity = Math.max(0.35, 1 - absD * 0.22);
+            brightness = Math.max(0.55, 0.82 - absD * 0.1);
+        }
+
+        // Oculta cards muito distantes
+        var hidden = absD > 3;
+
+        card.style.transform   = 'translateX(' + transX + 'px) translateZ(' + transZ + 'px) rotateY(' + rotY + 'deg) scale(' + scale + ')';
+        card.style.zIndex      = zIndex;
+        card.style.opacity     = hidden ? 0 : opacity;
+        card.style.filter      = 'brightness(' + brightness + ') saturate(' + saturate + ')';
+        card.style.pointerEvents = hidden ? 'none' : '';
+        card.style.visibility  = absD > 4 ? 'hidden' : 'visible';
+    });
+
+    // Botões
     if (btnPrev) btnPrev.disabled = carrIndex === 0;
-    if (btnNext) btnNext.disabled = carrIndex >= carrTotal - carrVisiveis;
+    if (btnNext) btnNext.disabled = carrIndex >= carrTotal - 1;
 
+    // Dots
     if (dotsEl) {
         dotsEl.innerHTML = '';
-        var numDots = Math.max(1, carrTotal - carrVisiveis + 1);
-        for (var i = 0; i < numDots; i++) {
+        for (var i = 0; i < carrTotal; i++) {
             var d = document.createElement('button');
             d.className = 'carr-dot' + (i === carrIndex ? ' active' : '');
+            d.setAttribute('aria-label', 'Item ' + (i + 1));
             d.onclick = (function(idx) {
-                return function() { carrIndex = idx; carrosselAtualizar(); };
+                return function() { coverflowIr(idx); };
             })(i);
             dotsEl.appendChild(d);
         }
     }
+
+    // Centraliza o track no card ativo
+    centralizarTrack();
+}
+
+function centralizarTrack() {
+    var track    = document.getElementById('passeios-track');
+    var viewport = document.getElementById('passeios');
+    if (!track || !viewport) return;
+
+    var cards       = track.querySelectorAll('.card-passeio');
+    var cardWidth   = COVERFLOW_CONFIG.cardWidth + COVERFLOW_CONFIG.cardGap;
+    var isMobile    = window.innerWidth <= 768;
+
+    if (isMobile) {
+        cardWidth = Math.min(window.innerWidth * 0.72, 300) + 16;
+    }
+
+    var viewW       = viewport.offsetWidth;
+    var totalW      = cards.length * cardWidth;
+    var centerOffset = (viewW / 2) - (cardWidth / 2) - (carrIndex * cardWidth);
+
+    track.style.transform = 'translateX(' + centerOffset + 'px)';
 }
 
 function carrosselMover(dir) {
-    var max = Math.max(0, carrTotal - carrVisiveis);
+    var max = carrTotal - 1;
     carrIndex = Math.min(max, Math.max(0, carrIndex + dir));
-    carrosselAtualizar();
+    coverflowAtualizar();
 }
 
-function carrosselCalcularVisiveis() {
-    var viewport = document.getElementById('passeios');
-    if (!viewport) return 3;
-    var w = viewport.offsetWidth;
-    if (w < 480) return 1;
-    return Math.max(1, Math.floor(w / (320 + 24)));
+function coverflowIr(idx) {
+    carrIndex = Math.max(0, Math.min(carrTotal - 1, idx));
+    coverflowAtualizar();
 }
 
+// Drag e swipe para o coverflow
 function initCarrosselDrag() {
     var el = document.getElementById('passeios');
-    if (!el) return;
-    var startX = 0, isDragging = false;
+    if (!el || el._dragInit) return;
+    el._dragInit = true;
+
+    var startX = 0, startY = 0, isDragging = false, isHoriz = null;
 
     var onStart = function(e) {
         isDragging = true;
-        startX = (e.touches ? e.touches[0].clientX : e.clientX);
+        isHoriz    = null;
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        startY = e.touches ? e.touches[0].clientY : e.clientY;
         el.classList.add('dragging');
     };
+
+    var onMove = function(e) {
+        if (!isDragging) return;
+        var x = e.touches ? e.touches[0].clientX : e.clientX;
+        var y = e.touches ? e.touches[0].clientY : e.clientY;
+        if (isHoriz === null) {
+            isHoriz = Math.abs(x - startX) > Math.abs(y - startY);
+        }
+        // Previne scroll vertical quando swipando horizontal
+        if (isHoriz && e.cancelable) e.preventDefault();
+    };
+
     var onEnd = function(e) {
         if (!isDragging) return;
         isDragging = false;
         el.classList.remove('dragging');
-        var endX = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
+        var endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
         var diff = startX - endX;
-        if (Math.abs(diff) > 50) carrosselMover(diff > 0 ? 1 : -1);
+        if (isHoriz && Math.abs(diff) > 40) {
+            carrosselMover(diff > 0 ? 1 : -1);
+        }
     };
 
     el.addEventListener('mousedown',  onStart);
     el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove',  onMove,  { passive: false });
     el.addEventListener('mouseup',    onEnd);
     el.addEventListener('touchend',   onEnd);
+
+    // Clique em card lateral navega para ele
+    el.addEventListener('click', function(e) {
+        var card = e.target.closest('.card-passeio');
+        if (!card) return;
+        var cards = Array.from(el.querySelectorAll('.card-passeio'));
+        var idx   = cards.indexOf(card);
+        if (idx >= 0 && idx !== carrIndex) {
+            e.stopPropagation();
+            coverflowIr(idx);
+        }
+    });
+
     window.addEventListener('resize', function() {
-        carrVisiveis = carrosselCalcularVisiveis();
-        carrosselAtualizar();
+        coverflowAtualizar();
     });
 }
+
+// Atalhos teclado
+document.addEventListener('keydown', function(e) {
+    // Só captura setas se nenhum modal estiver aberto
+    var modalAberto = document.querySelector('.modal-overlay.open');
+    if (modalAberto) return;
+
+    if (e.key === 'ArrowLeft')  carrosselMover(-1);
+    if (e.key === 'ArrowRight') carrosselMover(1);
+});
 
 // ==========================================
 // PASSEIOS
@@ -346,11 +487,16 @@ async function carregarPasseios(lang) {
         }
         track.innerHTML = html;
 
-        carrTotal    = listaPasseios.length;
-        carrIndex    = 0;
-        carrVisiveis = carrosselCalcularVisiveis();
-        carrosselAtualizar();
-        initCarrosselDrag();
+        carrTotal = listaPasseios.length;
+        carrIndex = 0;
+
+        // Pequeno delay para garantir que os cards estão no DOM
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                coverflowAtualizar();
+                initCarrosselDrag();
+            });
+        });
 
     } catch (e) {
         console.error('[carregarPasseios]', e);
@@ -379,7 +525,7 @@ function renderCard(p) {
 
     var precoSubHTML = precoSub ? '<small>' + precoSub + '</small>' : '';
 
-    return '<div class="card-passeio" onclick="abrirDetalhe(' + p.id + ')">' +
+    return '<div class="card-passeio" data-id="' + p.id + '" onclick="handleCardClick(' + p.id + ', this)">' +
         '<div class="card-img">' +
             imgHTML +
             '<span class="card-preco-badge">' + precoLabel + '</span>' +
@@ -390,10 +536,28 @@ function renderCard(p) {
             '<p class="card-desc">' + (p.descricao || '') + '</p>' +
             '<div class="card-footer">' +
                 '<div class="card-preco">' + precoLabel + precoSubHTML + '</div>' +
-                '<button class="btn-reservar" onclick="event.stopPropagation(); abrirDetalhe(' + p.id + ')">' + t('btn') + '</button>' +
+                '<button class="btn-reservar" onclick="event.stopPropagation(); handleCardClick(' + p.id + ', null)">' + t('btn') + '</button>' +
             '</div>' +
         '</div>' +
     '</div>';
+}
+
+// Click no card: se não for o ativo, navega até ele; se for ativo, abre detalhe
+function handleCardClick(passeioId, cardEl) {
+    var track = document.getElementById('passeios-track');
+    if (!track) return;
+
+    var cards = Array.from(track.querySelectorAll('.card-passeio'));
+    var idx   = cards.findIndex(function(c) { return parseInt(c.dataset.id) === passeioId; });
+
+    if (idx >= 0 && idx !== carrIndex) {
+        // Navega para o card clicado
+        coverflowIr(idx);
+        return;
+    }
+
+    // Card já é o ativo — abre detalhe
+    abrirDetalhe(passeioId);
 }
 
 // ==========================================
@@ -430,7 +594,7 @@ function detFotoRender() {
 
     var slidesHTML = '';
     for (var i = 0; i < detFotos.length; i++) {
-        slidesHTML += '<div class="det-foto-slide"><img src="' + detFotos[i] + '" alt="" onerror="this.parentElement.innerHTML=\'<div class=\\\'det-foto-slide-empty\\\'>🌊</div>\'"></div>';
+        slidesHTML += '<div class="det-foto-slide"><img src="' + detFotos[i] + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'det-foto-slide-empty\\\'>🌊</div>\'"></div>';
     }
     track.innerHTML = slidesHTML;
 
@@ -439,7 +603,7 @@ function detFotoRender() {
             var thumbsHTML = '';
             for (var j = 0; j < detFotos.length; j++) {
                 thumbsHTML += '<div class="det-thumb ' + (j === detFotoIndex ? 'active' : '') + '" onclick="detFotoIr(' + j + ')">' +
-                    '<img src="' + detFotos[j] + '" alt="" onerror="this.style.display=\'none\'">' +
+                    '<img src="' + detFotos[j] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' +
                 '</div>';
             }
             thumbs.innerHTML = thumbsHTML;
@@ -918,7 +1082,7 @@ function fecharModalLugar() {
 }
 
 // ==========================================
-// CARROSSEL LUGARES (simples, igual aos passeios)
+// CARROSSEL LUGARES
 // ==========================================
 var lugarCarrIndex    = 0;
 var lugarCarrVisiveis = 3;
@@ -1118,6 +1282,7 @@ window.trocarIdioma               = trocarIdioma;
 window.abrirModal                 = abrirModal;
 window.abrirDetalhe               = abrirDetalhe;
 window.fecharDetalhe              = fecharDetalhe;
+window.handleCardClick            = handleCardClick;
 window.abrirModalReservaDoDetalhe = abrirModalReservaDoDetalhe;
 window.voltarParaDetalhe          = voltarParaDetalhe;
 window.fecharModal                = fecharModal;
@@ -1125,6 +1290,7 @@ window.fecharModalReserva         = fecharModalReserva;
 window.confirmarReserva           = confirmarReserva;
 window.calcularTotal              = calcularTotal;
 window.carrosselMover             = carrosselMover;
+window.coverflowIr                = coverflowIr;
 window.detFotoMover               = detFotoMover;
 window.detFotoIr                  = detFotoIr;
 window.filtrarMapa                = filtrarMapa;
