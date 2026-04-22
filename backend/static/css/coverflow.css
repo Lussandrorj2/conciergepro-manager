@@ -6,7 +6,9 @@
 /* Viewport com perspectiva */
 #passeios {
     overflow: hidden;
+    overflow-x: hidden;
     position: relative;
+    width: 100%;
     cursor: grab;
     padding: 24px 0 40px;
     perspective: 900px;
@@ -14,16 +16,20 @@
     -webkit-perspective: 900px;
 }
 
+
 #passeios.dragging { cursor: grabbing; }
 
 /* Track vira container relativo, sem flex */
 #passeios-track {
     display: block !important;
     position: relative;
+    width: 100%;          /* garante que left:50% seja sempre do wrapper */
     height: 490px;
     transform: none !important;
     transition: none !important;
+    overflow: visible;
 }
+
 
 /* ==========================================
    CARD — absolute, centrado
