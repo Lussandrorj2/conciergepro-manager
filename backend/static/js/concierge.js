@@ -48,7 +48,7 @@ resumo_passeio: 'Tour', resumo_qtd: 'Guests', resumo_total: 'Estimated total',
 btn_confirmar: 'Chat on WhatsApp', btn_reservar_det: 'Book now',
 btn_voltar: '← Back to details', sucesso: 'Redirecting to WhatsApp!', sem_imagem: 'No image',
 wpp_msg: function(n,p,q,d,h){var m='Hello! My name is *'+n+"* and I'm interested in the tour *"+p+'* for *'+q+'guest(s)*';if(d)m+='on *'+d+'*';if(h)m+='at *'+h+'*';m+='. Could you confirm availability?';return m;},
-aviso_wpp: “You will be redirected to the hotel's WhatsApp to confirm your booking.",
+aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
 campos_obrigatorios: 'Please fill in your name and phone number.',
 mapa_label: 'Nearby', mapa_titulo: 'Restaurants & Shopping',
 mapa_todos: 'All', mapa_restaurantes: '🍽 Restaurants', mapa_compras: '🛍 Shopping',
@@ -79,8 +79,8 @@ lbl_nome: 'Nom complet', lbl_tel: 'Téléphone', lbl_qtd: 'Nombre de personnes',
 resumo_passeio: 'Visite', resumo_qtd: 'Personnes', resumo_total: 'Total estimé',
 btn_confirmar: 'Contacter sur WhatsApp', btn_reservar_det: 'Réserver maintenant',
 btn_voltar: '← Retour aux détails', sucesso: 'Redirection vers WhatsApp!', sem_imagem: 'Sans image',
-wpp_msg: function(n,p,q,d,h){var m=“Bonjour ! Je m'appelle *"+n+"* et je suis intéressé(e) par la visite *"+p+'* pour *'+q+'personne(s)*';if(d)m+='à la date *'+d+'*';if(h)m+='à *'+h+'*';m+='. Pourriez-vous confirmer la disponibilité ?';return m;},
-aviso_wpp: “Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
+wpp_msg: function(n,p,q,d,h){var m="Bonjour ! Je m'appelle *"+n+"* et je suis intéressé(e) par la visite *"+p+'* pour *'+q+'personne(s)*';if(d)m+='à la date *'+d+'*';if(h)m+='à *'+h+'*';m+='. Pourriez-vous confirmer la disponibilité ?';return m;},
+aviso_wpp: "Vous serez redirigé vers le WhatsApp de l'hôtel pour confirmer votre réservation.",
 campos_obrigatorios: 'Veuillez remplir votre nom et numéro de téléphone.',
 mapa_label: 'Aux alentours', mapa_titulo: 'Restaurants & Centres Commerciaux',
 mapa_todos: 'Tous', mapa_restaurantes: '🍽 Restaurants', mapa_compras: '🛍 Shopping',
@@ -607,7 +607,7 @@ var ts = document.getElementById('titulo-secao');
 var ce = document.getElementById('count-passeios');
 if (ls) ls.innerText = t('secao_label');
 if (ts) ts.innerText = t('secao_titulo');
-if (ce && listaPasseios.length) ce.innerText = listaPasseios.length+''+t('secao_label').toLowerCase();
+if (ce && listaPasseios.length) ce.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
 atualizarTextosMapa();
 await Promise.all([carregarHotel(lang), carregarPasseios(lang)]);
 }
@@ -636,9 +636,9 @@ var MAPA_GERAL_SRC = '';
 var LUGARES = [];
 var MAPA_LABELS = {
 pt:{restaurante:'Restaurante',shopping:'Compras',hotelBadge:'★ Do Hotel'},
-en:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ Hotel's Own"},
+en:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:"★ Hotel's Own"},
 es:{restaurante:'Restaurante',shopping:'Compras',hotelBadge:'★ Del Hotel'},
-fr:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:“★ De l'Hôtel"}
+fr:{restaurante:'Restaurant',shopping:'Shopping',hotelBadge:"★ De l'Hôtel"}
 };
 var lugarFiltroAtivo = 'todos';
 var lugarSelecionadoId = null;
