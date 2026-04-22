@@ -118,7 +118,7 @@ if (data.mapa_embed) MAPA_GERAL_SRC = data.mapa_embed;
 }
 
 // ==========================================
-// COVERFLOW ENGINE
+// COVERFLOW ENGINE — 360° formation
 // ==========================================
 var carrIndex = 0;
 var carrTotal = 0;
@@ -133,15 +133,15 @@ return 280;
 function coverflowGetConfig() {
 var isMobile = window.innerWidth <= 768;
 return {
-rotateY:    isMobile ? 38 : 44,      // graus de rotação lateral
-transZ:     isMobile ? -70 : -90,    // profundidade (px)
-gap:        isMobile ? 0.58 : 0.62,  // fração da largura do card para offset lateral
-scaleActive:isMobile ? 1.04 : 1.06,
-scaleSide:  isMobile ? 0.86 : 0.88,
+rotateY:     isMobile ? 42 : 50,      // graus de rotação lateral — mais pronunciado para 360
+transZ:      isMobile ? -110 : -140,   // profundidade (px) — mais fundo para efeito 360
+gap:         isMobile ? 0.52 : 0.56,   // fração do card para offset lateral
+scaleActive: isMobile ? 1.05 : 1.08,   // card central ligeiramente maior
+scaleSide:   isMobile ? 0.82 : 0.84,   // cards laterais menores
+scaleFar:    isMobile ? 0.68 : 0.70,   // cards distantes ainda menores
 };
 }
 
-// SUBSTITUA a função coverflowAtualizar por esta versão:
 function coverflowAtualizar() {
 var track   = document.getElementById(‘passeios-track’);
 var btnPrev = document.getElementById(‘carr-prev’);
@@ -149,7 +149,7 @@ var btnNext = document.getElementById(‘carr-next’);
 var dotsEl  = document.getElementById(‘carr-dots’);
 if (!track) return;
 
-
+```
 var cards = Array.from(track.querySelectorAll('.card-passeio'));
 var cfg   = coverflowGetConfig();
 
@@ -159,19 +159,30 @@ cards.forEach(function(card, i) {
 
     card.classList.toggle('coverflow-active', diff === 0);
 
-    // Lê a largura REAL do card no DOM (respeita CSS: 74vw, 80vw, 280px)
+    // Lê a largura REAL do card no DOM
     var cardW = card.offsetWidth || coverflowGetCardWidth();
 
     var baseX   = -(cardW / 2);
     var offsetX = diff * cardW * cfg.gap;
+
+    // rotação 360: lado esquerdo roda positivo, lado direito negativo
     var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
+
+    // profundidade cresce com a distância
     var transZ  = diff === 0 ? 0 : cfg.transZ * Math.min(absD, 2);
-    var scale   = diff === 0 ? cfg.scaleActive : Math.max(0.75, cfg.scaleSide - (absD - 1) * 0.06);
-    var opacity = diff === 0 ? 1 : Math.max(0.3, 0.72 - (absD - 1) * 0.18);
-    var bright  = diff === 0 ? 1 : Math.max(0.5, 0.72 - (absD - 1) * 0.1);
-    var sat     = diff === 0 ? 1 : Math.max(0.3, 0.55 - (absD - 1) * 0.1);
+
+    // escala: ativo > adjacente > distante
+    var scale;
+    if (diff === 0)       scale = cfg.scaleActive;
+    else if (absD === 1)  scale = cfg.scaleSide;
+    else                  scale = Math.max(0.55, cfg.scaleFar - (absD - 2) * 0.08);
+
+    var opacity = diff === 0 ? 1   : Math.max(0.25, 0.65 - (absD - 1) * 0.18);
+    var bright  = diff === 0 ? 1   : Math.max(0.45, 0.68 - (absD - 1) * 0.12);
+    var sat     = diff === 0 ? 1   : Math.max(0.25, 0.50 - (absD - 1) * 0.10);
     var zIndex  = 20 - absD;
 
+    // Oculta cards muito distantes
     if (absD > 4) {
         card.style.visibility    = 'hidden';
         card.style.pointerEvents = 'none';
@@ -211,7 +222,7 @@ if (dotsEl) {
         dotsEl.appendChild(d);
     }
 }
-
+```
 
 }
 
@@ -230,7 +241,7 @@ var el = document.getElementById(‘passeios’);
 if (!el || el._dragInit) return;
 el._dragInit = true;
 
-
+```
 var startX = 0, startY = 0, isH = null, dragging = false;
 
 el.addEventListener('mousedown', function(e) {
@@ -276,7 +287,7 @@ el.addEventListener('click', function(e) {
 }, true);
 
 window.addEventListener('resize', function() { coverflowAtualizar(); });
-
+```
 
 }
 
@@ -294,7 +305,7 @@ async function carregarPasseios(lang) {
 var track = document.getElementById(‘passeios-track’);
 if (!track) return;
 
-
+```
 if (!hotelSlug) {
     track.innerHTML = '<div class="estado-vazio"><span class="icon">🏖️</span><p>' + t('vazio') + '</p></div>';
     return;
@@ -329,14 +340,13 @@ try {
     console.error('[carregarPasseios]', e);
     track.innerHTML = '<div class="estado-erro"><span class="icon">⚠️</span><p>' + t('erro') + '</p></div>';
 }
-
+```
 
 }
 
 // ==========================================
-// CARD RENDER
+// CARD RENDER — sem badge de preço na foto
 // ==========================================
-
 function renderCard(p) {
 var precoLabel = p.preco_sob_consulta
 ? t(‘sob_consulta’)
@@ -349,10 +359,11 @@ var imgHTML = imgSrc
 : ‘<div class="card-img-empty">🌊</div>’;
 var precoSubHTML = precoSub ? ‘<small>’+precoSub+’</small>’ : ‘’;
 
+```
+// Sem badge de preço na foto — preço apenas no card-body
 return '<div class="card-passeio" data-id="'+p.id+'" onclick="handleCardClick('+p.id+', this)">' +
     '<div class="card-img">' +
         imgHTML +
-        '<span class="card-preco-badge">'+precoLabel+'</span>' +
         '<div class="card-img-hover"><span>'+t('btn')+'</span></div>' +
     '</div>' +
     '<div class="card-body">' +
@@ -364,7 +375,7 @@ return '<div class="card-passeio" data-id="'+p.id+'" onclick="handleCardClick('+
         '</div>' +
     '</div>' +
 '</div>';
-
+```
 
 }
 
@@ -395,7 +406,7 @@ var btnPrev = document.getElementById(‘det-foto-prev’);
 var btnNext = document.getElementById(‘det-foto-next’);
 if (!track) return;
 
-
+```
 if (!detFotos.length) {
     track.innerHTML = '<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>';
     if (thumbs) thumbs.innerHTML = '';
@@ -417,7 +428,7 @@ if (thumbs) {
 if (btnPrev) btnPrev.style.display = detFotos.length > 1 ? 'flex' : 'none';
 if (btnNext) btnNext.style.display = detFotos.length > 1 ? 'flex' : 'none';
 detFotoAtualizar();
-
+```
 
 }
 
@@ -445,7 +456,7 @@ passeioAtual = listaPasseios.find(function(p){ return p.id === passeioId; }) || 
 if (!passeioAtual) return;
 var p = passeioAtual;
 
-
+```
 detFotos = coletarFotos(p); detFotoIndex = 0; detFotoRender();
 
 var set = function(id, val) { var el = document.getElementById(id); if (el) el.innerText = val; };
@@ -483,7 +494,7 @@ if (btnDet) btnDet.textContent = t('btn_reservar_det');
 initDetFotoSwipe();
 document.getElementById('modalDetalhe').classList.add('open');
 document.body.style.overflow = 'hidden';
-
+```
 
 }
 
@@ -522,7 +533,7 @@ set(‘resumo-label-passeio’, t(‘resumo_passeio’));
 set(‘resumo-label-qtd’, t(‘resumo_qtd’));
 set(‘resumo-label-total’, t(‘resumo_total’));
 
-
+```
 var bv = document.getElementById('btn-voltar-txt');
 if (bv) bv.textContent = t('btn_voltar').replace('← ','');
 
@@ -535,7 +546,7 @@ document.getElementById('modal-resumo').classList.remove('show');
 calcularTotal();
 document.getElementById('modalReserva').classList.add('open');
 document.body.style.overflow = 'hidden';
-
+```
 
 }
 
@@ -578,10 +589,10 @@ window.open(‘https://wa.me/’+whatsappAtual+’?text=’+encodeURIComponent(m
 
 function mostrarToast(msg, tipo) {
 var c = document.getElementById(‘toasts’);
-var t = document.createElement(‘div’);
-t.className = ‘toast ‘+(tipo||’’); t.innerText = msg;
-c.appendChild(t);
-setTimeout(function(){ t.remove(); }, 3500);
+var toast = document.createElement(‘div’);
+toast.className = ‘toast ‘+(tipo||’’); toast.innerText = msg;
+c.appendChild(toast);
+setTimeout(function(){ toast.remove(); }, 3500);
 }
 
 // ==========================================
@@ -703,73 +714,153 @@ document.body.style.overflow = ‘hidden’;
 
 function fecharModalLugar() { document.getElementById(‘modalLugar’).classList.remove(‘open’); document.body.style.overflow = ‘’; }
 
-// Carrossel lugares (flat, não coverflow)
+// ==========================================
+// CARROSSEL LUGARES — flat (não coverflow)
+// ==========================================
 var lugarCarrIndex=0, lugarCarrVisiveis=3, lugarCarrTotal=0;
-function lugarCarrCalcularVisiveis() { var vp=document.getElementById(‘lugares-viewport’); if(!vp) return 3; var w=vp.offsetWidth; if(w<480) return 1; return Math.max(1,Math.floor(w/(300+20))); }
+
+function lugarCarrCalcularVisiveis() {
+var vp=document.getElementById(‘lugares-viewport’);
+if(!vp) return 3;
+var w=vp.offsetWidth;
+if(w<480) return 1;
+return Math.max(1,Math.floor(w/(300+20)));
+}
+
 function lugarCarrAtualizar() {
-var track=document.getElementById(‘lugares-track’); var bp=document.getElementById(‘lugares-prev’); var bn=document.getElementById(‘lugares-next’); var dots=document.getElementById(‘lugares-dots’);
+var track=document.getElementById(‘lugares-track’);
+var bp=document.getElementById(‘lugares-prev’);
+var bn=document.getElementById(‘lugares-next’);
+var dots=document.getElementById(‘lugares-dots’);
 if(!track) return;
 track.style.transform = ‘translateX(-’+(lugarCarrIndex*(300+20))+‘px)’;
 if(bp) bp.disabled = lugarCarrIndex===0;
 if(bn) bn.disabled = lugarCarrIndex>=lugarCarrTotal-lugarCarrVisiveis;
-if(dots) { dots.innerHTML=’’; var nd=Math.max(1,lugarCarrTotal-lugarCarrVisiveis+1); for(var i=0;i<nd;i++){var d=document.createElement(‘button’);d.className=‘lugares-dot’+(i===lugarCarrIndex?’ active’:’’);d.onclick=(function(idx){return function(){lugarCarrIndex=idx;lugarCarrAtualizar();};})(i);dots.appendChild(d);} }
+if(dots) {
+dots.innerHTML=’’;
+var nd=Math.max(1,lugarCarrTotal-lugarCarrVisiveis+1);
+for(var i=0;i<nd;i++){
+var d=document.createElement(‘button’);
+d.className=‘lugares-dot’+(i===lugarCarrIndex?’ active’:’’);
+d.onclick=(function(idx){return function(){lugarCarrIndex=idx;lugarCarrAtualizar();};})(i);
+dots.appendChild(d);
 }
-function lc360Mover(dir) { lugarCarrIndex=Math.min(Math.max(0,lugarCarrTotal-lugarCarrVisiveis),Math.max(0,lugarCarrIndex+dir)); lugarCarrAtualizar(); }
+}
+}
+
+function lc360Mover(dir) {
+lugarCarrIndex=Math.min(Math.max(0,lugarCarrTotal-lugarCarrVisiveis),Math.max(0,lugarCarrIndex+dir));
+lugarCarrAtualizar();
+}
+
 function lc360Ir(i) { lugarCarrIndex=i; lugarCarrAtualizar(); }
+
 function lc360Selecionar(id) { abrirModalLugar(id); selecionarLugar(id); }
+
 function initLugarDrag() {
-var vp=document.getElementById(‘lugares-viewport’); if(!vp||vp._dragInit) return; vp._dragInit=true;
+var vp=document.getElementById(‘lugares-viewport’);
+if(!vp||vp._dragInit) return;
+vp._dragInit=true;
 var sx=0, drag=false;
 vp.addEventListener(‘mousedown’, function(e){drag=true;sx=e.clientX;vp.classList.add(‘dragging’);});
 vp.addEventListener(‘touchstart’,function(e){drag=true;sx=e.touches[0].clientX;},{passive:true});
-var end=function(e){if(!drag)return;drag=false;vp.classList.remove(‘dragging’);var ex=e.changedTouches?e.changedTouches[0].clientX:e.clientX;if(Math.abs(sx-ex)>50)lc360Mover(sx-ex>0?1:-1);};
-vp.addEventListener(‘mouseup’,end); vp.addEventListener(‘touchend’,end);
+var end=function(e){
+if(!drag)return;
+drag=false;
+vp.classList.remove(‘dragging’);
+var ex=e.changedTouches?e.changedTouches[0].clientX:e.clientX;
+if(Math.abs(sx-ex)>50)lc360Mover(sx-ex>0?1:-1);
+};
+vp.addEventListener(‘mouseup’,end);
+vp.addEventListener(‘touchend’,end);
 }
 
+// ==========================================
+// RENDER LUGAR CARDS — CORRIGIDO
+// Bug original: variáveis ‘lista’, ‘grid’, ‘L_’ indefinidas
+// ==========================================
 function renderLugarCards() {
-// DEPOIS — substitua por:
+var grid = document.getElementById(‘mapa-cards-grid’);
+if (!grid) return;
+
+```
+// Filtra lista conforme filtro ativo
+var lista = lugarFiltroAtivo === 'todos'
+    ? LUGARES
+    : LUGARES.filter(function(l){ return l.tipo === lugarFiltroAtivo; });
+
+// Labels localizados
+var L_ = MAPA_LABELS[idiomaAtual] || MAPA_LABELS['pt'];
+
+if (!lista.length) {
+    grid.innerHTML = '<div class="estado-vazio"><span class="icon">📍</span><p>Nenhum local encontrado.</p></div>';
+    return;
+}
+
 var cardsHTML = lista.map(function(lugar){
-var nome=lugar.nome[idiomaAtual]||lugar.nome[‘pt’];
-var desc=lugar.desc[idiomaAtual]||lugar.desc[‘pt’];
-var dist=lugar.dist[idiomaAtual]||lugar.dist[‘pt’];
-var hor=lugar.horario[idiomaAtual]||lugar.horario[‘pt’];
-var tl=lugar.tipo===‘restaurante’?L_.restaurante:L_.shopping;
-// Estrelas visuais (converte “★★★★☆” em HTML colorido)
-var starsHTML = (lugar.estrelas||’’).replace(/★/g,’<span class="star filled">★</span>’).replace(/☆/g,’<span class="star empty">☆</span>’);
-return ‘<div class="lugar-card-v2" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">’+
-‘<div class="lc2-header">’+
-‘<div class="lc2-badge">’+lugar.emoji+’ ‘+tl+’</div>’+
-(lugar.mapaLink?’<a class="lc2-maps-btn" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver no Google Maps">↗</a>’:’’)+
-‘</div>’+
-‘<div class="lc2-nome">’+nome+’</div>’+
-‘<div class="lc2-desc">’+(desc||’’)+’</div>’+
-‘<div class="lc2-divider"></div>’+
-‘<div class="lc2-footer">’+
-‘<div class="lc2-meta-col">’+
-‘<div class="lc2-stars">’+starsHTML+’</div>’+
-(hor?’<div class="lc2-horario">🕐 ‘+hor+’</div>’:’’)+
-‘</div>’+
-(dist?’<div class="lc2-dist"><span class="lc2-dist-icon">🚶</span><span>’+dist+’</span></div>’:’’)+
-‘</div>’+
-‘</div>’;
-}).join(’’);
+    var nome  = lugar.nome[idiomaAtual]  || lugar.nome['pt'];
+    var desc  = lugar.desc[idiomaAtual]  || lugar.desc['pt'];
+    var dist  = lugar.dist[idiomaAtual]  || lugar.dist['pt'];
+    var hor   = lugar.horario[idiomaAtual] || lugar.horario['pt'];
+    var tl    = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
 
+    // Estrelas visuais
+    var starsHTML = (lugar.estrelas || '').replace(/★/g,'<span class="star filled">★</span>').replace(/☆/g,'<span class="star empty">☆</span>');
 
-grid.innerHTML = '<div class="lugares-carrossel-wrapper">'+
-    '<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" disabled>&#x2039;</button>'+
-    '<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)">&#x203a;</button>'+
-    '<div class="lugares-viewport" id="lugares-viewport"><div class="lugares-track" id="lugares-track">'+cardsHTML+'</div></div>'+
-    '<div class="lugares-dots" id="lugares-dots"></div>'+
-'</div>';
-lugarCarrVisiveis=lugarCarrCalcularVisiveis(); lugarCarrAtualizar(); initLugarDrag();
-window.addEventListener('resize',function(){lugarCarrVisiveis=lugarCarrCalcularVisiveis();lugarCarrAtualizar();});
+    return '<div class="lugar-card-v2" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">' +
+        '<div class="lc2-header">' +
+            '<div class="lc2-badge">' + lugar.emoji + ' ' + tl + '</div>' +
+            (lugar.mapaLink
+                ? '<a class="lc2-maps-btn" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver no Google Maps">↗</a>'
+                : '') +
+        '</div>' +
+        '<div class="lc2-nome">' + nome + '</div>' +
+        '<div class="lc2-desc">' + (desc || '') + '</div>' +
+        '<div class="lc2-divider"></div>' +
+        '<div class="lc2-footer">' +
+            '<div class="lc2-meta-col">' +
+                '<div class="lc2-stars">' + starsHTML + '</div>' +
+                (hor ? '<div class="lc2-horario">🕐 ' + hor + '</div>' : '') +
+            '</div>' +
+            (dist ? '<div class="lc2-dist"><span class="lc2-dist-icon">🚶</span><span>' + dist + '</span></div>' : '') +
+        '</div>' +
+    '</div>';
+}).join('');
 
+lugarCarrTotal = lista.length;
+lugarCarrIndex = 0;
+
+grid.innerHTML =
+    '<div class="lugares-carrossel-wrapper">' +
+        '<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" disabled>&#x2039;</button>' +
+        '<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)">&#x203a;</button>' +
+        '<div class="lugares-viewport" id="lugares-viewport">' +
+            '<div class="lugares-track" id="lugares-track">' + cardsHTML + '</div>' +
+        '</div>' +
+        '<div class="lugares-dots" id="lugares-dots"></div>' +
+    '</div>';
+
+lugarCarrVisiveis = lugarCarrCalcularVisiveis();
+lugarCarrAtualizar();
+initLugarDrag();
+
+window.addEventListener('resize', function(){
+    lugarCarrVisiveis = lugarCarrCalcularVisiveis();
+    lugarCarrAtualizar();
+});
+```
 
 }
 
 function atualizarTextosMapa() {
-var ids = {labelEl:‘label-mapa’,tituloEl:‘titulo-mapa’,loadEl:‘mapa-loading-txt’,btnTodos:‘filtro-todos’,btnRest:‘filtro-restaurante’,btnShop:‘filtro-shopping’};
-var vals = {labelEl:t(‘mapa_label’),tituloEl:t(‘mapa_titulo’),loadEl:t(‘mapa_carregando’),btnTodos:t(‘mapa_todos’),btnRest:t(‘mapa_restaurantes’),btnShop:t(‘mapa_compras’)};
+var ids = {
+labelEl:‘label-mapa’, tituloEl:‘titulo-mapa’, loadEl:‘mapa-loading-txt’,
+btnTodos:‘filtro-todos’, btnRest:‘filtro-restaurante’, btnShop:‘filtro-shopping’
+};
+var vals = {
+labelEl:t(‘mapa_label’), tituloEl:t(‘mapa_titulo’), loadEl:t(‘mapa_carregando’),
+btnTodos:t(‘mapa_todos’), btnRest:t(‘mapa_restaurantes’), btnShop:t(‘mapa_compras’)
+};
 Object.keys(ids).forEach(function(k){ var el=document.getElementById(ids[k]); if(el) el.innerText=vals[k]; });
 if (document.getElementById(‘mapa-cards-grid’)) renderLugarCards();
 }
