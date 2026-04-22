@@ -1,33 +1,28 @@
 /* ==========================================
    COVERFLOW CAROUSEL — POSITION ABSOLUTE
-   Cards centralizados, transform 3D via JS
    ========================================== */
 
-/* Viewport com perspectiva */
 #passeios {
     overflow: hidden;
     position: relative;
+    width: 100%;
     cursor: grab;
     padding: 24px 0 40px;
-    perspective: 900px;
+    perspective: 1100px;
     perspective-origin: 50% 40%;
-    -webkit-perspective: 900px;
+    -webkit-perspective: 1100px;
 }
 
 #passeios.dragging { cursor: grabbing; }
 
-/* Track vira container relativo, sem flex */
 #passeios-track {
-    display: block !important;
+    display: block;
     position: relative;
+    width: 100%;
     height: 490px;
-    transform: none !important;
-    transition: none !important;
+    overflow: visible;
 }
 
-/* ==========================================
-   CARD — absolute, centrado
-   ========================================== */
 .card-passeio {
     position: absolute !important;
     top: 0;
@@ -35,24 +30,20 @@
     width: 280px;
     margin: 0 !important;
     flex: none !important;
-
     background: var(--white);
     border: 1px solid var(--gold-dim);
     border-radius: var(--radius-card);
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 8px 32px rgba(15,23,42,0.12);
-
     transition:
         transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
         box-shadow 0.5s ease,
         opacity    0.5s ease,
         filter     0.5s ease;
-
     will-change: transform, opacity, filter;
     transform-origin: center center;
     transform-style: preserve-3d;
-
     filter: brightness(0.72) saturate(0.55);
     opacity: 0.68;
 }
@@ -66,7 +57,6 @@
     border-color: rgba(181,132,58,0.45) !important;
 }
 
-/* ---- imagem ---- */
 .card-img {
     height: 205px;
     overflow: hidden;
@@ -110,24 +100,12 @@
     transition: opacity 0.3s;
     pointer-events: none;
 }
+
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 .card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
 
-.card-preco-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 12px;
-    border-radius: 20px;
-    z-index: 2;
-}
+.card-preco-badge { display: none !important; }
 
-/* ---- corpo ---- */
 .card-body { padding: 20px 22px 22px; }
 
 .card-nome {
@@ -179,12 +157,8 @@
 }
 .btn-reservar:hover { background: var(--gold-light); }
 
-/* skeleton escondido no coverflow */
 .card-skeleton { display: none !important; }
 
-/* ==========================================
-   BOTÕES NAV
-   ========================================== */
 .carrossel-wrapper { position: relative; }
 
 .carr-btn {
@@ -207,13 +181,10 @@
     transition: background 0.2s, color 0.2s, opacity 0.2s;
 }
 .carr-btn:hover:not(:disabled) { background: var(--gold); color: #fff; }
-.carr-btn:disabled              { opacity: 0.2; cursor: default; }
+.carr-btn:disabled { opacity: 0.2; cursor: default; }
 .carr-prev { left: 8px; }
 .carr-next { right: 8px; }
 
-/* ==========================================
-   DOTS
-   ========================================== */
 .carr-dots {
     display: flex;
     justify-content: center;
@@ -236,38 +207,22 @@
     border-radius: 4px;
 }
 
-/* ==========================================
-   MOBILE ≤ 768px
-   ========================================== */
 @media (max-width: 768px) {
     #passeios {
         padding: 16px 0 28px;
-        perspective: 700px;
-        -webkit-perspective: 700px;
+        perspective: 800px;
+        -webkit-perspective: 800px;
     }
-
     #passeios-track { height: 460px; }
-
-    .card-passeio {
-        width: 74vw;
-        max-width: 290px;
-    }
-
+    .card-passeio { width: 74vw; max-width: 290px; }
     .card-img  { height: 185px; }
     .card-body { padding: 16px 18px 20px; }
     .card-nome { font-size: 17px; }
-
-    /* nav escondido — usa swipe */
     .carr-btn  { display: none; }
 }
 
 @media (max-width: 480px) {
     #passeios-track { height: 440px; }
-
-    .card-passeio {
-        width: 80vw;
-        max-width: 270px;
-    }
-
+    .card-passeio { width: 80vw; max-width: 270px; }
     .card-img { height: 170px; }
 }
