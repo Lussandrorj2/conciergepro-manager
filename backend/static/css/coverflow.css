@@ -1,80 +1,74 @@
 /* ==========================================
-   COVERFLOW CAROUSEL — PASSEIOS
-   Substitui o carrossel flat pelo efeito
-   coverflow 3-D estilo App Store / iTunes
+   COVERFLOW CAROUSEL — POSITION ABSOLUTE
+   Cards centralizados, transform 3D via JS
    ========================================== */
 
-/* Container principal do carrossel */
-.carrossel-wrapper {
-    position: relative;
-    /* perspectiva 3D para o efeito coverflow */
-    perspective: 1200px;
-    overflow: visible;
-}
-
-/* Viewport (clipping area) */
+/* Viewport com perspectiva */
 #passeios {
     overflow: hidden;
+    position: relative;
     cursor: grab;
-    padding: 32px 0 48px;   /* espaço vertical para as sombras e escala */
+    padding: 24px 0 40px;
+    perspective: 900px;
+    perspective-origin: 50% 40%;
+    -webkit-perspective: 900px;
 }
 
 #passeios.dragging { cursor: grabbing; }
 
-/* Track — transition suave no transform */
+/* Track vira container relativo, sem flex */
 #passeios-track {
-    display: flex;
-    gap: 0;                  /* gap controlado pelo margin-right de cada card */
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-style: preserve-3d;
-    will-change: transform;
-    align-items: center;
+    display: block !important;
+    position: relative;
+    height: 490px;
+    transform: none !important;
+    transition: none !important;
 }
 
 /* ==========================================
-   CARD COVERFLOW
+   CARD — absolute, centrado
    ========================================== */
 .card-passeio {
+    position: absolute !important;
+    top: 0;
+    left: 50%;
+    width: 280px;
+    margin: 0 !important;
+    flex: none !important;
+
     background: var(--white);
     border: 1px solid var(--gold-dim);
     border-radius: var(--radius-card);
     overflow: hidden;
     cursor: pointer;
-    /* largura fixa — JS vai sobrescrever o transform */
-    flex: 0 0 300px;
-    margin-right: 20px;
     box-shadow: 0 8px 32px rgba(15,23,42,0.12);
 
-    /* animação 3D */
     transition:
         transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
         box-shadow 0.5s ease,
-        opacity 0.5s ease,
-        filter 0.5s ease;
+        opacity    0.5s ease,
+        filter     0.5s ease;
 
+    will-change: transform, opacity, filter;
     transform-origin: center center;
     transform-style: preserve-3d;
-    will-change: transform;
 
-    /* cards laterais levemente escurecidos */
-    filter: brightness(0.82) saturate(0.7);
-    opacity: 0.75;
+    filter: brightness(0.72) saturate(0.55);
+    opacity: 0.68;
 }
 
-/* Card ATIVO (centro) — destaque total */
 .card-passeio.coverflow-active {
-    filter: brightness(1) saturate(1);
-    opacity: 1;
+    filter: brightness(1) saturate(1) !important;
+    opacity: 1 !important;
     box-shadow:
-        0 20px 60px rgba(181,132,58,0.22),
-        0 8px 24px rgba(15,23,42,0.18);
-    z-index: 10;
-    border-color: rgba(181,132,58,0.35);
+        0 24px 60px rgba(181,132,58,0.28),
+        0 6px 20px rgba(15,23,42,0.14) !important;
+    border-color: rgba(181,132,58,0.45) !important;
 }
 
-/* card foto */
+/* ---- imagem ---- */
 .card-img {
-    height: 220px;
+    height: 205px;
     overflow: hidden;
     position: relative;
     background: #e2e8f0;
@@ -84,8 +78,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    opacity: 1 !important;
     transition: transform 0.5s;
-    filter: none;
 }
 
 .card-passeio.coverflow-active .card-img img {
@@ -99,10 +96,9 @@
     align-items: center;
     justify-content: center;
     font-size: 40px;
-    background: linear-gradient(135deg,#e2e8f0,#cbd5e1);
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
 }
 
-/* hover overlay — apenas no card ativo */
 .card-img-hover {
     position: absolute;
     inset: 0;
@@ -114,34 +110,29 @@
     transition: opacity 0.3s;
     pointer-events: none;
 }
-
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
-
-.card-img-hover span {
-    color: #fff;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 1px;
-}
+.card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
 
 .card-preco-badge {
     position: absolute;
     top: 12px;
     left: 12px;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.6);
     backdrop-filter: blur(6px);
     color: #fff;
     font-size: 12px;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
+    z-index: 2;
 }
 
-.card-body { padding: 22px 24px 24px; }
+/* ---- corpo ---- */
+.card-body { padding: 20px 22px 22px; }
 
 .card-nome {
     font-family: 'Playfair Display', serif;
-    font-size: 19px;
+    font-size: 18px;
     margin-bottom: 8px;
     line-height: 1.3;
 }
@@ -149,7 +140,7 @@
 .card-desc {
     font-size: 13px;
     color: var(--text-muted);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -161,23 +152,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .card-preco {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--gold);
     display: flex;
     flex-direction: column;
     line-height: 1.2;
 }
-
-.card-preco small {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--text-muted);
-}
+.card-preco small { font-size:11px; font-weight:400; color:var(--text-muted); }
 
 .btn-reservar {
     background: var(--gold);
@@ -189,24 +175,25 @@
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
-    transition: background 0.2s, transform 0.15s;
+    transition: background 0.2s;
 }
+.btn-reservar:hover { background: var(--gold-light); }
 
-.btn-reservar:hover {
-    background: var(--gold-light);
-    transform: translateY(-1px);
-}
+/* skeleton escondido no coverflow */
+.card-skeleton { display: none !important; }
 
 /* ==========================================
-   BOTÕES NAV DO COVERFLOW
+   BOTÕES NAV
    ========================================== */
+.carrossel-wrapper { position: relative; }
+
 .carr-btn {
     position: absolute;
-    top: 50%;
+    top: calc(50% - 20px);
     transform: translateY(-50%);
-    z-index: 20;
-    width: 48px;
-    height: 48px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: none;
     background: var(--white);
@@ -216,23 +203,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(15,23,42,0.14);
-    transition: background 0.2s, color 0.2s, transform 0.2s, opacity 0.2s;
+    box-shadow: 0 4px 16px rgba(15,23,42,0.14);
+    transition: background 0.2s, color 0.2s, opacity 0.2s;
 }
-
-.carr-btn:hover:not(:disabled) {
-    background: var(--gold);
-    color: #fff;
-    transform: translateY(-50%) scale(1.08);
-}
-
-.carr-btn:disabled { opacity: 0.2; cursor: default; }
-
-.carr-prev { left: 0; }
-.carr-next { right: 0; }
+.carr-btn:hover:not(:disabled) { background: var(--gold); color: #fff; }
+.carr-btn:disabled              { opacity: 0.2; cursor: default; }
+.carr-prev { left: 8px; }
+.carr-next { right: 8px; }
 
 /* ==========================================
-   DOTS INDICADORES
+   DOTS
    ========================================== */
 .carr-dots {
     display: flex;
@@ -242,16 +222,14 @@
 }
 
 .carr-dot {
-    width: 7px;
-    height: 7px;
+    width: 7px; height: 7px;
     border-radius: 50%;
     border: none;
     background: rgba(181,132,58,0.25);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     padding: 0;
 }
-
 .carr-dot.active {
     background: var(--gold);
     width: 26px;
@@ -259,70 +237,37 @@
 }
 
 /* ==========================================
-   SKELETON COM COVERFLOW
-   ========================================== */
-.card-skeleton {
-    background: var(--white);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    flex: 0 0 300px;
-    margin-right: 20px;
-    opacity: 0.5;
-}
-
-.skeleton {
-    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
-    border-radius: 6px;
-}
-
-@keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-/* ==========================================
-   MOBILE — COVERFLOW ADAPTADO
+   MOBILE ≤ 768px
    ========================================== */
 @media (max-width: 768px) {
     #passeios {
-        padding: 24px 0 40px;
-        overflow: visible;
+        padding: 16px 0 28px;
+        perspective: 700px;
+        -webkit-perspective: 700px;
     }
 
-    /* wrapper com clipping lateral */
-    .carrossel-wrapper {
-        overflow: hidden;
-        padding: 0 0 8px;
-    }
+    #passeios-track { height: 460px; }
 
     .card-passeio {
-        flex: 0 0 72vw;
-        max-width: 300px;
-        margin-right: 16px;
+        width: 74vw;
+        max-width: 290px;
     }
 
-    .card-skeleton {
-        flex: 0 0 72vw;
-        max-width: 300px;
-    }
-
-    .card-img { height: 190px; }
+    .card-img  { height: 185px; }
     .card-body { padding: 16px 18px 20px; }
     .card-nome { font-size: 17px; }
 
-    /* botões nav escondidos em mobile — swipe nativo */
-    .carr-btn { display: none; }
-
-    .carr-dots { margin-top: 16px; }
+    /* nav escondido — usa swipe */
+    .carr-btn  { display: none; }
 }
 
 @media (max-width: 480px) {
+    #passeios-track { height: 440px; }
+
     .card-passeio {
-        flex: 0 0 78vw;
+        width: 80vw;
+        max-width: 270px;
     }
 
-    .card-skeleton { flex: 0 0 78vw; }
-    .card-img { height: 175px; }
+    .card-img { height: 170px; }
 }
