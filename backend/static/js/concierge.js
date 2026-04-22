@@ -39,7 +39,7 @@ var i18n = {
     mapa_carregando: 'Carregando mapa…', mapa_abrir: 'Ver no Google Maps', mapa_ver: 'Ver no mapa'
     },
     en: {
-    btn: 'See details', vazio: "No tours found.', erro: 'Loading error.',
+    btn: 'See details', vazio: 'No tours found.', erro: 'Loading error.',
     explorar: 'Explore', secao_label: 'Tours', secao_titulo: 'Available experiences',
     sob_consulta: 'On request', por_pessoa: '/ person', modal_eyebrow: 'Tour Inquiry',
     det_eyebrow: 'Experience', lbl_data: 'Preferred date', lbl_horario: 'Preferred time',
