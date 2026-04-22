@@ -47,7 +47,7 @@ var i18n = {
     resumo_passeio: 'Tour', resumo_qtd: 'Guests', resumo_total: 'Estimated total',
     btn_confirmar: 'Chat on WhatsApp', btn_reservar_det: 'Book now',
     btn_voltar: 'Back to details', sucesso: 'Redirecting to WhatsApp!', sem_imagem: 'No image',
-    wpp_msg: function(n,p,q,d,h){ var m='Hello! My name is *'+n+'* and I'm interested in the tour *'+p+'* for *'+q+' guest(s)*'; if(d) m+=' on *'+d+'*'; if(h) m+=' at *'+h+'*'; m+='. Could you confirm availability?'; return m; },
+    wpp_msg: function(n,p,q,d,h){ var m='Hello! My name is *'+n+"* and I'm interested in the tour *"+p+'* for *'+q+' guest(s)*'; if(d) m+=' on *'+d+'*'; if(h) m+=' at *'+h+'*'; m+='. Could you confirm availability?'; return m; },
     aviso_wpp: 'You will be redirected to the hotel's WhatsApp to confirm your booking.',
     campos_obrigatorios: 'Please fill in your name and phone number.',
     mapa_label: 'Nearby', mapa_titulo: 'Restaurants & Shopping',
