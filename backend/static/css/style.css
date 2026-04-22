@@ -1178,8 +1178,8 @@ body {
 }
 
 /* ==========================================
-   RESPONSIVO MOBILE — ESTILO APP NATIVO
-   Breakpoint principal: 768px
+   RESPONSIVO MOBILE — SUBSTITUA O BLOCO
+   @media (max-width: 768px) INTEIRO por este
    ========================================== */
 @media (max-width: 768px) {
 
@@ -1199,41 +1199,46 @@ body {
     .carr-next { right: 4px; }
     .carr-btn  { width: 36px; height: 36px; font-size: 18px; }
 
-    /* FIXED: cards ocupam quase toda a tela com margem lateral */
-    .card-passeio { flex: 0 0 calc(100vw - 48px); max-width: 360px; }
+    .card-passeio  { flex: 0 0 calc(100vw - 48px); max-width: 360px; }
     .card-skeleton { flex: 0 0 calc(100vw - 48px); }
+    .card-img      { height: 200px; }
+    .card-body     { padding: 18px 20px 20px; }
+    .card-nome     { font-size: 18px; }
 
-    /* card foto menor em mobile */
-    .card-img  { height: 200px; }
-
-    /* card body mais compacto */
-    .card-body { padding: 18px 20px 20px; }
-    .card-nome { font-size: 18px; }
-
-    /* --- overlay mobile: bottom sheet --- */
+    /* -------------------------------------------------------
+       OVERLAY — fundo escuro, centralizado verticalmente
+       para o card flutuar igual ao modelo de referência
+    ------------------------------------------------------- */
     .modal-overlay {
-       align-items: flex-end;
-       padding: 0;
-       background: rgba(0,0,0,0.55);
-       overflow-y: hidden; /* ← era: auto — impede scroll no overlay */
-   }
+        align-items: flex-end;          /* bottom sheet: ancora na base */
+        justify-content: center;
+        padding: 0;                     /* sem padding — sheet vai até a borda */
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(6px);
+        overflow-y: hidden;             /* scroll fica DENTRO do modal */
+    }
 
     /* -------------------------------------------------------
        BOTTOM SHEET — detalhe do passeio
+       Igual às imagens 3 e 4 do modelo de referência:
+       card sobe por baixo, bordas arredondadas no topo,
+       alça de drag, foto sem border-radius
     ------------------------------------------------------- */
     .modal-detalhe {
-       width: 100%;
-       max-width: 100%;
-       max-height: 92svh;
-       margin: 0;
-       border-radius: 24px 24px 0 0;
-       animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
-       padding-top: 4px;
-       overflow-y: auto; /* scroll fica no modal, não no overlay */
-       -webkit-overflow-scrolling: touch;
-   }
+        width: 100%;
+        max-width: 100%;
+        max-height: 92svh;
+        margin: 0;
+        border-radius: 24px 24px 0 0;
+        animation: sheetUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        padding-top: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+    }
 
-    /* alça de drag no topo */
+    /* alça de drag */
     .modal-detalhe::before {
         content: '';
         display: block;
@@ -1241,23 +1246,26 @@ body {
         height: 4px;
         background: #d1d5db;
         border-radius: 2px;
-        margin: 10px auto 0;
+        margin: 12px auto 0;
+        flex-shrink: 0;
     }
 
-    /* FIXED: foto sem border-radius e sem overlay marrom */
+    /* foto ocupa toda a largura, sem bordas */
     .det-foto-wrap {
         height: 260px;
         border-radius: 0;
+        flex-shrink: 0;
         background: #111;
     }
 
-    /* CRITICAL FIX: garantir que imagem aparece limpa, sem tinting */
+    /* imagem limpa — sem nenhum filtro de cor */
     .det-foto-slide img {
         filter: none !important;
         opacity: 1 !important;
         mix-blend-mode: normal !important;
     }
 
+    /* botão fechar reposicionado para o topo da sheet */
     .modal-close-det {
         top: 20px;
         right: 16px;
@@ -1270,6 +1278,7 @@ body {
     .det-body { padding: 20px 20px 40px; }
     .det-nome { font-size: 22px; }
 
+    /* rodapé: preço em cima, botão embaixo */
     .det-footer {
         flex-direction: column;
         align-items: stretch;
@@ -1286,22 +1295,27 @@ body {
 
     /* -------------------------------------------------------
        BOTTOM SHEET — formulário de reserva
+       Igual imagem 4: campos empilhados, resumo e botão
+       WhatsApp visíveis sem corte
     ------------------------------------------------------- */
     .modal-reserva {
-       width: 100%;
-       max-width: 100%;
-       max-height: 94svh;
-       margin: 0;
-       border-radius: 24px 24px 0 0;
-       padding: 0 0 env(safe-area-inset-bottom, 24px);
-       animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
-       display: flex;
-       flex-direction: column;
-       overflow-y: auto;
-       -webkit-overflow-scrolling: touch;
-   }
+        width: 100%;
+        max-width: 100%;
+        /* 94svh garante que o botão Reservar apareça */
+        max-height: 94svh;
+        margin: 0;
+        border-radius: 24px 24px 0 0;
+        /* padding-bottom respeita o botão home do iPhone */
+        padding: 0 0 env(safe-area-inset-bottom, 24px);
+        animation: sheetUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        display: flex;
+        flex-direction: column;
+        /* scroll interno — todo conteúdo acessível */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 
-    /* alça no topo da reserva */
+    /* alça de drag no topo da reserva */
     .modal-reserva::before {
         content: '';
         display: block;
@@ -1309,11 +1323,11 @@ body {
         height: 4px;
         background: #d1d5db;
         border-radius: 2px;
-        margin: 10px auto 0;
+        margin: 12px auto 0;
         flex-shrink: 0;
     }
 
-    /* padding lateral para todos os elementos da reserva */
+    /* padding lateral uniforme nos elementos do formulário */
     .modal-reserva .btn-voltar-det,
     .modal-reserva .modal-eyebrow,
     .modal-reserva .modal-title,
@@ -1322,9 +1336,17 @@ body {
         padding-right: 20px;
     }
 
-    .modal-reserva .btn-voltar-det { padding-top: 16px; margin-bottom: 12px; }
-    .modal-reserva .modal-title    { font-size: 18px; margin-bottom: 14px; }
+    .modal-reserva .btn-voltar-det {
+        padding-top: 16px;
+        margin-bottom: 12px;
+    }
 
+    .modal-reserva .modal-title {
+        font-size: 18px;
+        margin-bottom: 14px;
+    }
+
+    /* form rows e grupos também recebem margem lateral */
     .modal-reserva .form-row,
     .modal-reserva .form-group,
     .modal-reserva .modal-resumo,
@@ -1334,16 +1356,22 @@ body {
     }
 
     .modal-reserva .btn-confirmar {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         padding: 16px;
         font-size: 16px;
         border-radius: 14px;
+        /* garante largura correta com as margens laterais */
+        width: calc(100% - 40px);
     }
 
-    /* campos empilhados em mobile */
-    .form-row { grid-template-columns: 1fr; gap: 0; }
+    /* campos empilhados — sem grade de 2 colunas */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
 
-    /* CRITICAL FIX: font-size 16px impede zoom automático no iOS */
+    /* CRÍTICO: font-size 16px previne zoom automático no iOS */
     .form-group input {
         padding: 14px 16px;
         font-size: 16px !important;
@@ -1354,7 +1382,7 @@ body {
         appearance: none;
     }
 
-    /* date e time inputs também precisam de 16px */
+    /* todos os tipos de input precisam de 16px no iOS */
     input[type="date"],
     input[type="time"],
     input[type="text"],
@@ -1370,7 +1398,6 @@ body {
         margin-bottom: 6px;
     }
 
-    /* resumo mais compacto */
     .modal-resumo {
         border-radius: 14px;
         padding: 14px 16px;
@@ -1384,7 +1411,7 @@ body {
         max-width: 100%;
     }
 
-    /* filtros mapa — scroll horizontal */
+    /* filtros mapa: scroll horizontal sem barra visível */
     .filtros-mapa {
         width: 100%;
         display: flex;
@@ -1393,15 +1420,16 @@ body {
         padding-bottom: 4px;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
     }
     .filtros-mapa::-webkit-scrollbar { display: none; }
     .filtro-mapa-btn { flex-shrink: 0; font-size: 12px; padding: 7px 14px; }
 
     /* lugares */
-    .lugar-card { flex: 0 0 80vw; }
+    .lugar-card    { flex: 0 0 80vw; }
     .lugares-nav-btn { display: none; }
 
-    /* whatsapp fixo menor em mobile */
+    /* whatsapp fixo */
     #wpp-main {
         bottom: 16px;
         right: 16px;
@@ -1409,7 +1437,6 @@ body {
         font-size: 13px;
     }
 
-    /* toasts */
     .toast-container { right: 12px; bottom: 80px; }
 }
 
@@ -1417,19 +1444,14 @@ body {
    EXTRA PEQUENO — 480px
    ========================================== */
 @media (max-width: 480px) {
-    .lang-bar { top: 12px; right: 12px; }
+    .lang-bar       { top: 12px; right: 12px; }
     #txt-hero-title { font-size: clamp(28px, 9vw, 40px); }
 
-    .card-passeio { flex: 0 0 calc(100vw - 32px); }
+    .card-passeio  { flex: 0 0 calc(100vw - 32px); }
     .card-skeleton { flex: 0 0 calc(100vw - 32px); }
-    .card-img { height: 185px; }
-
+    .card-img      { height: 185px; }
     .det-foto-wrap { height: 230px; }
-
-    /* seção com menos padding */
-    .section { padding: 28px 12px 36px; }
-
-    /* section head mais compacto */
+    .section       { padding: 28px 12px 36px; }
     .section-title { font-size: 20px; }
 }
 
@@ -1448,8 +1470,9 @@ body {
     #wpp-main {
         bottom: calc(16px + env(safe-area-inset-bottom));
     }
-
     .modal-reserva {
         padding-bottom: env(safe-area-inset-bottom);
+    }
+}
     }
 }
