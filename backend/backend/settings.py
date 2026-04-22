@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # AMBIENTE
 # -----------------------
 # Railway define RAILWAY_ENVIRONMENT automaticamente
-IS_PROD = os.getenv("RAILWAY_ENVIRONMENT") is not None
+IS_PROD = os.getenv("DJANGO_ENV") == "production"
 
 # -----------------------
 # SEGURANÇA
