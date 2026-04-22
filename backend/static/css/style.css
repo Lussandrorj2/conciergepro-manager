@@ -25,6 +25,8 @@ body {
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    /* Prevent text size adjustment on iOS */
+    -webkit-text-size-adjust: 100%;
 }
 
 /* ==========================================
@@ -37,7 +39,7 @@ body {
     display: flex;
     align-items: center;
     overflow: hidden;
-    background: #1a1008;           /* fallback enquanto imagem carrega */
+    background: #1a1008;
 }
 
 #hero-bg {
@@ -46,7 +48,7 @@ body {
     background-size: cover;
     background-position: center;
     background-color: #1a1008;
-    opacity: 0;                    /* começa invisível; JS seta para 1 */
+    opacity: 0;
     transition: opacity 0.9s ease;
 }
 
@@ -300,6 +302,8 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s;
+    /* CRITICAL: Remove any color overlay/filter from the image itself */
+    filter: none;
 }
 
 .card-passeio:hover .card-img img { transform: scale(1.05); }
@@ -314,6 +318,7 @@ body {
     background: linear-gradient(135deg,#e2e8f0,#cbd5e1);
 }
 
+/* FIXED: Hover overlay only appears on hover, NOT by default */
 .card-img-hover {
     position: absolute;
     inset: 0;
@@ -323,6 +328,7 @@ body {
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s;
+    pointer-events: none;
 }
 
 .card-passeio:hover .card-img-hover { opacity: 1; }
@@ -504,30 +510,44 @@ body {
 
 .modal-close-det:hover { background: rgba(0,0,0,0.8); }
 
-/* Foto carrossel no detalhe */
+/* ==========================================
+   FOTO CARROSSEL NO DETALHE — CORRIGIDO
+   ========================================== */
 .det-foto-wrap {
     position: relative;
     height: 300px;
     overflow: hidden;
     border-radius: var(--radius-modal) var(--radius-modal) 0 0;
-    background: #1a1008;
+    /* FIXED: background neutro, sem cor marrom */
+    background: #1a1a1a;
 }
 
 .det-foto-track {
     display: flex;
     height: 100%;
     transition: transform 0.4s ease;
+    /* CRITICAL: sem background colorido no track */
+    background: transparent;
 }
 
 .det-foto-slide {
     flex: 0 0 100%;
     height: 100%;
+    /* CRITICAL: sem overlay marrom no slide */
+    background: transparent;
+    position: relative;
 }
 
+/* FIXED: imagem SEM filtro/overlay de cor */
 .det-foto-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+    /* CRITICAL: remove any color cast */
+    filter: none;
+    mix-blend-mode: normal;
+    opacity: 1;
 }
 
 .det-foto-slide-empty {
@@ -805,6 +825,8 @@ body {
     transition: border-color 0.2s;
     background: var(--white);
     width: 100%;
+    /* CRITICAL: prevent zoom on iOS — minimum 16px */
+    font-size: 16px;
 }
 
 .form-group input:focus {
@@ -973,7 +995,7 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ==========================================
-   LUGARES CAROUSEL (simples, horizontal)
+   LUGARES CAROUSEL
    ========================================== */
 .lugares-carrossel-wrapper {
     position: relative;
@@ -993,7 +1015,6 @@ body {
     transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* card de lugar */
 .lugar-card {
     flex: 0 0 300px;
     background: var(--white);
@@ -1069,7 +1090,6 @@ body {
 
 .lugar-card-link:hover { opacity: 0.7; }
 
-/* botões nav */
 .lugares-nav-btn {
     position: absolute;
     top: 50%;
@@ -1126,12 +1146,6 @@ body {
     border-radius: 4px;
 }
 
-@media (max-width: 768px) {
-    .lugar-card { flex: 0 0 82vw; }
-    .lugares-nav-btn.prev { left: -10px; }
-    .lugares-nav-btn.next { right: -10px; }
-}
-
 /* ==========================================
    TOAST
    ========================================== */
@@ -1164,24 +1178,39 @@ body {
 }
 
 /* ==========================================
-   RESPONSIVO — ESTILO APP NATIVO
+   RESPONSIVO MOBILE — ESTILO APP NATIVO
+   Breakpoint principal: 768px
    ========================================== */
 @media (max-width: 768px) {
 
     /* --- layout geral --- */
-    .hero-content { padding: 80px 20px 56px; }
-    .section      { padding: 40px 16px; }
-    .section-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .hero-content  { padding: 80px 20px 56px; }
+    .section       { padding: 32px 16px 40px; }
+    .section-head  { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .section-title { font-size: 22px; }
     .mapa-section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
     #mapa-container { height: 260px; border-radius: 12px; }
+
+    /* --- hero trust bar --- */
+    .hero-trust { font-size: 12px; padding: 12px 16px 20px; gap: 4px 12px; }
 
     /* --- carrossel passeios --- */
     .carr-prev { left: 4px; }
     .carr-next { right: 4px; }
     .carr-btn  { width: 36px; height: 36px; font-size: 18px; }
-    .card-passeio { flex: 0 0 82vw; }
 
-    /* --- overlay mobile: escurece e empurra sheet para cima --- */
+    /* FIXED: cards ocupam quase toda a tela com margem lateral */
+    .card-passeio { flex: 0 0 calc(100vw - 48px); max-width: 360px; }
+    .card-skeleton { flex: 0 0 calc(100vw - 48px); }
+
+    /* card foto menor em mobile */
+    .card-img  { height: 200px; }
+
+    /* card body mais compacto */
+    .card-body { padding: 18px 20px 20px; }
+    .card-nome { font-size: 18px; }
+
+    /* --- overlay mobile: bottom sheet --- */
     .modal-overlay {
         align-items: flex-end;
         padding: 0;
@@ -1198,10 +1227,10 @@ body {
         margin: 0;
         border-radius: 24px 24px 0 0;
         animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
-        /* alça de drag no topo */
         padding-top: 4px;
     }
 
+    /* alça de drag no topo */
     .modal-detalhe::before {
         content: '';
         display: block;
@@ -1209,25 +1238,33 @@ body {
         height: 4px;
         background: #d1d5db;
         border-radius: 2px;
-        margin: 8px auto 0;
+        margin: 10px auto 0;
     }
 
+    /* FIXED: foto sem border-radius e sem overlay marrom */
     .det-foto-wrap {
-        height: 240px;
-        border-radius: 0;           /* sem radius: sheet já tem no topo */
+        height: 260px;
+        border-radius: 0;
+        background: #111;
+    }
+
+    /* CRITICAL FIX: garantir que imagem aparece limpa, sem tinting */
+    .det-foto-slide img {
+        filter: none !important;
+        opacity: 1 !important;
+        mix-blend-mode: normal !important;
     }
 
     .modal-close-det {
         top: 20px;
         right: 16px;
-        background: rgba(0,0,0,0.45);
-        width: 32px;
-        height: 32px;
+        background: rgba(0,0,0,0.55);
+        width: 34px;
+        height: 34px;
         font-size: 14px;
     }
 
     .det-body { padding: 20px 20px 40px; }
-
     .det-nome { font-size: 22px; }
 
     .det-footer {
@@ -1241,6 +1278,7 @@ body {
         text-align: center;
         padding: 16px;
         font-size: 16px;
+        border-radius: 14px;
     }
 
     /* -------------------------------------------------------
@@ -1270,12 +1308,7 @@ body {
         flex-shrink: 0;
     }
 
-    /* área scrollável dentro da reserva */
-    .modal-reserva > *:not(:first-child) {
-        /* deixa o pseudo-element ocupar espaço sem afetar filhos */
-    }
-
-    /* cabeçalho da reserva fixo */
+    /* padding lateral para todos os elementos da reserva */
     .modal-reserva .btn-voltar-det,
     .modal-reserva .modal-eyebrow,
     .modal-reserva .modal-title,
@@ -1287,7 +1320,6 @@ body {
     .modal-reserva .btn-voltar-det { padding-top: 16px; margin-bottom: 12px; }
     .modal-reserva .modal-title    { font-size: 18px; margin-bottom: 14px; }
 
-    /* scroll interno */
     .modal-reserva .form-row,
     .modal-reserva .form-group,
     .modal-reserva .modal-resumo,
@@ -1303,15 +1335,29 @@ body {
         border-radius: 14px;
     }
 
-    /* campos empilhados */
+    /* campos empilhados em mobile */
     .form-row { grid-template-columns: 1fr; gap: 0; }
 
+    /* CRITICAL FIX: font-size 16px impede zoom automático no iOS */
     .form-group input {
-        padding: 14px 14px;
-        font-size: 16px;      /* evita zoom automático no iOS */
+        padding: 14px 16px;
+        font-size: 16px !important;
         border-radius: 12px;
         background: #f8f9fb;
         border-color: #e9ecef;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    /* date e time inputs também precisam de 16px */
+    input[type="date"],
+    input[type="time"],
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"] {
+        font-size: 16px !important;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .form-group label {
@@ -1319,29 +1365,29 @@ body {
         margin-bottom: 6px;
     }
 
-    /* resumo */
+    /* resumo mais compacto */
     .modal-resumo {
         border-radius: 14px;
         padding: 14px 16px;
     }
 
-    /* modal de lugar */
-    .modal-detalhe[style*="max-width:500px"],
-    .modal-overlay #modalLugar .modal-detalhe {
+    /* modal de lugar: também bottom sheet */
+    #modalLugar .modal-detalhe {
         border-radius: 24px 24px 0 0;
         max-height: 80svh;
         width: 100%;
         max-width: 100%;
     }
 
-    /* filtros mapa */
+    /* filtros mapa — scroll horizontal */
     .filtros-mapa {
         width: 100%;
         display: flex;
         gap: 6px;
         overflow-x: auto;
-        padding-bottom: 2px;
+        padding-bottom: 4px;
         scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
     .filtros-mapa::-webkit-scrollbar { display: none; }
     .filtro-mapa-btn { flex-shrink: 0; font-size: 12px; padding: 7px 14px; }
@@ -1350,17 +1396,55 @@ body {
     .lugar-card { flex: 0 0 80vw; }
     .lugares-nav-btn { display: none; }
 
-    /* modal close no lugar */
-    .modal-close { top: 14px; right: 14px; }
+    /* whatsapp fixo menor em mobile */
+    #wpp-main {
+        bottom: 16px;
+        right: 16px;
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+
+    /* toasts */
+    .toast-container { right: 12px; bottom: 80px; }
 }
 
-/* animação bottom sheet */
+/* ==========================================
+   EXTRA PEQUENO — 480px
+   ========================================== */
+@media (max-width: 480px) {
+    .lang-bar { top: 12px; right: 12px; }
+    #txt-hero-title { font-size: clamp(28px, 9vw, 40px); }
+
+    .card-passeio { flex: 0 0 calc(100vw - 32px); }
+    .card-skeleton { flex: 0 0 calc(100vw - 32px); }
+    .card-img { height: 185px; }
+
+    .det-foto-wrap { height: 230px; }
+
+    /* seção com menos padding */
+    .section { padding: 28px 12px 36px; }
+
+    /* section head mais compacto */
+    .section-title { font-size: 20px; }
+}
+
+/* ==========================================
+   ANIMAÇÃO BOTTOM SHEET
+   ========================================== */
 @keyframes sheetUp {
     from { transform: translateY(100%); }
     to   { transform: translateY(0); }
 }
 
-@media (max-width: 480px) {
-    .lang-bar { top: 12px; right: 12px; }
-    #txt-hero-title { font-size: clamp(28px, 9vw, 40px); }
+/* ==========================================
+   SAFE AREA — iPhone com notch/Dynamic Island
+   ========================================== */
+@supports (padding: env(safe-area-inset-bottom)) {
+    #wpp-main {
+        bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .modal-reserva {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
 }
