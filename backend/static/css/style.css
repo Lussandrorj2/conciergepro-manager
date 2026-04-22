@@ -1212,23 +1212,26 @@ body {
 
     /* --- overlay mobile: bottom sheet --- */
     .modal-overlay {
-        align-items: flex-end;
-        padding: 0;
-        background: rgba(0,0,0,0.55);
-    }
+       align-items: flex-end;
+       padding: 0;
+       background: rgba(0,0,0,0.55);
+       overflow-y: hidden; /* ← era: auto — impede scroll no overlay */
+   }
 
     /* -------------------------------------------------------
        BOTTOM SHEET — detalhe do passeio
     ------------------------------------------------------- */
     .modal-detalhe {
-        width: 100%;
-        max-width: 100%;
-        max-height: 92svh;
-        margin: 0;
-        border-radius: 24px 24px 0 0;
-        animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
-        padding-top: 4px;
-    }
+       width: 100%;
+       max-width: 100%;
+       max-height: 92svh;
+       margin: 0;
+       border-radius: 24px 24px 0 0;
+       animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+       padding-top: 4px;
+       overflow-y: auto; /* scroll fica no modal, não no overlay */
+       -webkit-overflow-scrolling: touch;
+   }
 
     /* alça de drag no topo */
     .modal-detalhe::before {
@@ -1285,16 +1288,18 @@ body {
        BOTTOM SHEET — formulário de reserva
     ------------------------------------------------------- */
     .modal-reserva {
-        width: 100%;
-        max-width: 100%;
-        max-height: 94svh;
-        margin: 0;
-        border-radius: 24px 24px 0 0;
-        padding: 0 0 env(safe-area-inset-bottom, 24px);
-        animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
-        display: flex;
-        flex-direction: column;
-    }
+       width: 100%;
+       max-width: 100%;
+       max-height: 94svh;
+       margin: 0;
+       border-radius: 24px 24px 0 0;
+       padding: 0 0 env(safe-area-inset-bottom, 24px);
+       animation: sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+       display: flex;
+       flex-direction: column;
+       overflow-y: auto;
+       -webkit-overflow-scrolling: touch;
+   }
 
     /* alça no topo da reserva */
     .modal-reserva::before {
