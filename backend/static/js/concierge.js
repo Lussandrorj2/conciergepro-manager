@@ -141,6 +141,7 @@ function coverflowGetConfig() {
     };
 }
 
+// SUBSTITUA a função coverflowAtualizar por esta versão:
 function coverflowAtualizar() {
     var track   = document.getElementById('passeios-track');
     var btnPrev = document.getElementById('carr-prev');
@@ -148,18 +149,8 @@ function coverflowAtualizar() {
     var dotsEl  = document.getElementById('carr-dots');
     if (!track) return;
 
-    var cards    = Array.from(track.querySelectorAll('.card-passeio'));
-    var cardW    = coverflowGetCardWidth();
-    var cfg      = coverflowGetConfig();
-    var viewW    = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
-
-    // Ajusta altura do track dinamicamente
-    var sampleCard = cards[0];
-    if (sampleCard) {
-        sampleCard.style.width = cardW + 'px';
-        var h = sampleCard.offsetHeight;
-        if (h > 0) track.style.height = (h + 40) + 'px';
-    }
+    var cards = Array.from(track.querySelectorAll('.card-passeio'));
+    var cfg   = coverflowGetConfig();
 
     cards.forEach(function(card, i) {
         var diff = i - carrIndex;
@@ -167,9 +158,10 @@ function coverflowAtualizar() {
 
         card.classList.toggle('coverflow-active', diff === 0);
 
-        // Posição base: centraliza o card no viewport
-        // left: 50% já está no CSS; usamos translateX para deslocar
-        var baseX  = -(cardW / 2);  // corrige o left:50% para centralizar o card
+        // ✅ USA A LARGURA REAL DO CARD DO DOM (não o valor JS)
+        var cardW = card.offsetWidth || coverflowGetCardWidth();
+
+        var baseX   = -(cardW / 2);
         var offsetX = diff * cardW * cfg.gap;
 
         var rotY    = diff < 0 ?  cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
@@ -180,7 +172,6 @@ function coverflowAtualizar() {
         var sat     = diff === 0 ? 1 : Math.max(0.3, 0.55 - (absD - 1) * 0.1);
         var zIndex  = 20 - absD;
 
-        // Oculta cards muito distantes
         if (absD > 4) {
             card.style.visibility = 'hidden';
             card.style.pointerEvents = 'none';
@@ -189,7 +180,6 @@ function coverflowAtualizar() {
 
         card.style.visibility    = 'visible';
         card.style.pointerEvents = absD > 2 ? 'none' : '';
-        card.style.width         = cardW + 'px';
         card.style.zIndex        = zIndex;
         card.style.opacity       = opacity;
         card.style.filter        = 'brightness(' + bright + ') saturate(' + sat + ')';
@@ -201,11 +191,16 @@ function coverflowAtualizar() {
         ].join(' ');
     });
 
-    // Botões
+    // Ajusta altura do track pelo card ativo
+    var activeCard = cards[carrIndex];
+    if (activeCard) {
+        var h = activeCard.offsetHeight;
+        if (h > 0) track.style.height = (h + 40) + 'px';
+    }
+
     if (btnPrev) btnPrev.disabled = carrIndex === 0;
     if (btnNext) btnNext.disabled = carrIndex >= carrTotal - 1;
 
-    // Dots
     if (dotsEl) {
         dotsEl.innerHTML = '';
         for (var i = 0; i < carrTotal; i++) {
@@ -217,6 +212,7 @@ function coverflowAtualizar() {
         }
     }
 }
+
 
 function carrosselMover(dir) {
     carrIndex = Math.min(carrTotal - 1, Math.max(0, carrIndex + dir));
