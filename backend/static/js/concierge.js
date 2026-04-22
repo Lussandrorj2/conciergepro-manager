@@ -109,7 +109,7 @@ async function carregarHotel(lang) {
         }
         var bg = document.getElementById('hero-bg');
         if (bg && data.foto_capa) {
-            bg.style.backgroundImage = 'url('” + data.foto_capa + '')”;
+            bg.style.backgroundImage = "url('' + data.foto_capa + '')";
             bg.style.opacity = '1';
         }
         var t1 = document.getElementById('txt-hero-title');
