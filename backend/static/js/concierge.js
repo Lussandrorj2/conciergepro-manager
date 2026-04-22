@@ -141,6 +141,7 @@ scaleSide:  isMobile ? 0.86 : 0.88,
 };
 }
 
+// SUBSTITUA a função coverflowAtualizar por esta versão:
 function coverflowAtualizar() {
 var track   = document.getElementById(‘passeios-track’);
 var btnPrev = document.getElementById(‘carr-prev’);
@@ -149,18 +150,8 @@ var dotsEl  = document.getElementById(‘carr-dots’);
 if (!track) return;
 
 ```
-var cards    = Array.from(track.querySelectorAll('.card-passeio'));
-var cardW    = coverflowGetCardWidth();
-var cfg      = coverflowGetConfig();
-var viewW    = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
-
-// Ajusta altura do track dinamicamente
-var sampleCard = cards[0];
-if (sampleCard) {
-    sampleCard.style.width = cardW + 'px';
-    var h = sampleCard.offsetHeight;
-    if (h > 0) track.style.height = (h + 40) + 'px';
-}
+var cards = Array.from(track.querySelectorAll('.card-passeio'));
+var cfg   = coverflowGetConfig();
 
 cards.forEach(function(card, i) {
     var diff = i - carrIndex;
@@ -168,12 +159,12 @@ cards.forEach(function(card, i) {
 
     card.classList.toggle('coverflow-active', diff === 0);
 
-    // Posição base: centraliza o card no viewport
-    // left: 50% já está no CSS; usamos translateX para deslocar
-    var baseX  = -(cardW / 2);  // corrige o left:50% para centralizar o card
-    var offsetX = diff * cardW * cfg.gap;
+    // Lê a largura REAL do card no DOM (respeita CSS: 74vw, 80vw, 280px)
+    var cardW = card.offsetWidth || coverflowGetCardWidth();
 
-    var rotY    = diff < 0 ?  cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
+    var baseX   = -(cardW / 2);
+    var offsetX = diff * cardW * cfg.gap;
+    var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
     var transZ  = diff === 0 ? 0 : cfg.transZ * Math.min(absD, 2);
     var scale   = diff === 0 ? cfg.scaleActive : Math.max(0.75, cfg.scaleSide - (absD - 1) * 0.06);
     var opacity = diff === 0 ? 1 : Math.max(0.3, 0.72 - (absD - 1) * 0.18);
@@ -181,39 +172,42 @@ cards.forEach(function(card, i) {
     var sat     = diff === 0 ? 1 : Math.max(0.3, 0.55 - (absD - 1) * 0.1);
     var zIndex  = 20 - absD;
 
-    // Oculta cards muito distantes
     if (absD > 4) {
-        card.style.visibility = 'hidden';
+        card.style.visibility    = 'hidden';
         card.style.pointerEvents = 'none';
         return;
     }
 
     card.style.visibility    = 'visible';
     card.style.pointerEvents = absD > 2 ? 'none' : '';
-    card.style.width         = cardW + 'px';
     card.style.zIndex        = zIndex;
     card.style.opacity       = opacity;
     card.style.filter        = 'brightness(' + bright + ') saturate(' + sat + ')';
     card.style.transform     = [
         'translateX(' + (baseX + offsetX) + 'px)',
         'translateZ(' + transZ + 'px)',
-        'rotateY(' + rotY + 'deg)',
-        'scale(' + scale + ')'
+        'rotateY('    + rotY   + 'deg)',
+        'scale('      + scale  + ')'
     ].join(' ');
 });
 
-// Botões
+// Altura dinâmica baseada no card ativo
+var activeCard = cards[carrIndex];
+if (activeCard) {
+    var h = activeCard.offsetHeight;
+    if (h > 0) track.style.height = (h + 40) + 'px';
+}
+
 if (btnPrev) btnPrev.disabled = carrIndex === 0;
 if (btnNext) btnNext.disabled = carrIndex >= carrTotal - 1;
 
-// Dots
 if (dotsEl) {
     dotsEl.innerHTML = '';
-    for (var i = 0; i < carrTotal; i++) {
+    for (var j = 0; j < carrTotal; j++) {
         var d = document.createElement('button');
-        d.className = 'carr-dot' + (i === carrIndex ? ' active' : '');
-        d.setAttribute('aria-label', 'Item ' + (i + 1));
-        d.onclick = (function(idx){ return function(){ coverflowIr(idx); }; })(i);
+        d.className = 'carr-dot' + (j === carrIndex ? ' active' : '');
+        d.setAttribute('aria-label', 'Item ' + (j + 1));
+        d.onclick = (function(idx){ return function(){ coverflowIr(idx); }; })(j);
         dotsEl.appendChild(d);
     }
 }
@@ -733,35 +727,44 @@ vp.addEventListener(‘mouseup’,end); vp.addEventListener(‘touchend’,end);
 }
 
 function renderLugarCards() {
-var grid = document.getElementById(‘mapa-cards-grid’);
-if (!grid) return;
-var L_ = MAPA_LABELS[idiomaAtual]||MAPA_LABELS[‘pt’];
-var lista = lugarFiltroAtivo===‘todos’ ? LUGARES : LUGARES.filter(function(l){return l.tipo===lugarFiltroAtivo;});
-if (!lista.length) { grid.innerHTML=’<div style="color:var(--text-muted);font-size:13px;padding:20px 0;">’+t(‘vazio’)+’</div>’; lugarCarrTotal=0; return; }
-lugarCarrTotal=lista.length; lugarCarrIndex=0; lugarCarrVisiveis=lugarCarrCalcularVisiveis();
+// DEPOIS — substitua por:
 var cardsHTML = lista.map(function(lugar){
 var nome=lugar.nome[idiomaAtual]||lugar.nome[‘pt’];
 var desc=lugar.desc[idiomaAtual]||lugar.desc[‘pt’];
 var dist=lugar.dist[idiomaAtual]||lugar.dist[‘pt’];
 var hor=lugar.horario[idiomaAtual]||lugar.horario[‘pt’];
 var tl=lugar.tipo===‘restaurante’?L_.restaurante:L_.shopping;
-return ‘<div class="lugar-card" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">’+
-‘<div class="lugar-tipo-badge">’+lugar.emoji+’ ‘+tl+’</div>’+
-‘<div class="lugar-nome">’+nome+’</div>’+
-‘<div class="lugar-info-desc">’+(desc||’’)+’</div>’+
-(hor?’<div class="lugar-horario-txt">🕐 ‘+hor+’</div>’:’’)+
-‘<div class="lugar-meta"><span class="lugar-estrelas">’+lugar.estrelas+’</span><span>🚶 ‘+(dist||’’)+’</span></div>’+
-(lugar.mapaLink?’<a class="lugar-card-link" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ‘+t(‘mapa_abrir’)+’</a>’:’’)+
+// Estrelas visuais (converte “★★★★☆” em HTML colorido)
+var starsHTML = (lugar.estrelas||’’).replace(/★/g,’<span class="star filled">★</span>’).replace(/☆/g,’<span class="star empty">☆</span>’);
+return ‘<div class="lugar-card-v2" onclick="lc360Selecionar('+lugar.id+')" role="button" tabindex="0">’+
+‘<div class="lc2-header">’+
+‘<div class="lc2-badge">’+lugar.emoji+’ ‘+tl+’</div>’+
+(lugar.mapaLink?’<a class="lc2-maps-btn" href="'+lugar.mapaLink+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver no Google Maps">↗</a>’:’’)+
+‘</div>’+
+‘<div class="lc2-nome">’+nome+’</div>’+
+‘<div class="lc2-desc">’+(desc||’’)+’</div>’+
+‘<div class="lc2-divider"></div>’+
+‘<div class="lc2-footer">’+
+‘<div class="lc2-meta-col">’+
+‘<div class="lc2-stars">’+starsHTML+’</div>’+
+(hor?’<div class="lc2-horario">🕐 ‘+hor+’</div>’:’’)+
+‘</div>’+
+(dist?’<div class="lc2-dist"><span class="lc2-dist-icon">🚶</span><span>’+dist+’</span></div>’:’’)+
+‘</div>’+
 ‘</div>’;
 }).join(’’);
-grid.innerHTML = ‘<div class="lugares-carrossel-wrapper">’+
-‘<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" disabled>‹</button>’+
-‘<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)">›</button>’+
-‘<div class="lugares-viewport" id="lugares-viewport"><div class="lugares-track" id="lugares-track">’+cardsHTML+’</div></div>’+
-‘<div class="lugares-dots" id="lugares-dots"></div>’+
-‘</div>’;
+
+```
+grid.innerHTML = '<div class="lugares-carrossel-wrapper">'+
+    '<button class="lugares-nav-btn prev" id="lugares-prev" onclick="lc360Mover(-1)" disabled>&#x2039;</button>'+
+    '<button class="lugares-nav-btn next" id="lugares-next" onclick="lc360Mover(1)">&#x203a;</button>'+
+    '<div class="lugares-viewport" id="lugares-viewport"><div class="lugares-track" id="lugares-track">'+cardsHTML+'</div></div>'+
+    '<div class="lugares-dots" id="lugares-dots"></div>'+
+'</div>';
 lugarCarrVisiveis=lugarCarrCalcularVisiveis(); lugarCarrAtualizar(); initLugarDrag();
-window.addEventListener(‘resize’,function(){lugarCarrVisiveis=lugarCarrCalcularVisiveis();lugarCarrAtualizar();});
+window.addEventListener('resize',function(){lugarCarrVisiveis=lugarCarrCalcularVisiveis();lugarCarrAtualizar();});
+```
+
 }
 
 function atualizarTextosMapa() {
