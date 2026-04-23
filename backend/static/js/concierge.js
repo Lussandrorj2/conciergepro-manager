@@ -334,7 +334,6 @@ try {
     console.error('[carregarPasseios]', e);
     track.innerHTML = '<div class="estado-erro"><span class="icon">⚠️</span><p>' + t('erro') + '</p></div>';
 }
-```
 
 }
 
@@ -353,7 +352,6 @@ var imgHTML = imgSrc
 : '<div class="card-img-empty">🌊</div>';
 var precoSubHTML = precoSub ? '<small>'+precoSub+'</small>': '';
 
-```
 // Sem badge de preço na foto — preço apenas no card-body
 return '<div class="card-passeio" data-id="'+p.id+'" onclick="handleCardClick('+p.id+', this)">' +
     '<div class="card-img">' +
@@ -369,7 +367,6 @@ return '<div class="card-passeio" data-id="'+p.id+'" onclick="handleCardClick('+
         '</div>' +
     '</div>' +
 '</div>';
-```
 
 }
 
@@ -400,7 +397,6 @@ var btnPrev = document.getElementById('det-foto-prev');
 var btnNext = document.getElementById('det-foto-next');
 if (!track) return;
 
-```
 if (!detFotos.length) {
     track.innerHTML = '<div class="det-foto-slide"><div class="det-foto-slide-empty">🌊</div></div>';
     if (thumbs) thumbs.innerHTML = '';
@@ -422,7 +418,6 @@ if (thumbs) {
 if (btnPrev) btnPrev.style.display = detFotos.length > 1 ? 'flex' : 'none';
 if (btnNext) btnNext.style.display = detFotos.length > 1 ? 'flex' : 'none';
 detFotoAtualizar();
-```
 
 }
 
@@ -450,7 +445,6 @@ passeioAtual = listaPasseios.find(function(p){ return p.id === passeioId; }) || 
 if (!passeioAtual) return;
 var p = passeioAtual;
 
-```
 detFotos = coletarFotos(p); detFotoIndex = 0; detFotoRender();
 
 var set = function(id, val) { var el = document.getElementById(id); if (el) el.innerText = val; };
@@ -488,7 +482,6 @@ if (btnDet) btnDet.textContent = t('btn_reservar_det');
 initDetFotoSwipe();
 document.getElementById('modalDetalhe').classList.add('open');
 document.body.style.overflow = 'hidden';
-```
 
 }
 
@@ -527,7 +520,6 @@ set('resumo-label-passeio', t('resumo_passeio'));
 set('resumo-label-qtd', t('resumo_qtd'));
 set('resumo-label-total', t('resumo_total'));
 
-```
 var bv = document.getElementById('btn-voltar-txt');
 if (bv) bv.textContent = t('btn_voltar').replace('← ','');
 
@@ -540,7 +532,6 @@ document.getElementById('modal-resumo').classList.remove('show');
 calcularTotal();
 document.getElementById('modalReserva').classList.add('open');
 document.body.style.overflow = 'hidden';
-```
 
 }
 
