@@ -32,6 +32,8 @@ var i18n = {
         btn_voltar: 'Voltar aos detalhes', sucesso: 'Redirecionando para o WhatsApp!',
         sem_imagem: 'Sem imagem',
         wpp_msg: function(n,p,q,d,h){ var m='Ola! Me chamo *'+n+'* e tenho interesse no passeio *'+p+'* para *'+q+' pessoa(s)*'; if(d) m+=', na data *'+d+'*'; if(h) m+=' as *'+h+'*'; m+='. Poderia confirmar a disponibilidade?'; return m; },
+        trust1: '✓ Guias credenciados', trust2: '✓ Transporte seguro', trust3: '✓ Reserva rápida pelo WhatsApp',
+        horario: 'Horário', distancia_label: 'Distância',
         aviso_wpp: 'Voce sera direcionado ao WhatsApp do hotel para confirmar sua reserva.',
         campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
         mapa_label: 'Nos arredores', mapa_titulo: 'Restaurantes & Centros Comerciais',
@@ -48,6 +50,8 @@ var i18n = {
         btn_confirmar: 'Chat on WhatsApp', btn_reservar_det: 'Book now',
         btn_voltar: 'Back to details', sucesso: 'Redirecting to WhatsApp!', sem_imagem: 'No image',
         wpp_msg: function(n,p,q,d,h){ var m='Hello! My name is *'+n+"* and I'm interested in the tour *"+p+'* for *'+q+' guest(s)*'; if(d) m+=' on *'+d+'*'; if(h) m+=' at *'+h+'*'; m+='. Could you confirm availability?'; return m; },
+        trust1: '✓ Accredited guides', trust2: '✓ Safe transport', trust3: '✓ Quick booking via WhatsApp',
+        horario: 'Hours', distancia_label: 'Distance',
         aviso_wpp: "You will be redirected to the hotel's WhatsApp to confirm your booking.",
         campos_obrigatorios: 'Please fill in your name and phone number.',
         mapa_label: 'Nearby', mapa_titulo: 'Restaurants & Shopping',
@@ -64,6 +68,8 @@ var i18n = {
         btn_confirmar: 'Hablar en WhatsApp', btn_reservar_det: 'Reservar ahora',
         btn_voltar: 'Volver a detalles', sucesso: 'Redirigiendo al WhatsApp!', sem_imagem: 'Sin imagen',
         wpp_msg: function(n,p,q,d,h){ var m='Hola! Me llamo *'+n+'* y estoy interesado en el paseo *'+p+'* para *'+q+' persona(s)*'; if(d) m+=' en la fecha *'+d+'*'; if(h) m+=' a las *'+h+'*'; m+='. Podria confirmar disponibilidad?'; return m; },
+        trust1: '✓ Guías acreditados', trust2: '✓ Transporte seguro', trust3: '✓ Reserva rápida por WhatsApp',
+        horario: 'Horario', distancia_label: 'Distancia',
         aviso_wpp: 'Sera redirigido al WhatsApp del hotel para confirmar su reserva.',
         campos_obrigatorios: 'Por favor, complete su nombre y telefono.',
         mapa_label: 'Alrededores', mapa_titulo: 'Restaurantes & Centros Comerciales',
@@ -80,6 +86,8 @@ var i18n = {
         btn_confirmar: 'Contacter sur WhatsApp', btn_reservar_det: 'Reserver maintenant',
         btn_voltar: 'Retour aux details', sucesso: 'Redirection vers WhatsApp!', sem_imagem: 'Sans image',
         wpp_msg: function(n,p,q,d,h){ var m="Bonjour ! Je m'appelle *"+n+"* et je suis interesse par la visite *"+p+"* pour *"+q+" personne(s)*"; if(d) m+=" a la date *"+d+"*"; if(h) m+=" a *"+h+"*"; m+=". Pourriez-vous confirmer la disponibilite ?"; return m; },
+        trust1: '✓ Guides accrédités', trust2: '✓ Transport sécurisé', trust3: '✓ Réservation rapide via WhatsApp',
+        horario: 'Horaires', distancia_label: 'Distance',
         aviso_wpp: "Vous serez redirige vers le WhatsApp de l'hotel pour confirmer votre reservation.",
         campos_obrigatorios: "Veuillez remplir votre nom et numero de telephone.",
         mapa_label: 'Aux alentours', mapa_titulo: 'Restaurants & Centres Commerciaux',
@@ -876,12 +884,10 @@ function renderLugarCards() {
         var metaHTML = '';
 
         if (hor) {
-            metaHTML += `
-                <div class="lc2-meta-item">
-                    <div class="lc2-meta-icon">&#128336;</div>
-                    <div class="lc2-meta-text"><strong>Horário</strong> ${hor}</div>
-                </div>
-            `;
+            metaHTML += '<div class="lc2-meta-item">' +
+                '<div class="lc2-meta-icon">&#128336;</div>' +
+                '<div class="lc2-meta-text"><strong>' + t('horario') + '</strong> ' + hor + '</div>' +
+            '</div>';
         }
         return (
             '<div class="lugar-card-v2" onclick="lc360Selecionar(' + lugar.id + ')" role="button" tabindex="0">' +
