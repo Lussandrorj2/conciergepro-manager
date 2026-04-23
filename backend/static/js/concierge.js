@@ -874,14 +874,15 @@ function renderLugarCards() {
             .replace(/\u2606/g, '<span class="star empty">&#9734;</span>');
             // Meta items: só horário no card
         var metaHTML = '';
-        if (hor) {
-            metaHTML += '<div class="lc2-meta-item">' +
-                '<div class="lc2-meta-icon">&#128336;</div>' +
-                '<div class="lc2-meta-text"><strong>Horário</strong>' + hor + '</div>' +
-            '</div>';
-        }
-        }
 
+        if (hor) {
+            metaHTML += `
+                <div class="lc2-meta-item">
+                    <div class="lc2-meta-icon">&#128336;</div>
+                    <div class="lc2-meta-text"><strong>Horário</strong> ${hor}</div>
+                </div>
+            `;
+        }
         return (
             '<div class="lugar-card-v2" onclick="lc360Selecionar(' + lugar.id + ')" role="button" tabindex="0">' +
                 '<div class="lc2-header">' +
