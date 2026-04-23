@@ -960,13 +960,15 @@ def forcar_traducao_hotel(request, hotel_slug):
         for p in Passeio.objects.filter(hotel=hotel, ativo=True):
             try:
                 if p.nome:
-                    p.nome_en = GoogleTranslator(source='pt', target='en').translate(p.nome)
-                    p.nome_es = GoogleTranslator(source='pt', target='es').translate(p.nome)
-                    p.nome_fr = GoogleTranslator(source='pt', target='fr').translate(p.nome)
+                    nome_proc = p.nome.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    p.nome_en = GoogleTranslator(source='pt', target='en').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.nome_es = GoogleTranslator(source='pt', target='es').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.nome_fr = GoogleTranslator(source='pt', target='fr').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
                 if p.descricao:
-                    p.descricao_en = GoogleTranslator(source='pt', target='en').translate(p.descricao)
-                    p.descricao_es = GoogleTranslator(source='pt', target='es').translate(p.descricao)
-                    p.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(p.descricao)
+                    desc_proc = p.descricao.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    p.descricao_en = GoogleTranslator(source='pt', target='en').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.descricao_es = GoogleTranslator(source='pt', target='es').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
                 p.save(update_fields=[
                     'nome_en','nome_es','nome_fr',
                     'descricao_en','descricao_es','descricao_fr'
@@ -974,6 +976,7 @@ def forcar_traducao_hotel(request, hotel_slug):
                 passeios_traduzidos += 1
             except Exception as e:
                 print(f"[tradução passeio {p.id}] {e}")
+
 
         return JsonResponse({
             "status": "ok",
