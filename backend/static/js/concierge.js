@@ -1017,12 +1017,10 @@ var cacheTraducoes = {};
 // INIT
 // ==========================================
 document.addEventListener('DOMContentLoaded', async function() {
-    // Botões de idioma
     document.querySelectorAll('.lang-btn').forEach(function(b){
         b.classList.toggle('active', b.dataset.lang === idiomaAtual);
     });
 
-    // ✅ Atualiza TODOS os textos estáticos com o idioma do localStorage
     var ls = document.getElementById('label-secao');
     var ts = document.getElementById('titulo-secao');
     if (ls) ls.innerText = t('secao_label');
@@ -1030,16 +1028,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     atualizarTrust();
     atualizarTextosMapa();
 
-    // Carrega hotel e mapa sequencialmente (mapa precisa estar pronto antes de traduzir)
     await carregarHotel(idiomaAtual);
     await initMapa();
-
-    // Carrega passeios e traduz lugares em paralelo
     await Promise.all([
         carregarPasseios(idiomaAtual),
         traduzirEAtualizarCards()
     ]);
 });
+
 
 
 // EXPORTS
