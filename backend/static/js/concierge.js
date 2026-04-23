@@ -646,6 +646,29 @@ function mostrarToast(msg, tipo) {
 // ==========================================
 // IDIOMA
 // ==========================================
+
+async function traduzirEAtualizarCards() {
+    if (idiomaAtual === 'pt') { renderLugarCards(); return; }
+    await Promise.all(LUGARES.map(async function(lugar) {
+        if (!lugar.desc[idiomaAtual] || lugar.desc[idiomaAtual] === lugar.desc['pt']) {
+            lugar.desc[idiomaAtual] = await traduzirTexto(lugar.desc['pt'], idiomaAtual);
+        }
+        if (!lugar.horario[idiomaAtual] || lugar.horario[idiomaAtual] === lugar.horario['pt']) {
+            lugar.horario[idiomaAtual] = await traduzirTexto(lugar.horario['pt'], idiomaAtual);
+        }
+    }));
+    renderLugarCards();
+}
+
+function atualizarTrust() {
+    var el1 = document.getElementById('trust-1');
+    var el2 = document.getElementById('trust-2');
+    var el3 = document.getElementById('trust-3');
+    if (el1) el1.innerText = t('trust1');
+    if (el2) el2.innerText = t('trust2');
+    if (el3) el3.innerText = t('trust3');
+}
+
 async function trocarIdioma(lang) {
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
@@ -656,8 +679,13 @@ async function trocarIdioma(lang) {
     if (ls) ls.innerText = t('secao_label');
     if (ts) ts.innerText = t('secao_titulo');
     if (ce && listaPasseios.length) ce.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
+    atualizarTrust();
     atualizarTextosMapa();
-    await Promise.all([carregarHotel(lang), carregarPasseios(lang)]);
+    await Promise.all([
+        carregarHotel(lang),
+        carregarPasseios(lang),
+        traduzirEAtualizarCards()  
+    ]);
 }
 
 // ESC / clique fora fecha modais
