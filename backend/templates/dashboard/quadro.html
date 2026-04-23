@@ -1,0 +1,835 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Quadro — {{ hotel.nome }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <style>
+        :root {
+            --col-pendente:  #ef4444;
+            --col-andamento: #f59e0b;
+            --col-concluido: #10b981;
+            --col-pendente-bg:  rgba(239,68,68,.07);
+            --col-andamento-bg: rgba(245,158,11,.07);
+            --col-concluido-bg: rgba(16,185,129,.07);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main, #f8fafc); color: var(--text-main, #1e293b); }
+
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; height: 56px;
+            background: var(--bg-card, #fff);
+            border-bottom: 1px solid var(--border, #e2e8f0);
+            position: sticky; top: 0; z-index: 100;
+            gap: 12px;
+        }
+        .topbar-left  { display: flex; align-items: center; gap: 12px; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-title { font-size: 15px; font-weight: 700; color: var(--text-main, #1e293b); }
+        .btn-back {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--bg-hover, #f1f5f9); border: 1px solid var(--border, #e2e8f0);
+            color: var(--text-soft, #64748b); padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none;
+            transition: all .15s;
+        }
+        .btn-back:hover { background: var(--border, #e2e8f0); color: var(--text-main, #1e293b); }
+        .hotel-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--bg-hover, #f1f5f9); border: 1px solid var(--border, #e2e8f0);
+            padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--text-soft, #64748b);
+        }
+        .hotel-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-left: 220px; }
+
+        /* ── VIEW TOGGLE ── */
+        .view-toggle {
+            display: flex; gap: 2px; background: var(--bg-hover, #f1f5f9);
+            border: 1px solid var(--border, #e2e8f0); border-radius: 8px; padding: 2px;
+        }
+        .view-btn {
+            padding: 5px 12px; border: none; background: none; border-radius: 6px;
+            font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-soft, #64748b);
+            transition: all .15s; display: flex; align-items: center; gap: 5px;
+        }
+        .view-btn.active { background: var(--bg-card, #fff); color: var(--text-main, #1e293b); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+        /* ── BTN ADD ── */
+        .btn-add-card {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--gold, #b5843a); color: #fff;
+            border: none; padding: 7px 14px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+        }
+        .btn-add-card:hover { opacity: .9; transform: translateY(-1px); }
+
+        /* ════════════════════════
+           BOARD VIEW
+        ════════════════════════ */
+        #view-board {
+            flex: 1; display: flex; gap: 16px;
+            padding: 20px; overflow-x: auto;
+            align-items: flex-start;
+        }
+
+        .board-col {
+            flex: 0 0 300px; display: flex; flex-direction: column; gap: 0;
+            background: var(--bg-card, #fff);
+            border: 1px solid var(--border, #e2e8f0);
+            border-radius: 14px; overflow: hidden;
+            min-height: 200px;
+        }
+
+        .board-col-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--border, #e2e8f0);
+            position: sticky; top: 0; background: inherit; z-index: 2;
+        }
+        .board-col-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+        }
+        .col-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .col-count {
+            background: var(--bg-hover, #f1f5f9); border: 1px solid var(--border, #e2e8f0);
+            color: var(--text-soft, #64748b); font-size: 10px; font-weight: 700;
+            padding: 1px 7px; border-radius: 10px;
+        }
+        .btn-col-add {
+            background: none; border: none; color: var(--text-soft, #64748b);
+            font-size: 18px; cursor: pointer; padding: 2px 4px; border-radius: 4px;
+            line-height: 1; transition: .15s;
+        }
+        .btn-col-add:hover { background: var(--bg-hover, #f1f5f9); color: var(--text-main, #1e293b); }
+
+        .board-col-body {
+            flex: 1; padding: 10px;
+            display: flex; flex-direction: column; gap: 8px;
+            min-height: 80px;
+        }
+        .board-col-body.drag-over {
+            background: rgba(99,102,241,.04);
+            outline: 2px dashed rgba(99,102,241,.3);
+            outline-offset: -4px; border-radius: 8px;
+        }
+
+        /* ── CARD ── */
+        .kanban-card {
+            background: var(--bg-main, #f8fafc);
+            border: 1px solid var(--border, #e2e8f0);
+            border-radius: 10px; padding: 12px;
+            cursor: grab; transition: all .15s;
+            position: relative; overflow: hidden;
+        }
+        .kanban-card:active { cursor: grabbing; }
+        .kanban-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,.07); transform: translateY(-1px); }
+        .kanban-card.dragging { opacity: .4; transform: scale(.97); }
+
+        .card-img-preview {
+            width: 100%; height: 120px; object-fit: cover;
+            border-radius: 6px; margin-bottom: 8px; display: block;
+        }
+
+        .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+        .card-tag {
+            font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+            text-transform: uppercase; letter-spacing: .3px;
+        }
+
+        .card-title { font-size: 13px; font-weight: 600; color: var(--text-main, #1e293b); margin-bottom: 4px; line-height: 1.4; }
+        .card-desc  { font-size: 11.5px; color: var(--text-soft, #64748b); line-height: 1.5; margin-bottom: 8px; }
+
+        .card-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 4px; gap: 6px;
+        }
+        .card-date { font-size: 10.5px; color: var(--text-soft, #64748b); display: flex; align-items: center; gap: 4px; }
+        .card-date.overdue { color: #ef4444; font-weight: 600; }
+        .card-actions { display: flex; gap: 4px; opacity: 0; transition: .15s; }
+        .kanban-card:hover .card-actions { opacity: 1; }
+        .btn-card-action {
+            background: var(--bg-card, #fff); border: 1px solid var(--border, #e2e8f0);
+            color: var(--text-soft, #64748b); width: 24px; height: 24px; border-radius: 5px;
+            cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center;
+            transition: .12s;
+        }
+        .btn-card-action:hover { color: var(--text-main, #1e293b); border-color: #94a3b8; }
+        .btn-card-action.del:hover { color: #ef4444; border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.06); }
+
+        /* ── DROP GHOST ── */
+        .drop-ghost {
+            background: rgba(99,102,241,.06); border: 2px dashed rgba(99,102,241,.3);
+            border-radius: 10px; height: 60px;
+        }
+
+        /* ════════════════════════
+           CALENDAR VIEW
+        ════════════════════════ */
+        #view-calendar { flex: 1; padding: 20px; display: none; flex-direction: column; gap: 16px; overflow-y: auto; }
+        #view-calendar.active { display: flex; }
+
+        .cal-nav {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-card, #fff); border: 1px solid var(--border, #e2e8f0);
+            border-radius: 12px; padding: 12px 18px;
+        }
+        .cal-nav h2 { font-size: 15px; font-weight: 700; }
+        .btn-nav {
+            background: var(--bg-hover, #f1f5f9); border: 1px solid var(--border, #e2e8f0);
+            color: var(--text-main, #1e293b); width: 32px; height: 32px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+            transition: .15s;
+        }
+        .btn-nav:hover { background: var(--border, #e2e8f0); }
+
+        .cal-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+        }
+        .cal-day-label {
+            text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase;
+            color: var(--text-soft, #64748b); letter-spacing: .5px; padding: 6px 0;
+        }
+        .cal-cell {
+            background: var(--bg-card, #fff); border: 1px solid var(--border, #e2e8f0);
+            border-radius: 10px; min-height: 90px; padding: 6px;
+            transition: .15s; position: relative;
+        }
+        .cal-cell.other-month { opacity: .4; }
+        .cal-cell.today { border-color: var(--gold, #b5843a); background: rgba(181,132,58,.03); }
+        .cal-cell.drag-over { background: rgba(99,102,241,.06); border-color: rgba(99,102,241,.4); outline: 2px dashed rgba(99,102,241,.3); }
+        .cal-cell-num {
+            font-size: 11px; font-weight: 700; color: var(--text-soft, #64748b);
+            width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 4px;
+        }
+        .cal-cell.today .cal-cell-num { background: var(--gold, #b5843a); color: #fff; }
+
+        .cal-card-chip {
+            font-size: 10px; font-weight: 500; padding: 2px 6px; border-radius: 4px;
+            margin-bottom: 3px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: .12s; border: 1px solid transparent;
+        }
+        .cal-card-chip:hover { filter: brightness(.92); }
+        .cal-add-btn {
+            position: absolute; bottom: 4px; right: 4px;
+            background: none; border: none; color: var(--text-soft, #64748b); font-size: 16px;
+            cursor: pointer; opacity: 0; transition: .15s; border-radius: 4px; padding: 0 3px;
+            line-height: 1;
+        }
+        .cal-cell:hover .cal-add-btn { opacity: 1; }
+        .cal-add-btn:hover { color: var(--gold, #b5843a); }
+
+        /* ════════════════════════
+           MODAL
+        ════════════════════════ */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
+            display: none; align-items: center; justify-content: center; padding: 16px;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg-card, #fff); border-radius: 16px; width: 100%; max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.15); overflow: hidden;
+            animation: modalIn .15s ease;
+        }
+        @keyframes modalIn { from { opacity:0; transform:scale(.96) translateY(8px); } to { opacity:1; transform:none; } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 22px 14px; border-bottom: 1px solid var(--border, #e2e8f0);
+        }
+        .modal-header h3 { font-size: 14px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; font-size: 20px; cursor: pointer;
+            color: var(--text-soft, #64748b); width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; transition: .12s;
+        }
+        .modal-close:hover { background: var(--bg-hover, #f1f5f9); }
+        .modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--border, #e2e8f0); }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text-soft, #64748b); }
+        .form-group input, .form-group textarea, .form-group select {
+            background: var(--bg-main, #f8fafc); border: 1px solid var(--border, #e2e8f0);
+            border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif;
+            color: var(--text-main, #1e293b); transition: .15s; width: 100%;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: var(--gold, #b5843a); box-shadow: 0 0 0 3px rgba(181,132,58,.1);
+        }
+        .form-group textarea { min-height: 70px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* tags picker */
+        .tags-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag-option {
+            font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 5px;
+            cursor: pointer; border: 2px solid transparent; transition: .12s; user-select: none;
+            text-transform: uppercase; letter-spacing: .3px;
+        }
+        .tag-option.selected { border-color: #1e293b; }
+
+        /* image drop zone */
+        .img-drop-zone {
+            border: 2px dashed var(--border, #e2e8f0); border-radius: 10px; padding: 20px;
+            text-align: center; cursor: pointer; transition: .15s; position: relative;
+        }
+        .img-drop-zone:hover, .img-drop-zone.drag-over { border-color: var(--gold, #b5843a); background: rgba(181,132,58,.04); }
+        .img-drop-zone p { font-size: 12px; color: var(--text-soft, #64748b); }
+        .img-drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .img-preview-wrap { position: relative; display: inline-block; margin-top: 8px; }
+        .img-preview-wrap img { max-height: 100px; border-radius: 8px; border: 1px solid var(--border, #e2e8f0); }
+        .btn-rm-img {
+            position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff;
+            border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* btns */
+        .btn { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: .15s; }
+        .btn-ghost { background: var(--bg-hover, #f1f5f9); color: var(--text-soft, #64748b); border: 1px solid var(--border, #e2e8f0); }
+        .btn-ghost:hover { background: var(--border, #e2e8f0); }
+        .btn-primary { background: var(--gold, #b5843a); color: #fff; }
+        .btn-primary:hover { opacity: .9; }
+        .btn-danger { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+        .btn-danger:hover { background: rgba(239,68,68,.18); }
+
+        /* status pills */
+        .status-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: .3px; }
+        .pill-pendente  { background: rgba(239,68,68,.1);  color: #ef4444; }
+        .pill-andamento { background: rgba(245,158,11,.1); color: #d97706; }
+        .pill-concluido { background: rgba(16,185,129,.1); color: #059669; }
+
+        /* mobile */
+        @media (max-width: 768px) {
+            .main { margin-left: 0; }
+            #view-board { padding: 12px; gap: 10px; }
+            .board-col { flex: 0 0 260px; }
+            #view-calendar { padding: 10px; }
+            .cal-grid { gap: 3px; }
+            .cal-cell { min-height: 60px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* sidebar compat */
+        .sidebar { width: 220px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR (mesmo padrão das outras páginas) -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
+            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <span class="topbar-title">📌 Quadro de Tarefas</span>
+            </div>
+            <div class="topbar-right">
+                <div class="view-toggle">
+                    <button class="view-btn active" id="btn-view-board" onclick="setView('board')">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="14" rx="1.5"/><rect x="9" y="1" width="6" height="9" rx="1.5"/></svg> Board
+                    </button>
+                    <button class="view-btn" id="btn-view-cal" onclick="setView('calendar')">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M1 6h14M5 1v2M11 1v2"/></svg> Calendário
+                    </button>
+                </div>
+                <button class="btn-add-card" onclick="abrirModal()">＋ Novo Card</button>
+                <div class="hotel-badge">
+                    <div class="hotel-dot"></div>
+                    <span>{{ hotel.nome|striptags }}</span>
+                </div>
+                <a href="/{{ hotel.slug }}/dashboard/" class="btn-back">← Dashboard</a>
+            </div>
+        </div>
+
+        <!-- BOARD VIEW -->
+        <div id="view-board" style="display:flex;">
+            <div class="board-col" id="col-pendente" data-status="pendente">
+                <div class="board-col-header">
+                    <div class="board-col-title">
+                        <div class="col-dot" style="background:var(--col-pendente)"></div>
+                        <span style="color:var(--col-pendente)">Pendente</span>
+                        <span class="col-count" id="cnt-pendente">0</span>
+                    </div>
+                    <button class="btn-col-add" onclick="abrirModal('pendente')" title="Adicionar">＋</button>
+                </div>
+                <div class="board-col-body" id="body-pendente" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'pendente')"></div>
+            </div>
+
+            <div class="board-col" id="col-andamento" data-status="andamento">
+                <div class="board-col-header">
+                    <div class="board-col-title">
+                        <div class="col-dot" style="background:var(--col-andamento)"></div>
+                        <span style="color:var(--col-andamento)">Andamento</span>
+                        <span class="col-count" id="cnt-andamento">0</span>
+                    </div>
+                    <button class="btn-col-add" onclick="abrirModal('andamento')" title="Adicionar">＋</button>
+                </div>
+                <div class="board-col-body" id="body-andamento" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'andamento')"></div>
+            </div>
+
+            <div class="board-col" id="col-concluido" data-status="concluido">
+                <div class="board-col-header">
+                    <div class="board-col-title">
+                        <div class="col-dot" style="background:var(--col-concluido)"></div>
+                        <span style="color:var(--col-concluido)">Concluído</span>
+                        <span class="col-count" id="cnt-concluido">0</span>
+                    </div>
+                    <button class="btn-col-add" onclick="abrirModal('concluido')" title="Adicionar">＋</button>
+                </div>
+                <div class="board-col-body" id="body-concluido" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'concluido')"></div>
+            </div>
+        </div>
+
+        <!-- CALENDAR VIEW -->
+        <div id="view-calendar">
+            <div class="cal-nav">
+                <button class="btn-nav" onclick="calMover(-1)">‹</button>
+                <h2 id="cal-mes-titulo"></h2>
+                <button class="btn-nav" onclick="calMover(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- MODAL CRIAR/EDITAR -->
+<div class="modal-overlay" id="modal-card">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-titulo">Novo Card</h3>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="card-id">
+
+            <div class="form-group">
+                <label>Título *</label>
+                <input type="text" id="card-titulo" placeholder="Título do card">
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="card-desc" placeholder="Descreva a tarefa..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="card-status">
+                        <option value="pendente">🔴 Pendente</option>
+                        <option value="andamento">🟡 Andamento</option>
+                        <option value="concluido">🟢 Concluído</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="card-data">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tags</label>
+                <div class="tags-picker" id="tags-picker"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Imagem</label>
+                <div class="img-drop-zone" id="img-drop-zone" ondragover="dzDragOver(event)" ondragleave="dzDragLeave(event)" ondrop="dzDrop(event)">
+                    <p>📎 Arraste uma imagem aqui, cole com Ctrl+V ou clique para selecionar</p>
+                    <input type="file" accept="image/*" onchange="handleFileInput(event)">
+                    <div id="img-preview-cont"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarCard()">💾 Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMAR DELETE -->
+<div class="modal-overlay" id="modal-del">
+    <div class="modal" style="max-width:400px">
+        <div class="modal-header">
+            <h3>Excluir Card</h3>
+            <button class="modal-close" onclick="fecharModalDel()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:13px;color:var(--text-soft,#64748b)">Tem certeza que deseja excluir este card? Essa ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModalDel()">Cancelar</button>
+            <button class="btn btn-danger" onclick="executarDelete()">🗑️ Excluir</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const HOTEL_SLUG = "{{ hotel.slug }}";
+const LS_KEY = `quadro_cards_${HOTEL_SLUG}`;
+
+// ─── TAGS DISPONÍVEIS ───────────────────────────────────────────────
+const TAGS_DEF = [
+    { id:'urgente',    label:'Urgente',    bg:'rgba(239,68,68,.15)',   color:'#dc2626' },
+    { id:'financeiro', label:'Financeiro', bg:'rgba(16,185,129,.15)',  color:'#059669' },
+    { id:'passeio',    label:'Passeio',    bg:'rgba(99,102,241,.15)',  color:'#6366f1' },
+    { id:'hotel',      label:'Hotel',      bg:'rgba(245,158,11,.15)',  color:'#d97706' },
+    { id:'cliente',    label:'Cliente',    bg:'rgba(236,72,153,.15)',  color:'#db2777' },
+    { id:'mkt',        label:'Marketing',  bg:'rgba(6,182,212,.15)',   color:'#0891b2' },
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────
+let cards       = [];
+let editId      = null;
+let deleteId    = null;
+let imgBase64   = null;
+let selectedTags = [];
+let dragId      = null;
+let calYear     = new Date().getFullYear();
+let calMonth    = new Date().getMonth();
+let currentView = 'board';
+let defaultStatus = 'pendente';
+
+// ─── STORAGE ────────────────────────────────────────────────────────
+function salvarLS() { try { localStorage.setItem(LS_KEY, JSON.stringify(cards)); } catch(e) {} }
+function carregarLS() {
+    try { cards = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { cards = []; }
+    if (!cards.length) {
+        cards = [
+            { id: uid(), titulo: 'Confirmar guia para grupo de amanhã', desc: 'Verificar disponibilidade do guia João para o passeio às 09h', status: 'pendente', tags: ['urgente','passeio'], data: hoje(), img: null },
+            { id: uid(), titulo: 'Atualizar cotação do Euro', desc: '', status: 'andamento', tags: ['financeiro'], data: '', img: null },
+            { id: uid(), titulo: 'Renovar contrato de parceria', desc: 'Contrato com operadora vence no fim do mês', status: 'concluido', tags: ['hotel'], data: '', img: null },
+        ];
+        salvarLS();
+    }
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function hoje() { return new Date().toISOString().slice(0,10); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── RENDER BOARD ───────────────────────────────────────────────────
+function renderBoard() {
+    ['pendente','andamento','concluido'].forEach(status => {
+        const body  = document.getElementById('body-' + status);
+        const count = document.getElementById('cnt-' + status);
+        const lista = cards.filter(c => c.status === status);
+        count.textContent = lista.length;
+        body.innerHTML = lista.length ? '' : '<div style="padding:20px;text-align:center;color:var(--text-soft,#64748b);font-size:12px;opacity:.6">Nenhum card</div>';
+        lista.forEach(c => { body.appendChild(buildCard(c)); });
+    });
+}
+
+function buildCard(c) {
+    const div = document.createElement('div');
+    div.className = 'kanban-card';
+    div.dataset.id = c.id;
+    div.draggable  = true;
+    div.addEventListener('dragstart', e => { dragId = c.id; div.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    div.addEventListener('dragend',   () => { div.classList.remove('dragging'); dragId = null; });
+
+    let html = '';
+    if (c.img) html += `<img src="${c.img}" class="card-img-preview" alt="">`;
+
+    if (c.tags && c.tags.length) {
+        html += '<div class="card-tags">';
+        c.tags.forEach(tid => {
+            const t = TAGS_DEF.find(x => x.id === tid);
+            if (t) html += `<span class="card-tag" style="background:${t.bg};color:${t.color}">${t.label}</span>`;
+        });
+        html += '</div>';
+    }
+
+    html += `<div class="card-title">${escHtml(c.titulo)}</div>`;
+    if (c.desc) html += `<div class="card-desc">${escHtml(c.desc)}</div>`;
+
+    const dataLabel = c.data ? (() => {
+        const d = new Date(c.data + 'T12:00:00');
+        const fmt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+        const past = c.data < hoje() && c.status !== 'concluido';
+        return `<span class="card-date${past?' overdue':''}">📅 ${fmt}${past?' ⚠️':''}</span>`;
+    })() : '';
+
+    html += `<div class="card-footer">
+        ${dataLabel}
+        <div class="card-actions">
+            <button class="btn-card-action" onclick="editarCard('${c.id}')" title="Editar">✏️</button>
+            <button class="btn-card-action del" onclick="confirmarDelete('${c.id}')" title="Excluir">🗑️</button>
+        </div>
+    </div>`;
+
+    div.innerHTML = html;
+    return div;
+}
+
+// ─── DRAG & DROP BOARD ──────────────────────────────────────────────
+function dragOver(e) {
+    e.preventDefault(); e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function drop(e, status) {
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    if (!dragId) return;
+    const card = cards.find(c => c.id === dragId);
+    if (card) { card.status = status; salvarLS(); renderBoard(); if (currentView === 'calendar') renderCalendar(); }
+}
+
+// ─── MODAL ──────────────────────────────────────────────────────────
+function abrirModal(status) {
+    editId = null; imgBase64 = null; selectedTags = [];
+    defaultStatus = status || 'pendente';
+    document.getElementById('modal-titulo').textContent = 'Novo Card';
+    document.getElementById('card-id').value    = '';
+    document.getElementById('card-titulo').value = '';
+    document.getElementById('card-desc').value   = '';
+    document.getElementById('card-status').value = defaultStatus;
+    document.getElementById('card-data').value   = '';
+    document.getElementById('img-preview-cont').innerHTML = '';
+    renderTagsPicker();
+    document.getElementById('modal-card').classList.add('open');
+    setTimeout(() => document.getElementById('card-titulo').focus(), 100);
+}
+
+function editarCard(id) {
+    const c = cards.find(x => x.id === id);
+    if (!c) return;
+    editId = id; imgBase64 = c.img || null; selectedTags = [...(c.tags||[])];
+    document.getElementById('modal-titulo').textContent = 'Editar Card';
+    document.getElementById('card-id').value    = c.id;
+    document.getElementById('card-titulo').value = c.titulo;
+    document.getElementById('card-desc').value   = c.desc || '';
+    document.getElementById('card-status').value = c.status;
+    document.getElementById('card-data').value   = c.data || '';
+    document.getElementById('img-preview-cont').innerHTML = imgBase64
+        ? `<div class="img-preview-wrap"><img src="${imgBase64}"><button class="btn-rm-img" onclick="removerImg()">✕</button></div>` : '';
+    renderTagsPicker();
+    document.getElementById('modal-card').classList.add('open');
+}
+
+function fecharModal() { document.getElementById('modal-card').classList.remove('open'); }
+
+function salvarCard() {
+    const titulo = document.getElementById('card-titulo').value.trim();
+    if (!titulo) { document.getElementById('card-titulo').focus(); return; }
+    const dados = {
+        titulo,
+        desc:   document.getElementById('card-desc').value.trim(),
+        status: document.getElementById('card-status').value,
+        data:   document.getElementById('card-data').value,
+        tags:   [...selectedTags],
+        img:    imgBase64,
+    };
+    if (editId) {
+        const idx = cards.findIndex(c => c.id === editId);
+        if (idx >= 0) cards[idx] = { ...cards[idx], ...dados };
+    } else {
+        cards.push({ id: uid(), ...dados });
+    }
+    salvarLS(); renderBoard(); if (currentView === 'calendar') renderCalendar();
+    fecharModal();
+}
+
+// ─── TAGS PICKER ────────────────────────────────────────────────────
+function renderTagsPicker() {
+    const el = document.getElementById('tags-picker');
+    el.innerHTML = TAGS_DEF.map(t => `
+        <div class="tag-option ${selectedTags.includes(t.id)?'selected':''}"
+             style="background:${t.bg};color:${t.color}"
+             onclick="toggleTag('${t.id}',this)">${t.label}</div>
+    `).join('');
+}
+function toggleTag(id, el) {
+    if (selectedTags.includes(id)) { selectedTags = selectedTags.filter(x => x !== id); el.classList.remove('selected'); }
+    else { selectedTags.push(id); el.classList.add('selected'); }
+}
+
+// ─── IMAGEM ─────────────────────────────────────────────────────────
+function handleFileInput(e) { const f = e.target.files[0]; if (f) fileToBase64(f); }
+function dzDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dzDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function dzDrop(e) {
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) fileToBase64(f);
+}
+function fileToBase64(f) {
+    const r = new FileReader();
+    r.onload = ev => {
+        imgBase64 = ev.target.result;
+        document.getElementById('img-preview-cont').innerHTML =
+            `<div class="img-preview-wrap"><img src="${imgBase64}"><button class="btn-rm-img" onclick="removerImg()">✕</button></div>`;
+    };
+    r.readAsDataURL(f);
+}
+function removerImg() { imgBase64 = null; document.getElementById('img-preview-cont').innerHTML = ''; }
+
+// Ctrl+V na página
+document.addEventListener('paste', e => {
+    if (!document.getElementById('modal-card').classList.contains('open')) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) { fileToBase64(item.getAsFile()); break; }
+    }
+});
+
+// ─── DELETE ─────────────────────────────────────────────────────────
+function confirmarDelete(id) { deleteId = id; document.getElementById('modal-del').classList.add('open'); }
+function fecharModalDel()    { document.getElementById('modal-del').classList.remove('open'); deleteId = null; }
+function executarDelete() {
+    if (!deleteId) return;
+    cards = cards.filter(c => c.id !== deleteId);
+    salvarLS(); renderBoard(); if (currentView === 'calendar') renderCalendar();
+    fecharModalDel();
+}
+
+// ─── VIEWS ──────────────────────────────────────────────────────────
+function setView(v) {
+    currentView = v;
+    document.getElementById('view-board').style.display    = v === 'board' ? 'flex' : 'none';
+    document.getElementById('view-calendar').style.display = v === 'calendar' ? 'flex' : 'none';
+    document.getElementById('btn-view-board').classList.toggle('active', v === 'board');
+    document.getElementById('btn-view-cal').classList.toggle('active', v === 'calendar');
+    if (v === 'calendar') renderCalendar();
+}
+
+// ─── CALENDÁRIO ─────────────────────────────────────────────────────
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const STATUS_COLOR = { pendente:'rgba(239,68,68,.15)', andamento:'rgba(245,158,11,.15)', concluido:'rgba(16,185,129,.15)' };
+const STATUS_TEXT  = { pendente:'#dc2626', andamento:'#d97706', concluido:'#059669' };
+
+function calMover(dir) { calMonth += dir; if (calMonth > 11) { calMonth = 0; calYear++; } if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+
+function renderCalendar() {
+    document.getElementById('cal-mes-titulo').textContent = `${MESES[calMonth]} ${calYear}`;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    DIAS.forEach(d => {
+        const lbl = document.createElement('div');
+        lbl.className = 'cal-day-label';
+        lbl.textContent = d;
+        grid.appendChild(lbl);
+    });
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const prevDays = new Date(calYear, calMonth, 0).getDate();
+    const todayStr = hoje();
+    const total = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+    for (let i = 0; i < total; i++) {
+        const cell = document.createElement('div');
+        let day, month, year, isOther = false;
+        if (i < firstDay) { day = prevDays - firstDay + i + 1; month = calMonth - 1; year = calYear; isOther = true; }
+        else if (i >= firstDay + daysInMonth) { day = i - firstDay - daysInMonth + 1; month = calMonth + 1; year = calYear; isOther = true; }
+        else { day = i - firstDay + 1; month = calMonth; year = calYear; }
+
+        const dateStr = `${year}-${String(month + 1 < 0 ? 12 + month + 1 : (month + 1) % 13 || 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        // Simpler date string
+        const d2 = new Date(year, month < 0 ? 11 : month > 11 ? 0 : month, day);
+        const ds = d2.toISOString().slice(0,10);
+
+        cell.className = 'cal-cell' + (isOther ? ' other-month' : '') + (ds === todayStr ? ' today' : '');
+        cell.dataset.date = ds;
+        cell.setAttribute('ondragover', "calDragOver(event)");
+        cell.setAttribute('ondragleave', "calDragLeave(event)");
+        cell.setAttribute('ondrop', `calDrop(event,'${ds}')`);
+
+        const num = document.createElement('div');
+        num.className = 'cal-cell-num';
+        num.textContent = day;
+        cell.appendChild(num);
+
+        const cardsDate = cards.filter(c => c.data === ds);
+        cardsDate.forEach(c => {
+            const chip = document.createElement('div');
+            chip.className = 'cal-card-chip';
+            chip.style.background = STATUS_COLOR[c.status] || '#f1f5f9';
+            chip.style.color = STATUS_TEXT[c.status] || '#475569';
+            chip.textContent = c.titulo;
+            chip.title = c.titulo;
+            chip.onclick = () => editarCard(c.id);
+            chip.draggable = true;
+            chip.addEventListener('dragstart', e => { dragId = c.id; e.stopPropagation(); e.dataTransfer.effectAllowed = 'move'; });
+            cell.appendChild(chip);
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'cal-add-btn';
+        addBtn.textContent = '+';
+        addBtn.title = 'Adicionar card neste dia';
+        addBtn.onclick = () => { abrirModal(); setTimeout(() => { document.getElementById('card-data').value = ds; }, 50); };
+        cell.appendChild(addBtn);
+
+        grid.appendChild(cell);
+    }
+}
+
+function calDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function calDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function calDrop(e, dateStr) {
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+    if (!dragId) return;
+    const card = cards.find(c => c.id === dragId);
+    if (card) { card.data = dateStr; salvarLS(); renderCalendar(); renderBoard(); dragId = null; }
+}
+
+// ─── FECHAR AO CLICAR FORA ──────────────────────────────────────────
+document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) { fecharModal(); fecharModalDel(); } });
+});
+
+// ESC
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { fecharModal(); fecharModalDel(); }
+});
+
+// ─── INIT ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    carregarLS();
+    renderBoard();
+    renderCalendar();
+});
+</script>
+
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+</body>
+</html>
