@@ -945,6 +945,23 @@ def forcar_traducao_hotel(request, hotel_slug):
         return JsonResponse({"erro": str(e)}, status=500)
 
 
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def traduzir_texto(request):
+    texto = request.data.get('texto', '')
+    idioma = request.data.get('idioma', 'en')
+    
+    if not texto or idioma == 'pt':
+        return Response({'traduzido': texto})
+    
+    try:
+        traduzido = GoogleTranslator(source='pt', target=idioma).translate(texto)
+        return Response({'traduzido': traduzido})
+    except Exception as e:
+        return Response({'traduzido': texto})
+
+
 @login_required
 def dashboard_lugares(request, hotel_slug):
     return render(request, 'dashboard/gerenciar_lugares.html', {
