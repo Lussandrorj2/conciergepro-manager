@@ -926,7 +926,6 @@ def forcar_traducao_hotel(request, hotel_slug):
     if not _get_hotel_do_usuario(request, hotel):
         return JsonResponse({"erro": "Sem permissão"}, status=403)
 
-
     try:
         campos = {}
         if hotel.titulo_hero:
@@ -937,12 +936,37 @@ def forcar_traducao_hotel(request, hotel_slug):
             campos['subtitulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(hotel.subtitulo_hero)
             campos['subtitulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(hotel.subtitulo_hero)
             campos['subtitulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(hotel.subtitulo_hero)
-    
+
         Hotel.objects.filter(pk=hotel.pk).update(**campos)
-        return JsonResponse({"status": "ok", "traduzido": list(campos.keys())})
+
+        passeios_traduzidos = 0
+        for p in Passeio.objects.filter(hotel=hotel, ativo=True):
+            try:
+                if p.nome:
+                    p.nome_en = GoogleTranslator(source='pt', target='en').translate(p.nome)
+                    p.nome_es = GoogleTranslator(source='pt', target='es').translate(p.nome)
+                    p.nome_fr = GoogleTranslator(source='pt', target='fr').translate(p.nome)
+                if p.descricao:
+                    p.descricao_en = GoogleTranslator(source='pt', target='en').translate(p.descricao)
+                    p.descricao_es = GoogleTranslator(source='pt', target='es').translate(p.descricao)
+                    p.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(p.descricao)
+                p.save(update_fields=[
+                    'nome_en','nome_es','nome_fr',
+                    'descricao_en','descricao_es','descricao_fr'
+                ])
+                passeios_traduzidos += 1
+            except Exception as e:
+                print(f"[tradução passeio {p.id}] {e}")
+
+        return JsonResponse({
+            "status": "ok",
+            "traduzido": list(campos.keys()),
+            "passeios_traduzidos": passeios_traduzidos
+        })
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
+
 
 
 @csrf_exempt
