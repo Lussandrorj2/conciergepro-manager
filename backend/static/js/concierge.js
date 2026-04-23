@@ -969,9 +969,12 @@ function atualizarTextosMapa() {
 async function traduzirTexto(texto, idioma) {
     if (!texto || idioma === 'pt') return texto;
 
-    // 🔥 PRÉ-PROCESSAMENTO (corrige contexto)
     var textoOriginal = texto;
-    var textoProcessado = texto.replace(/\bRio\b/g, 'Rio de Janeiro');
+
+    // Protege "Rio" (cidade) substituindo por placeholder antes de traduzir
+    var textoProcessado = texto
+        .replace(/\bRio de Janeiro\b/g, '##RIODEJANEIRO##')
+        .replace(/\bRio\b/g, '##RIO##');
 
     var chave = idioma + ':' + textoProcessado.slice(0, 40);
     if (cacheTraducoes[chave]) return cacheTraducoes[chave];
@@ -981,15 +984,17 @@ async function traduzirTexto(texto, idioma) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                texto: textoProcessado, // 👈 usa versão corrigida
+                texto: textoProcessado,
                 idioma: idioma 
             })
         });
 
         var data = await res.json();
 
-        // 🔥 PÓS-PROCESSAMENTO (opcional → volta pra "Rio")
-        var traduzidoFinal = data.traduzido.replace(/Rio de Janeiro/g, 'Rio');
+        // Restaura os nomes originais após a tradução
+        var traduzidoFinal = data.traduzido
+            .replace(/##RIODEJANEIRO##/g, 'Rio de Janeiro')
+            .replace(/##RIO##/g, 'Rio');
 
         cacheTraducoes[chave] = traduzidoFinal;
         return traduzidoFinal;
@@ -998,6 +1003,7 @@ async function traduzirTexto(texto, idioma) {
         return textoOriginal;
     }
 }
+
 
 var cacheTraducoes = {};
 
