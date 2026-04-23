@@ -938,6 +938,28 @@ function atualizarTextosMapa() {
     if (document.getElementById('mapa-cards-grid')) renderLugarCards();
 }
 
+async function traduzirTexto(texto, idioma) {
+    if (!texto || idioma === 'pt') return texto;
+    
+    var chave = idioma + ':' + texto.slice(0, 40);
+    if (cacheTraducoes[chave]) return cacheTraducoes[chave];
+    
+    try {
+        var res = await fetch('/api/traduzir/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto: texto, idioma: idioma })
+        });
+        var data = await res.json();
+        cacheTraducoes[chave] = data.traduzido;
+        return data.traduzido;
+    } catch(e) {
+        return texto;
+    }
+}
+
+var cacheTraducoes = {};
+
 // ==========================================
 // INIT
 // ==========================================
