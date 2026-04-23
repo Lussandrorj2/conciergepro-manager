@@ -996,6 +996,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     atualizarTrust();
     await carregarHotel(idiomaAtual);
     await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
+    // traduz os cards após o mapa carregar
+    if (idiomaAtual !== 'pt') {
+        await traduzirEAtualizarCards();
+    }
 });
 
 // EXPORTS
