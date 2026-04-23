@@ -37,9 +37,7 @@ def _traduzir_em_background(instance_pk, model_class, campos):
 
                 # Protege termos
                 for padrao, placeholder in termos_protegidos.items():
-                    texto_proc = re.sub(
-                        padrao, placeholder, texto_proc, flags=re.IGNORECASE
-                    )
+                    texto_proc = re.sub(padrao, placeholder, texto_proc)
 
                 # Atualiza idioma do tradutor dinamicamente
                 translator.target = lang_dest
