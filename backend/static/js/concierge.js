@@ -222,8 +222,6 @@ if (dotsEl) {
         dotsEl.appendChild(d);
     }
 }
-```
-
 }
 
 function carrosselMover(dir) {
@@ -241,7 +239,6 @@ var el = document.getElementById('passeios');
 if (!el || el._dragInit) return;
 el._dragInit = true;
 
-```
 var startX = 0, startY = 0, isH = null, dragging = false;
 
 el.addEventListener('mousedown', function(e) {
@@ -287,7 +284,6 @@ el.addEventListener('click', function(e) {
 }, true);
 
 window.addEventListener('resize', function() { coverflowAtualizar(); });
-```
 
 }
 
@@ -304,8 +300,6 @@ if (e.key === 'ArrowRight') carrosselMover(1);
 async function carregarPasseios(lang) {
 var track = document.getElementById('passeios-track');
 if (!track) return;
-
-```
 if (!hotelSlug) {
     track.innerHTML = '<div class="estado-vazio"><span class="icon">🏖️</span><p>' + t('vazio') + '</p></div>';
     return;
