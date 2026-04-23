@@ -157,34 +157,33 @@ function coverflowAtualizar() {
     var cfg   = coverflowGetConfig();
 
     cards.forEach(function(card, i) {
+        // diff circular — pega o caminho mais curto ao redor do círculo
         var diff = i - carrIndex;
+        var half = carrTotal / 2;
+        if (diff > half)  diff -= carrTotal;
+        if (diff < -half) diff += carrTotal;
+        
         var absD = Math.abs(diff);
-
         card.classList.toggle('coverflow-active', diff === 0);
-
+    
         var cardW   = card.offsetWidth || coverflowGetCardWidth();
         var baseX   = -(cardW / 2);
-        var viewW   = document.getElementById('passeios').offsetWidth || window.innerWidth;
-        var offsetX = diff * (viewW * 0.30);
+        var offsetX = diff * cardW * 0.90;
         var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
         var transZ  = diff === 0 ? 0 : cfg.transZ * Math.min(absD, 2);
-
-        var scale;
-        if (diff === 0)      scale = cfg.scaleActive;
-        else if (absD === 1) scale = cfg.scaleSide;
-        else                 scale = Math.max(0.55, cfg.scaleFar - (absD - 2) * 0.08);
-
+    
+        var scale   = diff === 0 ? cfg.scaleActive : absD === 1 ? cfg.scaleSide : Math.max(0.55, cfg.scaleFar - (absD - 2) * 0.08);
         var opacity = diff === 0 ? 1 : Math.max(0.25, 0.65 - (absD - 1) * 0.18);
         var bright  = diff === 0 ? 1 : Math.max(0.45, 0.68 - (absD - 1) * 0.12);
         var sat     = diff === 0 ? 1 : Math.max(0.25, 0.50 - (absD - 1) * 0.10);
         var zIndex  = 20 - absD;
-
+    
         if (absD > 4) {
             card.style.visibility    = 'hidden';
             card.style.pointerEvents = 'none';
             return;
         }
-
+    
         card.style.visibility    = 'visible';
         card.style.pointerEvents = absD > 2 ? 'none' : '';
         card.style.zIndex        = zIndex;
@@ -204,8 +203,8 @@ function coverflowAtualizar() {
         if (h > 0) track.style.height = (h + 40) + 'px';
     }
 
-    if (btnPrev) btnPrev.disabled = carrIndex === 0;
-    if (btnNext) btnNext.disabled = carrIndex >= carrTotal - 1;
+    if (btnPrev) btnPrev.disabled = false; // nunca desabilita
+    if (btnNext) btnNext.disabled = false; // nunca desabilita
 
     if (dotsEl) {
         dotsEl.innerHTML = '';
@@ -220,12 +219,12 @@ function coverflowAtualizar() {
 }
 
 function carrosselMover(dir) {
-    carrIndex = Math.min(carrTotal - 1, Math.max(0, carrIndex + dir));
+    carrIndex = (carrIndex + dir + carrTotal) % carrTotal; // circular!
     coverflowAtualizar();
 }
 
 function coverflowIr(idx) {
-    carrIndex = Math.max(0, Math.min(carrTotal - 1, idx));
+    carrIndex = ((idx % carrTotal) + carrTotal) % carrTotal;
     coverflowAtualizar();
 }
 
