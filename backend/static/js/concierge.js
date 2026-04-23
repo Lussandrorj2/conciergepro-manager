@@ -327,7 +327,7 @@ async function carregarPasseios(lang) {
     
     } catch(e) {
         console.error('[carregarPasseios]', e);
-        track.innerHTML = '<div class='estado-erro'><span class='icon'>&#9888;</span><p>' + t('erro') + '</p></div>';
+        track.innerHTML = "<div class='estado-erro'><span class='icon'>&#9888;</span><p>' + t('erro') + '</p></div>";
     }
 }
 
