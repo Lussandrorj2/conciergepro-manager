@@ -137,12 +137,12 @@ function coverflowGetCardWidth() {
 function coverflowGetConfig() {
     var isMobile = window.innerWidth <= 768;
     return {
-        rotateY:     isMobile ? 38 : 42,
-        transZ:      isMobile ? -80 : -100,
-        gap:         isMobile ? 0.44 : 0.46,   // ← menor = cards laterais mais perto do centro
-        scaleActive: isMobile ? 1.04 : 1.06,   // ← card central menos dominante
-        scaleSide:   isMobile ? 0.80 : 0.82,
-        scaleFar:    isMobile ? 0.65 : 0.68,
+        rotateY:     isMobile ? 25 : 28,
+        transZ:      isMobile ? -60 : -80,
+        gap:         isMobile ? 0.36 : 0.38,
+        scaleActive: isMobile ? 1.02 : 1.04,
+        scaleSide:   isMobile ? 0.78 : 0.80,
+        scaleFar:    isMobile ? 0.62 : 0.65,
     };
 }
 
@@ -164,7 +164,8 @@ function coverflowAtualizar() {
 
         var cardW   = card.offsetWidth || coverflowGetCardWidth();
         var baseX   = -(cardW / 2);
-        var offsetX = diff * cardW * cfg.gap;
+        var viewW   = document.getElementById('passeios').offsetWidth || window.innerWidth;
+        var offsetX = diff * (viewW * 0.30);
         var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
         var transZ  = diff === 0 ? 0 : cfg.transZ * Math.min(absD, 2);
 
