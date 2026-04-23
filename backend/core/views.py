@@ -944,8 +944,6 @@ def forcar_traducao_hotel(request, hotel_slug):
         print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
 
-
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def traduzir_texto(request):
