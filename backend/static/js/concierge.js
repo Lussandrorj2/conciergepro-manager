@@ -38,7 +38,7 @@ var i18n = {
         campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
         mapa_label: 'Nos arredores', mapa_titulo: 'Restaurantes & Centros Comerciais',
         mapa_todos: 'Todos', mapa_restaurantes: 'Restaurantes', mapa_compras: 'Compras',
-        mapa_carregando: 'Carregando mapa\u2026', mapa_abrir: 'Ver no Google Maps', mapa_ver: 'Ver no mapa'
+        mapa_carregando: 'Carregando mapa\u2026', mapa_abrir: 'Google Maps', mapa_ver: 'Ver no mapa'
     },
     en: {
         btn: 'See details', vazio: 'No tours found.', erro: 'Loading error.',
