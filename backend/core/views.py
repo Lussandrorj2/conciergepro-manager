@@ -289,19 +289,22 @@ def api_passeios(request, hotel_slug, passeio_id=None):
     
             try:
                 if passeio.nome:
-                    passeio.nome_en = GoogleTranslator(source='pt', target='en').translate(passeio.nome)
-                    passeio.nome_es = GoogleTranslator(source='pt', target='es').translate(passeio.nome)
-                    passeio.nome_fr = GoogleTranslator(source='pt', target='fr').translate(passeio.nome)
+                    nome_proc = passeio.nome.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    passeio.nome_en = GoogleTranslator(source='pt', target='en').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.nome_es = GoogleTranslator(source='pt', target='es').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.nome_fr = GoogleTranslator(source='pt', target='fr').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
                 if passeio.descricao:
-                    passeio.descricao_en = GoogleTranslator(source='pt', target='en').translate(passeio.descricao)
-                    passeio.descricao_es = GoogleTranslator(source='pt', target='es').translate(passeio.descricao)
-                    passeio.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(passeio.descricao)
+                    desc_proc = passeio.descricao.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    passeio.descricao_en = GoogleTranslator(source='pt', target='en').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.descricao_es = GoogleTranslator(source='pt', target='es').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
                 passeio.save(update_fields=[
                     'nome_en','nome_es','nome_fr',
                     'descricao_en','descricao_es','descricao_fr'
                 ])
             except Exception as e:
                 print(f"[tradução] {e}")
+
             
             return JsonResponse({"status": "ok", "id": passeio.id})
 
