@@ -349,20 +349,48 @@ function renderCard(p) {
 
     var imgSrc = getImageUrl(p.banner || p.imagem || p.foto || p.foto_capa || p.image || primeiraFoto);
 
-    // FIX: aspas dentro de atributos HTML usam aspas duplas no JS externo; onerror usa escapeHTML seguro
     var imgHTML = imgSrc
         ? '<img src="' + imgSrc + '" alt="' + escapeHTML(p.nome) + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'card-img-empty\\\'>&#127754;</div>\'">'
         : '<div class="card-img-empty">\uD83C\uDF0A</div>';
 
     var precoSubHTML = precoSub ? '<small>' + precoSub + '</small>' : '';
 
+    // Badge de categoria (usa p.categoria ou p.tipo se disponível)
+    var categoriaBadge = '';
+    if (p.categoria || p.tipo) {
+        categoriaBadge = '<div class="card-category-badge">' + escapeHTML(p.categoria || p.tipo) + '</div>';
+    }
+
+    // Badge de duração (usa p.duracao se disponível)
+    var duracaoBadge = '';
+    if (p.duracao) {
+        duracaoBadge = '<div class="card-duration-badge">' +
+            '<svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5">' +
+                '<circle cx="8" cy="8" r="6.5"/><path d="M8 5v3l2 2"/>' +
+            '</svg>' +
+            escapeHTML(p.duracao) + '</div>';
+    }
+
+    // Rating de estrelas (usa p.avaliacao ou p.rating se disponível)
+    var ratingHTML = '';
+    if (p.avaliacao || p.rating) {
+        var nota = p.avaliacao || p.rating;
+        var estrelas = '';
+        for (var i = 0; i < 5; i++) { estrelas += i < Math.round(nota) ? '&#9733;' : '&#9734;'; }
+        var qtdAv = p.total_avaliacoes ? ' <span class="card-rating-count">(' + p.total_avaliacoes + ')</span>' : '';
+        ratingHTML = '<div class="card-rating"><span class="card-stars">' + estrelas + '</span>' + qtdAv + '</div>';
+    }
+
     return (
         '<div class="card-passeio" data-id="' + p.id + '" onclick="handleCardClick(' + p.id + ', this)">' +
             '<div class="card-img">' +
                 imgHTML +
+                categoriaBadge +
+                duracaoBadge +
                 '<div class="card-img-hover"><span>' + t('btn') + '</span></div>' +
             '</div>' +
             '<div class="card-body">' +
+                ratingHTML +
                 '<h3 class="card-nome">' + escapeHTML(p.nome) + '</h3>' +
                 '<p class="card-desc">' + escapeHTML(p.descricao || '') + '</p>' +
                 '<div class="card-footer">' +
@@ -838,26 +866,41 @@ function renderLugarCards() {
         var dist = lugar.dist[idiomaAtual]    || lugar.dist['pt'];
         var hor  = lugar.horario[idiomaAtual] || lugar.horario['pt'];
         var tl   = lugar.tipo === 'restaurante' ? L_.restaurante : L_.shopping;
+        var tipoCls = lugar.tipo === 'restaurante' ? '' : 'shopping';
 
+        // Estrelas renderizadas como spans
         var starsHTML = (lugar.estrelas || '')
             .replace(/\u2605/g, '<span class="star filled">&#9733;</span>')
             .replace(/\u2606/g, '<span class="star empty">&#9734;</span>');
 
+        // Meta items: horário e info extra
+        var metaHTML = '';
+        if (hor) {
+            metaHTML += '<div class="lc2-meta-item">' +
+                '<div class="lc2-meta-icon">&#128336;</div>' +
+                '<div class="lc2-meta-text"><strong>Hor&aacute;rio</strong>' + hor + '</div>' +
+            '</div>';
+        }
+        if (lugar.instagram) {
+            metaHTML += '<div class="lc2-meta-item">' +
+                '<div class="lc2-meta-icon">&#128247;</div>' +
+                '<div class="lc2-meta-text"><strong>Instagram</strong>' + lugar.instagram.replace('@','') + '</div>' +
+            '</div>';
+        }
+
         return (
             '<div class="lugar-card-v2" onclick="lc360Selecionar(' + lugar.id + ')" role="button" tabindex="0">' +
                 '<div class="lc2-header">' +
-                    '<div class="lc2-badge">' + lugar.emoji + ' ' + tl + '</div>' +
-                    (lugar.mapaLink ? '<a class="lc2-maps-btn" href="' + lugar.mapaLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver no Google Maps">&#8599;</a>' : '') +
+                    '<div class="lc2-badge ' + tipoCls + '">' + lugar.emoji + ' ' + tl + '</div>' +
+                    (lugar.mapaLink ? '<a class="lc2-maps-btn" href="' + lugar.mapaLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="' + t('mapa_abrir') + '">\u2197</a>' : '') +
                 '</div>' +
                 '<div class="lc2-nome">' + nome + '</div>' +
+                (lugar.estrelas ? '<div class="lc2-stars-row"><div class="lc2-stars">' + starsHTML + '</div></div>' : '') +
                 '<div class="lc2-desc">' + (desc || '') + '</div>' +
-                '<div class="lc2-divider"></div>' +
+                (metaHTML ? '<div class="lc2-divider"></div><div class="lc2-meta">' + metaHTML + '</div>' : '<div class="lc2-divider"></div>') +
                 '<div class="lc2-footer">' +
-                    '<div class="lc2-meta-col">' +
-                        '<div class="lc2-stars">' + starsHTML + '</div>' +
-                        (hor ? '<div class="lc2-horario">&#128336; ' + hor + '</div>' : '') +
-                    '</div>' +
-                    (dist ? '<div class="lc2-dist"><span class="lc2-dist-icon">&#128694;</span><span>' + dist + '</span></div>' : '') +
+                    (dist ? '<div class="lc2-dist"><span class="lc2-dist-icon">&#128694;</span><span>' + dist + '</span></div>' : '<div></div>') +
+                    '<button class="lc2-cta" onclick="event.stopPropagation();lc360Selecionar(' + lugar.id + ')">' + t('mapa_ver') + ' \u2192</button>' +
                 '</div>' +
             '</div>'
         );
