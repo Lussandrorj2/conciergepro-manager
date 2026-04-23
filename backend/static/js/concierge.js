@@ -137,12 +137,12 @@ function coverflowGetCardWidth() {
 function coverflowGetConfig() {
     var isMobile = window.innerWidth <= 768;
     return {
-        rotateY:     isMobile ? 25 : 28,
-        transZ:      isMobile ? -60 : -80,
-        gap:         isMobile ? 0.36 : 0.38,
+        rotateY:     isMobile ? 35 : 40,   // ← aumenta a rotação lateral
+        transZ:      isMobile ? -120 : -150, // ← empurra mais para o fundo
+        gap:         isMobile ? 0.90 : 0.90,
         scaleActive: isMobile ? 1.02 : 1.04,
-        scaleSide:   isMobile ? 0.78 : 0.80,
-        scaleFar:    isMobile ? 0.62 : 0.65,
+        scaleSide:   isMobile ? 0.75 : 0.78,
+        scaleFar:    isMobile ? 0.60 : 0.62,
     };
 }
 
