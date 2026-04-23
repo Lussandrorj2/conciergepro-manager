@@ -685,9 +685,16 @@ function atualizarTrust() {
 }
 
 async function trocarIdioma(lang) {
+    // 1. Atualiza estado PRIMEIRO
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
-    document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === lang); });
+
+    // 2. Atualiza botões
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+
+    // 3. Atualiza DOM estático IMEDIATAMENTE (síncrono, sem await)
     var ls = document.getElementById('label-secao');
     var ts = document.getElementById('titulo-secao');
     var ce = document.getElementById('count-passeios');
@@ -696,12 +703,15 @@ async function trocarIdioma(lang) {
     if (ce && listaPasseios.length) ce.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
     atualizarTrust();
     atualizarTextosMapa();
+
+    // 4. Carrega dados async
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
-        traduzirEAtualizarCards()  
+        traduzirEAtualizarCards()
     ]);
 }
+
 
 // ESC / clique fora fecha modais
 document.addEventListener('keydown', function(e) {
@@ -907,7 +917,7 @@ function renderLugarCards() {
     var L_ = MAPA_LABELS[idiomaAtual] || MAPA_LABELS['pt'];
 
     if (!lista.length) {
-        grid.innerHTML = '<div class="estado-vazio"><span class="icon">&#128205;</span><p>Nenhum local encontrado.</p></div>';
+        grid.innerHTML = '<div class="estado-vazio"><span class="icon">&#128205;</span><p>' + t('vazio') + '</p></div>';
         return;
     }
 
@@ -1029,7 +1039,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === idiomaAtual); });
     atualizarTrust();
     await carregarHotel(idiomaAtual);
-    await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
+    await initMapa(); // espera lugares carregarem primeiro
+    await Promise.all([carregarPasseios(idiomaAtual), traduzirEAtualizarCards()]);
 });
 
 // EXPORTS
