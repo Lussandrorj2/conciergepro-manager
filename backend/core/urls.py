@@ -10,6 +10,7 @@ urlpatterns = [
     # HOME
     # =========================
     path('', views.home, name='home'),
+    path('api/traduzir/', views.traduzir_texto),
 
     # =========================
     # AUTENTICAÇÃO
