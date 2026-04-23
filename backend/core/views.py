@@ -287,7 +287,24 @@ def api_passeios(request, hotel_slug, passeio_id=None):
             for f in request.FILES.getlist("imagens"):
                 ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
     
+            try:
+                if passeio.nome:
+                    passeio.nome_en = GoogleTranslator(source='pt', target='en').translate(passeio.nome)
+                    passeio.nome_es = GoogleTranslator(source='pt', target='es').translate(passeio.nome)
+                    passeio.nome_fr = GoogleTranslator(source='pt', target='fr').translate(passeio.nome)
+                if passeio.descricao:
+                    passeio.descricao_en = GoogleTranslator(source='pt', target='en').translate(passeio.descricao)
+                    passeio.descricao_es = GoogleTranslator(source='pt', target='es').translate(passeio.descricao)
+                    passeio.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(passeio.descricao)
+                passeio.save(update_fields=[
+                    'nome_en','nome_es','nome_fr',
+                    'descricao_en','descricao_es','descricao_fr'
+                ])
+            except Exception as e:
+                print(f"[tradução] {e}")
+            
             return JsonResponse({"status": "ok", "id": passeio.id})
+
     
         except Exception as e:
             print("[api_passeios POST] Erro:")
