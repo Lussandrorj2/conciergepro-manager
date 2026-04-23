@@ -4,18 +4,18 @@
 html, body { overflow-x: hidden; }
 
 :root {
-    --gold:        #b5843a;
-    --gold-light:  #d4a95a;
-    --gold-dim:    rgba(181,132,58,0.15);
-    --text:        #0f172a;
-    --text-muted:  #64748b;
-    --border:      rgba(181,132,58,0.18);
-    --bg:          #f4f6f9;
-    --white:       #ffffff;
-    --radius-card: 20px;
-    --radius-modal:24px;
-    --shadow-card: 0 4px 24px rgba(15,23,42,0.08);
-    --shadow-modal:0 24px 80px rgba(15,23,42,0.22);
+    --gold:         #b5843a;
+    --gold-light:   #d4a95a;
+    --gold-dim:     rgba(181,132,58,0.15);
+    --text:         #0f172a;
+    --text-muted:   #64748b;
+    --border:       rgba(181,132,58,0.18);
+    --bg:           #f4f6f9;
+    --white:        #ffffff;
+    --radius-card:  20px;
+    --radius-modal: 24px;
+    --shadow-card:  0 4px 24px rgba(15,23,42,0.08);
+    --shadow-modal: 0 24px 80px rgba(15,23,42,0.22);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,7 +25,6 @@ body {
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    /* Prevent text size adjustment on iOS */
     -webkit-text-size-adjust: 100%;
 }
 
@@ -271,30 +270,32 @@ body {
 }
 
 /* ==========================================
-   CARD PASSEIO
+   CARD PASSEIO — melhorado
    ========================================== */
 .card-passeio {
     background: var(--white);
     border: 1px solid var(--gold-dim);
     border-radius: var(--radius-card);
     overflow: hidden;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94),
+                border-color 0.3s, box-shadow 0.35s;
     cursor: pointer;
     flex: 0 0 320px;
     box-shadow: var(--shadow-card);
 }
 
 .card-passeio:hover {
-    transform: translateY(-8px);
-    border-color: var(--gold);
-    box-shadow: 0 16px 40px rgba(181,132,58,0.15);
+    transform: translateY(-7px);
+    border-color: rgba(181,132,58,0.5);
+    box-shadow: 0 20px 48px rgba(181,132,58,0.18),
+                0 4px 16px rgba(15,23,42,0.08);
 }
 
 .card-img {
-    height: 220px;
+    height: 210px;
     overflow: hidden;
     position: relative;
-    background: #e2e8f0;
+    background: #1a1008;
 }
 
 .card-img img {
@@ -302,8 +303,17 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s;
-    /* CRITICAL: Remove any color overlay/filter from the image itself */
     filter: none;
+}
+
+/* gradiente sutil na base para badges */
+.card-img::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(to top, rgba(15,8,0,0.5) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 .card-passeio:hover .card-img img { transform: scale(1.05); }
@@ -315,20 +325,59 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 40px;
-    background: linear-gradient(135deg,#e2e8f0,#cbd5e1);
+    background: linear-gradient(135deg, #1a1008, #2d1f0a);
 }
 
-/* FIXED: Hover overlay only appears on hover, NOT by default */
+/* badge de categoria — topo esquerdo */
+.card-category-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    background: rgba(0,0,0,0.52);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--gold-light);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(181,132,58,0.28);
+}
+
+/* badge de duração — base direita */
+.card-duration-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 2;
+    background: rgba(0,0,0,0.52);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255,255,255,0.92);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* hover overlay */
 .card-img-hover {
     position: absolute;
     inset: 0;
-    background: rgba(181,132,58,0.6);
+    background: rgba(181,132,58,0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
+    z-index: 3;
 }
 
 .card-passeio:hover .card-img-hover { opacity: 1; }
@@ -340,35 +389,46 @@ body {
     letter-spacing: 1px;
 }
 
-.card-preco-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(6px);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
+/* badge de preço na foto: oculto */
+.card-preco-badge { display: none !important; }
+
+.card-body { padding: 20px 22px 22px; }
+
+/* rating de estrelas */
+.card-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
 }
 
-.card-body { padding: 24px; }
+.card-stars {
+    color: var(--gold);
+    font-size: 11.5px;
+    letter-spacing: 0.8px;
+}
+
+.card-rating-count {
+    font-size: 11px;
+    color: var(--text-muted);
+}
 
 .card-nome {
     font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 7px;
     line-height: 1.3;
+    letter-spacing: -0.2px;
 }
 
 .card-desc {
     font-size: 13px;
     color: var(--text-muted);
-    margin-bottom: 20px;
-    line-height: 1.5;
+    margin-bottom: 18px;
+    line-height: 1.55;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -377,7 +437,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .card-preco {
@@ -386,32 +446,34 @@ body {
     color: var(--gold);
     display: flex;
     flex-direction: column;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .card-preco small {
     font-size: 11px;
     font-weight: 400;
     color: var(--text-muted);
+    margin-top: 3px;
 }
 
 .btn-reservar {
     background: var(--gold);
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     white-space: nowrap;
     transition: background 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
-.btn-reservar:hover {
-    background: var(--gold-light);
-    transform: translateY(-1px);
-}
+.btn-reservar:hover { background: var(--gold-light); transform: translateY(-1px); }
 
 /* ==========================================
    SKELETON
@@ -511,14 +573,13 @@ body {
 .modal-close-det:hover { background: rgba(0,0,0,0.8); }
 
 /* ==========================================
-   FOTO CARROSSEL NO DETALHE — CORRIGIDO
+   FOTO CARROSSEL NO DETALHE
    ========================================== */
 .det-foto-wrap {
     position: relative;
     height: 300px;
     overflow: hidden;
     border-radius: var(--radius-modal) var(--radius-modal) 0 0;
-    /* FIXED: background neutro, sem cor marrom */
     background: #1a1a1a;
 }
 
@@ -526,25 +587,21 @@ body {
     display: flex;
     height: 100%;
     transition: transform 0.4s ease;
-    /* CRITICAL: sem background colorido no track */
     background: transparent;
 }
 
 .det-foto-slide {
     flex: 0 0 100%;
     height: 100%;
-    /* CRITICAL: sem overlay marrom no slide */
     background: transparent;
     position: relative;
 }
 
-/* FIXED: imagem SEM filtro/overlay de cor */
 .det-foto-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    /* CRITICAL: remove any color cast */
     filter: none;
     mix-blend-mode: normal;
     opacity: 1;
@@ -557,7 +614,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 52px;
-    background: linear-gradient(135deg,#1a1008,#2d1f0a);
+    background: linear-gradient(135deg, #1a1008, #2d1f0a);
 }
 
 .det-foto-btn {
@@ -819,13 +876,11 @@ body {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px 14px;
-    font-size: 14px;
     font-family: inherit;
     color: var(--text);
     transition: border-color 0.2s;
     background: var(--white);
     width: 100%;
-    /* CRITICAL: prevent zoom on iOS — minimum 16px */
     font-size: 16px;
 }
 
@@ -1178,38 +1233,276 @@ body {
 }
 
 /* ==========================================
-   SUBSTITUA TODO O BLOCO @media (max-width: 768px)
-   e os blocos abaixo dele até o fim do arquivo
+   LUGAR CARD V2 — melhorado
    ========================================== */
+.lugar-card-v2 {
+    flex: 0 0 300px;
+    background: var(--white);
+    border: 1px solid var(--gold-dim);
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 3px 18px rgba(15,23,42,0.06);
+    transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94),
+                box-shadow 0.3s ease, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
 
+.lugar-card-v2:hover {
+    transform: translateY(-5px);
+    border-color: rgba(181,132,58,0.48);
+    box-shadow: 0 18px 44px rgba(181,132,58,0.18),
+                0 3px 12px rgba(15,23,42,0.07);
+}
+
+.lc2-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px 0;
+    margin-bottom: 10px;
+}
+
+/* pill de tipo — base restaurante */
+.lc2-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(181,132,58,0.1);
+    border: 1px solid rgba(181,132,58,0.22);
+    color: #956d28;
+}
+
+/* pill de tipo — compras/shopping */
+.lc2-badge.shopping {
+    background: rgba(59,130,246,0.08);
+    border-color: rgba(59,130,246,0.2);
+    color: #1d4ed8;
+}
+
+.lc2-maps-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 700;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.lc2-maps-btn:hover {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold);
+}
+
+.lc2-nome {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+    padding: 0 18px;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+}
+
+/* linha de estrelas */
+.lc2-stars-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 18px;
+    margin-bottom: 8px;
+}
+
+.lc2-stars {
+    font-size: 11.5px;
+    letter-spacing: 0.8px;
+}
+
+.lc2-stars .star.filled { color: var(--gold); }
+.lc2-stars .star.empty  { color: #d1d5db; }
+
+.lc2-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.lc2-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding: 0 18px;
+    margin-bottom: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+}
+
+.lc2-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 18px 14px;
+}
+
+/* grid de metadados */
+.lc2-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 8px;
+    padding: 0 18px;
+    margin-bottom: 14px;
+}
+
+.lc2-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.lc2-meta-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: rgba(181,132,58,0.1);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-top: 1px;
+}
+
+.lc2-meta-icon.blue  { background: rgba(59,130,246,0.08); }
+.lc2-meta-icon.green { background: rgba(34,197,94,0.1); }
+
+.lc2-meta-text {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.lc2-meta-text strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1px;
+}
+
+/* rodapé: distância + CTA */
+.lc2-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
+
+.lc2-dist {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #f8f5ef;
+    border: 1px solid rgba(181,132,58,0.2);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--gold);
+    white-space: nowrap;
+}
+
+.lc2-dist-icon { font-size: 14px; }
+
+.lc2-cta {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+}
+
+.lc2-cta:hover { opacity: 0.7; }
+
+/* compatibilidade: horário standalone */
+.lc2-horario {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==========================================
+   ANIMAÇÕES GLOBAIS
+   ========================================== */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+/* ==========================================
+   MOBILE — 768px
+   ========================================== */
 @media (max-width: 768px) {
 
-    /* --- layout geral --- */
-    .hero-content  { padding: 80px 20px 56px; }
-    .section       { padding: 32px 16px 40px; }
-    .section-head  { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .section-title { font-size: 22px; }
+    /* layout geral */
+    .hero-content      { padding: 80px 20px 56px; }
+    .section           { padding: 32px 16px 40px; }
+    .section-head      { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .section-title     { font-size: 22px; }
     .mapa-section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
-    #mapa-container { height: 260px; border-radius: 12px; }
+    #mapa-container    { height: 260px; border-radius: 12px; }
 
-    /* --- hero trust bar --- */
+    /* hero trust bar */
     .hero-trust { font-size: 12px; padding: 12px 16px 20px; gap: 4px 12px; }
 
-    /* --- carrossel passeios --- */
+    /* carrossel passeios */
     .carr-prev { left: 4px; }
     .carr-next { right: 4px; }
     .carr-btn  { width: 36px; height: 36px; font-size: 18px; }
 
     .card-passeio  { flex: 0 0 calc(100vw - 48px); max-width: 360px; }
     .card-skeleton { flex: 0 0 calc(100vw - 48px); }
-    .card-img      { height: 200px; }
-    .card-body     { padding: 18px 20px 20px; }
-    .card-nome     { font-size: 18px; }
+    .card-img      { height: 195px; }
+    .card-body     { padding: 16px 18px 18px; }
+    .card-nome     { font-size: 17px; }
 
-    /* -------------------------------------------------------
-       OVERLAY — centralizado, card flutua no meio
-       Igual ao modelo Vercel (imagens 3 e 4 de referência)
-    ------------------------------------------------------- */
+    /* overlay */
     .modal-overlay {
         align-items: center;
         justify-content: center;
@@ -1219,43 +1512,35 @@ body {
         overflow-y: auto;
     }
 
-    /* -------------------------------------------------------
-       MODAL DETALHE — card flutuante centralizado
-       com bordas arredondadas em TODOS os lados
-       foto com border-radius no topo igual ao Vercel
-    ------------------------------------------------------- */
+    /* modal detalhe — card flutuante */
     .modal-detalhe {
         width: 100%;
         max-width: 100%;
         max-height: 88svh;
         margin: auto;
-        border-radius: 20px;            /* bordas em todos os lados */
+        border-radius: 20px;
         animation: slideUp 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-        overflow: hidden;               /* foto respeita o border-radius */
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         box-shadow: 0 32px 80px rgba(0,0,0,0.35);
     }
 
-    /* sem alça de drag — é card, não bottom sheet */
     .modal-detalhe::before { display: none; }
 
-    /* foto com border-radius no topo, igual ao Vercel */
     .det-foto-wrap {
         height: 240px;
-        border-radius: 0;               /* overflow:hidden no pai já recorta */
+        border-radius: 0;
         flex-shrink: 0;
         background: #111;
     }
 
-    /* imagem limpa */
     .det-foto-slide img {
         filter: none !important;
         opacity: 1 !important;
         mix-blend-mode: normal !important;
     }
 
-    /* botão fechar: canto superior direito da foto */
     .modal-close-det {
         top: 14px;
         right: 14px;
@@ -1266,7 +1551,6 @@ body {
         font-size: 14px;
     }
 
-    /* corpo do modal */
     .det-body {
         padding: 20px 24px 28px;
         overflow-y: auto;
@@ -1274,25 +1558,15 @@ body {
         flex: 1;
     }
 
-    .det-eyebrow {
-        font-size: 10px;
-        letter-spacing: 4px;
-        margin-bottom: 8px;
-    }
+    .det-eyebrow { font-size: 10px; letter-spacing: 4px; margin-bottom: 8px; }
 
     .det-nome {
         font-size: 24px;
-        margin-bottom: 16px;
-    }
-
-    /* divisor igual ao Vercel */
-    .det-nome {
         padding-bottom: 16px;
         border-bottom: 1px solid var(--border);
         margin-bottom: 16px;
     }
 
-    /* preço grande + / pessoa inline */
     .det-preco {
         font-size: 28px;
         font-weight: 700;
@@ -1303,25 +1577,18 @@ body {
         margin-bottom: 20px;
     }
 
-    .det-preco small {
-        font-size: 14px;
-        font-weight: 400;
-        color: var(--text-muted);
-    }
+    .det-preco small { font-size: 14px; font-weight: 400; color: var(--text-muted); }
 
-    /* rodapé: botão ocupa largura total, sem preço ao lado */
     .det-footer {
         flex-direction: column;
         align-items: stretch;
         gap: 0;
         padding-top: 0;
-        border-top: none;               /* divisor já está no nome */
+        border-top: none;
     }
 
-    /* esconde o preço do footer (já está acima) */
     .det-footer .det-preco { display: none; }
 
-    /* botão Reservar agora — fundo dourado, largura total */
     .btn-reservar-det {
         width: 100%;
         text-align: center;
@@ -1334,10 +1601,7 @@ body {
         letter-spacing: 0.3px;
     }
 
-    /* -------------------------------------------------------
-       BOTTOM SHEET — formulário de reserva
-       Este SIM é bottom sheet, igual imagem 4 de referência
-    ------------------------------------------------------- */
+    /* bottom sheet — formulário de reserva */
     .modal-reserva {
         width: 100%;
         max-width: 100%;
@@ -1350,11 +1614,9 @@ body {
         flex-direction: column;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        /* ancora na base quando o overlay está flex-end */
         align-self: flex-end;
     }
 
-    /* alça de drag */
     .modal-reserva::before {
         content: '';
         display: block;
@@ -1366,7 +1628,6 @@ body {
         flex-shrink: 0;
     }
 
-    /* padding lateral dos elementos */
     .modal-reserva .btn-voltar-det,
     .modal-reserva .modal-eyebrow,
     .modal-reserva .modal-title,
@@ -1394,10 +1655,8 @@ body {
         width: calc(100% - 40px);
     }
 
-    /* campos empilhados */
     .form-row { grid-template-columns: 1fr; gap: 0; }
 
-    /* CRÍTICO: 16px previne zoom automático no iOS */
     .form-group input {
         padding: 14px 16px;
         font-size: 16px !important;
@@ -1446,9 +1705,10 @@ body {
     .filtro-mapa-btn { flex-shrink: 0; font-size: 12px; padding: 7px 14px; }
 
     .lugar-card      { flex: 0 0 80vw; }
+    .lugar-card-v2   { flex: 0 0 84vw; }
     .lugares-nav-btn { display: none; }
 
-    #wpp-main { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 13px; }
+    #wpp-main        { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 13px; }
     .toast-container { right: 12px; bottom: 80px; }
 }
 
@@ -1461,10 +1721,11 @@ body {
 
     .card-passeio  { flex: 0 0 calc(100vw - 32px); }
     .card-skeleton { flex: 0 0 calc(100vw - 32px); }
-    .card-img      { height: 185px; }
+    .card-img      { height: 180px; }
     .det-foto-wrap { height: 200px; }
     .section       { padding: 28px 12px 36px; }
     .section-title { font-size: 20px; }
+    .lugar-card-v2 { flex: 0 0 88vw; }
 }
 
 /* ==========================================
