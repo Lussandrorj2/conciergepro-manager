@@ -872,27 +872,14 @@ function renderLugarCards() {
         var starsHTML = (lugar.estrelas || '')
             .replace(/\u2605/g, '<span class="star filled">&#9733;</span>')
             .replace(/\u2606/g, '<span class="star empty">&#9734;</span>');
-
-        // Meta items: horário e info extra
+            // Meta items: só horário no card
         var metaHTML = '';
         if (hor) {
-            var igHandle = lugar.instagram;
-            try {
-                var igMatch = lugar.instagram.match(/instagram\.com\/([^/?]+)/);
-                if (igMatch) igHandle = '@' + igMatch[1];
-                else igHandle = lugar.instagram.replace(/^https?:\/\/[^/]+\//, '').split('?')[0].replace(/^@?/, '@');
-            } catch(e) {}
-            
             metaHTML += '<div class="lc2-meta-item">' +
-                '<div class="lc2-meta-icon">&#128247;</div>' +
-                '<div class="lc2-meta-text"><strong>Instagram</strong>' + igHandle + '</div>' +
+                '<div class="lc2-meta-icon">&#128336;</div>' +
+                '<div class="lc2-meta-text"><strong>Horário</strong>' + hor + '</div>' +
             '</div>';
         }
-        if (lugar.instagram) {
-            metaHTML += '<div class="lc2-meta-item">' +
-                '<div class="lc2-meta-icon">&#128247;</div>' +
-                '<div class="lc2-meta-text"><strong>Instagram</strong>' + lugar.instagram.replace('@','') + '</div>' +
-            '</div>';
         }
 
         return (
