@@ -5,8 +5,8 @@
 
 /* Viewport com perspectiva */
 #passeios {
-    overflow: hidden;
-    overflow-x: hidden;
+    overflow: visible;
+    overflow-x: clip;
     position: relative;
     width: 100%;
     cursor: grab;
