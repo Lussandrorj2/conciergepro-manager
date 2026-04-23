@@ -973,17 +973,9 @@ async function traduzirTexto(texto, idioma) {
     if (cacheTraducoes[chave]) return cacheTraducoes[chave];
     
     try {
-        // pega o CSRF token do cookie
-        var csrfToken = document.cookie.split(';')
-            .find(function(c){ return c.trim().startsWith('csrftoken='); });
-        csrfToken = csrfToken ? csrfToken.split('=')[1].trim() : '';
-
         var res = await fetch('/api/traduzir/', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken   // ← adicione isso
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ texto: texto, idioma: idioma })
         });
         var data = await res.json();
