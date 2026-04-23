@@ -691,25 +691,44 @@ if (MAPA_GERAL_SRC && MAPA_GERAL_SRC.indexOf('http')===0) carregarMapaIframe(MAP
 }
 
 function abrirModalLugar(id) {
-var l = LUGARES.find(function(x){ return x.id===id; });
-if (!l) return;
-var nome = l.nome[idiomaAtual]||l.nome['pt'];
-var desc = l.desc[idiomaAtual]||l.desc['pt'];
-var dist = l.dist[idiomaAtual]||l.dist['pt'];
-var hor  = l.horario[idiomaAtual]||l.horario['pt'];
-document.getElementById('lugar-tipo').innerText      = l.tipo==='restaurante'?'🍽 Restaurante':'🛍 Compras';
-document.getElementById('lugar-nome').innerText      = nome;
-document.getElementById('lugar-desc').innerText      = desc||'';
-document.getElementById('lugar-horario').innerHTML   = hor  ? '🕐 '+hor  : '';
-document.getElementById('lugar-distancia').innerHTML = dist ? '🚶 '+dist : '';
-document.getElementById('lugar-estrelas').innerText  = l.estrelas||'';
-var html = '';
-if (l.mapaLink) html += '<a href="'+l.mapaLink+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">📍 Ver no Google Maps</a>';
-if (l.instagram) { var ig=l.instagram.indexOf('http')===0?l.instagram:'https://instagram.com/'+l.instagram.replace('@',''); html+='<a href="'+ig+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">📸 Instagram</a>'; }
-if (l.telefone)  html += '<a href="https://wa.me/'+l.telefone.replace(/\D/g,'')+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:10px;text-decoration:none;color:#16a34a;font-size:13px;font-weight:500;">💬 WhatsApp</a>';
-document.getElementById('lugar-contatos').innerHTML = html;
-document.getElementById('modalLugar').classList.add('open');
-document.body.style.overflow = 'hidden';
+    var l = LUGARES.find(function(x){ return x.id === id; });
+    if (!l) return;
+
+    var nome = l.nome[idiomaAtual] || l.nome["pt"];
+    var desc = l.desc[idiomaAtual] || l.desc["pt"];
+    var dist = l.dist[idiomaAtual] || l.dist["pt"];
+    var hor  = l.horario[idiomaAtual] || l.horario["pt"];
+
+    document.getElementById("lugar-tipo").innerText =
+        l.tipo === "restaurante" ? "🍽 Restaurante" : "🛍 Compras";
+
+    document.getElementById("lugar-nome").innerText = nome;
+    document.getElementById("lugar-desc").innerText = desc || "";
+    document.getElementById("lugar-horario").innerHTML = hor ? "🕐 " + hor : "";
+    document.getElementById("lugar-distancia").innerHTML = dist ? "🚶 " + dist : "";
+    document.getElementById("lugar-estrelas").innerText = l.estrelas || "";
+
+    var html = "";
+
+    if (l.mapaLink) {
+        html += `<a href="${l.mapaLink}" target="_blank" rel="noopener">📍 Ver no Google Maps</a>`;
+    }
+
+    if (l.instagram) {
+        var ig = l.instagram.indexOf("http") === 0
+            ? l.instagram
+            : "https://instagram.com/" + l.instagram.replace('@', '');
+
+        html += `<a href="${ig}" target="_blank" rel="noopener">📷 Instagram</a>`;
+    }
+
+    if (l.telefone) {
+        html += `<a href="https://wa.me/${l.telefone.replace(/\D/g, '')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+    }
+
+    document.getElementById("lugar-contatos").innerHTML = html;
+    document.getElementById("modalLugar").classList.add("open");
+    document.body.style.overflow = "hidden";
 }
 
 function fecharModalLugar() { document.getElementById('modalLugar').classList.remove('open'); document.body.style.overflow = ''; }
@@ -783,7 +802,6 @@ function renderLugarCards() {
 var grid = document.getElementById('mapa-cards-grid');
 if (!grid) return;
 
-```
 // Filtra lista conforme filtro ativo
 var lista = lugarFiltroAtivo === 'todos'
     ? LUGARES
@@ -848,7 +866,7 @@ window.addEventListener('resize', function(){
     lugarCarrVisiveis = lugarCarrCalcularVisiveis();
     lugarCarrAtualizar();
 });
-```
+
 
 }
 
