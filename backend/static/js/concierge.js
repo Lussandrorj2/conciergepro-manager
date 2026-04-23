@@ -669,16 +669,13 @@ function atualizarTrust() {
 }
 
 async function trocarIdioma(lang) {
-    // 1. Atualiza estado PRIMEIRO
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
 
-    // 2. Atualiza botões
     document.querySelectorAll('.lang-btn').forEach(function(b){
         b.classList.toggle('active', b.dataset.lang === lang);
     });
 
-    // 3. Atualiza DOM estático IMEDIATAMENTE (síncrono, sem await)
     var ls = document.getElementById('label-secao');
     var ts = document.getElementById('titulo-secao');
     var ce = document.getElementById('count-passeios');
@@ -688,13 +685,13 @@ async function trocarIdioma(lang) {
     atualizarTrust();
     atualizarTextosMapa();
 
-    // 4. Carrega dados async
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
         traduzirEAtualizarCards()
     ]);
 }
+
 
 
 // ESC / clique fora fecha modais
