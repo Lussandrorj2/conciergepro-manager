@@ -308,20 +308,22 @@ async function carregarPasseios(lang) {
     try {
         var res = await fetch(API_BASE + '/public/' + hotelSlug + '/passeios/?lang=' + lang);
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        listaPasseios = await res.json();
+        var dadosBrutos = await res.json();
 
-        // ✅ NOVO: traduz campos de cada passeio se idioma não for pt
+        // ✅ Sempre preserva os originais em PT separado do que é exibido
+        listaPasseios = dadosBrutos.map(function(p) {
+            return Object.assign({}, p, {
+                _nome_pt:      p.nome,
+                _desc_pt:      p.descricao,
+                _desc_comp_pt: p.descricao_completa
+            });
+        });
+
         if (lang !== 'pt') {
             await Promise.all(listaPasseios.map(async function(p) {
-                if (p.descricao) {
-                    p.descricao = await traduzirTexto(p.descricao, lang);
-                }
-                if (p.descricao_completa) {
-                    p.descricao_completa = await traduzirTexto(p.descricao_completa, lang);
-                }
-                if (p.nome) {
-                    p.nome = await traduzirTexto(p.nome, lang);
-                }
+                p.nome              = await traduzirTexto(p._nome_pt,      lang);
+                p.descricao         = await traduzirTexto(p._desc_pt,      lang);
+                p.descricao_completa = await traduzirTexto(p._desc_comp_pt, lang);
             }));
         }
 
@@ -349,7 +351,6 @@ async function carregarPasseios(lang) {
         track.innerHTML = "<div class='estado-erro'><span class='icon'>&#9888;</span><p>" + t('erro') + "</p></div>";
     }
 }
-
 
 // ==========================================
 // CARD RENDER
