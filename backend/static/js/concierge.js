@@ -308,24 +308,7 @@ async function carregarPasseios(lang) {
     try {
         var res = await fetch(API_BASE + '/public/' + hotelSlug + '/passeios/?lang=' + lang);
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        var dadosBrutos = await res.json();
-
-        // ✅ Sempre preserva os originais em PT separado do que é exibido
-        listaPasseios = dadosBrutos.map(function(p) {
-            return Object.assign({}, p, {
-                _nome_pt:      p.nome,
-                _desc_pt:      p.descricao,
-                _desc_comp_pt: p.descricao_completa
-            });
-        });
-
-        if (lang !== 'pt') {
-            await Promise.all(listaPasseios.map(async function(p) {
-                p.nome              = await traduzirTexto(p._nome_pt,      lang);
-                p.descricao         = await traduzirTexto(p._desc_pt,      lang);
-                p.descricao_completa = await traduzirTexto(p._desc_comp_pt, lang);
-            }));
-        }
+        listaPasseios = await res.json();
 
         var countEl = document.getElementById('count-passeios');
         if (countEl) countEl.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
@@ -351,6 +334,7 @@ async function carregarPasseios(lang) {
         track.innerHTML = "<div class='estado-erro'><span class='icon'>&#9888;</span><p>" + t('erro') + "</p></div>";
     }
 }
+
 
 // ==========================================
 // CARD RENDER
