@@ -310,11 +310,25 @@ async function carregarPasseios(lang) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         listaPasseios = await res.json();
 
+        // ✅ NOVO: traduz campos de cada passeio se idioma não for pt
+        if (lang !== 'pt') {
+            await Promise.all(listaPasseios.map(async function(p) {
+                if (p.descricao) {
+                    p.descricao = await traduzirTexto(p.descricao, lang);
+                }
+                if (p.descricao_completa) {
+                    p.descricao_completa = await traduzirTexto(p.descricao_completa, lang);
+                }
+                if (p.nome) {
+                    p.nome = await traduzirTexto(p.nome, lang);
+                }
+            }));
+        }
+
         var countEl = document.getElementById('count-passeios');
         if (countEl) countEl.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
 
         if (!listaPasseios.length) {
-            // FIX: aspas simples dentro de string com aspas simples causavam SyntaxError
             track.innerHTML = "<div class='estado-vazio'><span class='icon'>&#127958;</span><p>" + t('vazio') + "</p></div>";
             return;
         }
@@ -332,10 +346,10 @@ async function carregarPasseios(lang) {
 
     } catch(e) {
         console.error('[carregarPasseios]', e);
-        // FIX: mesma correção de aspas
         track.innerHTML = "<div class='estado-erro'><span class='icon'>&#9888;</span><p>" + t('erro') + "</p></div>";
     }
 }
+
 
 // ==========================================
 // CARD RENDER
