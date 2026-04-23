@@ -5,8 +5,8 @@
 
 /* Viewport com perspectiva */
 #passeios {
-    overflow: hidden;
-    overflow-x: hidden;
+    overflow: visible;
+    overflow-x: clip;
     position: relative;
     width: 100%;
     cursor: grab;
@@ -165,11 +165,20 @@
     z-index: 3;
 }
 
+/* overlay só no hover do card ativo — NÃO no touch/mobile 
+@media (hover: hover) {
+    .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
+}
+*/
+/* Overlay só aparece no card ativo ao passar o mouse */
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 .card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
 
-/* ---- Badge de preço oculto na foto ---- */
-.card-preco-badge { display: none !important; }
+/* ---- BADGE DE PREÇO REMOVIDO DA FOTO ---- */
+/* O .card-preco-badge fica oculto na foto; o preço aparece apenas no corpo do card */
+.card-preco-badge {
+    display: none !important;
+}
 
 /* ---- corpo ---- */
 .card-body { padding: 18px 20px 20px; }
