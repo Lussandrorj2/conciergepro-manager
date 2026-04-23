@@ -1,11 +1,8 @@
-
-⸻
-
 🚀 SaaS Concierge Manager Pro
 
 Plataforma completa para gestão de concierge em hotéis, focada em organização operacional, controle financeiro e aumento de receita.
 
-⸻
+
 
 🏨 Sobre o projeto
 
@@ -13,7 +10,7 @@ O Concierge Manager Pro é um sistema SaaS desenvolvido para digitalizar e centr
 
 A plataforma permite gerenciar passeios, recomendações, vendas, comissões e tarefas da equipe em um único dashboard.
 
-⸻
+
 
 💡 Problema que resolve
 
@@ -24,7 +21,7 @@ A operação de concierge tradicional enfrenta:
 * Dificuldade de acompanhar desempenho da equipe
 * Baixa visibilidade financeira
 
-⸻
+
 
 ⚙️ Solução
 
@@ -35,7 +32,7 @@ Uma plataforma completa que integra:
 * Organização da equipe
 * Experiência digital para o hóspede
 
-⸻
+
 
 🧠 Funcionalidades principais
 
@@ -46,7 +43,7 @@ Uma plataforma completa que integra:
 * Edição completa (nome, descrição, fotos e contatos)
 * Exclusão de registros
 
-⸻
+
 
 📋 Gestão de tarefas (Kanban)
 
@@ -54,7 +51,7 @@ Uma plataforma completa que integra:
 * Organização visual de tarefas
 * Fluxo de trabalho inspirado em Kanban
 
-⸻
+
 
 🔗 Integrações
 
@@ -62,7 +59,7 @@ Uma plataforma completa que integra:
 * WhatsApp (contato direto)
 * Instagram (divulgação de parceiros)
 
-⸻
+
 
 💰 Gestão financeira
 
@@ -75,7 +72,7 @@ Uma plataforma completa que integra:
 * Ranking de recepcionistas
 * Divisão de lucro por colaborador
 
-⸻
+
 
 🧾 Sistema de recebimento
 
@@ -84,7 +81,7 @@ Uma plataforma completa que integra:
     * Conferência geral
     * Assinatura de recebimento
 
-⸻
+
 
 ⚙️ Customização
 
@@ -92,7 +89,7 @@ Uma plataforma completa que integra:
 * Título e subtítulo personalizados
 * Configuração de contato e localização do hotel
 
-⸻
+
 
 🌐 Experiência do hóspede
 
@@ -100,7 +97,7 @@ Uma plataforma completa que integra:
 * Acesso direto a contatos e localização
 * Totalmente gerenciado pelo dashboard
 
-⸻
+
 
 🏢 Arquitetura
 
@@ -108,7 +105,7 @@ Uma plataforma completa que integra:
 * Banco de dados: Supabase / Neon
 * Armazenamento de imagens: Cloudinary / S3
 
-⸻
+
 
 🏨 Multi-hotel (Multi-tenant)
 
@@ -116,7 +113,7 @@ Uma plataforma completa que integra:
 * Isolamento de dados por hotel
 * Escalável para diferentes clientes
 
-⸻
+
 
 👥 Controle de acesso
 
@@ -126,7 +123,7 @@ Perfis de usuário:
 * Admin do Hotel → Gerencia equipe e operação
 * Recepcionista → Opera vendas e tarefas
 
-⸻
+
 
 🔐 Segurança e auditoria
 
@@ -134,7 +131,7 @@ Perfis de usuário:
 * Registro de logs de operação
 * Rastreabilidade completa
 
-⸻
+
 
 📈 Benefícios
 
@@ -144,7 +141,7 @@ Perfis de usuário:
 * Gestão transparente de comissões
 * Maior produtividade da equipe
 
-⸻
+
 
 🚀 Objetivo
 
@@ -155,10 +152,9 @@ Transformar o concierge em uma operação:
 * Escalável
 * Data-driven
 
-⸻
+
 
 📬 Contato
 
 Aberto a feedbacks, conexões e oportunidades.
 
-⸻
