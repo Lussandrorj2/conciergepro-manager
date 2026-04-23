@@ -29,6 +29,7 @@ urlpatterns = [
     path('<slug:hotel_slug>/dashboard/cambio/', views.dashboard_cambio, name='dashboard_cambio'),
     path('<slug:hotel_slug>/dashboard/relatorios/', views.dashboard_relatorios, name='dashboard_relatorios'),
     path('<slug:hotel_slug>/dashboard/configuracoes/', views.dashboard_config, name='dashboard_config'),
+    path('<slug:hotel_slug>/dashboard/quadro/', views.dashboard_quadro, name='dashboard_quadro'),
 
     # =========================
     # API PÚBLICA
