@@ -117,11 +117,11 @@
     z-index: 3;
 }
 
-/* overlay só no hover do card ativo — NÃO no touch/mobile */
+/* overlay só no hover do card ativo — NÃO no touch/mobile 
 @media (hover: hover) {
     .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 }
-
+*/
 /* Overlay só aparece no card ativo ao passar o mouse */
 .card-passeio.coverflow-active:hover .card-img-hover { opacity: 1; }
 .card-img-hover span { color:#fff; font-weight:600; font-size:14px; letter-spacing:1px; }
