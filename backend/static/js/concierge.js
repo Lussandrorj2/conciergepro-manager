@@ -968,21 +968,34 @@ function atualizarTextosMapa() {
 
 async function traduzirTexto(texto, idioma) {
     if (!texto || idioma === 'pt') return texto;
-    
-    var chave = idioma + ':' + texto.slice(0, 40);
+
+    // 🔥 PRÉ-PROCESSAMENTO (corrige contexto)
+    var textoOriginal = texto;
+    var textoProcessado = texto.replace(/\bRio\b/g, 'Rio de Janeiro');
+
+    var chave = idioma + ':' + textoProcessado.slice(0, 40);
     if (cacheTraducoes[chave]) return cacheTraducoes[chave];
-    
+
     try {
         var res = await fetch('/api/traduzir/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texto: texto, idioma: idioma })
+            body: JSON.stringify({ 
+                texto: textoProcessado, // 👈 usa versão corrigida
+                idioma: idioma 
+            })
         });
+
         var data = await res.json();
-        cacheTraducoes[chave] = data.traduzido;
-        return data.traduzido;
+
+        // 🔥 PÓS-PROCESSAMENTO (opcional → volta pra "Rio")
+        var traduzidoFinal = data.traduzido.replace(/Rio de Janeiro/g, 'Rio');
+
+        cacheTraducoes[chave] = traduzidoFinal;
+        return traduzidoFinal;
+
     } catch(e) {
-        return texto;
+        return textoOriginal;
     }
 }
 
