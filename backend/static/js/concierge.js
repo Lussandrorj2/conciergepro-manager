@@ -993,6 +993,7 @@ var cacheTraducoes = {};
 // ==========================================
 document.addEventListener('DOMContentLoaded', async function() {
     document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === idiomaAtual); });
+    atualizarTrust();
     await carregarHotel(idiomaAtual);
     await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
 });
