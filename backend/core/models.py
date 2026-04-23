@@ -19,9 +19,21 @@ def _traduzir_em_background(instance_pk, model_class, campos):
             for attr_pt, attr_lang, lang_dest in campos:
                 texto = getattr(obj, attr_pt, None)
                 if texto:
+                    texto_proc = (
+                        texto
+                        .replace('Rio de Janeiro', '##RIODEJANEIRO##')
+                        .replace('Rio', '##RIO##')
+                    )
+
                     traduzido = GoogleTranslator(
                         source='pt', target=lang_dest
-                    ).translate(texto)
+                    ).translate(texto_proc)
+                    
+                    traduzido = (
+                        traduzido
+                        .replace('##RIODEJANEIRO##', 'Rio de Janeiro')
+                        .replace('##RIO##', 'Rio')
+                    )
                     setattr(obj, attr_lang, traduzido or "")
                     campos_atualizados.append(attr_lang)
             if campos_atualizados:
