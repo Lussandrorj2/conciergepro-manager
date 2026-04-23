@@ -876,9 +876,16 @@ function renderLugarCards() {
         // Meta items: horário e info extra
         var metaHTML = '';
         if (hor) {
+            var igHandle = lugar.instagram;
+            try {
+                var igMatch = lugar.instagram.match(/instagram\.com\/([^/?]+)/);
+                if (igMatch) igHandle = '@' + igMatch[1];
+                else igHandle = lugar.instagram.replace(/^https?:\/\/[^/]+\//, '').split('?')[0].replace(/^@?/, '@');
+            } catch(e) {}
+            
             metaHTML += '<div class="lc2-meta-item">' +
-                '<div class="lc2-meta-icon">&#128336;</div>' +
-                '<div class="lc2-meta-text"><strong>Hor&aacute;rio</strong>' + hor + '</div>' +
+                '<div class="lc2-meta-icon">&#128247;</div>' +
+                '<div class="lc2-meta-text"><strong>Instagram</strong>' + igHandle + '</div>' +
             '</div>';
         }
         if (lugar.instagram) {
