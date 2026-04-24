@@ -577,15 +577,19 @@ function carregarLS() {
         if (r.pago === undefined) r.pago = false;
         if (r.status === 'a_confirmar') r.status = 'pendente';
     });
-    if (!reservas.length) {
+
+    // ── Dados de exemplo APENAS na primeira vez (nunca após o usuário deletar) ──
+    const jaInicializado = localStorage.getItem(LS_KEY + '_init');
+    if (!jaInicializado) {
         reservas = [
-            { id:uid(), num:'2026-001', nome:'Carlos Eduardo Mendes', tel:'+55 21 98765-4321', email:'carlos@email.com', checkin:'2026-04-24', checkout:'2026-04-27', quarto:'301',          qtd:2, status:'confirmada', pago:true,  obs:'Pedido de berço extra' },
-            { id:uid(), num:'2026-002', nome:'Ana Paula Ferreira',    tel:'+55 11 91234-5678', email:'ana@email.com',    checkin:'2026-04-25', checkout:'2026-04-28', quarto:'215',          qtd:1, status:'pendente',   pago:false, obs:'' },
-            { id:uid(), num:'2026-003', nome:'John Smith',            tel:'+1 212 555-0100',   email:'john@mail.com',   checkin:'2026-04-26', checkout:'2026-04-30', quarto:'Suite Ipanema',qtd:2, status:'pendente',   pago:false, obs:'Vegano — avisar cozinha' },
-            { id:uid(), num:'2026-004', nome:'Maria Gonzalez',        tel:'+55 21 97777-8888', email:'maria@email.com', checkin:'2026-04-20', checkout:'2026-04-23', quarto:'102',          qtd:3, status:'no_show',    pago:false, obs:'' },
-            { id:uid(), num:'2026-005', nome:'Pierre Dupont',         tel:'+33 6 12 34 56 78', email:'pierre@email.fr', checkin:'2026-05-01', checkout:'2026-05-05', quarto:'405',          qtd:2, status:'waiting',    pago:false, obs:'Aguarda cancelamento' },
+            { id:uid(), num:'2026-001', nome:'Carlos Eduardo Mendes', tel:'+55 21 98765-4321', email:'carlos@email.com', checkin:'2026-04-24', checkout:'2026-04-27', quarto:'301',           qtd:2, status:'confirmada', pago:true,  obs:'Pedido de berço extra' },
+            { id:uid(), num:'2026-002', nome:'Ana Paula Ferreira',    tel:'+55 11 91234-5678', email:'ana@email.com',    checkin:'2026-04-25', checkout:'2026-04-28', quarto:'215',           qtd:1, status:'pendente',   pago:false, obs:'' },
+            { id:uid(), num:'2026-003', nome:'John Smith',            tel:'+1 212 555-0100',   email:'john@mail.com',   checkin:'2026-04-26', checkout:'2026-04-30', quarto:'Suite Ipanema', qtd:2, status:'pendente',   pago:false, obs:'Vegano — avisar cozinha' },
+            { id:uid(), num:'2026-004', nome:'Maria Gonzalez',        tel:'+55 21 97777-8888', email:'maria@email.com', checkin:'2026-04-20', checkout:'2026-04-23', quarto:'102',           qtd:3, status:'no_show',    pago:false, obs:'' },
+            { id:uid(), num:'2026-005', nome:'Pierre Dupont',         tel:'+33 6 12 34 56 78', email:'pierre@email.fr', checkin:'2026-05-01', checkout:'2026-05-05', quarto:'405',           qtd:2, status:'waiting',    pago:false, obs:'Aguarda cancelamento' },
         ];
         salvarLS();
+        localStorage.setItem(LS_KEY + '_init', '1');
     }
 }
 
