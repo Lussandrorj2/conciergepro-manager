@@ -185,16 +185,24 @@
 </div>
 
 <style>
-    /* ── Scroll horizontal na tabela ── */
+    /* ── IMPEDE scroll lateral na página toda ── */
+    html, body {
+        overflow-x: hidden;
+    }
+    .main, .content, .cambio-grid, .painel-direito, .tabela-container {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+
+    /* ── Scroll horizontal APENAS dentro da tabela ── */
     .tabela-scroll {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        width: 100%;
     }
-
     .tabela-scroll table {
         min-width: 900px;
     }
-
     .tabela-scroll::-webkit-scrollbar { height: 6px; }
     .tabela-scroll::-webkit-scrollbar-track { background: var(--bg-hover); }
     .tabela-scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 999px; }
@@ -208,9 +216,8 @@
         font-size: 11px;
         font-weight: 700;
     }
-
     .margem-badge.pos { background: var(--green-dim); color: var(--green); }
-    .margem-badge.neg { background: var(--red-dim);   color: #f87171; }
+    .margem-badge.neg { background: var(--red-dim); color: #f87171; }
 
     .btn-acao.danger:hover {
         background: var(--red-dim);
@@ -218,32 +225,16 @@
         color: #f87171;
     }
 
-    /* ── FIX MOBILE: layout câmbio em coluna, sem overflow cortando o scroll ── */
+    /* ── Mobile: form e tabela em coluna ── */
     @media (max-width: 1024px) {
-        /* Grid vira coluna — o painel de tabela aparece abaixo do form */
         .cambio-grid {
             display: flex !important;
             flex-direction: column !important;
             gap: 16px;
         }
-
-        /* Remove overflow:hidden que impedia scroll */
-        .tabela-container {
-            overflow: visible !important;
-        }
-
-        /* Mantém scroll horizontal só na área da tabela */
-        .tabela-scroll {
-            overflow-x: auto;
-        }
-
-        /* Garante que todas as colunas fiquem visíveis */
-        .tabela-container th,
-        .tabela-container td {
-            display: table-cell !important;
-        }
     }
 </style>
+
 
 <script>
     const hotelSlug = "{{ hotel.slug }}";
