@@ -38,7 +38,7 @@ var i18n = {
         campos_obrigatorios: 'Por favor, preencha seu nome e telefone.',
         mapa_label: 'Nos arredores', mapa_titulo: 'Restaurantes & Centros Comerciais',
         mapa_todos: 'Todos', mapa_restaurantes: 'Restaurantes', mapa_compras: 'Compras',
-        mapa_carregando: 'Carregando mapa\u2026', mapa_abrir: 'Ver no Google Maps', mapa_ver: 'Ver no mapa'
+        mapa_carregando: 'Carregando mapa\u2026', mapa_abrir: 'Google Maps', mapa_ver: 'Ver no mapa'
     },
     en: {
         btn: 'See details', vazio: 'No tours found.', erro: 'Loading error.',
@@ -803,7 +803,7 @@ function abrirModalLugar(id) {
 
     // FIX: html iniciava com "'; — aspa simples solta e concatenação de aspas errada
     var html = '';
-    if (l.mapaLink)  html += '<a href="' + l.mapaLink + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">\uD83D\uDCCD Ver no Google Maps</a>';
+    if (l.mapaLink)  html += '<a href="' + l.mapaLink + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f4f6f9;border-radius:10px;text-decoration:none;color:var(--text);font-size:13px;font-weight:500;border:1px solid #e2e8f0;">\uD83D\uDCCD Google Maps</a>';
     if (l.instagram) {
         // FIX: abertura de href sem aspas e aspas trocadas
         var ig = l.instagram.indexOf('http') === 0 ? l.instagram : 'https://instagram.com/' + l.instagram.replace('@', '');

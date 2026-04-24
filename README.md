@@ -1,52 +1,160 @@
-# Concierge hotel
+🚀 SaaS Concierge Manager Pro
 
-Bem-vindo ao **Concierge Ipanema Inn**, um site desenvolvido para oferecer informações detalhadas sobre passeios turísticos, transfers e serviços personalizados no Rio de Janeiro. O objetivo é facilitar a experiência dos hóspedes e turistas, oferecendo todas as informações em um só lugar, com suporte a múltiplos idiomas e integração direta com WhatsApp para reservas e dúvidas.
+Plataforma completa para gestão de concierge em hotéis, focada em organização operacional, controle financeiro e aumento de receita.
 
----
 
-## 🌟 Funcionalidades
 
-- Lista completa de passeios turísticos no Rio de Janeiro e arredores.
-- Informações detalhadas para cada passeio: roteiro, horários, frequência e itens inclusos.
-- Integração com WhatsApp para contato direto, permitindo solicitações de informações ou reservas.
-- Suporte multilíngue (Português, Inglês e Espanhol) com botões de idioma que atualizam textos e mensagens do WhatsApp.
-- Design responsivo, compatível com desktops, tablets e smartphones.
-- Botões interativos e dinâmicos que facilitam a comunicação com o concierge.
+🏨 Sobre o projeto
 
----
+O Concierge Manager Pro é um sistema SaaS desenvolvido para digitalizar e centralizar toda a operação de concierge.
 
-## 🗺️ Passeios e Serviços Disponíveis
+A plataforma permite gerenciar passeios, recomendações, vendas, comissões e tarefas da equipe em um único dashboard.
 
-- **Um dia no Rio** – Tour completo pelos principais pontos turísticos.
-- **Rio Express** – Passeio rápido e panorâmico.
-- **Floresta da Tijuca** – Trilha e contato com a natureza.
-- **Pedra do Telégrafo** – Trilha e fotos incríveis.
-- **Favela Tour** – Conheça a cultura e o dia a dia das comunidades.
-- **Helicopter Tour** – Sobrevoo pelas praias e pontos icônicos.
-- **Petrópolis – Almoço + Bohemia** – Passeio histórico com gastronomia local.
-- **Petrópolis – Almoço + Bohemia + Museu de Cera** – Tour histórico completo.
-- **Passeio de lancha no Rio** – Aventura pelo litoral carioca com paradas de banho.
-- **Mergulho em Arraial do Cabo** – Experiência subaquática com instrutor e equipamento.
-- **Transfers privativos** – Transporte confortável para destinos próximos ao Rio.
 
----
 
-## 🛠️ Tecnologias Utilizadas
+💡 Problema que resolve
 
-- **HTML5** – Estrutura do site.
-- **CSS3** – Estilização e layout responsivo.
-- **JavaScript (Vanilla JS)** – Funcionalidades de idioma e links dinâmicos.
-- **GitHub Pages** – Possível plataforma para deploy gratuito.
-- **WhatsApp API** – Integração para contato direto com clientes.
+A operação de concierge tradicional enfrenta:
 
----
+* Falta de controle sobre vendas e comissões
+* Processos manuais e desorganizados
+* Dificuldade de acompanhar desempenho da equipe
+* Baixa visibilidade financeira
 
-## 🎨 Layout e Experiência do Usuário
 
-- **Responsivo**: adapta-se a diferentes tamanhos de tela.
-- **Botões intuitivos**: cada passeio possui botão para envio de mensagem via WhatsApp.
-- **Multilíngue**: botão de seleção de idioma atualiza todos os textos e mensagens automaticamente.
-- **Design limpo e moderno**: foco na experiência do usuário, facilitando a navegação e leitura.
 
----
+⚙️ Solução
+
+Uma plataforma completa que integra:
+
+* Gestão operacional
+* Controle financeiro
+* Organização da equipe
+* Experiência digital para o hóspede
+
+
+
+🧠 Funcionalidades principais
+
+🎛️ Dashboard Interativo
+
+* Criação e gestão de passeios
+* Sugestões de restaurantes e centros comerciais
+* Edição completa (nome, descrição, fotos e contatos)
+* Exclusão de registros
+
+
+
+📋 Gestão de tarefas (Kanban)
+
+* Sistema de lembretes integrado
+* Organização visual de tarefas
+* Fluxo de trabalho inspirado em Kanban
+
+
+
+🔗 Integrações
+
+* Google Maps (localização)
+* WhatsApp (contato direto)
+* Instagram (divulgação de parceiros)
+
+
+
+💰 Gestão financeira
+
+* Registro de vendas e câmbio
+* Controle de comissões por recepcionista
+
+📊 Relatórios automáticos:
+
+* Passeios mais vendidos
+* Ranking de recepcionistas
+* Divisão de lucro por colaborador
+
+
+
+🧾 Sistema de recebimento
+
+* Pagamentos via WhatsApp ou dinheiro
+* Geração de PDF com:
+    * Conferência geral
+    * Assinatura de recebimento
+
+
+
+⚙️ Customização
+
+* Banner da página do concierge
+* Título e subtítulo personalizados
+* Configuração de contato e localização do hotel
+
+
+
+🌐 Experiência do hóspede
+
+* Interface com passeios e recomendações
+* Acesso direto a contatos e localização
+* Totalmente gerenciado pelo dashboard
+
+
+
+🏢 Arquitetura
+
+* Backend: Railway
+* Banco de dados: Supabase / Neon
+* Armazenamento de imagens: Cloudinary / S3
+
+
+
+🏨 Multi-hotel (Multi-tenant)
+
+* Suporte a múltiplos hotéis
+* Isolamento de dados por hotel
+* Escalável para diferentes clientes
+
+
+
+👥 Controle de acesso
+
+Perfis de usuário:
+
+* Admin Master → Gerencia toda a plataforma
+* Admin do Hotel → Gerencia equipe e operação
+* Recepcionista → Opera vendas e tarefas
+
+
+
+🔐 Segurança e auditoria
+
+* Controle de permissões por usuário
+* Registro de logs de operação
+* Rastreabilidade completa
+
+
+
+📈 Benefícios
+
+* Aumento nas vendas de passeios
+* Melhor controle financeiro
+* Redução de erros operacionais
+* Gestão transparente de comissões
+* Maior produtividade da equipe
+
+
+
+🚀 Objetivo
+
+Transformar o concierge em uma operação:
+
+* Digital
+* Organizada
+* Escalável
+* Data-driven
+
+
+
+📬 Contato
+
+Aberto a feedbacks, conexões e oportunidades.
 
