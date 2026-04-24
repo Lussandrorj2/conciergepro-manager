@@ -511,7 +511,7 @@ const CORES = ['#10b981','#38bdf8','#f59e0b','#c9a96e','#ef4444','#06b6d4','#84c
 
 let todasReservas=[], dadosMensal=[], dadosPasseios=[];
 let totalComissao=0, totalCambio=0, totalCompra=0, totalRepasse=0, totalPix=0;
-let pixPorRec={}, adiantamentos=[], adiantCount=0, nomesDiv=[], cambioPorMoeda={}, totalTxCambio=0;
+let pixPorRec={}, adiantamentos=[], adiantCount=0, nomesDiv=[], pctsDiv = [], cambioPorMoeda={}, totalTxCambio=0;
 let chartMensal, chartPasseios, _adDados=null;
 
 // ── ABAS ──
@@ -571,26 +571,28 @@ async function carregarDivisaoAba() {
     renderDivisao();
 }
 
+// DEPOIS — variável separada pctsDiv
+
 async function carregarDivisao() {
     try {
         const res = await fetch(`/api/admin/${hotelSlug}/divisao/`);
         const d   = await res.json();
         nomesDiv  = d.nomes || [];
-        // pcts salvas
-        nomesDiv._pcts = d.pcts || [];
+        pctsDiv   = d.pcts  || [];       // ← salva em variável dedicada
         const n = nomesDiv.length || 1;
         document.getElementById('num-rec').value = n;
         gerarCampos();
         const inputs    = document.querySelectorAll('.rec-nome-input');
         const pctInputs = document.querySelectorAll('.rec-pct-input');
-        nomesDiv.forEach((nome,i) => {
+        nomesDiv.forEach((nome, i) => {
             if (inputs[i])    inputs[i].value    = nome;
-            if (pctInputs[i] && nomesDiv._pcts[i]) pctInputs[i].value = nomesDiv._pcts[i];
+            if (pctInputs[i] && pctsDiv[i] != null) pctInputs[i].value = pctsDiv[i];
         });
         if (nomesDiv.length) document.getElementById('salvo-badge').style.display = 'inline';
         atualizarBarraPct();
-    } catch { nomesDiv=[]; gerarCampos(); }
+    } catch { nomesDiv = []; pctsDiv = []; gerarCampos(); }
 }
+
 
 async function carregarReservas() {
     try {
@@ -892,7 +894,7 @@ async function carregarPaginaAdiantamentos(){
 
     // Usa pcts salvas ou divide igualmente
     const n=nomesDiv.length||1;
-    const pctsSalvas=nomesDiv._pcts||[];
+    const pctsSalvas = pctsDiv || [];
     const algumPct=pctsSalvas.some(p=>p&&parseFloat(p)>0);
     const pctPadrao=100/n;
     const parteComissao=(nome,i)=>{
