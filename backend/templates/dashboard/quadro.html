@@ -58,20 +58,62 @@
             padding: 16px;
             overflow-x: auto;
             overflow-y: hidden;
-            align-items: flex-start;
+            align-items: stretch; /* colunas esticam até a mesma altura */
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
             cursor: grab;
+            /* Altura máxima = viewport menos topbar (52px) */
+            max-height: calc(100vh - 52px);
         }
         #view-board:active { cursor: grabbing; }
         #view-board.dragging-scroll { cursor: grabbing; user-select: none; }
-        .board-col { flex:0 0 280px; display:flex; flex-direction:column; background:var(--bg-card,#fff); border:1px solid var(--border,#e2e8f0); border-radius:14px; overflow:hidden; min-height:100px; scroll-snap-align:start; }
-        .board-col-header { display:flex; align-items:center; justify-content:space-between; padding:11px 13px 9px; border-bottom:1px solid var(--border,#e2e8f0); }
+        .board-col {
+            flex: 0 0 280px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card,#fff);
+            border: 1px solid var(--border,#e2e8f0);
+            border-radius: 14px;
+            overflow: hidden;
+            scroll-snap-align: start;
+            /* Altura máxima da coluna — header fica fixo, body rola */
+            max-height: 100%;
+        }
+        .board-col-header { display:flex; align-items:center; justify-content:space-between; padding:11px 13px 9px; border-bottom:1px solid var(--border,#e2e8f0); flex-shrink:0; }
         .board-col-title { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
         .col-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
         .col-count { background:var(--bg-hover,#f1f5f9); border:1px solid var(--border,#e2e8f0); color:var(--text-soft,#64748b); font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; }
         .btn-col-add { background:none; border:none; color:var(--text-soft,#64748b); font-size:18px; cursor:pointer; padding:2px 4px; border-radius:4px; line-height:1; }
-        .board-col-body { flex:1; padding:8px; display:flex; flex-direction:column; gap:7px; min-height:50px; }
+        .board-col-body {
+            flex: 1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-height: 50px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            /* scrollbar fina e discreta */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border,#e2e8f0) transparent;
+        }
+        .board-col-body::-webkit-scrollbar { width: 4px; }
+        .board-col-body::-webkit-scrollbar-thumb { background: var(--border,#e2e8f0); border-radius: 4px; }
+        .board-col-body::-webkit-scrollbar-thumb:hover { background: var(--border-light,#cbd5e1); }
+
+        /* Sombra que indica mais conteúdo abaixo */
+        .board-col-body.has-scroll::after {
+            content: '';
+            position: sticky;
+            bottom: 0;
+            left: 0; right: 0;
+            height: 32px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,.9));
+            display: block;
+            pointer-events: none;
+            flex-shrink: 0;
+        }
         .board-col-body.drag-over { background:rgba(181,132,58,.05); outline:2px dashed rgba(181,132,58,.3); outline-offset:-4px; border-radius:8px; }
         .kanban-card { background:var(--bg-main,#f8fafc); border:1px solid var(--border,#e2e8f0); border-radius:10px; padding:10px; cursor:grab; transition:.15s; }
         .kanban-card:hover { border-color:#cbd5e1; box-shadow:0 3px 10px rgba(0,0,0,.06); transform:translateY(-1px); }
@@ -182,6 +224,7 @@
             .modal::before { display:none; }
             .cal-day { min-height:90px; }
             .board-col { flex: 0 0 300px; }
+            #view-board { max-height: calc(100vh - 52px); }
         }
     </style>
 </head>
@@ -195,11 +238,10 @@
             <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/quadro/" class="active">📌 Quadro</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
             <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/" class="active">📌 Quadro</a>
             <hr>
             <a href="/logout/">↩ Sair</a>
         </nav>
@@ -469,6 +511,7 @@ function salvarCard(){
     if(editId){const idx=cards.findIndex(c=>c.id===editId);if(idx>=0)cards[idx]={...cards[idx],...dados};}
     else cards.push({id:uid(),...dados});
     salvarLS();renderBoard();renderCalendar();renderDetalhe(selectedDate);fecharModal();
+    setTimeout(atualizarScrollIndicators, 50);
 }
 function renderTagsPicker(){
     document.getElementById('tags-picker').innerHTML=TAGS_DEF.map(t=>
@@ -770,6 +813,25 @@ document.addEventListener('DOMContentLoaded',()=>{
     carregarLS();
     renderBoard();
     renderCalendar();
+});
+
+// Detecta scroll nas colunas e aplica sombra
+function atualizarScrollIndicators() {
+    document.querySelectorAll('.board-col-body').forEach(body => {
+        const temScroll = body.scrollHeight > body.clientHeight + 8;
+        const noFundo   = body.scrollTop + body.clientHeight >= body.scrollHeight - 8;
+        body.classList.toggle('has-scroll', temScroll && !noFundo);
+    });
+}
+
+// Observer para redetectar quando cards são adicionados
+const resizeObs = new ResizeObserver(atualizarScrollIndicators);
+['body-pendente','body-andamento','body-concluido'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        resizeObs.observe(el);
+        el.addEventListener('scroll', atualizarScrollIndicators);
+    }
 });
 </script>
 
