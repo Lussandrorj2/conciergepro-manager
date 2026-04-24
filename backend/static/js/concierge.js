@@ -180,7 +180,8 @@ function coverflowAtualizar() {
         var absD = Math.abs(diff);
         card.classList.toggle('coverflow-active', diff === 0);
     
-        var cardW   = card.offsetWidth || coverflowGetCardWidth();
+        var cardW = coverflowGetCardWidth();
+
         var baseX   = -(cardW / 2);
         var offsetX = diff * cardW * 0.90;
         var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
