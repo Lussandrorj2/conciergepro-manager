@@ -212,15 +212,6 @@ function coverflowAtualizar() {
         ].join(' ');
     });
 
-    var activeCard = cards[carrIndex];
-    requestAnimationFrame(function() {
-        if (activeCard) {
-            var h = activeCard.offsetHeight;
-            if (h > 0) track.style.height = (h + 40) + 'px';
-        }
-    });
-
-
     if (btnPrev) btnPrev.disabled = false; // nunca desabilita
     if (btnNext) btnNext.disabled = false; // nunca desabilita
 
