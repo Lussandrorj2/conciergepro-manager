@@ -1,6 +1,12 @@
 // ==========================================
 // CONFIG GLOBAL
 // ==========================================
+// Adicione essa função auxiliar no topo do arquivo
+function debounce(fn, ms) {
+    var t;
+    return function() { clearTimeout(t); t = setTimeout(fn, ms); };
+}
+
 function getImageUrl(img) {
     if (!img) return '';
     if (typeof img === 'string') return img;
@@ -206,10 +212,13 @@ function coverflowAtualizar() {
     });
 
     var activeCard = cards[carrIndex];
-    if (activeCard) {
-        var h = activeCard.offsetHeight;
-        if (h > 0) track.style.height = (h + 40) + 'px';
-    }
+    requestAnimationFrame(function() {
+        if (activeCard) {
+            var h = activeCard.offsetHeight;
+            if (h > 0) track.style.height = (h + 40) + 'px';
+        }
+    });
+
 
     if (btnPrev) btnPrev.disabled = false; // nunca desabilita
     if (btnNext) btnNext.disabled = false; // nunca desabilita
@@ -284,7 +293,9 @@ function initCarrosselDrag() {
         }
     }, true);
 
-    window.addEventListener('resize', function() { coverflowAtualizar(); });
+    window.addEventListener('resize', debounce(function() { 
+        coverflowAtualizar(); 
+    }, 120));
 }
 
 document.addEventListener('keydown', function(e) {
