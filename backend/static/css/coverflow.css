@@ -26,11 +26,12 @@
     display: block !important;
     position: relative;
     width: 100%;
-    height: 490px;
+    height: 520px !important; /* ← altura fixa, remova o ajuste via JS */
     transform: none !important;
     transition: none !important;
     overflow: visible;
 }
+
 
 /* ==========================================
    CARD — absolute, centrado
