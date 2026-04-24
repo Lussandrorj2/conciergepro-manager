@@ -868,8 +868,18 @@ async function salvarAdiantamentos(){
 async function salvarDivisao(){
     const nomes=[...document.querySelectorAll('.rec-nome-input')].map(i=>i.value.trim()||'Recepcionista');
     const pcts=getPcts();
-    try{const res=await fetch(`/api/admin/${hotelSlug}/divisao/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nomes,pcts})});const d=await res.json();if(d.erro)throw new Error(d.erro);nomesDiv=nomes;document.getElementById('salvo-badge').style.display='inline';toast('✔ Configuração salva!','ok');renderDivisao();}catch(e){toast('Erro: '+e.message,'err');}
+    try{
+        const res=await fetch(`/api/admin/${hotelSlug}/divisao/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nomes,pcts})});
+        const d=await res.json();
+        if(d.erro)throw new Error(d.erro);
+        nomesDiv=nomes;
+        pctsDiv=pcts; // ← atualiza pctsDiv em memória após salvar
+        document.getElementById('salvo-badge').style.display='inline';
+        toast('✔ Configuração salva!','ok');
+        renderDivisao();
+    }catch(e){toast('Erro: '+e.message,'err');}
 }
+
 
 // ── ABA ADIANTAMENTOS (histórico) ──
 async function carregarPaginaAdiantamentos(){
