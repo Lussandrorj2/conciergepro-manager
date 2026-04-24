@@ -578,16 +578,27 @@ async function carregarDivisao() {
         const res = await fetch(`/api/admin/${hotelSlug}/divisao/`);
         const d   = await res.json();
         nomesDiv  = d.nomes || [];
-        pctsDiv   = d.pcts  || [];       // ← salva em variável dedicada
+        pctsDiv   = d.pcts  || [];
+
+        document.getElementById('num-rec').value = nomesDiv.length || 1;
+        
+        // Gera campos ANTES de preencher
         const n = nomesDiv.length || 1;
-        document.getElementById('num-rec').value = n;
-        gerarCampos();
-        const inputs    = document.querySelectorAll('.rec-nome-input');
-        const pctInputs = document.querySelectorAll('.rec-pct-input');
-        nomesDiv.forEach((nome, i) => {
-            if (inputs[i])    inputs[i].value    = nome;
-            if (pctInputs[i] && pctsDiv[i] != null) pctInputs[i].value = pctsDiv[i];
-        });
+        const container = document.getElementById('campos-recs');
+        container.innerHTML = Array.from({length: n}, (_, i) => `
+            <div class="campo-rec">
+                <label>Recepcionista ${i+1}</label>
+                <input type="text" class="rec-nome-input" placeholder="Nome" 
+                       value="${nomesDiv[i] || ''}" oninput="renderDivisao()">
+                <div class="rec-pct-wrap">
+                    <input type="number" class="rec-pct-input" placeholder="100" min="0" max="100" step="1"
+                           value="${pctsDiv[i] != null ? pctsDiv[i] : ''}" 
+                           oninput="atualizarBarraPct();renderDivisao()">
+                    <span class="pct-symbol">%</span>
+                </div>
+                <span style="font-size:10px;color:var(--text-soft);margin-top:2px;">vazio ou 100 = mês completo</span>
+            </div>`).join('');
+
         if (nomesDiv.length) document.getElementById('salvo-badge').style.display = 'inline';
         atualizarBarraPct();
     } catch { nomesDiv = []; pctsDiv = []; gerarCampos(); }
