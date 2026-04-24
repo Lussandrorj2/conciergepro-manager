@@ -184,6 +184,7 @@
                             <button class="btn-salvar" onclick="salvarDivisao()">💾 Salvar configuração</button>
                         </div>
                         <div class="campos-recs" id="campos-recs"></div>
+                        <div id="pct-aviso" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#d97706;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-bottom:12px;"></div>
                         <div class="divisao-total-row">
                             <span>Total de comissão recepção — passeios pagos no período</span>
                             <span id="div-total">R$ —</span>
@@ -611,40 +612,110 @@ function renderRankingPasseios() {
 function gerarCampos() {
     const n = parseInt(document.getElementById('num-rec').value) || 1;
     const container = document.getElementById('campos-recs');
-    const existentes = [...container.querySelectorAll('.rec-nome-input')].map(i=>i.value);
-    container.innerHTML = Array.from({length:n},(_,i) => `
+    const existentes = [...container.querySelectorAll('.rec-nome-input')].map(i => i.value);
+    const pctExist   = [...container.querySelectorAll('.rec-pct-input')].map(i => i.value);
+    const pctPadrao  = parseFloat((100 / n).toFixed(2));
+
+    container.innerHTML = Array.from({length: n}, (_, i) => `
         <div class="campo-rec">
             <label>Recepcionista ${i+1}</label>
-            <input type="text" class="rec-nome-input" placeholder="Nome" value="${existentes[i]||''}" oninput="renderDivisao()">
+            <input type="text" class="rec-nome-input" placeholder="Nome"
+                   value="${existentes[i] || ''}" oninput="renderDivisao()">
+            <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
+                <input type="number" class="rec-pct-input"
+                       placeholder="${pctPadrao}"
+                       value="${pctExist[i] || ''}"
+                       min="0" max="100" step="0.01"
+                       style="width:70px;padding:5px 8px;font-size:12px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-main);outline:none;"
+                       oninput="validarPct(this);renderDivisao()">
+                <span style="font-size:11px;color:var(--text-soft)">%</span>
+            </div>
         </div>`).join('');
+
     renderDivisao();
 }
 
+function validarPct(el) {
+    // Só avisa se ultrapassar 100, não bloqueia
+    const inputs = [...document.querySelectorAll('.rec-pct-input')];
+    const total  = inputs.reduce((s, i) => s + (parseFloat(i.value) || 0), 0);
+    const aviso  = document.getElementById('pct-aviso');
+    if (aviso) aviso.style.display = total > 100.01 ? '' : 'none';
+}
+
 function renderDivisao() {
-    const inputs = [...document.querySelectorAll('.rec-nome-input')];
-    const nomes  = inputs.map((inp,i) => inp.value.trim() || `Rec ${i+1}`);
-    const n      = nomes.length;
+    const inputs    = [...document.querySelectorAll('.rec-nome-input')];
+    const pctInputs = [...document.querySelectorAll('.rec-pct-input')];
+    const n         = inputs.length;
+    const pctPadrao = n > 0 ? 100 / n : 0;
+
+    const nomes = inputs.map((inp, i) => inp.value.trim() || `Rec ${i+1}`);
+
+    // Monta array de porcentagens — se campo vazio usa padrão igual
+    const pcts = pctInputs.map(inp => {
+        const v = parseFloat(inp.value);
+        return isNaN(v) || inp.value === '' ? null : v;
+    });
+
+    // Se todos vazios, divide igualmente
+    const algumPreenchido = pcts.some(p => p !== null);
+    const pctsFinal = pcts.map(p => p !== null ? p : (algumPreenchido ? 0 : pctPadrao));
+
+    const totalPct = pctsFinal.reduce((s, p) => s + p, 0);
     const totalParaDividir = totalComissao + totalCambio;
-    const parte  = n > 0 ? totalParaDividir / n : 0;
-    document.getElementById('div-total').textContent = `R$ ${fmt(totalParaDividir)} (passeios R$ ${fmt(totalComissao)} + câmbio R$ ${fmt(totalCambio)})`;
+
+    // Aviso de total
+    const aviso = document.getElementById('pct-aviso');
+    if (aviso) {
+        if (Math.abs(totalPct - 100) > 0.1) {
+            aviso.textContent = `⚠️ Total das porcentagens: ${totalPct.toFixed(2)}% (deve somar 100%)`;
+            aviso.style.display = '';
+        } else {
+            aviso.style.display = 'none';
+        }
+    }
+
+    document.getElementById('div-total').textContent =
+        `R$ ${fmt(totalParaDividir)} (passeios R$ ${fmt(totalComissao)} + câmbio R$ ${fmt(totalCambio)})`;
+
     const adiantPorRec = {};
-    adiantamentos.forEach(a => { const nome = (a.rec||'').trim(); if (nome) adiantPorRec[nome] = (adiantPorRec[nome]||0) + (parseFloat(a.valor)||0); });
-    document.getElementById('div-rec-grid').innerHTML = nomes.map(nome => {
-        const pixRec    = pixPorRec[nome] || 0;
-        const adiantRec = adiantPorRec[nome] || 0;
-        const saldo     = parte - pixRec - adiantRec;
-        const saldoPos  = saldo >= 0;
+    adiantamentos.forEach(a => {
+        const nome = (a.rec || '').trim();
+        if (nome) adiantPorRec[nome] = (adiantPorRec[nome] || 0) + (parseFloat(a.valor) || 0);
+    });
+
+    document.getElementById('div-rec-grid').innerHTML = nomes.map((nome, i) => {
+        const pct      = pctsFinal[i];
+        const parte    = totalParaDividir * (pct / 100);
+        const pixRec   = pixPorRec[nome]    || 0;
+        const adiantRec= adiantPorRec[nome] || 0;
+        const saldo    = parte - pixRec - adiantRec;
+        const saldoPos = saldo >= 0;
+        const pctLabel = pct.toFixed(1) + '%' + (pcts[i] === null && algumPreenchido ? ' (sem %)*' : '');
+
         return `<div class="div-rec-card">
             <div class="div-rec-top">
                 <div class="div-rec-avatar">${nome.charAt(0).toUpperCase()}</div>
-                <div><div class="div-rec-nome">${nome}</div><div class="div-rec-pct">${n>0?(100/n).toFixed(1):0}% do total</div></div>
+                <div>
+                    <div class="div-rec-nome">${nome}</div>
+                    <div class="div-rec-pct">${pctLabel} do total</div>
+                </div>
             </div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">Parte da comissão</span><span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span></div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">📱 Pix já recebido</span><span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span></div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">💸 Adiantamentos</span><span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span></div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">Parte da comissão</span>
+                <span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span>
+            </div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">📱 Pix já recebido</span>
+                <span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span>
+            </div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">💸 Adiantamentos</span>
+                <span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span>
+            </div>
             <div class="div-rec-linha" style="padding-top:8px;margin-top:4px;border-top:1px solid var(--border);border-bottom:none">
-                <span class="div-rec-linha-label" style="font-weight:600;color:var(--text-main)">${saldoPos?'A Receber':'Devendo'}</span>
-                <span class="div-rec-linha-val ${saldoPos?'cor-saldo-pos':'cor-saldo-neg'}">R$ ${fmt(Math.abs(saldo))}</span>
+                <span class="div-rec-linha-label" style="font-weight:600;color:var(--text-main)">${saldoPos ? 'A Receber' : 'Devendo'}</span>
+                <span class="div-rec-linha-val ${saldoPos ? 'cor-saldo-pos' : 'cor-saldo-neg'}">R$ ${fmt(Math.abs(saldo))}</span>
             </div>
         </div>`;
     }).join('');
