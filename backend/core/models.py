@@ -4,28 +4,56 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
 from cloudinary.models import CloudinaryField
+import re
+import threading
+from deep_translator import GoogleTranslator
 
 
 def _traduzir_em_background(instance_pk, model_class, campos):
-    """
-    Traduz campos de um model em uma thread separada usando deep-translator.
-    Só traduz se o campo de destino estiver vazio.
-    """
     def _run():
         try:
-            from deep_translator import GoogleTranslator
+            termos_protegidos = {
+                r'\bRio de Janeiro\b': '##RIODEJANEIRO##',
+                r'\bRio\b': '##RIO##',
+            }
+
+            # Mapeamento reverso para restauração
+            restauracao = {
+                '##RIODEJANEIRO##': 'Rio de Janeiro',
+                '##RIO##': 'Rio',
+            }
+
             obj = model_class.objects.get(pk=instance_pk)
             campos_atualizados = []
+
+            translator = GoogleTranslator(source='pt', target='en')  # default, será ajustado
+
             for attr_pt, attr_lang, lang_dest in campos:
                 texto = getattr(obj, attr_pt, None)
-                if texto:
-                    traduzido = GoogleTranslator(
-                        source='pt', target=lang_dest
-                    ).translate(texto)
-                    setattr(obj, attr_lang, traduzido or "")
+                if not texto:
+                    continue
+
+                texto_proc = texto
+
+                # Protege termos
+                for padrao, placeholder in termos_protegidos.items():
+                    texto_proc = re.sub(padrao, placeholder, texto_proc)
+
+                # Atualiza idioma do tradutor dinamicamente
+                translator.target = lang_dest
+                traduzido = translator.translate(texto_proc)
+
+                # Restaura termos protegidos
+                if traduzido:
+                    for placeholder, valor in restauracao.items():
+                        traduzido = traduzido.replace(placeholder, valor)
+
+                    setattr(obj, attr_lang, traduzido)
                     campos_atualizados.append(attr_lang)
+
             if campos_atualizados:
                 obj.save(update_fields=campos_atualizados)
+
         except Exception as e:
             print(f"[Tradução] Erro: {e}")
 

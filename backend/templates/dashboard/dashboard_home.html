@@ -9,108 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        .dash-grid {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-            align-items: start;
-            width: 100%; /* Garante que não transborde */
-        }
-        
-        /* Evita que tabelas quebrem o layout mobile */
-        .tabela-scroll {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            width: 100%;
-        }
-        
-        /* ═══════════════════════════════
-           MOBILE OVERRIDES (Abaixo de 1024px)
-           ═══════════════════════════════ */
-        /* ═══════════════════════════════
-           MOBILE OVERRIDES (Abaixo de 768px)
-           ═══════════════════════════════ */
+        .layout { display: flex; min-height: 100vh; }
+        .dash-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; width: 100%; }
+        .tabela-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+
         @media (max-width: 768px) {
-            .main {
-                margin-left: 0 !important;
-                width: 100% !important;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-        
-            /* 3. Ajusta a Topbar para não ter espaço sobrando em cima */
-            .topbar {
-                padding: 10px 12px;
-                height: auto;
-                min-height: 60px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: var(--bg-card);
-                border-bottom: 1px solid var(--border);
-                flex-wrap: nowrap;
-                gap: 8px;
-            }
-        
-            /* 4. Ajusta o conteúdo para preencher a tela sem cortar */
-            .content {
-                padding: 12px 12px 100px !important; /* Padding embaixo para o menu não tampar */
-                gap: 12px;
-                width: 100% !important;
-                box-sizing: border-box;
-            }
-        
-            /* 5. Força a coluna única e remove o "corte" lateral */
-            .dash-grid {
-                display: flex !important;
-                flex-direction: column !important;
-                width: 100%;
-                gap: 12px;
-            }
-        
-            .dash-left, .dash-right {
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-        
-            /* 6. Melhora os KPIs para não ficarem esmagados */
-            .kpis-mes-row {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px;
-            }
-        
-            /* 7. Garante que o gráfico ocupe a largura certa */
-            #chart-mes-wrap {
-                height: 200px !important;
-                width: 100%;
-            }
-        
-            /* 8. Botão "Ir para home" mais compacto no mobile */
-            .btn-ir-site {
-                margin: 0;
-                padding: 6px 10px;
-                font-size: 11px;
-                white-space: nowrap;
-                width: auto;
-                flex-shrink: 0;
-            }
-            
-            .hotel-badge {
-                font-size: 11px;
-                padding: 4px 8px;
-                max-width: 120px;
-                flex-shrink: 1;
-            }
+            .main { margin-left: 0 !important; width: 100% !important; min-height: 100vh; display: flex; flex-direction: column; }
+            .topbar { padding: 10px 12px; height: auto; min-height: 60px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border-bottom: 1px solid var(--border); flex-wrap: nowrap; gap: 8px; }
+            .content { padding: 12px 12px 100px !important; gap: 12px; width: 100% !important; box-sizing: border-box; }
+            .dash-grid { display: flex !important; flex-direction: column !important; width: 100%; gap: 12px; }
+            .dash-left, .dash-right { width: 100% !important; max-width: 100% !important; }
+            .kpis-mes-row { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+            #chart-mes-wrap { height: 200px !important; width: 100%; }
+            .btn-ir-site { margin: 0; padding: 6px 10px; font-size: 11px; white-space: nowrap; width: auto; flex-shrink: 0; }
+            .hotel-badge { font-size: 11px; padding: 4px 8px; max-width: 120px; flex-shrink: 1; }
         }
-        
     </style>
-    
 </head>
 <body>
 <div class="layout">
@@ -122,7 +36,9 @@
             <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/">📌 Quadro</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
             <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
             <hr>
@@ -132,41 +48,38 @@
 
     <main class="main">
         <div class="topbar">
-    <div class="topbar-left">
-        <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-        </button>
-        <span class="topbar-title">Visão Geral</span>
-    </div>
-
-    <div class="topbar-right">
-        <div class="hotel-badge">
-            <div class="hotel-dot"></div>
-            <span>{{ hotel.nome|striptags }}</span>
+            <div class="topbar-left">
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <span class="topbar-title">Visão Geral</span>
+            </div>
+            <div class="topbar-right">
+                <div class="hotel-badge">
+                    <div class="hotel-dot"></div>
+                    <span>{{ hotel.nome|striptags }}</span>
+                </div>
+                <a href="/?hotel={{ hotel.slug }}" class="btn-ir-site" title="Ver página do hóspede">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span class="btn-ir-site-label">Ver site</span>
+                </a>
+            </div>
         </div>
-        <a href="/?hotel={{ hotel.slug }}" class="btn-ir-site" title="Ver página do hóspede">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-            <span class="btn-ir-site-label">Ver site</span>
-        </a>
-    </div>
-</div>
-        <div class="content">
 
-            <!-- GRID PRINCIPAL -->
+        <div class="content">
             <div class="dash-grid">
 
                 <!-- COLUNA ESQUERDA -->
                 <div class="dash-left">
 
-                    <!-- RESERVAS DO DIA -->
                     <div class="card-config">
                         <div class="card-header">
                             <h3>📅 Passeios Agendados para Hoje</h3>
@@ -177,7 +90,6 @@
                         </div>
                     </div>
 
-                    <!-- DESEMPENHO DO MÊS -->
                     <div class="card-config">
                         <div class="card-header">
                             <h3>📈 Desempenho do Mês</h3>
@@ -192,12 +104,11 @@
                             <div class="kpi-mes"><div class="kpi-mes-label">Total do Mês</div><div class="kpi-mes-val gold" id="km-total">R$ —</div></div>
                             <div class="kpi-mes"><div class="kpi-mes-label">Reservas Pagas</div><div class="kpi-mes-val" id="km-reservas" style="color:var(--text-main)">—</div></div>
                         </div>
-                        <div id="chart-mes-wrap" style="position:relative; height:220px; margin-top:12px">
+                        <div id="chart-mes-wrap" style="position:relative;height:220px;margin-top:12px">
                             <canvas id="chart-mes"></canvas>
                         </div>
                     </div>
 
-                    <!-- ÚLTIMAS ATIVIDADES -->
                     <div class="card-config">
                         <div class="card-header">
                             <h3>🕐 Últimas Atividades</h3>
@@ -206,12 +117,7 @@
                         <div class="tabela-scroll">
                             <table id="tabela-atividades">
                                 <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Descrição</th>
-                                        <th>Valor</th>
-                                        <th>Data</th>
-                                    </tr>
+                                    <tr><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Data</th></tr>
                                 </thead>
                                 <tbody id="tbody-atividades">
                                     <tr><td colspan="4"><div class="loading">Carregando...</div></td></tr>
@@ -222,11 +128,11 @@
 
                 </div>
 
-                <!-- COLUNA DIREITA: LEMBRETES -->
+                <!-- COLUNA DIREITA: TAREFAS DE HOJE (do Quadro) -->
                 <div class="dash-right">
                     <div class="lembretes-header">
-                        <h3>📌 Lembretes</h3>
-                        <button class="btn-add-lembrete" onclick="abrirModalLembrete()">＋ Novo</button>
+                        <h3>📌 Hoje</h3>
+                        <a href="/{{ hotel.slug }}/dashboard/quadro/" class="btn-add-lembrete" style="text-decoration:none;">Ver Quadro →</a>
                     </div>
                     <div id="lembretes-lista">
                         <div class="loading">Carregando...</div>
@@ -238,243 +144,80 @@
     </main>
 </div>
 
-<!-- MODAL LEMBRETE -->
-<div class="modal-overlay" id="modal-lembrete">
-    <div class="modal" style="max-width:460px">
-        <div class="modal-header">
-            <h3 id="modal-lembrete-titulo">Novo Lembrete</h3>
-            <button class="modal-close" onclick="fecharModalLembrete()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <input type="hidden" id="lem-id"/>
-            <div class="form-group">
-                <label>Texto do Lembrete *</label>
-                <textarea id="lem-texto" placeholder="Descreva o lembrete..." style="min-height:80px"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Prioridade</label>
-                <select id="lem-prioridade">
-                    <option value="high">🔴 Pendente</option>
-                    <option value="medium" selected>🟡 Andamento</option>
-                    <option value="low">🟢 Concluído </option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="fecharModalLembrete()">Cancelar</button>
-            <button class="btn btn-primary" onclick="salvarLembrete()">💾 Salvar</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL DELETE LEMBRETE -->
-<div class="modal-overlay" id="modal-del-lem">
-    <div class="modal" style="max-width:400px">
-        <div class="modal-header">
-            <h3>Excluir Lembrete</h3>
-            <button class="modal-close" onclick="fecharModal('modal-del-lem')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p style="color:var(--text-muted);font-size:13px">Tem certeza que deseja excluir este lembrete?</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="fecharModal('modal-del-lem')">Cancelar</button>
-            <button class="btn btn-danger" onclick="executarDeleteLembrete()">🗑️ Excluir</button>
-        </div>
-    </div>
-</div>
-
 <style>
-/* ═══════════════════════════════
-   MOBILE-FIRST DASHBOARD
-═══════════════════════════════ */
-
-/* Grid desktop */
-.dash-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
-    align-items: start;
-}
+.dash-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
 .dash-left  { display: flex; flex-direction: column; gap: 20px; }
 .dash-right { position: sticky; top: 80px; }
 
-/* ── Legenda ── */
 .legenda-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink:0; }
 .legenda-txt { font-size: 11px; color: var(--text-soft); }
 
-/* ── KPIs do mês ── */
-.kpis-mes-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-.kpi-mes {
-    background: var(--bg-main);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-}
+.kpis-mes-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.kpi-mes { background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
 .kpi-mes-label { font-size: 10px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing:.4px; margin-bottom:4px; }
 .kpi-mes-val   { font-size: 15px; font-weight: 700; line-height: 1.2; }
 .kpi-mes-val.green { color: var(--green); }
 .kpi-mes-val.blue  { color: #38bdf8; }
 .kpi-mes-val.gold  { color: var(--gold); }
 
-/* ── Reservas hoje ── */
-.reserva-hoje-card {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    transition: background var(--transition);
-}
+.reserva-hoje-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); transition: background var(--transition); }
 .reserva-hoje-card:last-child { border-bottom: none; }
 .reserva-hoje-card:hover { background: var(--bg-hover); }
 .rh-hora   { font-size: 13px; font-weight: 700; color: var(--gold); min-width: 48px; flex-shrink:0; }
-.rh-avatar {
-    width:36px; height:36px; border-radius:50%;
-    background:var(--green-glow); color:var(--green);
-    border:1px solid rgba(34,197,94,.2);
-    display:flex; align-items:center; justify-content:center;
-    font-size:13px; font-weight:700; flex-shrink:0;
-}
+.rh-avatar { width:36px; height:36px; border-radius:50%; background:var(--green-glow); color:var(--green); border:1px solid rgba(34,197,94,.2); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
 .rh-info   { flex:1; min-width:0; }
 .rh-cliente  { font-size:13px; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .rh-passeio  { font-size:11.5px; color:var(--text-soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .rh-right    { text-align:right; flex-shrink:0; }
-
 .empty-hoje { padding:32px 16px; text-align:center; color:var(--text-soft); font-size:13px; }
 .empty-hoje-icon { font-size:28px; margin-bottom:8px; opacity:.4; display:block; }
 
-/* ── Lembretes ── */
 .lembretes-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
 .lembretes-header h3 { font-size:13px; font-weight:600; color:var(--text-soft); text-transform:uppercase; letter-spacing:.5px; }
-.btn-add-lembrete {
-    background:var(--gold-dim); border:1px solid rgba(181,132,58,.3); color:var(--gold);
-    padding:5px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:600;
-    cursor:pointer; font-family:'Inter',sans-serif; transition:var(--transition);
-}
+.btn-add-lembrete { background:var(--gold-dim); border:1px solid rgba(181,132,58,.3); color:var(--gold); padding:5px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:var(--transition); }
 .btn-add-lembrete:hover { background:rgba(181,132,58,.2); }
-
 #lembretes-lista { display:flex; flex-direction:column; gap:10px; }
 
-.trello-card {
-    background:var(--bg-card); border:1px solid var(--border);
-    border-radius:var(--radius-md); padding:14px;
-    border-left:4px solid var(--border-light);
-    box-shadow:0 1px 3px rgba(0,0,0,.06);
-    transition:var(--transition);
-}
+.trello-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; border-left:4px solid var(--border-light); box-shadow:0 1px 3px rgba(0,0,0,.06); transition:var(--transition); }
 .trello-card.priority-high   { border-left-color:#ef4444; }
 .trello-card.priority-medium { border-left-color:#facc15; }
-.trello-card.priority-low    { border-left-color:#38bdf8; }
-.trello-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.trello-badge {
-    font-size:10px; font-weight:700;
-    background:var(--bg-hover); padding:2px 8px; border-radius:4px;
-    color:var(--text-soft); border:1px solid var(--border);
-}
-.trello-card.priority-high   .trello-badge { background:rgba(239,68,68,.1);  color:#f87171; border-color:rgba(239,68,68,.2); }
+.trello-card-top { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.trello-badge { font-size:10px; font-weight:700; background:var(--bg-hover); padding:2px 8px; border-radius:4px; color:var(--text-soft); border:1px solid var(--border); }
+.trello-card.priority-high   .trello-badge { background:rgba(239,68,68,.1); color:#f87171; border-color:rgba(239,68,68,.2); }
 .trello-card.priority-medium .trello-badge { background:rgba(250,204,21,.1); color:#ca8a04; border-color:rgba(250,204,21,.2); }
-.trello-card.priority-low    .trello-badge { background:rgba(56,189,248,.1); color:#38bdf8; border-color:rgba(56,189,248,.2); }
-.trello-card-actions { display:flex; gap:6px; }
-.btn-lem-edit, .btn-lem-del {
-    background:none; border:1px solid var(--border); color:var(--text-soft);
-    width:26px; height:26px; border-radius:6px; cursor:pointer; font-size:12px;
-    display:flex; align-items:center; justify-content:center; transition:var(--transition);
-}
-.btn-lem-edit:hover { background:var(--bg-hover); color:var(--gold); border-color:var(--gold); }
-.btn-lem-del:hover  { background:var(--red-dim); color:#f87171; border-color:rgba(239,68,68,.3); }
-.trello-card p { font-size:13px; color:var(--text-main); line-height:1.5; margin:4px 0 8px; }
-.trello-footer { font-size:11px; color:var(--text-soft); border-top:1px solid var(--border); padding-top:8px; margin-top:4px; }
+.trello-card p { font-size:13px; color:var(--text-main); line-height:1.5; margin:0; }
 
-/* tabela atividades */
 #tabela-atividades { min-width: 480px; }
 
-/* ═══════════════════════════════
-   MOBILE OVERRIDES
-═══════════════════════════════ */
 @media (max-width: 1100px) {
     .dash-grid { grid-template-columns: 1fr; }
     .dash-right { position: static; }
 }
-
 @media (max-width: 768px) {
-
-    /* ── Remover padding extra no mobile ── */
     .content { padding: 12px 12px 80px; gap: 12px; }
-
-    /* ── card-config vira app-card ── */
-    .card-config {
-        border-radius: 16px;
-        padding: 16px;
-        margin-bottom: 0;
-        box-shadow: 0 2px 12px rgba(0,0,0,.07);
-        border: none;
-    }
+    .card-config { border-radius: 16px; padding: 16px; margin-bottom: 0; box-shadow: 0 2px 12px rgba(0,0,0,.07); border: none; }
     .card-config .card-header h3 { font-size: 14px; }
-
-    /* ── KPIs do mês: 2 colunas no mobile ── */
-    .kpis-mes-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
+    .kpis-mes-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .kpi-mes { border-radius: 12px; padding: 14px 12px; }
     .kpi-mes-label { font-size: 9px; }
     .kpi-mes-val   { font-size: 16px; }
-
-    /* ── Gráfico mais baixo no mobile ── */
     #chart-mes-wrap { height: 180px !important; }
     #chart-mes { height: 180px !important; }
-
-    /* ── Reservas do dia ── */
     .reserva-hoje-card { padding: 12px; gap: 10px; }
     .rh-hora   { font-size: 12px; min-width: 42px; }
     .rh-avatar { width:32px; height:32px; font-size:12px; }
     .rh-cliente  { font-size: 13px; }
     .rh-passeio  { font-size: 11px; }
-
-    /* ── Lembretes no mobile ficam abaixo do gráfico ── */
-    .dash-right {
-        background: var(--bg-card);
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 2px 12px rgba(0,0,0,.07);
-        border: none;
-    }
+    .dash-right { background: var(--bg-card); border-radius: 16px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.07); border: none; }
     .lembretes-header h3 { font-size: 12px; }
     .trello-card { border-radius: 12px; }
-
-    /* ── Tabela atividades scroll ── */
     .tabela-scroll { border-radius: 0; }
-
-    /* ── Modal vira bottom sheet ── */
-    .modal {
-        border-radius: 20px 20px 0 0;
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        max-width: 100% !important;
-        margin: 0;
-    }
-    .modal-overlay { align-items: flex-end; padding: 0; }
-    .modal-body    { padding: 16px; }
-    .modal-header  { padding: 16px 20px 12px; }
-    .modal-footer  { padding: 12px 16px; }
-
-    /* ── Inputs e selects ── */
-    .modal-body input,
-    .modal-body select,
-    .modal-body textarea { font-size: 16px !important; border-radius: 10px; }
-
-    /* ── Topbar no mobile ── */
     .topbar { padding: 12px 16px; }
     .topbar-title { font-size: 16px; font-weight: 700; }
 }
-
-/* ── Tap feedback nos cards ── */
 @media (hover: none) {
     .reserva-hoje-card:active { background: var(--bg-hover); }
-    .trello-card:active        { opacity: .85; }
+    .trello-card:active { opacity: .85; }
 }
 </style>
 
@@ -484,113 +227,62 @@ const hotelSlug = "{{ hotel.slug }}";
 Chart.defaults.color       = '#94a3b8';
 Chart.defaults.borderColor = '#e2e8f0';
 
-let lembretes   = [];
-let deleteLemId = null;
-let chartMes    = null;
-let editLemId   = null;
+let chartMes = null;
 
-/* ── utils ── */
 function fmt(v) { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function hoje() { return new Date().toISOString().substring(0,10); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* ════════════════════════
-   LEMBRETES (localStorage)
+   TAREFAS DE HOJE — lê do Quadro
 ════════════════════════ */
-const LS_KEY = `lembretes_${hotelSlug}`;
+const QUADRO_KEY = `quadro_v2_${hotelSlug}`;
+
+const TAGS_LABEL = { urgente:'Urgente', financeiro:'Financeiro', passeio:'Passeio', hotel:'Hotel', cliente:'Cliente', mkt:'Marketing' };
+const TAGS_BG    = { urgente:'rgba(239,68,68,.15)', financeiro:'rgba(16,185,129,.15)', passeio:'rgba(99,102,241,.15)', hotel:'rgba(245,158,11,.15)', cliente:'rgba(236,72,153,.15)', mkt:'rgba(6,182,212,.15)' };
+const TAGS_COR   = { urgente:'#dc2626', financeiro:'#059669', passeio:'#6366f1', hotel:'#d97706', cliente:'#db2777', mkt:'#0891b2' };
+const S_DOT      = { pendente:'#ef4444', andamento:'#f59e0b', concluido:'#10b981' };
+const PRIO_LABEL = { pendente:'🔴 Pendente', andamento:'🟡 Andamento' };
 
 function carregarLembretes() {
-    try { lembretes = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { lembretes = []; }
-    if (!lembretes.length) {
-        lembretes = [
-            { id: Date.now()+1, texto: 'Confirmar pick-up grupo Alemão (14:00)', prioridade:'high',   status:'Hoje'     },
-            { id: Date.now()+2, texto: 'Atualizar cotação do Dólar no painel',   prioridade:'medium', status:'Pendente' },
-            { id: Date.now()+3, texto: 'Verificar novos e-mails de reserva',      prioridade:'low',    status:'Ok'       },
-        ];
-        salvarLS();
-    }
-    renderLembretes();
-}
-
-function salvarLS() { localStorage.setItem(LS_KEY, JSON.stringify(lembretes)); }
-
-const PRIO_LABEL  = { high:'🔴 Pendente', medium:'🟡 Andamento', low:'🟢 Concluído' };
-const STATUS_ICON = { Pendente:'', Andamento:'', Concluído:'' };
-
-function renderLembretes() {
     const cont = document.getElementById('lembretes-lista');
-    if (!lembretes.length) {
-        cont.innerHTML = `<div class="empty-hoje"><span class="empty-hoje-icon">📌</span><p>Nenhum lembrete.</p></div>`;
+    let quadroCards = [];
+    try { quadroCards = JSON.parse(localStorage.getItem(QUADRO_KEY)) || []; } catch { quadroCards = []; }
+
+    const hojeStr = hoje();
+    const deHoje  = quadroCards.filter(c => c.data === hojeStr && c.status !== 'concluido');
+
+    if (!deHoje.length) {
+        cont.innerHTML = `
+            <div class="empty-hoje">
+                <span class="empty-hoje-icon">📌</span>
+                <p>Nenhuma tarefa para hoje.</p>
+                <a href="/{{ hotel.slug }}/dashboard/quadro/"
+                   style="font-size:12px;color:var(--gold);text-decoration:none;margin-top:8px;display:block;">
+                   Adicionar no Quadro →
+                </a>
+            </div>`;
         return;
     }
-    cont.innerHTML = lembretes.map(l => `
-        <div class="trello-card priority-${l.prioridade}">
+
+    cont.innerHTML = deHoje.map(c => {
+        const dot  = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${S_DOT[c.status]||'#94a3b8'};flex-shrink:0;"></span>`;
+        const tags = (c.tags||[]).map(tid =>
+            `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;background:${TAGS_BG[tid]||'#f1f5f9'};color:${TAGS_COR[tid]||'#64748b'}">${TAGS_LABEL[tid]||tid}</span>`
+        ).join('');
+        return `
+        <div class="trello-card priority-${c.status === 'pendente' ? 'high' : 'medium'}"
+             onclick="window.location='/{{ hotel.slug }}/dashboard/quadro/'"
+             style="cursor:pointer;">
             <div class="trello-card-top">
-                <span class="trello-badge">${PRIO_LABEL[l.prioridade]||'Geral'}</span>
-                <div class="trello-card-actions">
-                    <button class="btn-lem-edit" onclick="editarLembrete(${l.id})">✏️</button>
-                    <button class="btn-lem-del"  onclick="confirmarDeleteLembrete(${l.id})">🗑️</button>
-                </div>
+                ${dot}
+                <span class="trello-badge">${PRIO_LABEL[c.status]||c.status}</span>
             </div>
-            <p>${escHtml(l.texto)}</p>
-            <div class="trello-footer">${STATUS_ICON[l.status]||''} ${l.status}</div>
-        </div>`).join('');
+            <p>${escHtml(c.titulo)}</p>
+            ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">${tags}</div>` : ''}
+        </div>`;
+    }).join('');
 }
-
-function abrirModalLembrete() {
-    editLemId = null;
-    document.getElementById('modal-lembrete-titulo').textContent = 'Novo Lembrete';
-    document.getElementById('lem-id').value         = '';
-    document.getElementById('lem-texto').value      = '';
-    document.getElementById('lem-prioridade').value = 'medium';
-    document.getElementById('modal-lembrete').classList.add('open');
-}
-
-function fecharModalLembrete() { document.getElementById('modal-lembrete').classList.remove('open'); }
-
-function editarLembrete(id) {
-    const l = lembretes.find(x => x.id === id);
-    if (!l) return;
-    editLemId = id;
-    document.getElementById('modal-lembrete-titulo').textContent = 'Editar Lembrete';
-    document.getElementById('lem-id').value         = l.id;
-    document.getElementById('lem-texto').value      = l.texto;
-    document.getElementById('lem-prioridade').value = l.prioridade;
-    document.getElementById('modal-lembrete').classList.add('open');
-}
-
-function salvarLembrete() {
-    const texto = document.getElementById('lem-texto').value.trim();
-    if (!texto) { alert('Informe o texto do lembrete.'); return; }
-    const prio   = document.getElementById('lem-prioridade').value;
-    const PRIO_STATUS = { high: 'Pendente', medium: 'Andamento', low: 'Concluído' };
-    const status = PRIO_STATUS[prio] || 'Pendente';
-    if (editLemId) {
-        const idx = lembretes.findIndex(x => x.id === editLemId);
-        if (idx >= 0) lembretes[idx] = { ...lembretes[idx], texto, prioridade:prio, status };
-    } else {
-        lembretes.push({ id: Date.now(), texto, prioridade:prio, status });
-    }
-    salvarLS();
-    renderLembretes();
-    fecharModalLembrete();
-}
-
-function confirmarDeleteLembrete(id) {
-    deleteLemId = id;
-    document.getElementById('modal-del-lem').classList.add('open');
-}
-
-function executarDeleteLembrete() {
-    if (!deleteLemId) return;
-    lembretes = lembretes.filter(l => l.id !== deleteLemId);
-    salvarLS();
-    renderLembretes();
-    fecharModal('modal-del-lem');
-    deleteLemId = null;
-}
-
-function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
 
 /* ════════════════════════
    RESERVAS DO DIA
@@ -605,19 +297,12 @@ async function carregarReservasHoje() {
 
         const dataHoje = hoje();
 
-        // Checa TODOS os campos de data possíveis que o backend pode retornar
-        // DEPOIS
         function getDataReserva(r) {
             const candidatos = [r.data_passeio, r.data, r.data_agendamento, r.date, r.scheduled_date, r.tour_date];
             for (const c of candidatos) {
                 if (!c) continue;
                 const s = String(c);
-                // formato dd/mm/yyyy → converte para yyyy-mm-dd
-                if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) {
-                    const [d, m, a] = s.substring(0,10).split('/');
-                    return `${a}-${m}-${d}`;
-                }
-                // formato yyyy-mm-dd → usa direto
+                if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) { const [d,m,a] = s.substring(0,10).split('/'); return `${a}-${m}-${d}`; }
                 if (s.length >= 10) return s.substring(0,10);
             }
             return '';
@@ -644,19 +329,15 @@ async function carregarReservasHoje() {
         const bgMap = { pendente:'rgba(251,191,36,.07)', confirmado:'rgba(56,189,248,.06)', pago:'rgba(22,163,74,.07)', cancelado:'rgba(239,68,68,.06)' };
 
         cont.innerHTML = deHoje.map(r => {
-            const ini      = (r.nome_cliente||'?').charAt(0).toUpperCase();
-            const hora     = r.horario ? r.horario.substring(0,5) : '—:—';
-            const status   = r.status || 'pendente';
-            const sc       = scMap[status] || 'status-pendente';
-            const sl       = slMap[status] || status;
-            const bg       = bgMap[status] || '';
+            const ini     = (r.nome_cliente||'?').charAt(0).toUpperCase();
+            const hora    = r.horario ? r.horario.substring(0,5) : '—:—';
+            const status  = r.status || 'pendente';
+            const bg      = bgMap[status] || '';
             const valBruto = r.valor_bruto ? ` · R$ ${fmt(parseFloat(r.valor_bruto))}` : '';
             const passeio  = escHtml(r.passeio_nome || r.passeio_titulo || '–');
             const pessoas  = r.numero_pessoas || 1;
             const recep    = r.recepcionista ? `<span style="font-size:10px;color:var(--text-soft)">👤 ${escHtml(r.recepcionista)}</span>` : '';
-            const waLink   = r.whatsapp
-                ? `<a href="https://wa.me/${r.whatsapp.replace(/\D/g,'')}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;color:#25d366;font-size:11px;font-weight:600;text-decoration:none;">💬 WA</a>`
-                : '';
+            const waLink   = r.whatsapp ? `<a href="https://wa.me/${r.whatsapp.replace(/\D/g,'')}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;color:#25d366;font-size:11px;font-weight:600;text-decoration:none;">💬 WA</a>` : '';
             return `
             <div class="reserva-hoje-card" style="background:${bg}">
                 <div class="rh-hora">${hora}</div>
@@ -667,7 +348,7 @@ async function carregarReservasHoje() {
                     <div style="display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap;">${recep}${waLink}</div>
                 </div>
                 <div class="rh-right">
-                    <span class="status-pill ${sc}">${sl}</span>
+                    <span class="status-pill ${scMap[status]||'status-pendente'}">${slMap[status]||status}</span>
                 </div>
             </div>`;
         }).join('');
@@ -695,20 +376,11 @@ async function carregarAtividades() {
 
         const atividades = [];
 
-        // Câmbios
         if (Array.isArray(cambios)) cambios.slice(0,10).forEach(op => {
-            atividades.push({
-                tipo:   'cambio',
-                status: 'pago',
-                desc:   `Câmbio ${op.quantidade||op.valor||''} ${op.moeda||''}`.trim(),
-                valor:  parseFloat(op.valor_pago||op.valor_reais||0),
-                data:   op.data || '',
-            });
+            atividades.push({ tipo:'cambio', status:'pago', desc:`Câmbio ${op.quantidade||op.valor||''} ${op.moeda||''}`.trim(), valor:parseFloat(op.valor_pago||op.valor_reais||0), data:op.data||'' });
         });
 
-        // Reservas — TODAS (pagas, confirmadas, pendentes)
         if (Array.isArray(reservas)) {
-            // Ordena por data de criação/pagamento mais recente primeiro
             const sorted = [...reservas].sort((a,b) => {
                 const da = a.data_pagamento||a.data_passeio||a.data||'';
                 const db = b.data_pagamento||b.data_passeio||b.data||'';
@@ -717,19 +389,10 @@ async function carregarAtividades() {
             sorted.slice(0,10).forEach(r => {
                 const statusLabel = { pendente:'Pendente', confirmado:'Confirmado', pago:'Pago', cancelado:'Cancelado' }[r.status] || r.status;
                 const badgeCls    = { pendente:'badge-pendente', confirmado:'badge-confirmado', pago:'badge-pago', cancelado:'badge-cancelado' }[r.status] || 'badge-pendente';
-                atividades.push({
-                    tipo:     'reserva',
-                    status:   r.status,
-                    badgeCls,
-                    statusLabel,
-                    desc:     `${r.nome_cliente||'–'} — ${r.passeio_nome||r.passeio_titulo||'–'}`,
-                    valor:    parseFloat(r.comissao_recepcao||0),
-                    data:     r.data_pagamento||r.data_passeio||r.data||'',
-                });
+                atividades.push({ tipo:'reserva', status:r.status, badgeCls, statusLabel, desc:`${r.nome_cliente||'–'} — ${r.passeio_nome||r.passeio_titulo||'–'}`, valor:parseFloat(r.comissao_recepcao||0), data:r.data_pagamento||r.data_passeio||r.data||'' });
             });
         }
 
-        // Ordena tudo por data desc
         atividades.sort((a,b) => (b.data||'').localeCompare(a.data||''));
         const top = atividades.slice(0,12);
         badge.textContent = `${top.length} registros`;
@@ -741,16 +404,12 @@ async function carregarAtividades() {
             const badgeLbl = a.tipo === 'cambio' ? 'Câmbio' : (a.statusLabel||'Reserva');
             const valorStr = a.valor > 0 ? `R$ ${fmt(a.valor)}` : '–';
             const valorCor = a.tipo === 'cambio' ? '#38bdf8' : (a.status==='pago' ? 'var(--green)' : 'var(--text-soft)');
+            const dataStr  = (() => { const s = String(a.data||''); if (!s||s==='-') return '–'; if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.substring(0,10); return new Date(s+'T12:00:00').toLocaleDateString('pt-BR'); })();
             return `<tr>
                 <td><span class="badge ${badgeCls}">${badgeLbl}</span></td>
                 <td style="color:var(--text-main)">${escHtml(a.desc)}</td>
                 <td style="color:${valorCor};font-weight:600">${valorStr}</td>
-                <td style="font-size:11px;color:var(--text-soft)">${(() => {
-                    const s = String(a.data||'');
-                    if (!s || s === '-') return '–';
-                    if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.substring(0,10);
-                    return new Date(s+'T12:00:00').toLocaleDateString('pt-BR');
-                })()}</td>
+                <td style="font-size:11px;color:var(--text-soft)">${dataStr}</td>
             </tr>`;
         }).join('');
     } catch {
@@ -797,7 +456,6 @@ async function carregarDesempenhoMes() {
         document.getElementById('km-total').textContent    = `R$ ${fmt(comissaoMes+lucroMes)}`;
         document.getElementById('km-reservas').textContent = reservasMes.length;
 
-        /* Gráfico por dia */
         const diasNoMes = new Date(ano, parseInt(mes), 0).getDate();
         const labels    = Array.from({length:diasNoMes},(_,i) => String(i+1).padStart(2,'0'));
         const dadosPass = new Array(diasNoMes).fill(0);
@@ -851,10 +509,6 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarReservasHoje();
     carregarAtividades();
     carregarDesempenhoMes();
-
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-    });
 });
 </script>
 

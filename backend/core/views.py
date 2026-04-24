@@ -213,6 +213,14 @@ def dashboard_reservas(request, hotel_slug):
 def dashboard_cambio(request, hotel_slug):
     return render(request, 'dashboard/cambio.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
 
+@login_required
+def dashboard_quadro(request, hotel_slug):
+    return render(request, 'dashboard/quadro.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+
+@login_required
+def dashboard_hospedagem(request, hotel_slug):
+    return render(request, 'dashboard/hospedagem.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+
 # =========================
 
 # PASSEIOS CRUD (ADMIN)
@@ -287,7 +295,27 @@ def api_passeios(request, hotel_slug, passeio_id=None):
             for f in request.FILES.getlist("imagens"):
                 ImagemPasseio.objects.create(passeio=passeio, arquivo=f)
     
+            try:
+                if passeio.nome:
+                    nome_proc = passeio.nome.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    passeio.nome_en = GoogleTranslator(source='pt', target='en').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.nome_es = GoogleTranslator(source='pt', target='es').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.nome_fr = GoogleTranslator(source='pt', target='fr').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                if passeio.descricao:
+                    desc_proc = passeio.descricao.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    passeio.descricao_en = GoogleTranslator(source='pt', target='en').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.descricao_es = GoogleTranslator(source='pt', target='es').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    passeio.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                passeio.save(update_fields=[
+                    'nome_en','nome_es','nome_fr',
+                    'descricao_en','descricao_es','descricao_fr'
+                ])
+            except Exception as e:
+                print(f"[tradução] {e}")
+
+            
             return JsonResponse({"status": "ok", "id": passeio.id})
+
     
         except Exception as e:
             print("[api_passeios POST] Erro:")
@@ -926,7 +954,6 @@ def forcar_traducao_hotel(request, hotel_slug):
     if not _get_hotel_do_usuario(request, hotel):
         return JsonResponse({"erro": "Sem permissão"}, status=403)
 
-
     try:
         campos = {}
         if hotel.titulo_hero:
@@ -937,13 +964,43 @@ def forcar_traducao_hotel(request, hotel_slug):
             campos['subtitulo_hero_en'] = GoogleTranslator(source='pt', target='en').translate(hotel.subtitulo_hero)
             campos['subtitulo_hero_es'] = GoogleTranslator(source='pt', target='es').translate(hotel.subtitulo_hero)
             campos['subtitulo_hero_fr'] = GoogleTranslator(source='pt', target='fr').translate(hotel.subtitulo_hero)
-    
+
         Hotel.objects.filter(pk=hotel.pk).update(**campos)
-        return JsonResponse({"status": "ok", "traduzido": list(campos.keys())})
+
+        passeios_traduzidos = 0
+        for p in Passeio.objects.filter(hotel=hotel, ativo=True):
+            try:
+                if p.nome:
+                    nome_proc = p.nome.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    p.nome_en = GoogleTranslator(source='pt', target='en').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.nome_es = GoogleTranslator(source='pt', target='es').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.nome_fr = GoogleTranslator(source='pt', target='fr').translate(nome_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                if p.descricao:
+                    desc_proc = p.descricao.replace('Rio de Janeiro', '##RIODEJANEIRO##').replace('Rio', '##RIO##')
+                    p.descricao_en = GoogleTranslator(source='pt', target='en').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.descricao_es = GoogleTranslator(source='pt', target='es').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                    p.descricao_fr = GoogleTranslator(source='pt', target='fr').translate(desc_proc).replace('##RIODEJANEIRO##', 'Rio de Janeiro').replace('##RIO##', 'Rio')
+                p.save(update_fields=[
+                    'nome_en','nome_es','nome_fr',
+                    'descricao_en','descricao_es','descricao_fr'
+                ])
+                passeios_traduzidos += 1
+            except Exception as e:
+                print(f"[tradução passeio {p.id}] {e}")
+
+
+        return JsonResponse({
+            "status": "ok",
+            "traduzido": list(campos.keys()),
+            "passeios_traduzidos": passeios_traduzidos
+        })
     except Exception as e:
         print(traceback.format_exc())
         return JsonResponse({"erro": str(e)}, status=500)
 
+
+
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def traduzir_texto(request):

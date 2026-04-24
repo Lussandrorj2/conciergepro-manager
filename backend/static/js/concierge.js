@@ -314,7 +314,6 @@ async function carregarPasseios(lang) {
         if (countEl) countEl.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
 
         if (!listaPasseios.length) {
-            // FIX: aspas simples dentro de string com aspas simples causavam SyntaxError
             track.innerHTML = "<div class='estado-vazio'><span class='icon'>&#127958;</span><p>" + t('vazio') + "</p></div>";
             return;
         }
@@ -332,10 +331,10 @@ async function carregarPasseios(lang) {
 
     } catch(e) {
         console.error('[carregarPasseios]', e);
-        // FIX: mesma correção de aspas
         track.innerHTML = "<div class='estado-erro'><span class='icon'>&#9888;</span><p>" + t('erro') + "</p></div>";
     }
 }
+
 
 // ==========================================
 // CARD RENDER
@@ -672,7 +671,11 @@ function atualizarTrust() {
 async function trocarIdioma(lang) {
     idiomaAtual = lang;
     localStorage.setItem('lang', lang);
-    document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === lang); });
+
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+
     var ls = document.getElementById('label-secao');
     var ts = document.getElementById('titulo-secao');
     var ce = document.getElementById('count-passeios');
@@ -681,12 +684,15 @@ async function trocarIdioma(lang) {
     if (ce && listaPasseios.length) ce.innerText = listaPasseios.length + ' ' + t('secao_label').toLowerCase();
     atualizarTrust();
     atualizarTextosMapa();
+
     await Promise.all([
         carregarHotel(lang),
         carregarPasseios(lang),
-        traduzirEAtualizarCards()  
+        traduzirEAtualizarCards()
     ]);
 }
+
+
 
 // ESC / clique fora fecha modais
 document.addEventListener('keydown', function(e) {
@@ -892,7 +898,7 @@ function renderLugarCards() {
     var L_ = MAPA_LABELS[idiomaAtual] || MAPA_LABELS['pt'];
 
     if (!lista.length) {
-        grid.innerHTML = '<div class="estado-vazio"><span class="icon">&#128205;</span><p>Nenhum local encontrado.</p></div>';
+        grid.innerHTML = '<div class="estado-vazio"><span class="icon">&#128205;</span><p>' + t('vazio') + '</p></div>';
         return;
     }
 
@@ -968,23 +974,42 @@ function atualizarTextosMapa() {
 
 async function traduzirTexto(texto, idioma) {
     if (!texto || idioma === 'pt') return texto;
-    
-    var chave = idioma + ':' + texto.slice(0, 40);
+
+    var textoOriginal = texto;
+
+    // Protege "Rio" (cidade) substituindo por placeholder antes de traduzir
+    var textoProcessado = texto
+        .replace(/\bRio de Janeiro\b/g, '##RIODEJANEIRO##')
+        .replace(/\bRio\b/g, '##RIO##');
+
+    var chave = idioma + ':' + textoProcessado.slice(0, 40);
     if (cacheTraducoes[chave]) return cacheTraducoes[chave];
-    
+
     try {
         var res = await fetch('/api/traduzir/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texto: texto, idioma: idioma })
+            body: JSON.stringify({ 
+                texto: textoProcessado,
+                idioma: idioma 
+            })
         });
+
         var data = await res.json();
-        cacheTraducoes[chave] = data.traduzido;
-        return data.traduzido;
+
+        // Restaura os nomes originais após a tradução
+        var traduzidoFinal = data.traduzido
+            .replace(/##RIODEJANEIRO##/g, 'Rio de Janeiro')
+            .replace(/##RIO##/g, 'Rio');
+
+        cacheTraducoes[chave] = traduzidoFinal;
+        return traduzidoFinal;
+
     } catch(e) {
-        return texto;
+        return textoOriginal;
     }
 }
+
 
 var cacheTraducoes = {};
 
@@ -992,15 +1017,26 @@ var cacheTraducoes = {};
 // INIT
 // ==========================================
 document.addEventListener('DOMContentLoaded', async function() {
-    document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.lang === idiomaAtual); });
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.lang === idiomaAtual);
+    });
+
+    var ls = document.getElementById('label-secao');
+    var ts = document.getElementById('titulo-secao');
+    if (ls) ls.innerText = t('secao_label');
+    if (ts) ts.innerText = t('secao_titulo');
     atualizarTrust();
+    atualizarTextosMapa();
+
     await carregarHotel(idiomaAtual);
-    await Promise.all([carregarPasseios(idiomaAtual), initMapa()]);
-    // traduz os cards após o mapa carregar
-    if (idiomaAtual !== 'pt') {
-        await traduzirEAtualizarCards();
-    }
+    await initMapa();
+    await Promise.all([
+        carregarPasseios(idiomaAtual),
+        traduzirEAtualizarCards()
+    ]);
 });
+
+
 
 // EXPORTS
 window.trocarIdioma               = trocarIdioma;
