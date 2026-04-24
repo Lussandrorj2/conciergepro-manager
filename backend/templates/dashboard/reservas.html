@@ -241,10 +241,35 @@
                 <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
                 <div id="mes-ref-badge-pg" class="mes-ref-badge"></div>
             </div>
+
             <hr class="divider"/>
-            <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
-            <div id="pix-list"></div>
-            <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
+            <p class="section-title">Forma de Pagamento</p>
+            <div class="pagamento-tipo-toggle">
+                <button type="button" id="pg-tipo-pix" class="tipo-btn active" onclick="setPgTipo('pix')">
+                    📲 PIX
+                </button>
+                <button type="button" id="pg-tipo-dinheiro" class="tipo-btn" onclick="setPgTipo('dinheiro')">
+                    💵 Dinheiro
+                </button>
+            </div>
+
+            <!-- PIX: seleção de recepcionistas -->
+            <div id="pg-pix-section">
+                <hr class="divider"/>
+                <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
+                <div id="pix-list"></div>
+                <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
+            </div>
+
+            <!-- Dinheiro: campo simples -->
+            <div id="pg-dinheiro-section" style="display:none">
+                <hr class="divider"/>
+                <p class="section-title">Valor Recebido <span id="pg-total-label-din" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
+                <div class="form-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="pg-dinheiro-valor" step="0.01" min="0" placeholder="0,00"/>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
