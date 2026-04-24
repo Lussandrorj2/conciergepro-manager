@@ -535,7 +535,7 @@ function parsePix(raw) {
     return [];
 }
 function parseRecs(s) { return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : []; }
-function fmt(v) { return parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+function fmt(v) { return parseFloat(parseFloat(v||0).toFixed(2)).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function getMesRef()    { return { ano:document.getElementById('filtro-ano').value,    mes:document.getElementById('filtro-mes').value }; }
 function getMesRefDiv() { return { ano:document.getElementById('filtro-ano-div').value, mes:document.getElementById('filtro-mes-div').value }; }
 function getMesRefAd()  { return { ano:document.getElementById('filtro-ano-ad').value,  mes:document.getElementById('filtro-mes-ad').value }; }
@@ -721,22 +721,23 @@ function gerarCampos() {
             <label>Recepcionista ${i+1}</label>
             <input type="text" class="rec-nome-input" placeholder="Nome" value="${existNomes[i]||''}" oninput="renderDivisao()">
             <div class="rec-pct-wrap">
-                <input type="number" class="rec-pct-input" placeholder="auto" min="0" max="100" step="0.01"
+                <input type="number" class="rec-pct-input" placeholder="100" min="0" max="100" step="1"
                        value="${existPcts[i]||''}" oninput="atualizarBarraPct();renderDivisao()">
                 <span class="pct-symbol">%</span>
             </div>
+            <span style="font-size:10px;color:var(--text-soft);margin-top:2px;">vazio ou 100 = mês completo</span>
         </div>`).join('');
     atualizarBarraPct();
     renderDivisao();
 }
 
 function getPcts() {
+    // Retorna a % individual de cada um — vazio = 100% da parte base
     const inputs = [...document.querySelectorAll('.rec-pct-input')];
-    const n      = inputs.length;
-    const pctPadrao = n > 0 ? 100/n : 0;
-    const pcts   = inputs.map(inp => { const v=parseFloat(inp.value); return isNaN(v)||inp.value===''?null:v; });
-    const algum  = pcts.some(p=>p!==null);
-    return pcts.map(p => p!==null ? p : (algum ? 0 : pctPadrao));
+    return inputs.map(inp => {
+        const v = parseFloat(inp.value);
+        return (!inp.value || isNaN(v)) ? 100 : Math.min(100, Math.max(0, v));
+    });
 }
 
 function igualarPct() {
@@ -748,48 +749,85 @@ function igualarPct() {
 }
 
 function atualizarBarraPct() {
-    const pcts=getPcts();
-    const total=pcts.reduce((s,p)=>s+p,0);
-    const bar=document.getElementById('pct-bar');
-    const aviso=document.getElementById('pct-aviso');
-    const kpiPct=document.getElementById('div-kpi-pct');
+    // Com a nova lógica, % é individual — só avisa se alguém colocou > 100
+    const inputs = [...document.querySelectorAll('.rec-pct-input')];
+    const aviso  = document.getElementById('pct-aviso');
+    const kpiPct = document.getElementById('div-kpi-pct');
+    const bar    = document.getElementById('pct-bar');
 
-    if(bar){bar.style.width=Math.min(total,100)+'%';bar.classList.toggle('over',total>100.01);}
-    if(kpiPct) kpiPct.textContent=total.toFixed(1)+'%';
-    if(aviso){
-        if(Math.abs(total-100)>0.1){
-            aviso.textContent=total>100?`⚠️ Total ${total.toFixed(1)}% — ultrapassa 100%`:`⚠️ Total ${total.toFixed(1)}% — faltam ${(100-total).toFixed(1)}%`;
-            aviso.className='pct-aviso'+(total>100?' danger':'');
-            aviso.style.display='';
-        } else { aviso.style.display='none'; }
+    const algumParcial = inputs.some(inp => inp.value !== '' && parseFloat(inp.value) < 100);
+    const algumInvalido = inputs.some(inp => inp.value !== '' && (parseFloat(inp.value) > 100 || parseFloat(inp.value) < 0));
+
+    // Barra: mostra % mínima configurada (a mais baixa = quem recebe menos)
+    const pcts = inputs.map(inp => (!inp.value || isNaN(parseFloat(inp.value))) ? 100 : parseFloat(inp.value));
+    const minPct = Math.min(...pcts);
+    if (bar) { bar.style.width = minPct + '%'; bar.classList.toggle('over', algumInvalido); }
+    if (kpiPct) kpiPct.textContent = algumParcial ? `Mín. ${minPct}%` : '100%';
+
+    if (aviso) {
+        if (algumInvalido) {
+            aviso.textContent = '⚠️ Porcentagem deve ser entre 0 e 100';
+            aviso.className = 'pct-aviso danger'; aviso.style.display = '';
+        } else if (algumParcial) {
+            const nomes = [...document.querySelectorAll('.rec-nome-input')];
+            const parciais = inputs.map((inp,i) => ({
+                nome: nomes[i]?.value || `Rec ${i+1}`,
+                pct: (!inp.value||isNaN(parseFloat(inp.value)))?100:parseFloat(inp.value)
+            })).filter(x => x.pct < 100);
+            aviso.textContent = `ℹ️ ${parciais.map(p=>`${p.nome}: ${p.pct}% da parte base`).join(' · ')}`;
+            aviso.className = 'pct-aviso'; aviso.style.display = '';
+        } else {
+            aviso.style.display = 'none';
+        }
     }
 }
 
 function renderDivisao() {
-    const inputs=[...document.querySelectorAll('.rec-nome-input')];
-    const nomes=inputs.map((inp,i)=>inp.value.trim()||`Rec ${i+1}`);
-    const pcts=getPcts();
-    const totalParaDividir=totalComissao+totalCambio;
-    document.getElementById('div-total').textContent=`R$ ${fmt(totalParaDividir)} (passeios R$ ${fmt(totalComissao)} + câmbio R$ ${fmt(totalCambio)})`;
-    if(document.getElementById('div-kpi-total')) document.getElementById('div-kpi-total').textContent='R$ '+fmt(totalParaDividir);
-    if(document.getElementById('div-kpi-recs')) document.getElementById('div-kpi-recs').textContent=nomes.length;
-    const adiantPorRec={};
-    adiantamentos.forEach(a=>{const nome=(a.rec||'').trim();if(nome)adiantPorRec[nome]=(adiantPorRec[nome]||0)+(parseFloat(a.valor)||0);});
-    document.getElementById('div-rec-grid').innerHTML=nomes.map((nome,i)=>{
-        const pct=pcts[i];
-        const parte=totalParaDividir*(pct/100);
-        const pixRec=pixPorRec[nome]||0;
-        const adiantRec=adiantPorRec[nome]||0;
-        const saldo=parte-pixRec-adiantRec;
-        const saldoPos=saldo>=0;
+    const inputs = [...document.querySelectorAll('.rec-nome-input')];
+    const nomes  = inputs.map((inp,i) => inp.value.trim() || `Rec ${i+1}`);
+    const n      = nomes.length;
+    const pcts   = getPcts(); // % individual (vazio = 100%)
+
+    const totalParaDividir = totalComissao + totalCambio;
+    const parteBase = n > 0 ? totalParaDividir / n : 0; // divisão igual entre todos
+
+    document.getElementById('div-total').textContent =
+        `R$ ${fmt(totalParaDividir)} ÷ ${n} = R$ ${fmt(parteBase)} por pessoa (base)`;
+    if (document.getElementById('div-kpi-total')) document.getElementById('div-kpi-total').textContent = 'R$ ' + fmt(totalParaDividir);
+    if (document.getElementById('div-kpi-recs'))  document.getElementById('div-kpi-recs').textContent  = n;
+
+    const adiantPorRec = {};
+    adiantamentos.forEach(a => { const nome=(a.rec||'').trim(); if(nome) adiantPorRec[nome]=(adiantPorRec[nome]||0)+(parseFloat(a.valor)||0); });
+
+    document.getElementById('div-rec-grid').innerHTML = nomes.map((nome, i) => {
+        const pct      = pcts[i]; // % individual desta pessoa
+        const parte    = parteBase * (pct / 100); // aplica % sobre a parte base
+        const pixRec   = pixPorRec[nome]    || 0;
+        const adiantRec= adiantPorRec[nome] || 0;
+        const saldo    = parte - pixRec - adiantRec;
+        const saldoPos = saldo >= 0;
+        const pctLabel = pct === 100 ? 'Mês completo' : `${pct}% do período`;
+
         return `<div class="div-rec-card">
             <div class="div-rec-top">
                 <div class="div-rec-avatar">${nome.charAt(0).toUpperCase()}</div>
-                <div><div class="div-rec-nome">${nome}</div><div class="div-rec-pct">${pct.toFixed(1)}% do total</div></div>
+                <div>
+                    <div class="div-rec-nome">${nome}</div>
+                    <div class="div-rec-pct">${pctLabel} — base R$ ${fmt(parteBase)}</div>
+                </div>
             </div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">Parte da comissão</span><span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span></div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">📱 Pix recebido</span><span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span></div>
-            <div class="div-rec-linha"><span class="div-rec-linha-label">💸 Adiantamentos</span><span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span></div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">Parte a receber</span>
+                <span class="div-rec-linha-val cor-positivo">R$ ${fmt(parte)}</span>
+            </div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">📱 Pix recebido</span>
+                <span class="div-rec-linha-val cor-negativo">− R$ ${fmt(pixRec)}</span>
+            </div>
+            <div class="div-rec-linha">
+                <span class="div-rec-linha-label">💸 Adiantamentos</span>
+                <span class="div-rec-linha-val cor-adiant">− R$ ${fmt(adiantRec)}</span>
+            </div>
             <div class="div-rec-linha" style="padding-top:8px;margin-top:4px;border-top:1px solid var(--border);border-bottom:none">
                 <span class="div-rec-linha-label" style="font-weight:600;color:var(--text-main)">${saldoPos?'A Receber':'Devendo'}</span>
                 <span class="div-rec-linha-val ${saldoPos?'cor-saldo-pos':'cor-saldo-neg'}">R$ ${fmt(Math.abs(saldo))}</span>
