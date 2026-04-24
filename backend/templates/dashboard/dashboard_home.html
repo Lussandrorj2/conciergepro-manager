@@ -226,8 +226,8 @@
                 <!-- COLUNA DIREITA: LEMBRETES -->
                 <div class="dash-right">
                     <div class="lembretes-header">
-                        <h3>📌 Lembretes de Hoje</h3>
-                        <a href="/{{ hotel.slug }}/dashboard/quadro/" class="btn-add-lembrete">Ver Quadro →</a>
+                        <h3>📌 Hoje</h3>
+                        <a href="/{{ hotel.slug }}/dashboard/quadro/" class="btn-add-lembrete" style="text-decoration:none;">Ver Quadro →</a>
                     </div>
                     <div id="lembretes-lista">
                         <div class="loading">Carregando...</div>
@@ -519,23 +519,21 @@ const PRIO_LABEL  = { high:'🔴 Pendente', medium:'🟡 Andamento', low:'🟢 C
 const STATUS_ICON = { Pendente:'', Andamento:'', Concluído:'' };
 
 function renderLembretes() {
+    function renderLembretes() {
     const cont = document.getElementById('lembretes-lista');
-    if (!lembretes.length) {
-        cont.innerHTML = `<div class="empty-hoje"><span class="empty-hoje-icon">📌</span><p>Nenhum lembrete.</p></div>`;
+    const filtrados = lembretes.filter(l => l.prioridade === 'high' || l.prioridade === 'medium');
+    if (!filtrados.length) {
+        cont.innerHTML = `<div class="empty-hoje"><span class="empty-hoje-icon">📌</span><p>Nenhum lembrete pendente hoje.</p><a href="/{{ hotel.slug }}/dashboard/quadro/" style="font-size:12px;color:var(--gold);text-decoration:none;margin-top:6px;display:block;">Ver todos no Quadro →</a></div>`;
         return;
     }
-    cont.innerHTML = lembretes.map(l => `
+    cont.innerHTML = filtrados.map(l => `
         <div class="trello-card priority-${l.prioridade}">
             <div class="trello-card-top">
                 <span class="trello-badge">${PRIO_LABEL[l.prioridade]||'Geral'}</span>
-                <div class="trello-card-actions">
-                    <button class="btn-lem-edit" onclick="editarLembrete(${l.id})">✏️</button>
-                    <button class="btn-lem-del"  onclick="confirmarDeleteLembrete(${l.id})">🗑️</button>
-                </div>
             </div>
             <p>${escHtml(l.texto)}</p>
-            <div class="trello-footer">${STATUS_ICON[l.status]||''} ${l.status}</div>
         </div>`).join('');
+}
 }
 
 function abrirModalLembrete() {
