@@ -115,6 +115,30 @@
             flex-shrink: 0;
         }
         .board-col-body.drag-over { background:rgba(181,132,58,.05); outline:2px dashed rgba(181,132,58,.3); outline-offset:-4px; border-radius:8px; }
+
+        /* ── SEPARADOR DE MÊS ── */
+        .month-separator {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 4px 4px;
+            margin-top: 4px;
+        }
+        .month-separator:first-child { margin-top: 0; padding-top: 4px; }
+        .month-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .5px; color: var(--text-soft,#94a3b8);
+            white-space: nowrap;
+        }
+        .month-count {
+            font-size: 9px; font-weight: 700;
+            background: var(--bg-hover,#f1f5f9);
+            border: 1px solid var(--border,#e2e8f0);
+            color: var(--text-soft,#94a3b8);
+            padding: 1px 5px; border-radius: 8px;
+        }
+        .month-separator::after {
+            content: ''; flex: 1; height: 1px;
+            background: var(--border,#e2e8f0);
+        }
         .kanban-card { background:var(--bg-main,#f8fafc); border:1px solid var(--border,#e2e8f0); border-radius:10px; padding:10px; cursor:grab; transition:.15s; }
         .kanban-card:hover { border-color:#cbd5e1; box-shadow:0 3px 10px rgba(0,0,0,.06); transform:translateY(-1px); }
         .kanban-card.dragging { opacity:.4; }
@@ -440,16 +464,59 @@ function carregarLS() {
 }
 
 // BOARD
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function getMesLabel(ds) {
+    if (!ds) return 'Sem data';
+    const d = new Date(ds + 'T12:00:00');
+    return MESES_PT[d.getMonth()] + ' ' + d.getFullYear();
+}
+
 function renderBoard() {
     ['pendente','andamento','concluido'].forEach(s=>{
-        const body=document.getElementById('body-'+s);
-        const cnt=document.getElementById('cnt-'+s);
-        const lista=cards.filter(c=>c.status===s);
-        cnt.textContent=lista.length;
-        body.innerHTML='';
-        if(!lista.length){body.innerHTML='<div style="padding:14px;text-align:center;color:var(--text-soft,#64748b);font-size:11px;opacity:.5">Vazio</div>';return;}
-        lista.forEach(c=>body.appendChild(buildCard(c)));
+        const body = document.getElementById('body-'+s);
+        const cnt  = document.getElementById('cnt-'+s);
+        const lista = cards.filter(c=>c.status===s);
+        cnt.textContent = lista.length;
+        body.innerHTML = '';
+
+        if (!lista.length) {
+            body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-soft,#64748b);font-size:11px;opacity:.5">Vazio</div>';
+            return;
+        }
+
+        // Separar: cards com data e sem data
+        const comData   = lista.filter(c => c.data).sort((a,b) => a.data.localeCompare(b.data));
+        const semData   = lista.filter(c => !c.data);
+
+        // Agrupar por mês
+        const grupos = {};
+        comData.forEach(c => {
+            const mes = getMesLabel(c.data);
+            if (!grupos[mes]) grupos[mes] = [];
+            grupos[mes].push(c);
+        });
+
+        // Renderizar grupos por mês
+        Object.entries(grupos).forEach(([mes, cardsDoMes]) => {
+            // Separador de mês
+            const sep = document.createElement('div');
+            sep.className = 'month-separator';
+            sep.innerHTML = `<span class="month-label">${mes}</span><span class="month-count">${cardsDoMes.length}</span>`;
+            body.appendChild(sep);
+            cardsDoMes.forEach(c => body.appendChild(buildCard(c)));
+        });
+
+        // Cards sem data no final
+        if (semData.length) {
+            const sep = document.createElement('div');
+            sep.className = 'month-separator';
+            sep.innerHTML = `<span class="month-label">Sem data</span><span class="month-count">${semData.length}</span>`;
+            body.appendChild(sep);
+            semData.forEach(c => body.appendChild(buildCard(c)));
+        }
     });
+    setTimeout(atualizarScrollIndicators, 50);
 }
 function buildCard(c){
     const div=document.createElement('div');
