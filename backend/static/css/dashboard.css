@@ -1055,5 +1055,33 @@ input, select, textarea,
 .actions-item-destaque { color: var(--green); font-weight: 600; }
 .actions-item-destaque:hover { background: var(--green-dim); }
 
+/* Toggle forma de pagamento */
+.pagamento-tipo-toggle {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+.tipo-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-hover);
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+}
+.tipo-btn.active {
+    background: var(--blue, #3b82f6);
+    color: #fff;
+    border-color: var(--blue, #3b82f6);
+}
+.tipo-btn:hover:not(.active) {
+    background: var(--bg-card, #1e1e2e);
+    color: var(--text-main);
+}
 
 

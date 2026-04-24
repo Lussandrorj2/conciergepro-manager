@@ -12,24 +12,17 @@
 
     const path = window.location.pathname;
 
-    // ── Extrai o hotel slug da URL ──
-    // URL: /ipanema/dashboard/reservas/ → slug = "ipanema"
     function getHotelSlug() {
         if (window.hotelSlug) return window.hotelSlug;
         const parts = path.split('/').filter(Boolean);
         return parts[0] || '';
     }
 
-    // ── Identifica a subpágina ativa ──
-    // /slug/dashboard/reservas/ → "reservas"
-    // /slug/dashboard/          → "" (dashboard raiz)
     function getActivePage() {
         const parts = path.split('/').filter(Boolean);
-        // parts[0] = slug, parts[1] = "dashboard", parts[2] = subpágina
         return parts[2] || '';
     }
 
-    // ── Itens do bottom nav ──
     const NAV_ITEMS = [
         { icon: '🏠', label: 'Dashboard', key: '',           sub: ''            },
         { icon: '📅', label: 'Reservas',  key: 'reservas',   sub: 'reservas/'   },
@@ -53,8 +46,8 @@
     }
 
     function init() {
-        // Não rodar em páginas sem sidebar (ex: login)
         if (!document.querySelector(".sidebar")) return;
+
         // 1. Backdrop
         if (!document.querySelector('.sidebar-backdrop')) {
             const backdrop = document.createElement('div');
@@ -65,7 +58,6 @@
 
         // 2. Hamburguer na topbar
         const topbar = document.querySelector('.topbar');
-        // DEPOIS
         const existingBtn = topbar?.querySelector('.hamburger-btn') || document.getElementById('hamburger-btn');
         if (topbar && !existingBtn) {
             const btn = document.createElement('button');
@@ -78,7 +70,6 @@
             existingBtn.addEventListener('click', toggleSidebar);
         }
 
-
         // 3. Bottom nav
         if (!document.querySelector('.bottom-nav')) {
             const nav = document.createElement('nav');
@@ -87,7 +78,33 @@
             document.body.appendChild(nav);
         }
 
+        // 4. Mostrar/ocultar botões desktop vs mobile na topbar
+        aplicarVisibilidadeTopbar();
+
         bindSidebarLinks();
+    }
+
+    /**
+     * Em desktop (>768px): esconde o menu ⋮ se existirem botões .desktop-only
+     * Em mobile: esconde botões .desktop-only, mantém o ⋮
+     */
+    function aplicarVisibilidadeTopbar() {
+        const desktopBtns = document.querySelectorAll('.desktop-only');
+        const actionsMenu = document.getElementById('actions-menu-wrap');
+
+        function atualizar() {
+            const mobile = isMobile();
+            desktopBtns.forEach(el => {
+                el.style.display = mobile ? 'none' : (el.dataset.display || 'flex');
+            });
+            // O menu ⋮ fica visível no mobile; no desktop, só se não houver botões diretos
+            if (actionsMenu) {
+                actionsMenu.style.display = (!mobile && desktopBtns.length) ? 'none' : '';
+            }
+        }
+
+        atualizar();
+        window.addEventListener('resize', atualizar);
     }
 
     function toggleSidebar() {
@@ -115,19 +132,18 @@
             });
         });
     }
-    
-        // ── Dropdown de ações da topbar ──
+
+    // ── Dropdown de ações da topbar (centralizado para todas as páginas) ──
     window.toggleActionsMenu = function () {
         document.getElementById('actions-dropdown')?.classList.toggle('open');
     };
-    
+
     document.addEventListener('click', function (e) {
         const wrap = document.getElementById('actions-menu-wrap');
         if (wrap && !wrap.contains(e.target)) {
             document.getElementById('actions-dropdown')?.classList.remove('open');
         }
     });
-
 
     // Fecha ao redimensionar para desktop
     let resizeTimer;
@@ -138,7 +154,7 @@
         }, 150);
     });
 
-    // Swipe para fechar (arrastar para esquerda com sidebar aberta)
+    // Swipe para fechar/abrir sidebar
     let touchStartX = 0;
     document.addEventListener('touchstart', e => {
         touchStartX = e.touches[0].clientX;
@@ -147,17 +163,14 @@
     document.addEventListener('touchend', e => {
         const dx      = e.changedTouches[0].clientX - touchStartX;
         const sidebar = document.querySelector('.sidebar');
-        // Fechar: swipe esquerda com sidebar aberta
         if (dx < -60 && sidebar?.classList.contains('open')) {
             closeSidebar();
         }
-        // Abrir: swipe direita começando na borda esquerda (<30px)
         if (dx > 60 && touchStartX < 30 && !sidebar?.classList.contains('open')) {
             openSidebar();
         }
     }, { passive: true });
 
-    // Init — aguarda DOM se necessário
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

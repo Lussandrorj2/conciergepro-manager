@@ -18,7 +18,7 @@
             <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
             <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/" class="active">📅 Reservas</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/" class="active">📅 Reservas Concierge</a>
             <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📌 Quadro</a>
@@ -80,7 +80,6 @@
                     <option value="">Todos os status</option>
                     <option value="pendente">Pendente</option>
                     <option value="confirmado">Confirmado</option>
-                    <option value="pago">Pago</option>
                     <option value="cancelado">Cancelado</option>
                 </select>
                 <select id="filtro-mes" onchange="renderTabela()">
@@ -242,10 +241,35 @@
                 <input type="date" id="pg-data" onchange="atualizarMesRefPg()"/>
                 <div id="mes-ref-badge-pg" class="mes-ref-badge"></div>
             </div>
+
             <hr class="divider"/>
-            <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
-            <div id="pix-list"></div>
-            <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
+            <p class="section-title">Forma de Pagamento</p>
+            <div class="pagamento-tipo-toggle">
+                <button type="button" id="pg-tipo-pix" class="tipo-btn active" onclick="setPgTipo('pix')">
+                    📲 PIX
+                </button>
+                <button type="button" id="pg-tipo-dinheiro" class="tipo-btn" onclick="setPgTipo('dinheiro')">
+                    💵 Dinheiro
+                </button>
+            </div>
+
+            <!-- PIX: seleção de recepcionistas -->
+            <div id="pg-pix-section">
+                <hr class="divider"/>
+                <p class="section-title">Distribuição PIX <span id="pg-total-label" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
+                <div id="pix-list"></div>
+                <button class="btn btn-ghost btn-sm" onclick="addPixRow()" style="margin-top:4px">➕ Adicionar recepcionista</button>
+            </div>
+
+            <!-- Dinheiro: campo simples -->
+            <div id="pg-dinheiro-section" style="display:none">
+                <hr class="divider"/>
+                <p class="section-title">Valor Recebido <span id="pg-total-label-din" style="color:var(--gold);font-size:13px;font-weight:700;"></span></p>
+                <div class="form-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="pg-dinheiro-valor" step="0.01" min="0" placeholder="0,00"/>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="fecharModal('modal-pagamento')">Cancelar</button>
@@ -573,8 +597,13 @@
         if (!r) return;
         document.getElementById('pg-id').value = id;
         document.getElementById('pg-data').value = new Date().toISOString().substring(0,10);
-        document.getElementById('pg-total-label').textContent = `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
+        const totalLabel = `— Total: R$ ${parseFloat(r.valor_bruto||0).toFixed(2).replace('.',',')}`;
+        document.getElementById('pg-total-label').textContent = totalLabel;
+        document.getElementById('pg-total-label-din').textContent = totalLabel;
+        document.getElementById('pg-dinheiro-valor').value = parseFloat(r.valor_bruto||0).toFixed(2);
         atualizarMesRefPg();
+        // Reset para PIX por padrão
+        setPgTipo('pix');
         const pixList = document.getElementById('pix-list');
         pixList.innerHTML = '';
         const nomes = recepcionistas.length ? recepcionistas : (r.recepcionista ? [r.recepcionista] : ['Recepção']);
@@ -610,10 +639,30 @@
         } else { badge.style.display = 'none'; }
     }
 
+    // ── Tipo de pagamento no modal de pagamento ──
+let pgTipoAtual = 'pix';
+
+function setPgTipo(tipo) {
+    pgTipoAtual = tipo;
+    document.getElementById('pg-tipo-pix').classList.toggle('active', tipo === 'pix');
+    document.getElementById('pg-tipo-dinheiro').classList.toggle('active', tipo === 'dinheiro');
+    document.getElementById('pg-pix-section').style.display    = tipo === 'pix'      ? '' : 'none';
+    document.getElementById('pg-dinheiro-section').style.display = tipo === 'dinheiro' ? '' : 'none';
+}
+
     async function confirmarPagamento() {
-        const id      = document.getElementById('pg-id').value;
-        const dataPag = document.getElementById('pg-data').value;
-        if (!dataPag) { alert('Informe a data de pagamento.'); return; }
+    const id      = document.getElementById('pg-id').value;
+    const dataPag = document.getElementById('pg-data').value;
+    if (!dataPag) { alert('Informe a data de pagamento.'); return; }
+
+    const payload = {
+        status: 'pago',
+        data_pagamento: dataPag,
+        mes_referencia: dataPag.substring(0, 7),
+        forma_pagamento: pgTipoAtual,  // 'pix' ou 'dinheiro'
+    };
+
+    if (pgTipoAtual === 'pix') {
         const pixRows = document.querySelectorAll('#pix-list .pix-row');
         const pixRecebimentos = {};
         pixRows.forEach(row => {
@@ -621,17 +670,25 @@
             const val  = parseFloat(row.querySelector('.pix-valor')?.value) || 0;
             if (nome) pixRecebimentos[nome] = val;
         });
-        try {
-            const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-                body: JSON.stringify({ status:'pago', data_pagamento:dataPag, mes_referencia:dataPag.substring(0,7), pix_recebimentos:JSON.stringify(pixRecebimentos) })
-            });
-            if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`); return; }
-            fecharModal('modal-pagamento');
-            await carregarReservas();
-        } catch(e) { console.error('[confirmarPagamento]', e); alert('Erro de conexão.'); }
+        payload.pix_recebimentos = JSON.stringify(pixRecebimentos);
+    } else {
+        // Dinheiro: salva como pix_recebimentos vazio ou apenas o valor total
+        const val = parseFloat(document.getElementById('pg-dinheiro-valor').value) || 0;
+        payload.valor_bruto = val > 0 ? val : undefined;
+        payload.pix_recebimentos = JSON.stringify({});
     }
+
+    try {
+        const res = await fetch(`${API_BASE}/${hotelSlug}/reservas/${id}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.erro || `Erro ${res.status} ao confirmar pagamento.`); return; }
+        fecharModal('modal-pagamento');
+        await carregarReservas();
+    } catch(e) { console.error('[confirmarPagamento]', e); alert('Erro de conexão.'); }
+}
 
     function confirmarDelete(id, nome) {
         deleteIdPendente = id;
