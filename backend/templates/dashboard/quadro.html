@@ -35,10 +35,9 @@
         .view-toggle { display:flex; gap:1px; background:var(--ios-border); border-radius:9px; padding:2px; }
         .view-btn { padding:5px 11px; border:none; background:none; border-radius:7px; font-size:12px; font-weight:500; cursor:pointer; color:var(--ios-soft); transition:.15s; white-space:nowrap; }
         .view-btn.active { background:var(--ios-card); color:var(--ios-text); box-shadow:0 1px 4px rgba(0,0,0,.1); }
-        .btn-add-card { display:flex; align-items:center; gap:4px; background:var(--ios-accent); color:#fff; border:none; padding:7px 12px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
         .hotel-badge { display:none; }
 
-        /* ── MAIN — usa a mesma var do dashboard.css ── */
+        /* ── MAIN ── */
         .main {
             flex: 1;
             display: flex;
@@ -80,7 +79,6 @@
             border-radius: 14px;
             overflow: hidden;
             scroll-snap-align: start;
-            /* Altura máxima da coluna — header fica fixo, body rola */
             max-height: 100%;
         }
         .board-col-header { display:flex; align-items:center; justify-content:space-between; padding:11px 13px 9px; border-bottom:1px solid var(--border,#e2e8f0); flex-shrink:0; }
@@ -98,15 +96,12 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            /* scrollbar fina e discreta */
             scrollbar-width: thin;
             scrollbar-color: var(--border,#e2e8f0) transparent;
         }
         .board-col-body::-webkit-scrollbar { width: 4px; }
         .board-col-body::-webkit-scrollbar-thumb { background: var(--border,#e2e8f0); border-radius: 4px; }
         .board-col-body::-webkit-scrollbar-thumb:hover { background: var(--border-light,#cbd5e1); }
-
-        /* Sombra que indica mais conteúdo abaixo */
         .board-col-body.has-scroll::after {
             content: '';
             position: sticky;
@@ -120,15 +115,12 @@
         }
         .board-col-body.drag-over { background:rgba(181,132,58,.05); outline:2px dashed rgba(181,132,58,.3); outline-offset:-4px; border-radius:8px; }
 
-        /* ── SELETOR DE MÊS NO BOARD ── */
         .board-month-bar {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 16px 0;
             flex-shrink: 0;
         }
-        .board-month-nav {
-            display: flex; align-items: center; gap: 8px;
-        }
+        .board-month-nav { display: flex; align-items: center; gap: 8px; }
         .btn-month-nav {
             background: var(--bg-hover,#f1f5f9); border: 1px solid var(--border,#e2e8f0);
             color: var(--text-soft,#94a3b8); width: 28px; height: 28px;
@@ -141,21 +133,13 @@
             font-size: 13px; font-weight: 700; color: var(--text-main,#1e293b);
             min-width: 130px; text-align: center;
         }
-        .board-month-dots {
-            display: flex; gap: 4px; align-items: center;
-        }
+        .board-month-dots { display: flex; gap: 4px; align-items: center; }
         .board-month-dot {
             width: 6px; height: 6px; border-radius: 50%;
             background: var(--border,#e2e8f0); cursor: pointer; transition: .15s;
         }
         .board-month-dot.active { background: var(--gold,#b5843a); transform: scale(1.3); }
         .board-month-dot:hover { background: var(--border-light,#cbd5e1); }
-        .board-month-total {
-            font-size: 11px; color: var(--text-soft,#94a3b8);
-            background: var(--bg-hover,#f1f5f9); border: 1px solid var(--border,#e2e8f0);
-            padding: 2px 8px; border-radius: 10px; font-weight: 600;
-        }
-        /* sem data badge */
         .board-semdata-badge {
             display: inline-flex; align-items: center; gap: 4px;
             background: var(--bg-hover,#f1f5f9); border: 1px solid var(--border,#e2e8f0);
@@ -165,17 +149,14 @@
         }
         .board-semdata-badge.active { background: var(--gold-dim,rgba(181,132,58,.1)); border-color: rgba(181,132,58,.3); color: var(--gold,#b5843a); }
 
-        /* ── SEPARADOR DE MÊS ── */
         .month-separator {
             display: flex; align-items: center; gap: 8px;
-            padding: 8px 4px 4px;
-            margin-top: 4px;
+            padding: 8px 4px 4px; margin-top: 4px;
         }
         .month-separator:first-child { margin-top: 0; padding-top: 4px; }
         .month-label {
             font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .5px; color: var(--text-soft,#94a3b8);
-            white-space: nowrap;
+            letter-spacing: .5px; color: var(--text-soft,#94a3b8); white-space: nowrap;
         }
         .month-count {
             font-size: 9px; font-weight: 700;
@@ -184,10 +165,7 @@
             color: var(--text-soft,#94a3b8);
             padding: 1px 5px; border-radius: 8px;
         }
-        .month-separator::after {
-            content: ''; flex: 1; height: 1px;
-            background: var(--border,#e2e8f0);
-        }
+        .month-separator::after { content: ''; flex: 1; height: 1px; background: var(--border,#e2e8f0); }
         .kanban-card { background:var(--bg-main,#f8fafc); border:1px solid var(--border,#e2e8f0); border-radius:10px; padding:10px; cursor:grab; transition:.15s; }
         .kanban-card:hover { border-color:#cbd5e1; box-shadow:0 3px 10px rgba(0,0,0,.06); transform:translateY(-1px); }
         .kanban-card.dragging { opacity:.4; }
@@ -233,7 +211,6 @@
         .cal-chip-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; pointer-events:none; }
         .cal-chips { pointer-events:none; }
 
-        /* Detalhe do dia */
         .cal-day-detail { background:var(--ios-card); border-top:1px solid var(--ios-border); flex:1; min-height:200px; }
         .cal-detail-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid var(--ios-border); }
         .cal-detail-title { font-size:14px; font-weight:600; color:var(--ios-text); }
@@ -248,7 +225,7 @@
         .cal-detail-arrow { color:#c7c7cc; font-size:16px; }
         .cal-detail-empty { text-align:center; padding:28px 16px; color:var(--ios-soft); font-size:13px; }
 
-        /* ════ MODAL (bottom sheet mobile) ════ */
+        /* ════ MODAL ════ */
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1000; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
         .modal-overlay.open { display:flex; }
         .modal { background:var(--ios-card); border-radius:20px 20px 0 0; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:env(safe-area-inset-bottom,16px); animation:slideUp .2s ease; }
@@ -279,7 +256,22 @@
         .btn-primary { background:var(--ios-accent); color:#fff; }
         .btn-danger { background:rgba(239,68,68,.1); color:#ef4444; }
 
-        /* mobile — dashboard.css já cuida do sidebar, só ajustamos o board/cal */
+        /* ── desktop-only: botões diretos na topbar ── */
+        .desktop-only { display: none; }
+
+        @media (min-width: 769px) {
+            .desktop-only { display: flex !important; }
+            /* esconde o três-pontos no desktop se já tem botões diretos */
+            .mobile-actions-only { display: none !important; }
+            .hotel-badge { display:flex !important; align-items:center; gap:6px; }
+            .modal-overlay { align-items:center; }
+            .modal { border-radius:16px; max-width:500px; }
+            .modal::before { display:none; }
+            .cal-day { min-height:90px; }
+            .board-col { flex: 0 0 300px; }
+            #view-board { max-height: calc(100vh - 52px); }
+        }
+
         @media (max-width:768px) {
             .main { margin-left: 0 !important; width: 100% !important; }
             .board-col { flex: 0 0 82vw; max-width: 310px; }
@@ -289,17 +281,6 @@
             .cal-day { min-height: 60px; padding: 3px 2px; }
             .cal-day-num { width: 22px; height: 22px; font-size: 11px; }
             .cal-chip { font-size: 8.5px; padding: 1px 3px; }
-        }
-
-        /* desktop overrides */
-        @media (min-width:769px) {
-            .hotel-badge { display:flex !important; align-items:center; gap:6px; }
-            .modal-overlay { align-items:center; }
-            .modal { border-radius:16px; max-width:500px; }
-            .modal::before { display:none; }
-            .cal-day { min-height:90px; }
-            .board-col { flex: 0 0 300px; }
-            #view-board { max-height: calc(100vh - 52px); }
         }
     </style>
 </head>
@@ -332,20 +313,41 @@
                 <span class="topbar-title">📌 Quadro</span>
             </div>
             <div class="topbar-right">
+                <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
+
+                <!-- View toggle: sempre visível -->
                 <div class="view-toggle">
                     <button class="view-btn active" id="btn-view-board" onclick="setView('board')">Board</button>
                     <button class="view-btn" id="btn-view-cal" onclick="setView('calendar')">Calendário</button>
                 </div>
-                <button class="btn-add-card" onclick="abrirModal()">＋ Card</button>
-                <button style="background:none;border:1px solid var(--ios-border);color:var(--ios-soft);padding:6px 11px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;" onclick="abrirModalTags()">🏷️ Tags</button>
-                <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
+
+                <!-- Botões desktop diretos -->
+                <button class="desktop-only btn-add-card-inline" onclick="abrirModal()" style="display:none;align-items:center;gap:4px;background:var(--ios-accent);color:#fff;border:none;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">＋ Card</button>
+                <button class="desktop-only btn-tags-inline" onclick="abrirModalTags()" style="display:none;background:none;border:1px solid var(--ios-border);color:var(--ios-soft);padding:6px 11px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;">🏷️ Tags</button>
+
+                <!-- Menu de ações mobile (três pontos) -->
+                <div class="topbar-actions-menu" id="actions-menu-wrap">
+                    <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <div class="topbar-actions-dropdown" id="actions-dropdown">
+                        <button class="actions-item actions-item-destaque" onclick="abrirModal(); toggleActionsMenu()">
+                            ＋ Card
+                        </button>
+                        <button class="actions-item" onclick="abrirModalTags(); toggleActionsMenu()">
+                            🏷️ Gerenciar Tags
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- BOARD -->
         <div id="view-board" style="display:flex;flex-direction:column;">
-
-            <!-- Barra de mês -->
             <div class="board-month-bar">
                 <div class="board-month-nav">
                     <button class="btn-month-nav" onclick="boardMoverMes(-1)">‹</button>
@@ -360,7 +362,6 @@
                 </div>
             </div>
 
-            <!-- Colunas -->
             <div class="board-cols-wrap">
             <div class="board-col">
                 <div class="board-col-header"><div class="board-col-title"><div class="col-dot" style="background:#ef4444"></div><span style="color:#ef4444">Pendente</span><span class="col-count" id="cnt-pendente">0</span></div><button class="btn-col-add" onclick="abrirModal('pendente')">＋</button></div>
@@ -374,8 +375,8 @@
                 <div class="board-col-header"><div class="board-col-title"><div class="col-dot" style="background:#10b981"></div><span style="color:#10b981">Concluído</span><span class="col-count" id="cnt-concluido">0</span></div><button class="btn-col-add" onclick="abrirModal('concluido')">＋</button></div>
                 <div class="board-col-body" id="body-concluido" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'concluido')"></div>
             </div>
-            </div><!-- /colunas -->
-        </div><!-- /view-board -->
+            </div>
+        </div>
 
         <!-- CALENDÁRIO iOS -->
         <div id="view-calendar">
@@ -467,8 +468,6 @@
     </div>
 </div>
 
-<!-- MODAL DELETE -->
-
 <div class="modal-overlay" id="modal-del">
     <div class="modal">
         <div class="modal-header"><h3>Excluir Card</h3><button class="modal-close" onclick="fecharModalDel()">✕</button></div>
@@ -519,7 +518,6 @@ function uid()  { return Date.now().toString(36)+Math.random().toString(36).slic
 function hoje() { return new Date().toISOString().slice(0,10); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// STORAGE
 function salvarLS() { try{localStorage.setItem(LS_KEY,JSON.stringify(cards));}catch(e){} }
 function carregarLS() {
     try{cards=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{cards=[];}
@@ -533,13 +531,8 @@ function carregarLS() {
     }
 }
 
-// BOARD
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-// Estado do filtro de mês do board
-let boardMeses    = [];   // lista de 'YYYY-MM' disponíveis
-let boardMesIdx   = 0;    // índice do mês atual
-let boardSemData  = false; // mostrar cards sem data
+let boardMeses=[], boardMesIdx=0, boardSemData=false;
 
 function getMesKey(ds)   { return ds ? ds.slice(0,7) : null; }
 function getMesLabel(mk) {
@@ -560,19 +553,13 @@ function boardMoverMes(dir) {
     renderBoard();
 }
 
-function boardToggleSemData() {
-    boardSemData = !boardSemData;
-    renderBoard();
-}
+function boardToggleSemData() { boardSemData = !boardSemData; renderBoard(); }
 
 function renderBoardMonthBar() {
     boardMeses = boardGetMeses();
-
-    // Se não existe mês atual salvo, vai para o mês corrente ou último disponível
     if (!boardSemData) {
         const hojeKey = new Date().toISOString().slice(0,7);
         const idxHoje = boardMeses.indexOf(hojeKey);
-        // Mantém índice válido
         boardMesIdx = Math.min(boardMesIdx, Math.max(0, boardMeses.length-1));
         if (boardMeses.length && boardMesIdx === 0 && idxHoje >= 0) boardMesIdx = idxHoje;
     }
@@ -583,7 +570,6 @@ function renderBoardMonthBar() {
     const labelEl = document.getElementById('board-mes-label');
     if (labelEl) labelEl.textContent = boardSemData ? '📌 Sem data' : label;
 
-    // Dots de navegação
     const dotsEl = document.getElementById('board-mes-dots');
     if (dotsEl) {
         dotsEl.innerHTML = boardMeses.map((mk, i) =>
@@ -591,7 +577,6 @@ function renderBoardMonthBar() {
         ).join('');
     }
 
-    // Badge sem data
     const semDataCards = cards.filter(c => !c.data);
     const btnSem = document.getElementById('board-semdata-btn');
     const cntSem = document.getElementById('board-semdata-cnt');
@@ -600,27 +585,20 @@ function renderBoardMonthBar() {
     if (btnSem) btnSem.style.display = semDataCards.length ? '' : 'none';
 }
 
-function boardIrMes(idx) {
-    boardSemData = false;
-    boardMesIdx  = idx;
-    renderBoard();
-}
+function boardIrMes(idx) { boardSemData = false; boardMesIdx = idx; renderBoard(); }
 
 function renderBoard() {
     boardMeses = boardGetMeses();
     renderBoardMonthBar();
-
     const mesAtual = boardSemData ? null : (boardMeses[boardMesIdx] || null);
 
     ['pendente','andamento','concluido'].forEach(s => {
         const body = document.getElementById('body-'+s);
         const cnt  = document.getElementById('cnt-'+s);
-        // Contagem total da coluna (todos os meses)
         const total = cards.filter(c => c.status === s).length;
         cnt.textContent = total;
         body.innerHTML  = '';
 
-        // Filtrar por mês selecionado
         let lista;
         if (boardSemData) {
             lista = cards.filter(c => c.status === s && !c.data);
@@ -637,13 +615,13 @@ function renderBoard() {
             return;
         }
 
-        // Ordenar por data
         lista.sort((a,b) => (a.data||'9999').localeCompare(b.data||'9999'));
         lista.forEach(c => body.appendChild(buildCard(c)));
     });
 
     setTimeout(atualizarScrollIndicators, 50);
 }
+
 function buildCard(c){
     const div=document.createElement('div');
     div.className='kanban-card';div.dataset.id=c.id;div.draggable=true;
@@ -659,6 +637,7 @@ function buildCard(c){
     h+=`<div class="card-footer">${dl}<div class="card-actions"><button class="btn-card-action" onclick="editarCard('${c.id}')">✏️</button><button class="btn-card-action del" onclick="confirmarDelete('${c.id}')">🗑️</button></div></div>`;
     div.innerHTML=h;return div;
 }
+
 function dragOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
 function dragLeave(e){e.currentTarget.classList.remove('drag-over');}
 function drop(e,s){
@@ -668,7 +647,6 @@ function drop(e,s){
     if(c){c.status=s;salvarLS();renderBoard();renderCalendar();}
 }
 
-// MODAL
 function abrirModal(status,dataPreset){
     editId=null;imgBase64=null;selectedTags=[];
     document.getElementById('modal-titulo').textContent='Novo Card';
@@ -682,6 +660,7 @@ function abrirModal(status,dataPreset){
     document.getElementById('modal-card').classList.add('open');
     setTimeout(()=>document.getElementById('card-titulo').focus(),150);
 }
+
 function editarCard(id){
     const c=cards.find(x=>x.id===id);if(!c)return;
     editId=id;imgBase64=c.img||null;selectedTags=[...(c.tags||[])];
@@ -696,6 +675,7 @@ function editarCard(id){
     renderTagsPicker();
     document.getElementById('modal-card').classList.add('open');
 }
+
 function fecharModal(){document.getElementById('modal-card').classList.remove('open');}
 function salvarCard(){
     const titulo=document.getElementById('card-titulo').value.trim();
@@ -706,6 +686,7 @@ function salvarCard(){
     salvarLS();renderBoard();renderCalendar();renderDetalhe(selectedDate);fecharModal();
     setTimeout(atualizarScrollIndicators, 50);
 }
+
 function renderTagsPicker(){
     document.getElementById('tags-picker').innerHTML=TAGS_DEF.map(t=>
         `<div class="tag-option ${selectedTags.includes(t.id)?'selected':''}" style="background:${t.bg};color:${t.color}" onclick="toggleTag('${t.id}',this)">${t.label}</div>`
@@ -721,13 +702,9 @@ function dzDragLeave(e){e.currentTarget.classList.remove('drag-over');}
 function dzDrop(e){e.preventDefault();e.currentTarget.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f?.type.startsWith('image/'))fileToBase64(f);}
 function fileToBase64(f){const r=new FileReader();r.onload=ev=>{imgBase64=ev.target.result;document.getElementById('img-preview-cont').innerHTML=`<div class="img-preview-wrap"><img src="${imgBase64}"><button class="btn-rm-img" onclick="removerImg()">✕</button></div>`;};r.readAsDataURL(f);}
 function removerImg(){imgBase64=null;document.getElementById('img-preview-cont').innerHTML='';}
-// ── GERENCIAR TAGS ──
-let editTagId = null;
 
-function abrirModalTags() {
-    renderTagsManager();
-    document.getElementById('modal-tags').classList.add('open');
-}
+let editTagId = null;
+function abrirModalTags() { renderTagsManager(); document.getElementById('modal-tags').classList.add('open'); }
 function fecharModalTags() { document.getElementById('modal-tags').classList.remove('open'); }
 
 function renderTagsManager() {
@@ -780,7 +757,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 function fecharModalEditTag() { document.getElementById('modal-edit-tag').classList.remove('open'); }
-
 function salvarTag() {
     const label = document.getElementById('edit-tag-label').value.trim();
     if (!label) { document.getElementById('edit-tag-label').focus(); return; }
@@ -820,7 +796,6 @@ function executarDelete(){
     salvarLS();renderBoard();renderCalendar();renderDetalhe(selectedDate);fecharModalDel();
 }
 
-// VIEWS
 function setView(v){
     currentView=v;
     document.getElementById('view-board').style.display=v==='board'?'flex':'none';
@@ -830,7 +805,6 @@ function setView(v){
     if(v==='calendar')renderCalendar();
 }
 
-// CALENDÁRIO iOS
 function calMover(dir){
     calMonth+=dir;
     if(calMonth>11){calMonth=0;calYear++;}
@@ -842,7 +816,6 @@ function renderCalendar(){
     document.getElementById('cal-mes-nome').textContent=MESES[calMonth];
     document.getElementById('cal-mes-ano').textContent=' '+calYear;
 
-    // labels
     const wl=document.getElementById('cal-wlabels');
     wl.innerHTML=DIAS.map((d,i)=>`<div class="cal-wlabel" style="${i===0?'color:var(--ios-red)':''}">${d}</div>`).join('');
 
@@ -902,10 +875,7 @@ function renderCalendar(){
                 cell.appendChild(chips);
             }
 
-            // click
             cell.addEventListener('click',()=>selecionarDia(ds));
-
-            // drag drop
             cell.addEventListener('dragover',e=>{e.preventDefault();cell.classList.add('drag-over');});
             cell.addEventListener('dragleave',()=>cell.classList.remove('drag-over'));
             cell.addEventListener('drop',e=>{
@@ -925,7 +895,6 @@ function renderCalendar(){
 
 function selecionarDia(ds){
     selectedDate=ds;
-    // atualizar selected visualmente
     document.querySelectorAll('.cal-day').forEach(el=>{
         el.classList.toggle('selected',el.dataset.date===ds&&!el.classList.contains('other-month'));
     });
@@ -963,7 +932,6 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();fecharModalDel();}});
 
-// ── DRAG TO SCROLL NO BOARD ──
 (function() {
     let isDown = false, startX, scrollLeft;
     document.addEventListener('DOMContentLoaded', () => {
@@ -971,7 +939,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();fecha
         if (!board) return;
 
         board.addEventListener('mousedown', e => {
-            if (e.target.closest('.kanban-card')) return; // não interfere no drag do card
+            if (e.target.closest('.kanban-card')) return;
             isDown = true;
             board.classList.add('dragging-scroll');
             startX = e.pageX - board.offsetLeft;
@@ -986,7 +954,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();fecha
             board.scrollLeft = scrollLeft - (x - startX) * 1.5;
         });
 
-        // touch swipe no board
         let touchStartX = 0, touchScrollLeft = 0;
         board.addEventListener('touchstart', e => {
             if (e.target.closest('.kanban-card')) return;
@@ -1008,7 +975,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderCalendar();
 });
 
-// Detecta scroll nas colunas e aplica sombra
 function atualizarScrollIndicators() {
     document.querySelectorAll('.board-col-body').forEach(body => {
         const temScroll = body.scrollHeight > body.clientHeight + 8;
@@ -1017,7 +983,6 @@ function atualizarScrollIndicators() {
     });
 }
 
-// Observer para redetectar quando cards são adicionados
 const resizeObs = new ResizeObserver(atualizarScrollIndicators);
 ['body-pendente','body-andamento','body-concluido'].forEach(id => {
     const el = document.getElementById(id);
