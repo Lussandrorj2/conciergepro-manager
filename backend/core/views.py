@@ -217,6 +217,10 @@ def dashboard_cambio(request, hotel_slug):
 def dashboard_quadro(request, hotel_slug):
     return render(request, 'dashboard/quadro.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
 
+@login_required
+def dashboard_hospedagem(request, hotel_slug):
+    return render(request, 'dashboard/hospedagem.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+
 # =========================
 
 # PASSEIOS CRUD (ADMIN)
