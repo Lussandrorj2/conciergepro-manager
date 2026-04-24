@@ -18,6 +18,9 @@
 
 #passeios.dragging { cursor: grabbing; }
 
+#passeios.dragging .card-passeio {
+    transition: none !important;
+}
 /* Track vira container relativo, sem flex */
 #passeios-track {
     display: block !important;
