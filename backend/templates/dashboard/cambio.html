@@ -1,147 +1,112 @@
+{% extends “base.html” %}
 {% load static %}
 
-<!DOCTYPE html>
+{% block title %}Câmbio{% endblock %}
 
-<html lang="pt-br">
+{% block topbar_title %}💵↔️💶 Câmbio{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <title>Câmbio — {{ hotel.nome }}</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+{# active_nav é passado pela view: context[‘active_nav’] = ‘cambio’ #}
 
-<body>
-<div class="layout">
+{% block content %}
 
+<!-- STATS MINI -->
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-    <div class="sidebar-logo">🔔 Concierge</div>
-    <nav>
-        <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-        <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-        <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
-        <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-        <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
-        <a href="/{{ hotel.slug }}/dashboard/cambio/" class="active">💱 Câmbio</a>
-        <a href="/{{ hotel.slug }}/dashboard/quadro/">📌 Quadro</a>
-        <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-        <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
-        <hr>
-        <a href="/logout/">↩ Sair</a>
-    </nav>
-</aside>
+<div class="stats-mini-row">
+    <div class="stat-mini">
+        <div class="stat-mini-label">Pago</div>
+        <div class="stat-mini-value red" id="total-pago">R$ 0,00</div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-label">Recebido</div>
+        <div class="stat-mini-value blue" id="total-recebido">R$ 0,00</div>
+    </div>
+    <div class="stat-mini">
+        <div class="stat-mini-label">Lucro período</div>
+        <div class="stat-mini-value green" id="total-lucro">R$ 0,00</div>
+    </div>
+</div>
 
-<!-- MAIN -->
-<main class="main">
+<!-- GRID CÂMBIO -->
 
-    <!-- TOPBAR -->
-    <div class="topbar">
-        <span class="topbar-title"> 	💵↔️💶 Câmbio</span>
-        <div class="hotel-badge">
-            <div class="hotel-dot"></div>
-            {{ hotel.nome }}
+<div class="cambio-grid">
+
+```
+<!-- FORMULÁRIO -->
+<div class="card-form">
+    <h3>Registrar Operação</h3>
+
+    <div class="moedas-rapidas">
+        <button class="moeda-chip active" data-moeda="USD">USD</button>
+        <button class="moeda-chip" data-moeda="EUR">EUR</button>
+        <button class="moeda-chip" data-moeda="GBP">GBP</button>
+    </div>
+
+    <label>Moeda</label>
+    <select id="moeda">
+        <option value="USD">USD — Dólar Americano</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="GBP">GBP — Libra Esterlina</option>
+    </select>
+
+    <label>Quantidade</label>
+    <input type="number" id="quantidade" placeholder="Ex: 200,00"
+           inputmode="decimal" min="0" step="any">
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Cotação Compra</label>
+            <input type="number" id="cotacao_compra" placeholder="R$ 0,00"
+                   inputmode="decimal" min="0" step="any">
+        </div>
+        <div class="form-group">
+            <label>Cotação Venda <span class="label-opcional">(opcional)</span></label>
+            <input type="number" id="cotacao_venda" placeholder="R$ 0,00"
+                   inputmode="decimal" min="0" step="any">
         </div>
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
+    <!-- Preview do lucro -->
+    <div class="fluxo-resumo" id="fluxo-resumo">
+        <div class="fluxo-linha">
+            <span>Valor pago ao hóspede</span>
+            <span id="f-pago">R$ —</span>
+        </div>
+        <div class="fluxo-linha" id="f-linha-recebido" style="display:none;">
+            <span>Valor de repasse</span>
+            <span id="f-recebido">R$ —</span>
+        </div>
+        <div class="fluxo-lucro" id="f-linha-lucro" style="display:none;">
+            <span>Lucro estimado</span>
+            <span id="f-lucro">R$ —</span>
+        </div>
+    </div>
 
-        <!-- STATS MINI -->
-        <div class="stats-mini-row">
-            <div class="stat-mini">
-                <div class="stat-mini-label">Pago</div>
-                <div class="stat-mini-value red" id="total-pago">R$ 0,00</div>
-            </div>
-            <div class="stat-mini">
-                <div class="stat-mini-label">Recebido</div>
-                <div class="stat-mini-value blue" id="total-recebido">R$ 0,00</div>
-            </div>
-            <div class="stat-mini">
-                <div class="stat-mini-label">Lucro período</div>
-                <div class="stat-mini-value green" id="total-lucro">R$ 0,00</div>
+    <button class="btn-registrar" id="btn-registrar" style="margin-top: 20px;">
+        💾 Registrar Operação
+    </button>
+</div>
+
+<!-- PAINEL DIREITO -->
+<div class="painel-direito">
+    <div class="tabela-container">
+        <div class="table-head">
+            <h2>Operações do período</h2>
+            <span id="count-registros" style="font-size:12px;color:var(--text-soft);">—</span>
+        </div>
+        <div class="tabela-scroll">
+            <div id="tabela-body">
+                <div class="loading">Carregando operações</div>
             </div>
         </div>
-
-        <!-- GRID CÂMBIO -->
-        <div class="cambio-grid">
-
-            <!-- FORMULÁRIO -->
-            <div class="card-form">
-                <h3>Registrar Operação</h3>
-
-                <div class="moedas-rapidas">
-                    <button class="moeda-chip active" data-moeda="USD">USD</button>
-                    <button class="moeda-chip" data-moeda="EUR">EUR</button>
-                    <button class="moeda-chip" data-moeda="GBP">GBP</button>
-                </div>
-
-                <label>Moeda</label>
-                <select id="moeda">
-                    <option value="USD">USD — Dólar Americano</option>
-                    <option value="EUR">EUR — Euro</option>
-                    <option value="GBP">GBP — Libra Esterlina</option>
-                </select>
-
-                <label>Quantidade</label>
-                <input type="number" id="quantidade" placeholder="Ex: 200,00" inputmode="decimal" min="0" step="any">
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Cotação Compra</label>
-                        <input type="number" id="cotacao_compra" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
-                    </div>
-                    <div class="form-group">
-                        <label>Cotação Venda <span class="label-opcional">(opcional)</span></label>
-                        <input type="number" id="cotacao_venda" placeholder="R$ 0,00" inputmode="decimal" min="0" step="any">
-                    </div>
-                </div>
-
-                <!-- Preview do lucro -->
-                <div class="fluxo-resumo" id="fluxo-resumo">
-                    <div class="fluxo-linha">
-                        <span>Valor pago ao hóspede</span>
-                        <span id="f-pago">R$ —</span>
-                    </div>
-                    <div class="fluxo-linha" id="f-linha-recebido" style="display:none;">
-                        <span>Valor de repasse</span>
-                        <span id="f-recebido">R$ —</span>
-                    </div>
-                    <div class="fluxo-lucro" id="f-linha-lucro" style="display:none;">
-                        <span>Lucro estimado</span>
-                        <span id="f-lucro">R$ —</span>
-                    </div>
-                </div>
-
-                <button class="btn-registrar" id="btn-registrar" style="margin-top: 20px;">
-                    💾 Registrar Operação
-                </button>
-            </div>
-
-            <!-- PAINEL DIREITO -->
-            <div class="painel-direito">
-                <div class="tabela-container">
-                    <div class="table-head">
-                        <h2>Operações do período</h2>
-                        <span id="count-registros" style="font-size:12px;color:var(--text-soft);">—</span>
-                    </div>
-                    <div class="tabela-scroll">
-                        <div id="tabela-body">
-                            <div class="loading">Carregando operações</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /cambio-grid -->
-
-    </div><!-- /content -->
-</main>
-
-
+    </div>
 </div>
+```
+
+</div><!-- /cambio-grid -->
+
+{% endblock %}
+
+{% block modals %}
 
 <!-- MODAL EDIÇÃO -->
 
@@ -183,9 +148,11 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_head %}
 
 <style>
-    /* ── IMPEDE scroll lateral na página toda ── */
     html, body {
         overflow-x: hidden;
     }
@@ -194,21 +161,18 @@
         max-width: 100%;
     }
 
-    /* ── Scroll horizontal APENAS dentro da tabela ── */
+    /* Scroll horizontal apenas dentro da tabela */
     .tabela-scroll {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         width: 100%;
     }
-    .tabela-scroll table {
-        min-width: 900px;
-    }
+    .tabela-scroll table { min-width: 900px; }
     .tabela-scroll::-webkit-scrollbar { height: 6px; }
     .tabela-scroll::-webkit-scrollbar-track { background: var(--bg-hover); }
     .tabela-scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 999px; }
     .tabela-scroll::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-    /* ── Badge de margem ── */
     .margem-badge {
         display: inline-block;
         padding: 2px 8px;
@@ -225,7 +189,6 @@
         color: #f87171;
     }
 
-    /* ── Mobile: form e tabela em coluna ── */
     @media (max-width: 1024px) {
         .cambio-grid {
             display: flex !important;
@@ -235,12 +198,15 @@
     }
 </style>
 
+{% endblock %}
+
+{% block extra_scripts %}
 
 <script>
-    const hotelSlug = "{{ hotel.slug }}";
-    const API = `/api/admin/${hotelSlug}/cambio/`;
+    // ── Endpoint desta página ─────────────────────
+    const API = `${window.API_BASE}/cambio/`;
 
-    // Chips de moeda
+    // ── Chips de moeda ────────────────────────────
     document.querySelectorAll('.moeda-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.moeda-chip').forEach(c => c.classList.remove('active'));
@@ -249,7 +215,7 @@
         });
     });
 
-    // Preview do fluxo — cotacao_venda é opcional
+    // ── Preview do fluxo ─────────────────────────
     function atualizarFluxo() {
         const qty    = parseFloat(document.getElementById('quantidade').value) || 0;
         const compra = parseFloat(document.getElementById('cotacao_compra').value) || 0;
@@ -277,16 +243,11 @@
         }
     }
 
-    ['quantidade', 'cotacao_compra', 'cotacao_venda'].forEach(id => {
-        document.getElementById(id).addEventListener('input', atualizarFluxo);
-    });
+    ['quantidade', 'cotacao_compra', 'cotacao_venda'].forEach(id =>
+        document.getElementById(id).addEventListener('input', atualizarFluxo)
+    );
 
-    // Formatar BRL
-    function brl(v) {
-        return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    // Registrar operação — apenas moeda, quantidade e cotacao_compra são obrigatórios
+    // ── Registrar operação ────────────────────────
     document.getElementById('btn-registrar').addEventListener('click', async () => {
         const moeda  = document.getElementById('moeda').value;
         const qty    = parseFloat(document.getElementById('quantidade').value);
@@ -299,12 +260,8 @@
         if (venda) payload.cotacao_venda = venda;
 
         try {
-            const r = await fetch(API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
-                body: JSON.stringify(payload)
-            });
-            if (!r.ok) throw new Error();
+            // usa apiFetch() do base.html — CSRF e JSON automáticos
+            await apiFetch('/cambio/', { method: 'POST', body: payload });
             toast('Operação registrada!');
             document.getElementById('quantidade').value     = '';
             document.getElementById('cotacao_compra').value = '';
@@ -314,12 +271,10 @@
         } catch { toast('Erro ao registrar.', true); }
     });
 
-    // Carregar tabela
+    // ── Carregar tabela ───────────────────────────
     async function carregarOperacoes() {
         try {
-            const r    = await fetch(API);
-            const data = await r.json();
-            const ops  = Array.isArray(data) ? data : (data.results || []);
+            const ops = await apiFetch('/cambio/').then(d => Array.isArray(d) ? d : (d.results || []));
 
             let totalPago = 0, totalRecebido = 0;
             ops.forEach(op => {
@@ -327,9 +282,9 @@
                 totalRecebido += parseFloat(op.valor_recebido || (op.cotacao_venda ? op.quantidade * op.cotacao_venda : 0) || 0);
             });
 
-            document.getElementById('total-pago').textContent     = brl(totalPago);
-            document.getElementById('total-recebido').textContent = brl(totalRecebido);
-            document.getElementById('total-lucro').textContent    = brl(totalRecebido - totalPago);
+            document.getElementById('total-pago').textContent      = brl(totalPago);
+            document.getElementById('total-recebido').textContent  = brl(totalRecebido);
+            document.getElementById('total-lucro').textContent     = brl(totalRecebido - totalPago);
             document.getElementById('count-registros').textContent = `${ops.length} registro(s)`;
 
             const body = document.getElementById('tabela-body');
@@ -343,18 +298,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Moeda</th>
-                            <th>Data</th>
-                            <th>Hora</th>
-                            <th>Quantidade</th>
-                            <th>Cotação Compra</th>
-                            <th>Cotação Venda</th>
-                            <th>Valor Pago</th>
-                            <th>Valor Recebido</th>
-                            <th>Lucro</th>
-                            <th>Margem</th>
-                            <th>Ações</th>
+                            <th>#</th><th>Moeda</th><th>Data</th><th>Hora</th>
+                            <th>Quantidade</th><th>Cotação Compra</th><th>Cotação Venda</th>
+                            <th>Valor Pago</th><th>Valor Recebido</th><th>Lucro</th>
+                            <th>Margem</th><th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -364,17 +311,14 @@
                             const lucro    = recebido - pago;
                             const temVenda = op.cotacao_venda && parseFloat(op.cotacao_venda) > 0;
                             const margem   = temVenda && pago > 0 ? ((lucro / pago) * 100).toFixed(1) + '%' : '—';
-                            const dtObj    = op.data ? new Date(op.data) : null;
-                            const dataFmt  = dtObj ? dtObj.toLocaleDateString('pt-BR') : '—';
-                            const horaFmt  = dtObj ? dtObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '—';
                             const lucroColor = lucro > 0 ? 'var(--green)' : lucro < 0 ? '#f87171' : 'var(--text-soft)';
                             const opJson   = encodeURIComponent(JSON.stringify(op));
                             return `<tr>
                                 <td style="color:var(--text-soft);font-size:11px;">${ops.length - idx}</td>
                                 <td><span class="badge badge-confirmado">${op.moeda}</span></td>
-                                <td style="white-space:nowrap;">${dataFmt}</td>
-                                <td style="color:var(--text-soft);font-size:11px;white-space:nowrap;">${horaFmt}</td>
-                                <td style="font-weight:600;">${Number(op.quantidade).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                                <td style="white-space:nowrap;">${fmtData(op.data)}</td>
+                                <td style="color:var(--text-soft);font-size:11px;white-space:nowrap;">${fmtHora(op.data)}</td>
+                                <td style="font-weight:600;">${Number(op.quantidade).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
                                 <td>${brl(op.cotacao_compra)}</td>
                                 <td>${temVenda ? brl(op.cotacao_venda) : '<span style="color:var(--text-soft)">—</span>'}</td>
                                 <td style="color:#f87171;font-weight:600;">${brl(pago)}</td>
@@ -401,7 +345,7 @@
         }
     }
 
-    // Edição
+    // ── Edição ────────────────────────────────────
     function abrirEdicao(jsonStr) {
         const op = JSON.parse(jsonStr);
         document.getElementById('edit-id').value         = op.id;
@@ -425,54 +369,28 @@
 
         if (!qty || !compra) return toast('Preencha Quantidade e Cotação Compra.', true);
 
-        const payload = { moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda };
-
         try {
-            const r = await fetch(`${API}${id}/`, {
+            await apiFetch(`/cambio/${id}/`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
-                body: JSON.stringify(payload)
+                body: { moeda, quantidade: qty, cotacao_compra: compra, cotacao_venda: venda },
             });
-            if (!r.ok) throw new Error();
             fecharModal();
             toast('Operação atualizada!');
             carregarOperacoes();
         } catch { toast('Erro ao salvar.', true); }
     }
 
-    // Excluir
+    // ── Excluir ───────────────────────────────────
     async function excluir(id) {
-        if (!confirm('Excluir esta operação?')) return;
+        if (!await confirmar('Excluir esta operação?')) return;
         try {
-            const r = await fetch(`${API}${id}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': getCsrf() }
-            });
-            if (!r.ok) throw new Error();
+            await apiFetch(`/cambio/${id}/`, { method: 'DELETE' });
             toast('Operação excluída.');
             carregarOperacoes();
         } catch { toast('Erro ao excluir.', true); }
     }
 
-    // Toast
-    function toast(msg, erro = false) {
-        const t = document.createElement('div');
-        t.className = 'toast' + (erro ? ' error' : '');
-        t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    }
-
-    // CSRF
-    function getCsrf() {
-        return document.cookie.split(';').map(c => c.trim())
-            .find(c => c.startsWith('csrftoken='))?.split('=')[1] || '';
-    }
-
     carregarOperacoes();
 </script>
 
-<script src="{% static 'js/mobile-menu.js' %}"></script>
-
-</body>
-</html>
+{% endblock %}
