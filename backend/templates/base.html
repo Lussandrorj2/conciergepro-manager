@@ -1,0 +1,202 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>{% block title %}Concierge{% endblock %} — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+<div class="layout">
+
+```
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo">🔔 Concierge</div>
+    <nav>
+        <a href="/{{ hotel.slug }}/dashboard/"
+           {% if active_nav == 'dashboard' %}class="active"{% endif %}>
+            🏠 Dashboard
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/criar/"
+           {% if active_nav == 'criar' %}class="active"{% endif %}>
+            ➕ Criar Passeio
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/listar/"
+           {% if active_nav == 'listar' %}class="active"{% endif %}>
+            📋 Gerenciar
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/reservas/"
+           {% if active_nav == 'reservas' %}class="active"{% endif %}>
+            📅 Reservas Concierge
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/hospedagem/"
+           {% if active_nav == 'hospedagem' %}class="active"{% endif %}>
+            🏨 Hospedagem
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/cambio/"
+           {% if active_nav == 'cambio' %}class="active"{% endif %}>
+            💱 Câmbio
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/quadro/"
+           {% if active_nav == 'quadro' %}class="active"{% endif %}>
+            📌 Quadro
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/relatorios/"
+           {% if active_nav == 'relatorios' %}class="active"{% endif %}>
+            📊 Relatórios
+        </a>
+        <a href="/{{ hotel.slug }}/dashboard/configuracoes/"
+           {% if active_nav == 'configuracoes' %}class="active"{% endif %}>
+            ⚙️ Config
+        </a>
+        <hr>
+        <a href="/logout/">↩ Sair</a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <span class="topbar-title">{% block topbar_title %}{% endblock %}</span>
+        <div class="hotel-badge">
+            <div class="hotel-dot"></div>
+            {{ hotel.nome }}
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+</main>
+```
+
+</div>
+
+{% block modals %}{% endblock %}
+
+<!-- ═══════════════════════════════════════════
+     GLOBALS — dados e utilitários disponíveis
+     em qualquer template que herde base.html
+     ═══════════════════════════════════════════ -->
+
+<script>
+    // ── Dados globais do hotel ──────────────────
+    window.HOTEL = {
+        slug: "{{ hotel.slug }}",
+        nome: "{{ hotel.nome }}",
+        id:   {{ hotel.id|default:"null" }},
+    };
+
+    // Atalho conveniente para o slug (retrocompatibilidade)
+    const hotelSlug = window.HOTEL.slug;
+
+    // ── URLs base da API ────────────────────────
+    window.API_BASE = `/api/admin/${hotelSlug}`;
+
+    // ── CSRF token ──────────────────────────────
+    function getCsrf() {
+        // 1. tenta o cookie (fallback universal)
+        const fromCookie = document.cookie
+            .split(';')
+            .map(c => c.trim())
+            .find(c => c.startsWith('csrftoken='))
+            ?.split('=')[1] || '';
+        if (fromCookie) return fromCookie;
+
+        // 2. tenta a meta tag (adicione <meta name="csrf-token"> se quiser)
+        return document.querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') || '';
+    }
+
+    // ── Fetch com CSRF e JSON automático ────────
+    /**
+     * apiFetch(path, options)
+     *   path    → relativo a API_BASE, ex: '/cambio/' ou '/cambio/5/'
+     *   options → igual ao fetch nativo; body pode ser objeto (será serializado)
+     */
+    async function apiFetch(path, options = {}) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrf(),
+            ...(options.headers || {}),
+        };
+        if (options.body && typeof options.body === 'object') {
+            options.body = JSON.stringify(options.body);
+        }
+        const res = await fetch(`${window.API_BASE}${path}`, { ...options, headers });
+        if (!res.ok) {
+            const err = new Error(`HTTP ${res.status}`);
+            err.response = res;
+            throw err;
+        }
+        // DELETE retorna 204 sem body
+        if (res.status === 204) return null;
+        return res.json();
+    }
+
+    // ── Toast global ────────────────────────────
+    /**
+     * toast(mensagem, isErro = false, duracao = 3000)
+     */
+    function toast(msg, erro = false, duracao = 3000) {
+        const t = document.createElement('div');
+        t.className = 'toast' + (erro ? ' error' : '');
+        t.textContent = msg;
+        document.body.appendChild(t);
+        // força reflow para a animação funcionar
+        void t.offsetWidth;
+        t.classList.add('show');
+        setTimeout(() => {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 300);
+        }, duracao);
+    }
+
+    // ── Formatação de moeda BRL ──────────────────
+    function brl(v) {
+        return 'R$ ' + Number(v).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+    }
+
+    // ── Formatação de data / hora ────────────────
+    function fmtData(isoString) {
+        if (!isoString) return '—';
+        return new Date(isoString).toLocaleDateString('pt-BR');
+    }
+    function fmtHora(isoString) {
+        if (!isoString) return '—';
+        return new Date(isoString).toLocaleTimeString('pt-BR', {
+            hour: '2-digit', minute: '2-digit',
+        });
+    }
+
+    // ── Confirmação async (substitui confirm()) ──
+    /**
+     * Retorna Promise<boolean> — aguarda o clique do usuário.
+     * Cria um diálogo leve inline; pode ser substituído por modal real.
+     */
+    function confirmar(msg) {
+        return new Promise(resolve => resolve(window.confirm(msg)));
+    }
+</script>
+
+{% block extra_scripts %}{% endblock %}
+
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+
+</body>
+</html>
