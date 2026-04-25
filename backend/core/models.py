@@ -335,6 +335,7 @@ class ConfiguracaoDivisao(models.Model):
     hotel                = models.OneToOneField(Hotel, on_delete=models.CASCADE, related_name='divisao')
     percentual_hotel     = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     nomes_recepcionistas = models.TextField(blank=True, default='')
+    pcts_json            = models.TextField(blank=True, default='[]')  # ← ADICIONE ESTA LINHA
     atualizado_em        = models.DateTimeField(auto_now=True)
 
     def get_nomes(self):
@@ -348,8 +349,20 @@ class ConfiguracaoDivisao(models.Model):
         import json
         self.nomes_recepcionistas = json.dumps(lista)
 
+    def get_pcts(self):          # ← ADICIONE ESTE MÉTODO
+        import json
+        try:
+            return json.loads(self.pcts_json)
+        except Exception:
+            return []
+
+    def set_pcts(self, lista):   # ← ADICIONE ESTE MÉTODO
+        import json
+        self.pcts_json = json.dumps(lista)
+
     def __str__(self):
         return f"Divisão — {self.hotel.nome}"
+
 
 
 # ==========================================

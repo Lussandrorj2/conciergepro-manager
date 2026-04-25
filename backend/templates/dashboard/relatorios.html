@@ -237,15 +237,14 @@
     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
         <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" >🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/quadro/">📌 Quadro</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/" class="active">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
             <hr>
             <a href="/logout/">↩ Sair</a>
         </nav>
@@ -349,8 +348,15 @@
                     <div class="panel-body"><div id="ranking-rec-grid" class="ranking-simples"><div class="loading">Carregando...</div></div></div>
                 </div>
                 <div class="panel">
-                    <div class="panel-header"><span class="panel-title">🏆 Ranking de Passeios</span><span class="panel-badge" id="badge-ranking">—</span></div>
-                    <div id="tabela-ranking"><div class="loading" style="padding:20px">Carregando...</div></div>
+                    <div class="panel-header">
+                        <span class="panel-title">🏆 Ranking de Passeios</span>
+                        <span class="panel-badge" id="badge-ranking">—</span>
+                    </div>
+                    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                        <div id="tabela-ranking">
+                            <div class="loading" style="padding:20px">Carregando...</div>
+                        </div>
+                    </div>
                 </div>
 
             </div><!-- /tab-relatorios -->
@@ -511,7 +517,7 @@ const CORES = ['#10b981','#38bdf8','#f59e0b','#c9a96e','#ef4444','#06b6d4','#84c
 
 let todasReservas=[], dadosMensal=[], dadosPasseios=[];
 let totalComissao=0, totalCambio=0, totalCompra=0, totalRepasse=0, totalPix=0;
-let pixPorRec={}, adiantamentos=[], adiantCount=0, nomesDiv=[], cambioPorMoeda={}, totalTxCambio=0;
+let pixPorRec={}, adiantamentos=[], adiantCount=0, nomesDiv=[], pctsDiv = [], cambioPorMoeda={}, totalTxCambio=0;
 let chartMensal, chartPasseios, _adDados=null;
 
 // ── ABAS ──
@@ -571,26 +577,39 @@ async function carregarDivisaoAba() {
     renderDivisao();
 }
 
+// DEPOIS — variável separada pctsDiv
+
 async function carregarDivisao() {
     try {
         const res = await fetch(`/api/admin/${hotelSlug}/divisao/`);
         const d   = await res.json();
         nomesDiv  = d.nomes || [];
-        // pcts salvas
-        nomesDiv._pcts = d.pcts || [];
+        pctsDiv   = d.pcts  || [];
+
+        document.getElementById('num-rec').value = nomesDiv.length || 1;
+        
+        // Gera campos ANTES de preencher
         const n = nomesDiv.length || 1;
-        document.getElementById('num-rec').value = n;
-        gerarCampos();
-        const inputs    = document.querySelectorAll('.rec-nome-input');
-        const pctInputs = document.querySelectorAll('.rec-pct-input');
-        nomesDiv.forEach((nome,i) => {
-            if (inputs[i])    inputs[i].value    = nome;
-            if (pctInputs[i] && nomesDiv._pcts[i]) pctInputs[i].value = nomesDiv._pcts[i];
-        });
+        const container = document.getElementById('campos-recs');
+        container.innerHTML = Array.from({length: n}, (_, i) => `
+            <div class="campo-rec">
+                <label>Recepcionista ${i+1}</label>
+                <input type="text" class="rec-nome-input" placeholder="Nome" 
+                       value="${nomesDiv[i] || ''}" oninput="renderDivisao()">
+                <div class="rec-pct-wrap">
+                    <input type="number" class="rec-pct-input" placeholder="100" min="0" max="100" step="1"
+                           value="${pctsDiv[i] != null ? pctsDiv[i] : ''}" 
+                           oninput="atualizarBarraPct();renderDivisao()">
+                    <span class="pct-symbol">%</span>
+                </div>
+                <span style="font-size:10px;color:var(--text-soft);margin-top:2px;">vazio ou 100 = mês completo</span>
+            </div>`).join('');
+
         if (nomesDiv.length) document.getElementById('salvo-badge').style.display = 'inline';
         atualizarBarraPct();
-    } catch { nomesDiv=[]; gerarCampos(); }
+    } catch { nomesDiv = []; pctsDiv = []; gerarCampos(); }
 }
+
 
 async function carregarReservas() {
     try {
@@ -866,8 +885,18 @@ async function salvarAdiantamentos(){
 async function salvarDivisao(){
     const nomes=[...document.querySelectorAll('.rec-nome-input')].map(i=>i.value.trim()||'Recepcionista');
     const pcts=getPcts();
-    try{const res=await fetch(`/api/admin/${hotelSlug}/divisao/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nomes,pcts})});const d=await res.json();if(d.erro)throw new Error(d.erro);nomesDiv=nomes;document.getElementById('salvo-badge').style.display='inline';toast('✔ Configuração salva!','ok');renderDivisao();}catch(e){toast('Erro: '+e.message,'err');}
+    try{
+        const res=await fetch(`/api/admin/${hotelSlug}/divisao/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nomes,pcts})});
+        const d=await res.json();
+        if(d.erro)throw new Error(d.erro);
+        nomesDiv=nomes;
+        pctsDiv=pcts; // ← atualiza pctsDiv em memória após salvar
+        document.getElementById('salvo-badge').style.display='inline';
+        toast('✔ Configuração salva!','ok');
+        renderDivisao();
+    }catch(e){toast('Erro: '+e.message,'err');}
 }
+
 
 // ── ABA ADIANTAMENTOS (histórico) ──
 async function carregarPaginaAdiantamentos(){
@@ -892,7 +921,7 @@ async function carregarPaginaAdiantamentos(){
 
     // Usa pcts salvas ou divide igualmente
     const n=nomesDiv.length||1;
-    const pctsSalvas=nomesDiv._pcts||[];
+    const pctsSalvas = pctsDiv || [];
     const algumPct=pctsSalvas.some(p=>p&&parseFloat(p)>0);
     const pctPadrao=100/n;
     const parteComissao=(nome,i)=>{

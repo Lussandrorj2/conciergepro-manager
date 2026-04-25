@@ -32,15 +32,14 @@
     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
         <nav>
-            <a href="/{{ hotel.slug }}/dashboard/" class="active">🏠 Dashboard</a>
-            <a href="/{{ hotel.slug }}/dashboard/criar/">➕ Criar Passeio</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">📋 Gerenciar</a>
+            <a href="/{{ hotel.slug }}/dashboard/"class="active">🏠 Início</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
             <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/quadro/">📌 Quadro</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Config</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
             <hr>
             <a href="/logout/">↩ Sair</a>
         </nav>
@@ -236,7 +235,7 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 /* ════════════════════════
    TAREFAS DE HOJE — lê do Quadro
 ════════════════════════ */
-const QUADRO_KEY = `quadro_v2_${hotelSlug}`;
+const QUADRO_KEY = `quadro_v3_${hotelSlug}`;
 
 const TAGS_LABEL = { urgente:'Urgente', financeiro:'Financeiro', passeio:'Passeio', hotel:'Hotel', cliente:'Cliente', mkt:'Marketing' };
 const TAGS_BG    = { urgente:'rgba(239,68,68,.15)', financeiro:'rgba(16,185,129,.15)', passeio:'rgba(99,102,241,.15)', hotel:'rgba(245,158,11,.15)', cliente:'rgba(236,72,153,.15)', mkt:'rgba(6,182,212,.15)' };

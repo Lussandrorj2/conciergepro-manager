@@ -1,6 +1,12 @@
 // ==========================================
 // CONFIG GLOBAL
 // ==========================================
+// Adicione essa função auxiliar no topo do arquivo
+function debounce(fn, ms) {
+    var t;
+    return function() { clearTimeout(t); t = setTimeout(fn, ms); };
+}
+
 function getImageUrl(img) {
     if (!img) return '';
     if (typeof img === 'string') return img;
@@ -174,7 +180,8 @@ function coverflowAtualizar() {
         var absD = Math.abs(diff);
         card.classList.toggle('coverflow-active', diff === 0);
     
-        var cardW   = card.offsetWidth || coverflowGetCardWidth();
+        var cardW = coverflowGetCardWidth();
+
         var baseX   = -(cardW / 2);
         var offsetX = diff * cardW * 0.90;
         var rotY    = diff < 0 ? cfg.rotateY : (diff > 0 ? -cfg.rotateY : 0);
@@ -204,12 +211,6 @@ function coverflowAtualizar() {
             'scale('      + scale  + ')'
         ].join(' ');
     });
-
-    var activeCard = cards[carrIndex];
-    if (activeCard) {
-        var h = activeCard.offsetHeight;
-        if (h > 0) track.style.height = (h + 40) + 'px';
-    }
 
     if (btnPrev) btnPrev.disabled = false; // nunca desabilita
     if (btnNext) btnNext.disabled = false; // nunca desabilita
@@ -284,7 +285,9 @@ function initCarrosselDrag() {
         }
     }, true);
 
-    window.addEventListener('resize', function() { coverflowAtualizar(); });
+    window.addEventListener('resize', debounce(function() { 
+        coverflowAtualizar(); 
+    }, 120));
 }
 
 document.addEventListener('keydown', function(e) {

@@ -753,25 +753,29 @@ def api_divisao(request, hotel_slug):
     if request.method == "GET":
         try:
             cfg = hotel.divisao
-            return JsonResponse({"percentual_hotel": str(cfg.percentual_hotel), "nomes": cfg.get_nomes()})
+            return JsonResponse({
+                "nomes": cfg.get_nomes(),
+                "pcts":  cfg.get_pcts(),
+            })
         except Exception:
-            return JsonResponse({"percentual_hotel": "0", "nomes": []})
+            return JsonResponse({"nomes": [], "pcts": []})
 
     if request.method == "POST":
         try:
-            body      = json.loads(request.body)
-            pct_hotel = float(body.get("percentual_hotel", 0))
-            nomes     = body.get("nomes", [])
-            cfg, _    = ConfiguracaoDivisao.objects.get_or_create(hotel=hotel)
-            cfg.percentual_hotel = pct_hotel
+            body  = json.loads(request.body)
+            nomes = body.get("nomes", [])
+            pcts  = body.get("pcts", [])
+            cfg, _ = ConfiguracaoDivisao.objects.get_or_create(hotel=hotel)
             cfg.set_nomes(nomes)
+            cfg.set_pcts(pcts)
             cfg.save()
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
-    
+
     return JsonResponse({"erro": "Método inválido"}, status=405)
+
 
 
 # =========================
