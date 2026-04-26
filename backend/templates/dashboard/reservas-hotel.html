@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <title>Hospedagem — {{ hotel.nome }}</title>
+    <title>Reservas Hotel — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -187,7 +187,6 @@
         .hosp-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .hosp-modal-grid .full { grid-column: 1 / -1; }
 
-        /* Toggle pago no modal */
         .pago-toggle-wrap {
             display: flex; align-items: center; gap: 10px;
             background: var(--bg-hover); border: 2px solid var(--border);
@@ -222,7 +221,6 @@
         .detail-row-label { color: var(--text-soft); }
         .detail-row-val { font-weight: 500; color: var(--text-main); text-align: right; }
 
-        /* Botão pagamento no detalhe */
         .btn-pag-detalhe {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700;
@@ -234,7 +232,6 @@
         .btn-pag-detalhe.sim { background: rgba(22,163,74,.1); border-color: rgba(22,163,74,.25); color: #15803d; }
         .btn-pag-detalhe.sim:hover { background: rgba(22,163,74,.16); }
 
-        /* ── STATUS QUICK ── */
         .status-quick-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
         .btn-status-quick {
             padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
@@ -242,7 +239,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* ── NOTAS ── */
         .notas-wrap textarea {
             width: 100%; min-height: 70px; background: var(--bg-hover);
             border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -251,7 +247,6 @@
         }
         .notas-wrap textarea:focus { border-color: var(--gold); }
 
-        /* ── MOBILE ── */
         @media (max-width: 768px) {
             .hosp-kpis { grid-template-columns: repeat(4, 1fr); gap: 8px; }
             .hosp-kpi-num { font-size: 18px; }
@@ -302,7 +297,8 @@
             <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" >🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/" class="active">🛏️ Reservas Hotel</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
@@ -322,7 +318,7 @@
                         <line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
-                <span class="topbar-title">🏨 Hospedagem</span>
+                <span class="topbar-title">🛏️ Reservas Hotel</span>
             </div>
             <div class="topbar-right">
                 <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
@@ -349,7 +345,6 @@
             <div class="hosp-kpis" id="kpis-wrap"></div>
             <div class="hosp-tabs" id="tabs-wrap"></div>
 
-            <!-- FILTROS -->
             <div class="hosp-filters">
                 <div class="hosp-search">
                     <span class="hosp-search-icon">🔍</span>
@@ -368,7 +363,6 @@
                 <button class="btn-clear-filters" onclick="limparFiltros()">✕ Limpar</button>
             </div>
 
-            <!-- LISTA -->
             <div class="hosp-list-wrap">
                 <div class="hosp-list-head">
                     <span>Nº Reserva</span>
@@ -439,7 +433,6 @@
                     <label>Nº de Hóspedes</label>
                     <input type="number" id="res-qtd" value="1" min="1">
                 </div>
-                <!-- PAGAMENTO -->
                 <div class="form-group full">
                     <label>Pagamento</label>
                     <div class="pago-toggle-wrap" id="pago-toggle-wrap" onclick="togglePagoModal()">
@@ -531,7 +524,6 @@
 const HOTEL_SLUG = "{{ hotel.slug }}";
 const LS_KEY = `hosp_reservas_${HOTEL_SLUG}`;
 
-// ── STATUS (sem a_confirmar) ──
 const STATUS_DEF = {
     confirmada: { label:'Confirmada',   emoji:'✅', cls:'s-confirmada', cor:'#15803d', bg:'rgba(22,163,74,.1)' },
     pendente:   { label:'Pendente',     emoji:'🟡', cls:'s-pendente',   cor:'#d97706', bg:'rgba(245,158,11,.1)' },
@@ -551,11 +543,10 @@ const TABS = [
 
 let reservas  = [];
 let abaAtiva  = 'todas';
-let filtroPag = null; // null | 'pago' | 'nao'
+let filtroPag = null;
 let deleteId  = null;
 let detalheId = null;
 
-// ── UTILS ──
 function uid() { return 'R' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase(); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtDate(ds) {
@@ -567,17 +558,13 @@ function calcNoites(ci, co) {
     return Math.max(0, Math.round((new Date(co) - new Date(ci)) / 86400000));
 }
 
-// ── STORAGE ──
 function salvarLS() { try { localStorage.setItem(LS_KEY, JSON.stringify(reservas)); } catch(e) {} }
 function carregarLS() {
     try { reservas = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { reservas = []; }
-    // migração: garante campo pago em registros antigos + remove status a_confirmar
     reservas.forEach(r => {
         if (r.pago === undefined) r.pago = false;
         if (r.status === 'a_confirmar') r.status = 'pendente';
     });
-
-    // ── Dados de exemplo APENAS na primeira vez (nunca após o usuário deletar) ──
     const jaInicializado = localStorage.getItem(LS_KEY + '_init');
     if (!jaInicializado) {
         reservas = [
@@ -592,7 +579,6 @@ function carregarLS() {
     }
 }
 
-// ── KPIs ──
 function renderKPIs() {
     const el = document.getElementById('kpis-wrap');
     const counts = { todas: reservas.length };
@@ -624,7 +610,6 @@ function renderKPIs() {
         </div>`;
 }
 
-// ── TABS ──
 function renderTabs() {
     const counts = { todas: reservas.length };
     Object.keys(STATUS_DEF).forEach(k => counts[k] = 0);
@@ -635,11 +620,10 @@ function renderTabs() {
         </button>`).join('');
 }
 
-// ── LISTA ──
 function renderLista(lista) {
     const el = document.getElementById('hosp-list-body');
     if (!lista.length) {
-        el.innerHTML = `<div class="hosp-empty"><span class="hosp-empty-icon">🏨</span>Nenhuma reserva encontrada.</div>`;
+        el.innerHTML = `<div class="hosp-empty"><span class="hosp-empty-icon">🛏️</span>Nenhuma reserva encontrada.</div>`;
         return;
     }
     el.innerHTML = lista.map(r => {
@@ -674,7 +658,6 @@ function renderLista(lista) {
     }).join('');
 }
 
-// ── TOGGLE PAGO NA LINHA ──
 function togglePagoLista(id) {
     const r = reservas.find(x => x.id === id);
     if (!r) return;
@@ -682,7 +665,6 @@ function togglePagoLista(id) {
     salvarLS(); render();
 }
 
-// ── FILTRO PAGAMENTO ──
 function toggleFiltroPag(val) {
     filtroPag = (filtroPag === val) ? null : val;
     document.getElementById('btn-f-pago')?.classList.toggle('active-pago', filtroPag === 'pago');
@@ -730,7 +712,6 @@ function setAba(key) {
 }
 function render() { renderKPIs(); renderTabs(); aplicarFiltros(); }
 
-// ── TOGGLE PAGO MODAL ──
 function setPagoModal(pago) {
     document.getElementById('res-pago').value = pago ? '1' : '0';
     const wrap  = document.getElementById('pago-toggle-wrap');
@@ -744,7 +725,6 @@ function togglePagoModal() {
     setPagoModal(document.getElementById('res-pago').value !== '1');
 }
 
-// ── TOGGLE PAGO DETALHE ──
 function atualizarBtnPagDetalhe(pago) {
     const btn = document.getElementById('btn-pag-detalhe');
     if (!btn) return;
@@ -761,7 +741,6 @@ function togglePagoDetalhe() {
     render();
 }
 
-// ── MODAL NOVA / EDITAR ──
 function abrirModalNova() {
     document.getElementById('modal-res-titulo').textContent = 'Nova Reserva';
     ['res-id','res-num','res-nome','res-tel','res-email','res-checkin','res-checkout','res-quarto','res-obs']
@@ -821,7 +800,6 @@ function salvarReserva() {
     salvarLS(); fecharModal('modal-reserva'); render();
 }
 
-// ── DETALHE ──
 function abrirDetalhe(id) {
     const r = reservas.find(x => x.id === id);
     if (!r) return;
@@ -863,7 +841,6 @@ function trocarStatus(id, novoStatus) {
     salvarLS(); fecharModal('modal-detalhe'); render();
 }
 
-// ── EXCLUIR ──
 function iniciarExcluir(id)  { deleteId = id; abrirModal('modal-excluir'); }
 function confirmarExcluir()  { deleteId = detalheId; fecharModal('modal-detalhe'); abrirModal('modal-excluir'); }
 function executarExcluir() {
@@ -873,7 +850,6 @@ function executarExcluir() {
     deleteId = null; render();
 }
 
-// ── MODAIS ──
 function abrirModal(id)  { document.getElementById(id)?.classList.add('open'); document.body.style.overflow = 'hidden'; }
 function fecharModal(id) { document.getElementById(id)?.classList.remove('open'); document.body.style.overflow = ''; }
 
