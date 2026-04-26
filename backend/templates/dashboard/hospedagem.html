@@ -235,10 +235,12 @@
             font-size:13px; transition:all .15s; flex-shrink:0; color:transparent;
         }
         .btn-saiu:hover { border-color:#15803d; background:rgba(22,163,74,.1); }
-        .btn-saiu.saiu { background:rgba(22,163,74,.12); border-color:#15803d; color:#15803d; }
-        tr.row-saiu td { opacity:.5; text-decoration:line-through; }
-        tr.row-saiu .btn-saiu { opacity:1 !important; text-decoration:none !important; }
-        tr.row-saiu td:last-child { opacity:1; text-decoration:none; }
+        .btn-saiu.saiu { background:rgba(220,38,38,.1); border-color:#dc2626; color:#dc2626; }
+        tr.row-saiu td { opacity:.65; text-decoration:line-through; text-decoration-color:#dc2626; color:#dc2626 !important; }
+        tr.row-saiu td input, tr.row-saiu td select { color:#dc2626 !important; text-decoration:line-through; text-decoration-color:#dc2626; }
+        tr.row-saiu .btn-saiu { opacity:1 !important; text-decoration:none !important; color:#15803d !important; }
+        tr.row-saiu td.td-chk, tr.row-saiu td.td-del { opacity:1; text-decoration:none; }
+        tr.row-saiu { background:rgba(220,38,38,.04) !important; }
 
         /* ── PREVISÃO — layout melhorado ── */
         .prev-section-title {
@@ -522,7 +524,7 @@
             <!-- ABAS -->
             <div class="tabs-nav">
                 <button class="tab-btn active"  data-tab="checkout"    onclick="setTab('checkout')">🚪 Check-outs <span class="tbadge" id="tb-co">0</span></button>
-                <button class="tab-btn"          data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
+                <button class="tab-btn"          data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã</button>
                 <button class="tab-btn"          data-tab="especiais"  onclick="setTab('especiais')">⭐ Especiais na Casa <span class="tbadge" id="tb-esp">0</span></button>
                 <button class="tab-btn"          data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
                 <button class="tab-btn"          data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
@@ -564,7 +566,7 @@
             <div class="tab-pane" id="pane-previsao">
                 <div class="panel">
                     <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-purple"></div> Previsão Geral — Amanhã</div>
+                        <div class="panel-title"><div class="dot dot-purple"></div> Previsão — Amanhã</div>
                         <span id="lbl-prev-data" style="font-size:11px;color:var(--text-soft)">—</span>
                     </div>
                     <!-- Ocupação + UHs + Entradas + Saídas -->
@@ -622,28 +624,7 @@
                         <span style="font-size:11px;color:#d97706">hóspedes esperados</span>
                     </div>
                 </div>
-                <!-- Check-outs amanhã -->
-                <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-purple"></div> Check-outs Previstos — Amanhã</div>
-                        <span class="pbadge pb-purple" id="b-prev">0</span>
-                    </div>
-                    <div class="ed-wrap"><table class="ed-t">
-                        <thead><tr class="head-purple">
-                            <th class="td-del"></th><th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
-                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
-                            <th style="min-width:180px">Nome do Hóspede</th>
-                            <th>Observação / LCO / Reentrada</th>
-                        </tr></thead>
-                        <tbody id="tbody-prev"></tbody>
-                    </table></div>
-                    <div class="tfoot">
-                        <span class="itag xt-lco">🕐 LCO</span>
-                        <span class="itag xt-reent">🔄 Reentrada</span>
-                        <button class="btn-paste" onclick="abrirColar('prev')">📋 Colar lista</button>
-                        <button class="btn-add" onclick="addRow('prev')">＋ Linha</button>
-                    </div>
-                </div>
+
 
                 <!-- ══ RESERVAS ESPECIAIS — CHECK-INS PREVISTOS ══ -->
                 <div class="panel">
@@ -989,7 +970,6 @@ const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 
 // ══ ESTADO ══
 let co      = [];
-let prev    = [];
 let esp     = [];   // especiais na casa (persistem entre auditorias)
 let espCi   = [];   // especiais de check-ins previstos
 let ci      = [];
@@ -1054,14 +1034,11 @@ function renderCo(){
     renderCoTable(co,'tbody-co','co');
     syncKpisCo();
 }
-function renderPrev(){
-    renderCoTable(prev,'tbody-prev','prev');
-    g('b-prev').textContent = g('tb-prev').textContent = prev.length;
-}
+
 function renderCoTable(arr,tbodyId,key){
     const tbody=g(tbodyId);
     const isCo = (key==='co'); // só checkout de hoje tem coluna "Saiu"
-    const cols  = isCo ? 8 : 7;
+    const cols  = isCo ? 8 : 5;
     if(!arr.length){
         tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhum registro — clique em 📋 Colar lista ou ＋ Linha</td></tr>`;
         return;
@@ -1073,34 +1050,60 @@ function renderCoTable(arr,tbodyId,key){
         let tags='';
         if(/lco|late/i.test(r.obs))       tags+='<span class="itag xt-lco">🕐 LCO</span> ';
         if(/reentrada|reent/i.test(r.obs)) tags+='<span class="itag xt-reent">🔄</span> ';
-        const saiuCol = isCo ? `<td class="td-saiu">
-            <button class="btn-saiu ${r.saiu?'saiu':''}"
-                onclick="toggleSaiu('${key}',${i})"
-                title="${r.saiu?'Desmarcar saída':'Marcar como saiu'}">✓</button>
-        </td>` : '';
-        return `<tr class="${cls}" data-key="${key}" data-i="${i}">
-            <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
-            ${saiuCol}
-            <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
-            <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
-            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
-                oninput="setF('${key}',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
-            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
-                oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
-            <td>
-                <div class="obs-wrap">
-                    ${tags}
-                    <input class="obs-input-field"
-                        value="${esc(r.obs)}"
-                        placeholder="LCO / Reentrada no SUP / observação…"
-                        data-key="${key}" data-i="${i}"
-                        onblur="commitObs(this)"
-                        onkeydown="if(event.key==='Enter'){this.blur();}">
-                    <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
-                </div>
-            </td>
-        </tr>`;
+
+        if(isCo){
+            // CHECK-OUTS DO DIA — com Saiu, PRE, TRIP
+            const saiuCol = `<td class="td-saiu">
+                <button class="btn-saiu ${r.saiu?'saiu':''}"
+                    onclick="toggleSaiu('${key}',${i})"
+                    title="${r.saiu?'Desmarcar saída':'Marcar como saiu'}">✓</button>
+            </td>`;
+            return `<tr class="${cls}" data-key="${key}" data-i="${i}">
+                <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
+                ${saiuCol}
+                <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
+                <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
+                <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
+                    oninput="setF('${key}',${i},'uh',this.value)"></td>
+                <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
+                    oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
+                <td>
+                    <div class="obs-wrap">
+                        ${tags}
+                        <input class="obs-input-field"
+                            value="${esc(r.obs)}"
+                            placeholder="LCO / Reentrada no SUP / observação…"
+                            data-key="${key}" data-i="${i}"
+                            onblur="commitObs(this)"
+                            onkeydown="if(event.key==='Enter'){this.blur();}">
+                        <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
+                    </div>
+                </td>
+            </tr>`;
+        } else {
+            // CHECK-OUTS PREVISTOS — sem Saiu, sem PRE/TRIP, só consulta+edição
+            return `<tr class="${cls}" data-key="${key}" data-i="${i}">
+                <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
+                <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
+                    oninput="setF('${key}',${i},'uh',this.value)"></td>
+                <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
+                    oninput="setF('${key}',${i},'nome',this.value)" style="min-width:170px"></td>
+                <td>
+                    <div class="obs-wrap">
+                        ${tags}
+                        <input class="obs-input-field"
+                            value="${esc(r.obs)}"
+                            placeholder="LCO / Reentrada no SUP / observação…"
+                            data-key="${key}" data-i="${i}"
+                            onblur="commitObs(this)"
+                            onkeydown="if(event.key==='Enter'){this.blur();}">
+                        <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
+                    </div>
+                </td>
+            </tr>`;
+        }
     }).join('');
 }
 
@@ -1205,7 +1208,7 @@ function renderOcorr(){
 function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); }
 function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
 
-function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderEspCi(); renderCi(); renderOcorr(); }
+function renderTudo(){ renderCo(); renderEsp(); renderEspCi(); renderCi(); renderOcorr(); }
 
 // ══ HELPERS ══
 function ctOpts(sel) {
@@ -1213,12 +1216,11 @@ function ctOpts(sel) {
     const padrao = sel || cats[0] || 'SUP';
     return cats.map(o => `<option ${padrao === o ? 'selected' : ''}>${o}</option>`).join('');
 }
-function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
+function getData(k){ return k==='co'?co:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
 function setF(k,i,f,v){ getData(k)[i][f]=v; }
 function addRow(k){
     const def = {
         co:   {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
-        prev: {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
         esp:  {uh:'',ct:'SUP',reserva:'',checkin:'',checkout:'',descricao:'',tipo:'long_stay'},
         ci:     {reserva:'',nome:'',uh:'',ct:'SUP',obs:''},
         'esp-ci': {ct:'SUP',reserva:'',in:'',out:'',descricao:'',uh:'',tipo:'long_stay',c:false,m:false,e:false},
@@ -1237,7 +1239,7 @@ function delRow(k,i){
     re(k);
 }
 function re(k){
-    ({co:renderCo,prev:renderPrev,esp:renderEsp,'esp-ci':renderEspCi,ci:renderCi}[k]||renderCi)();
+    ({co:renderCo,esp:renderEsp,'esp-ci':renderEspCi,ci:renderCi}[k]||renderCi)();
 }
 
 // ══ TAG MENU ══
@@ -1275,11 +1277,10 @@ function tagMenu(k,i,btn){
 let colarKey='co';
 const HINTS={
     co:   '<strong>Check-outs do dia.</strong> Cole do Oracle — qualquer formato:<br>• <code>21  SUP  Manuel,Rui</code> (tudo junto)<br>• <code>Manuel,Rui</code> (só nome)<br>• Ou cole <strong>cada coluna separada</strong>: primeiro UH, depois CTG, depois Nome',
-    prev: '<strong>Check-outs previstos amanhã.</strong> Cole do Oracle — qualquer formato:<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code><br>• Ou cole cada coluna separada: UH, CTG, Nome',
     'esp-ci': '<strong>Reservas Especiais — Check-ins Previstos.</strong> Cole da planilha ou Oracle.<br>Exemplo: <code>SUP  334532990  26/04/2026  27/04/2026  Almeida,Luis - 1 de 3</code>',
     ci:   '<strong>Check-ins pendentes.</strong> Cole do Oracle ou planilha.<br>• <code>336271347  Ramos,Maria Luiza</code><br>• <code>Ramos,Maria Luiza</code>',
 };
-const TITULOS={co:'📋 Colar — Check-outs do Dia',prev:'📋 Colar — Check-outs Amanhã',ci:'📋 Colar — Check-ins Pendentes'};
+const TITULOS={co:'📋 Colar — Check-outs do Dia',ci:'📋 Colar — Check-ins Pendentes'};
 
 function abrirColar(k){
     colarKey = k;
@@ -1437,7 +1438,7 @@ function novaAuditoria(){
     if(co.length+prev.length+ci.length>0){
         if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
     }
-    co=[]; prev=[]; espCi=[]; ci=[]; ocorr=[];
+    co=[]; espCi=[]; ci=[]; ocorr=[];
     ['t-turno','t-ocup','t-dm','prev-ocup','prev-diaria','prev-uh','prev-ent','prev-sai','prev-cafe'].forEach(id=>{const el=g(id);if(el)el.value='';});
     limparValoresCats();
     g('t-data').value=new Date().toISOString().split('T')[0];
@@ -1457,7 +1458,6 @@ function salvar(){
         prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
         cats_vals: lerValoresCats(),
         co:JSON.parse(JSON.stringify(co)),
-        prev:JSON.parse(JSON.stringify(prev)),
         espCi:JSON.parse(JSON.stringify(espCi)),
         ci:JSON.parse(JSON.stringify(ci)),
         ocorr:[...ocorr],
@@ -1538,20 +1538,7 @@ function gerarPDF(){
     });
     y = doc.lastAutoTable.finalY + 6;
 
-    // ── CHECK-OUTS AMANHÃ ──
-    if(prev.length){
-        secao(`CHECK-OUTS PREVISTOS AMANHÃ (${prev.length})`, roxo);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Nome do Hóspede','Observação']],
-            body:prev.map(r=>[r.uh,r.ct,r.nome,r.obs]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[248,245,255]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:60},3:{cellWidth:80}},
-        });
-        y = doc.lastAutoTable.finalY + 6;
-    }
+
 
     // ── RESERVAS ESPECIAIS ──
     if(esp.length){
@@ -1626,8 +1613,6 @@ function exportarTxt(){
     txt+=`  Entradas por CTG: ${lerValoresCats().map(cv=>cv.cat+' '+cv.val).join(' | ')}\n\n`;
     txt+=`── CHECK-OUTS DO DIA (${co.length}) ──\n`;
     co.forEach(r=>{ const f=[/lco|late/i.test(r.obs)?'LCO':'',/reentrada/i.test(r.obs)?'REENTRADA':'',r.pre?'PRE':'',r.trip?'TRIP':''].filter(Boolean).join('|'); txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}${f?' ('+f+')':''}\n`; });
-    txt+=`\n── CHECK-OUTS PREVISTOS AMANHÃ (${prev.length}) ──\n`;
-    prev.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`);
     txt+=`\n── RESERVAS ESPECIAIS NA CASA (${esp.length}) ──\n`;
     esp.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.reserva} | ${r.checkin}→${r.checkout} | ${r.descricao} | ${r.tipo||''}\n`);
     txt+=`\n── CHECK-INS PENDENTES (${ci.length}) ──\n`;
@@ -1650,7 +1635,7 @@ function renderHist(){
             <span style="font-size:18px">📋</span>
             <div>
                 <div class="hist-nome">${h.turno||'Auditoria'}</div>
-                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | Prev: ${(h.prev||[]).length} | CI: ${(h.ci||[]).length}</div>
+                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
             <div style="text-align:right">
                 <div class="hist-ocup">${h.ocupacao||'—'}</div>
@@ -1662,7 +1647,6 @@ function carregarHist(i){
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
     const h=hist[i]; if(!h)return;
     co    = h.co    ?JSON.parse(JSON.stringify(h.co))    :[];
-    prev  = h.prev  ?JSON.parse(JSON.stringify(h.prev))  :[];
     espCi = h.espCi ?JSON.parse(JSON.stringify(h.espCi)) :[];
     ci    = h.ci    ?JSON.parse(JSON.stringify(h.ci))    :[];
     ocorr = h.ocorr ?[...h.ocorr]:[];
