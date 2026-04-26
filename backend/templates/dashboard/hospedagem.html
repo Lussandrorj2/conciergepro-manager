@@ -1247,8 +1247,9 @@ function delRow(k,i){
     re(k);
 }
 function re(k){
-    ({co:renderCo,prev:renderPrev,esp:renderEsp,ci:renderCi}[k]||renderCi)();
+    ({co:renderCo,prev:renderPrev,esp:renderEsp,ci:renderCi,'esp-ci':renderEspCi}[k]||renderCi)();
 }
+
 
 // ══ TAG MENU ══
 function tagMenu(k,i,btn){
