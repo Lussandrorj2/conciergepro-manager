@@ -1084,7 +1084,7 @@ function renderCoTable(arr,tbodyId,key){
             <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
             <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
                 oninput="setF('${key}',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td>${ctInput(r.ct, key, i)}</td>
             <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
                 oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
             <td>
@@ -1162,7 +1162,10 @@ function renderEsp(){
             return `<tr>
                 <td class="td-del"><button class="btn-del" onclick="delRow('esp',${i})">✕</button></td>
                 <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="esp[${i}].uh=this.value;salvarEsp()"></td>
-                <td><select class="es" onchange="esp[${i}].ct=this.value;salvarEsp()">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei ei-ct" list="dl-cats-esp-${i}" value="${esc(r.ct)}" placeholder="CTG"
+                    oninput="esp[${i}].ct=this.value.toUpperCase();this.value=this.value.toUpperCase();salvarEsp()"
+                    style="width:60px;text-transform:uppercase">
+                <datalist id="dl-cats-esp-${i}">${getCats().map(c=>`<option value="${c}">`).join('')}</datalist></td>
                 <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="esp[${i}].reserva=this.value;salvarEsp()"></td>
                 <td><input class="ei ei-date" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkin=this.value;salvarEsp()"></td>
                 <td><input class="ei ei-date" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkout=this.value;salvarEsp()">${diasRestantes}</td>
@@ -1187,7 +1190,7 @@ function renderCi(){
             <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Nº Reserva" oninput="setF('ci',${i},'reserva',this.value)"></td>
             <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome" oninput="setF('ci',${i},'nome',this.value)" style="min-width:150px"></td>
             <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('ci',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setF('ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td>${ctInput(r.ct, 'ci', i)}</td>
             <td><input class="ei" value="${esc(r.obs)}" placeholder="Observação" oninput="setF('ci',${i},'obs',this.value)" style="min-width:120px"></td>
         </tr>`).join('');
     }
@@ -1207,11 +1210,19 @@ function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
 function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderCi(); renderOcorr(); }
 
 // ══ HELPERS ══
-function ctOpts(sel) {
+// CTG como input livre com datalist (autocomplete)
+function ctInput(val, key, i) {
     const cats = getCats();
-    const padrao = sel || cats[0] || 'SUP';
-    return cats.map(o => `<option ${padrao === o ? 'selected' : ''}>${o}</option>`).join('');
+    const listId = `dl-cats-${key}-${i}`;
+    return `<input class="ei ei-ct"
+        list="${listId}"
+        value="${esc(val || cats[0] || '')}"
+        placeholder="CTG"
+        oninput="setF('${key}',${i},'ct',this.value.toUpperCase());this.value=this.value.toUpperCase()"
+        style="width:60px;text-transform:uppercase"
+    ><datalist id="${listId}">${cats.map(c=>`<option value="${c}">`).join('')}</datalist>`;
 }
+
 function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
 function setF(k,i,f,v){ getData(k)[i][f]=v; }
 function addRow(k){
@@ -2074,14 +2085,6 @@ function renderCatGrid() {
     renderCatOpts();
 }
 
-function renderCatOpts() {
-    // Atualiza todos os selects de categoria nas tabelas existentes
-    document.querySelectorAll('select.es[data-cat-sel]').forEach(sel => {
-        const atual = sel.value;
-        sel.innerHTML = ctOpts(atual);
-    });
-}
-
 function renderCats() {
     renderCatTags();
     renderCatGrid();
@@ -2106,10 +2109,6 @@ function adicionarCategoria() {
     input.value = '';
     renderCats();
     // Atualiza selects nas tabelas
-    document.querySelectorAll('select.es').forEach(sel => {
-        const atual = sel.value;
-        sel.innerHTML = ctOpts(atual);
-    });
     toast(`✅ Categoria ${val} adicionada!`);
 }
 
@@ -2119,10 +2118,6 @@ function removerCategoria(cat) {
     const novas = cats.filter(c => c !== cat);
     salvarCats(novas);
     renderCats();
-    document.querySelectorAll('select.es').forEach(sel => {
-        if (sel.value === cat) sel.value = novas[0];
-        sel.innerHTML = ctOpts(sel.value);
-    });
     toast(`🗑️ Categoria ${cat} removida`);
 }
 
@@ -2485,7 +2480,7 @@ function renderEspCi() {
     } else {
         tbody.innerHTML = espCi.map((r,i) => `<tr>
             <td class="td-del"><button class="btn-del" onclick="delRow('esp-ci',${i})">✕</button></td>
-            <td><select class="es" onchange="setF('esp-ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td>${ctInput(r.ct, 'esp-ci', i)}</td>
             <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setF('esp-ci',${i},'reserva',this.value)"></td>
             <td><input class="ei" style="width:88px" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'in',this.value)"></td>
             <td><input class="ei" style="width:88px" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'out',this.value)"></td>
