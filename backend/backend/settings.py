@@ -123,3 +123,5 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 # -----------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL          = '/login/'
+
+GROQ_API_KEY = 'gsk_sua_chave_aqui'  # console.groq.com
