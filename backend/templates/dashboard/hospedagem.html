@@ -164,8 +164,8 @@
         .btn-cancel{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
 
         /* ── ESTATÍSTICAS ── */
-        .stats-top { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px; }
-        .stat-box { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;border-top:3px solid transparent;text-align:center; }
+        .stats-top{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+        .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;border-top:3px solid transparent;text-align:center}
         .stat-box.s-green{border-top-color:#15803d}.stat-box.s-blue{border-top-color:#2563eb}
         .stat-box.s-purple{border-top-color:#7c3aed}.stat-box.s-gold{border-top-color:var(--gold)}
         .stat-box-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:6px}
@@ -173,6 +173,16 @@
         .stat-box-sub{font-size:10px;color:var(--text-soft);margin-top:4px}
         .stat-box-trend{font-size:11px;font-weight:700;margin-top:4px}
         .trend-up{color:#15803d}.trend-down{color:#dc2626}.trend-eq{color:var(--text-soft)}
+        /* charts */
+        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:start}
+        .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;min-width:0}
+        .chart-panel.full{grid-column:1/-1}
+        .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .chart-panel-title{font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
+        .chart-panel-body{padding:12px;overflow:hidden}
+        .chart-canvas-wrap{position:relative;height:200px;width:100%}
+        .chart-canvas-wrap canvas{display:block;width:100%!important;height:100%!important}
+        .chart-canvas-wrap.tall{height:250px}
 
 
 
@@ -200,7 +210,7 @@
         .badge-comp{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700}
         .bc-up{background:rgba(22,163,74,.1);color:#15803d}.bc-down{background:rgba(220,38,38,.1);color:#dc2626}.bc-eq{background:var(--bg-hover);color:var(--text-soft)}
 
-        @media(max-width:900px){.stats-top{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.chart-panel.full{grid-column:1}}
+        @media(max-width:900px){.stats-top{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr!important}.chart-panel.full{grid-column:1!important}}
         @media(max-width:768px){.stats-top{grid-template-columns:1fr 1fr}}
 
         /* ── OBS INPUT — sem re-render ao digitar, não trava ── */
@@ -416,43 +426,6 @@
         /* ── BADGE TIPO COMPACTO ── */
         .tipo-badge { display:inline-block;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap; }
 
-
-        /* ══ CHARTS — definição única e limpa ══ */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-            align-items: start;
-        }
-        .chart-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            min-width: 0;
-            box-sizing: border-box;
-        }
-        .chart-panel.full { grid-column: 1 / -1; }
-        .chart-panel-head {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px; border-bottom: 1px solid var(--border);
-            background: var(--bg-hover);
-        }
-        .chart-panel-title {
-            font-size: 11px; font-weight: 700; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: .5px;
-        }
-        .chart-panel-body { padding: 14px; overflow: hidden; }
-        .chart-canvas-wrap {
-            position: relative; height: 200px; width: 100%;
-        }
-        .chart-canvas-wrap canvas { display: block; width: 100% !important; }
-        .chart-canvas-wrap.tall { height: 260px; }
-        @media(max-width:900px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .chart-panel.full { grid-column: 1; }
-        }
 
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
@@ -935,8 +908,7 @@
             <!-- Abas -->
             <div class="paste-tabs">
                 <button class="paste-tab active" id="ptab-texto" onclick="setPasteTab('texto')">📝 Colar do Oracle</button>
-                <button class="paste-tab" id="ptab-livre" onclick="setPasteTab('livre')">✏️ Digitar livre</button>
-                <button class="paste-tab" id="ptab-img" onclick="setPasteTab('img')">🖼️ Colar print (IA)</button>
+                <button class="paste-tab" id="ptab-livre" onclick="setPasteTab('livre')">✏️ Digitar / colar livre</button>
             </div>
 
             <!-- ABA TEXTO -->
@@ -960,40 +932,6 @@
                 <div class="paste-prev" id="paste-prev-livre"></div>
             </div>
 
-            <!-- ABA IMAGEM -->
-            <div class="paste-tab-pane" id="ppane-img">            <!-- ABA IMAGEM -->
-            <div class="paste-tab-pane" id="ppane-img">
-                <div class="paste-ctrl-v-hint">
-                    <kbd>Ctrl</kbd>+<kbd>V</kbd> para colar print direto, ou arraste/selecione a imagem abaixo
-                </div>
-                <div class="img-drop-zone" id="img-drop-zone">
-                    <input type="file" id="img-file-input" accept="image/*" onchange="onImgSelect(this)">
-                    <span style="font-size:32px;display:block;margin-bottom:8px">🖼️</span>
-                    <div style="font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:4px">Arraste o print aqui</div>
-                    <div style="font-size:11px;color:var(--text-soft)">ou <span style="color:var(--gold);font-weight:600">clique para selecionar</span> — PNG, JPG aceitos</div>
-                </div>
-                <div class="img-preview-wrap" id="img-preview-wrap">
-                    <img id="img-preview" src="" alt="preview">
-                    <button class="img-preview-del" onclick="limparImg()">✕</button>
-                </div>
-                <div class="ai-inline-load" id="ai-inline-load">
-                    <div class="ai-mini-spin"></div>
-                    <div class="ai-inline-label">Gemini lendo o print e extraindo dados…</div>
-                </div>
-                <div class="paste-prev" id="paste-prev-img"></div>
-                <!-- Chave Gemini compacta -->
-                <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                    <span style="font-size:11px;color:var(--text-soft);white-space:nowrap">🔑 Chave Gemini:</span>
-                    <input id="gk-input-modal" type="password"
-                        style="flex:1;min-width:140px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;"
-                        placeholder="AIzaSy…"
-                        onfocus="this.type='text'"
-                        onblur="if(this.value)this.type='password';saveGK(this.value)"
-                        oninput="saveGK(this.value)">
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank"
-                        style="font-size:11px;color:#4285f4;white-space:nowrap;text-decoration:none">Obter grátis ↗</a>
-                </div>
-            </div>
         </div>
         <div class="modal-foot">
             <button class="btn-cancel" onclick="fecharColar()">Cancelar</button>
@@ -1293,8 +1231,8 @@ function tagMenu(k,i,btn){
 // ══ MODAL COLAR ══
 let colarKey='co';
 const HINTS={
-    co:   '<strong>Check-outs do dia.</strong> Cole do Oracle ou planilha.<br>Exemplos aceitos:<br>• <code>21  SUP  Manuel,Rui</code><br>• <code>Manuel,Rui</code><br>• <code>21  SUP  Manuel,Rui  LCO</code>',
-    prev: '<strong>Check-outs previstos amanhã.</strong> Mesmo formato dos check-outs.<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code>',
+    co:   '<strong>Check-outs do dia.</strong> Cole do Oracle — qualquer formato:<br>• <code>21  SUP  Manuel,Rui</code> (tudo junto)<br>• <code>Manuel,Rui</code> (só nome)<br>• Ou cole <strong>cada coluna separada</strong>: primeiro UH, depois CTG, depois Nome',
+    prev: '<strong>Check-outs previstos amanhã.</strong> Cole do Oracle — qualquer formato:<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code><br>• Ou cole cada coluna separada: UH, CTG, Nome',
     'esp-ci': '<strong>Reservas Especiais — Check-ins Previstos.</strong> Cole da planilha ou Oracle.<br>Exemplo: <code>SUP  334532990  26/04/2026  27/04/2026  Almeida,Luis - 1 de 3</code>',
     ci:   '<strong>Check-ins pendentes.</strong> Cole do Oracle ou planilha.<br>• <code>336271347  Ramos,Maria Luiza</code><br>• <code>Ramos,Maria Luiza</code>',
 };
@@ -1367,24 +1305,85 @@ function parseLinha(linha,key){
 function limpar(s){ return s.replace(/[\r\n]+/g,'').replace(/  +/g,' ').trim(); }
 
 function previewColar(){
-    const linhas=g('paste-ta').value.split('\n').map(l=>l.trim()).filter(l=>l);
-    const pv=g('paste-prev');
+    const raw = g('paste-ta').value;
+    const linhas = raw.split('\n').map(l=>l.trim()).filter(l=>l);
+    const pv = g('paste-prev');
     if(!linhas.length){pv.classList.remove('show');return;}
-    const parsed=linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
+
+    const arr = getData(colarKey);
+    const cats = getCats();
+    const soNomes = linhas.every(l=>l.split(/\t|  +/).length===1&&!/^\d+$/.test(l));
+    const soUHs   = linhas.every(l=>/^\d+$/.test(l.trim()));
+    const isCL    = l=>cats.some(ct=>ct.toUpperCase()===l.trim().toUpperCase())||/^(SUP|STD|SUI|DLX|PHO|SUT)$/i.test(l.trim());
+    const soCtgs  = linhas.every(l=>isCL(l));
+
+    let modoMsg = '';
+    if (soNomes && arr.length>0) modoMsg = `<span style="color:#2563eb">📋 Modo: preencher <strong>nomes</strong> nas ${linhas.length} linha(s) existentes</span><br>`;
+    else if (soUHs && arr.length>0) modoMsg = `<span style="color:#2563eb">📋 Modo: preencher <strong>UHs</strong> nas ${linhas.length} linha(s) existentes</span><br>`;
+    else if (soCtgs && arr.length>0) modoMsg = `<span style="color:#2563eb">📋 Modo: preencher <strong>categorias</strong> nas ${linhas.length} linha(s) existentes</span><br>`;
+
+    const parsed = linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
     pv.classList.add('show');
-    pv.innerHTML=`<strong>${parsed.length} linha(s) detectada(s)</strong> — prévia das 3 primeiras:<br><br>`+
-        parsed.slice(0,3).map(r=>
-            colarKey==='ci'
-                ? `• ${r.nome} ${r.reserva?'('+r.reserva+')':''} UH ${r.uh||'?'} [${r.ct}]`
-                : `• UH ${r.uh||'?'} [${r.ct}] — ${r.nome}${r.obs?' | '+r.obs:''}`
-        ).join('<br>')+(parsed.length>3?`<br><em>…e mais ${parsed.length-3}</em>`:'');
+    pv.innerHTML = modoMsg +
+        `<strong>${linhas.length} linha(s)</strong> — prévia:<br><br>` +
+        (modoMsg
+            ? linhas.slice(0,4).map(l=>`• ${l}`).join('<br>')
+            : parsed.slice(0,3).map(r=>
+                colarKey==='ci'
+                    ? `• ${r.nome} UH ${r.uh||'?'} [${r.ct}]`
+                    : `• UH ${r.uh||'?'} [${r.ct}] — ${r.nome}${r.obs?' | '+r.obs:''}`
+              ).join('<br>')
+        ) + (linhas.length>4?`<br><em>…e mais ${linhas.length-4}</em>`:'');
 }
 
 function confirmarColar(){
-    const linhas=g('paste-ta').value.split('\n').map(l=>l.trim()).filter(l=>l);
-    const parsed=linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
+    const raw = g('paste-ta').value;
+    const linhas = raw.split('\n').map(l=>l.trim()).filter(l=>l);
+    if(!linhas.length){toast('⚠️ Cole algum conteúdo primeiro');return;}
+
+    // Detecta modo "só nomes" — todas as linhas são apenas nomes sem número
+    const soNomes = linhas.every(l => {
+        const p = l.split(/\t|  +/);
+        return p.length === 1 && !/^\d+$/.test(p[0]);
+    });
+
+    // Detecta modo "só UHs" — todas as linhas são apenas números
+    const soUHs = linhas.every(l => /^\d+$/.test(l.trim()));
+
+    // Detecta modo "só CTGs" — todas as linhas são siglas de categoria
+    const cats = getCats();
+    const isCatLine = l => cats.some(ct=>ct.toUpperCase()===l.trim().toUpperCase()) || /^(SUP|STD|SUI|DLX|PHO|SUT|DBL|SGL)$/i.test(l.trim());
+    const soCtgs = linhas.every(l => isCatLine(l));
+
+    const arr = getData(colarKey);
+
+    if (soNomes && arr.length > 0) {
+        // Cola só os nomes nas linhas já existentes (preenche campo nome)
+        linhas.forEach((nome, i) => {
+            if (i < arr.length) arr[i].nome = nome;
+            else arr.push({uh:'',ct:cats[0]||'SUP',nome,obs:'',pre:false,trip:false,saiu:false});
+        });
+        re(colarKey); fecharColar();
+        toast(`✅ ${linhas.length} nome(s) preenchido(s)!`);
+        return;
+    }
+    if (soUHs && arr.length > 0) {
+        linhas.forEach((uh, i) => { if(i<arr.length) arr[i].uh = uh; });
+        re(colarKey); fecharColar();
+        toast(`✅ ${linhas.length} UH(s) preenchido(s)!`);
+        return;
+    }
+    if (soCtgs && arr.length > 0) {
+        linhas.forEach((ct, i) => { if(i<arr.length) arr[i].ct = ct.toUpperCase(); });
+        re(colarKey); fecharColar();
+        toast(`✅ ${linhas.length} categoria(s) preenchida(s)!`);
+        return;
+    }
+
+    // Modo padrão — parse linha a linha
+    const parsed = linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
     if(!parsed.length){toast('⚠️ Nenhuma linha reconhecida');return;}
-    parsed.forEach(r=>getData(colarKey).push(r));
+    parsed.forEach(r=>arr.push(r));
     re(colarKey);
     fecharColar();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
@@ -2256,8 +2255,7 @@ function setPasteTab(tab) {
 
 // Confirmar dependendo da aba ativa
 function confirmarColarAtivo() {
-    if (pasteTabAtiva === 'img')   confirmarColarImg();
-    else if (pasteTabAtiva === 'livre') confirmarColarLivre();
+    if (pasteTabAtiva === 'livre') confirmarColarLivre();
     else confirmarColar();
 }
 
