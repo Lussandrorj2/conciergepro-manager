@@ -14,12 +14,6 @@
         .up-title { display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--text-main); }
         .up-icon { width:30px;height:30px;border-radius:8px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);display:flex;align-items:center;justify-content:center;font-size:15px; }
         .up-body { padding:14px 18px; }
-        .up-key-row { display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px; }
-        .up-key-label { font-size:10px;font-weight:700;color:#4285f4;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px; }
-        .up-key-input { flex:1;min-width:160px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;transition:border-color .15s; }
-        .up-key-input:focus { border-color:#4285f4; }
-        .up-key-link { display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#4285f4;white-space:nowrap;text-decoration:none;padding:6px 12px;border:1px solid rgba(66,133,244,.3);border-radius:999px;background:rgba(66,133,244,.06);transition:.15s; }
-        .up-key-link:hover { background:rgba(66,133,244,.14); }
         .drop-zone { border:2px dashed var(--border-light);border-radius:var(--radius-md);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg-hover); }
         .drop-zone:hover,.drop-zone.drag-over { border-color:var(--gold);background:var(--gold-dim); }
         .drop-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2; }
@@ -27,10 +21,24 @@
         .drop-text { font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:3px; }
         .drop-hint { font-size:11px;color:var(--text-soft); }
         .drop-hint span { color:var(--gold);font-weight:600; }
-        .file-sel { display:none;align-items:center;gap:10px;margin-top:10px;background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:9px 12px; }
-        .file-sel.show { display:flex; }
-        .file-sel-name { font-size:13px;font-weight:600;color:#15803d; }
-        .file-sel-size { font-size:11px;color:var(--text-soft);margin-left:auto; }
+        /* MULTI-ARQUIVO */
+        .files-list { display:none;flex-direction:column;gap:6px;margin-top:10px; }
+        .files-list.show { display:flex; }
+        .file-item { display:flex;align-items:center;gap:9px;background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:8px 12px; }
+        .file-item-icon { font-size:15px;flex-shrink:0; }
+        .file-item-info { flex:1;min-width:0; }
+        .file-item-name { font-size:12px;font-weight:600;color:#15803d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .file-item-size { font-size:10px;color:var(--text-soft);margin-top:1px; }
+        .file-item-tag { font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2);white-space:nowrap;cursor:pointer;transition:.15s; }
+        .file-item-tag:hover { background:rgba(181,132,58,.18); }
+        .file-item-del { background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0; }
+        .file-item-del:hover { color:#dc2626; }
+        .files-add-more { display:none;align-items:center;gap:8px;margin-top:8px;padding:8px 12px;border:1px dashed var(--border-light);border-radius:var(--radius-sm);cursor:pointer;background:none;font-size:12px;color:var(--text-soft);font-family:'Inter',sans-serif;width:100%;transition:.15s;position:relative; }
+        .files-add-more input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+        .files-add-more:hover { border-color:var(--gold);color:var(--gold); }
+        .files-add-more.show { display:flex; }
+        .file-tipo-select { background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:11px;font-family:'Inter',sans-serif;color:var(--text-muted);cursor:pointer;outline:none; }
+        .file-tipo-select:focus { border-color:var(--gold); }
         .btn-process { display:inline-flex;align-items:center;gap:8px;justify-content:center;background:var(--gold);color:#0b0f19;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:filter .15s;margin-top:12px;width:100%; }
         .btn-process:hover { filter:brightness(1.1); }
         .btn-process:disabled { opacity:.45;cursor:not-allowed; }
@@ -253,29 +261,19 @@
                     <button class="btn-a" onclick="novaAuditoria()">＋ Manual</button>
                 </div>
                 <div class="up-body">
-                    <div class="up-key-row">
-                        <span style="font-size:18px;flex-shrink:0">🔑</span>
-                        <div style="flex:1;min-width:160px">
-                            <div class="up-key-label">Chave Gemini API</div>
-                            <input id="gemini-key-input" type="password" class="up-key-input" placeholder="Cole sua chave: AIzaSy..."
-                                oninput="salvarKeyLocal(this.value)"
-                                onfocus="this.type='text';this.style.borderColor='#4285f4'"
-                                onblur="if(this.value)this.type='password';this.style.borderColor='var(--border)'">
-                        </div>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="up-key-link">Obter grátis ↗</a>
-                    </div>
                     <div class="drop-zone" id="drop-zone">
-                        <input type="file" id="pdf-input" accept=".pdf,image/*" onchange="onFileSelect(this)">
+                        <input type="file" id="pdf-input" accept=".pdf,image/*" multiple onchange="onFileSelect(this)">
                         <span class="drop-icon">📄</span>
-                        <div class="drop-text">Arraste a imagem ou PDF da auditoria aqui</div>
-                        <div class="drop-hint">ou <span>clique para selecionar</span> — PDF, PNG, JPG aceitos</div>
+                        <div class="drop-text">Arraste os PDFs/imagens da auditoria aqui</div>
+                        <div class="drop-hint">ou <span>clique para selecionar</span> — vários arquivos aceitos (PDF, PNG, JPG)</div>
                     </div>
-                    <div class="file-sel" id="file-sel-info">
-                        <span>📎</span>
-                        <span class="file-sel-name" id="file-name-lbl">—</span>
-                        <span class="file-sel-size" id="file-size-lbl">—</span>
-                        <button onclick="limparArquivo()" style="background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:14px;margin-left:4px">✕</button>
-                    </div>
+                    <!-- Lista de arquivos selecionados -->
+                    <div class="files-list" id="files-list"></div>
+                    <!-- Botão adicionar mais -->
+                    <button class="files-add-more" id="btn-add-more">
+                        <input type="file" accept=".pdf,image/*" multiple onchange="adicionarMaisArquivos(this)">
+                        ＋ Adicionar mais arquivos
+                    </button>
                     <button class="btn-process" id="btn-processar" onclick="processarComIA()" disabled>
                         ✨ Processar com Gemini — Extrair Dados da Auditoria
                     </button>
@@ -484,9 +482,10 @@ const HOTEL_SLUG  = "{{ hotel.slug }}";
 const LS_KEY      = `hosp_audit_hist_${HOTEL_SLUG}`;
 const GEMINI_MODEL = 'gemini-2.0-flash';
 
-const GEMINI_API_KEY = 'AIzaSyBUnHx3ovQfMiwQYrr-kn2eEUb6COoQRbU';
 
-let arquivoSel    = null;
+const GEMINI_API_KEY = 'AIzaSyAZnWFAmAlPx3PcbjzgE3UwRX2wmISuQtg';
+
+let arquivosSel   = []; // array de {file, tipo}
 let auditoriaAtual = null;
 let ocorrencias   = [];
 let checkoutsHoje = [];
@@ -497,38 +496,75 @@ let checkins      = [];
 
 // ── GEMINI KEY ──
 function getGeminiKey() {
-    if (GEMINI_API_KEY && GEMINI_API_KEY !== 'COLE_SUA_CHAVE_AQUI') return GEMINI_API_KEY;
-    const c = document.getElementById('gemini-key-input');
-    if (c && c.value.trim()) { localStorage.setItem('gk', c.value.trim()); return c.value.trim(); }
-    return localStorage.getItem('gk') || '';
+    return GEMINI_API_KEY;
 }
-function salvarKeyLocal(v) { if (v.trim()) localStorage.setItem('gk', v.trim()); }
 
 // ── DRAG & DROP ──
 const dz = document.getElementById('drop-zone');
 dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) setArquivo(f); });
-function onFileSelect(inp) { if (inp.files[0]) setArquivo(inp.files[0]); }
-function setArquivo(f) {
-    arquivoSel = f;
-    g('file-name-lbl').textContent = f.name;
-    g('file-size-lbl').textContent = (f.size/1024).toFixed(0)+' KB';
-    g('file-sel-info').classList.add('show');
-    g('btn-processar').disabled = false;
+dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    adicionarArquivos(Array.from(e.dataTransfer.files));
+});
+function onFileSelect(inp) { adicionarArquivos(Array.from(inp.files)); inp.value=''; }
+function adicionarMaisArquivos(inp) { adicionarArquivos(Array.from(inp.files)); inp.value=''; }
+
+const TIPOS = ['Ocupação','Check-outs','Check-ins','Reservas Especiais','Outro'];
+
+function adicionarArquivos(files) {
+    files.forEach(f => {
+        // detecta tipo pelo nome do arquivo
+        const nome = f.name.toLowerCase();
+        let tipo = 'Outro';
+        if (nome.includes('ocup') || nome.includes('occup')) tipo = 'Ocupação';
+        else if (nome.includes('check') && nome.includes('out')) tipo = 'Check-outs';
+        else if (nome.includes('check') && nome.includes('in'))  tipo = 'Check-ins';
+        else if (nome.includes('espec') || nome.includes('reserv')) tipo = 'Reservas Especiais';
+        arquivosSel.push({ file: f, tipo });
+    });
+    renderFilesList();
 }
-function limparArquivo() {
-    arquivoSel = null;
-    g('pdf-input').value = '';
-    g('file-sel-info').classList.remove('show');
-    g('btn-processar').disabled = true;
+
+function removerArquivo(idx) {
+    arquivosSel.splice(idx, 1);
+    renderFilesList();
+}
+
+function renderFilesList() {
+    const list = g('files-list');
+    const addMore = g('btn-add-more');
+    if (!arquivosSel.length) {
+        list.innerHTML = '';
+        list.classList.remove('show');
+        addMore.classList.remove('show');
+        g('btn-processar').disabled = true;
+        return;
+    }
+    list.classList.add('show');
+    addMore.classList.add('show');
+    g('btn-processar').disabled = false;
+
+    const icones = {'Ocupação':'📊','Check-outs':'🚪','Check-ins':'🟡','Reservas Especiais':'⭐','Outro':'📄'};
+    list.innerHTML = arquivosSel.map((a,i) => `
+        <div class="file-item">
+            <span class="file-item-icon">${icones[a.tipo]||'📄'}</span>
+            <div class="file-item-info">
+                <div class="file-item-name">${esc(a.file.name)}</div>
+                <div class="file-item-size">${(a.file.size/1024).toFixed(0)} KB</div>
+            </div>
+            <select class="file-tipo-select" onchange="arquivosSel[${i}].tipo=this.value;renderFilesList()">
+                ${TIPOS.map(t=>`<option value="${t}" ${t===a.tipo?'selected':''}>${t}</option>`).join('')}
+            </select>
+            <button class="file-item-del" onclick="removerArquivo(${i})" title="Remover">✕</button>
+        </div>`).join('');
 }
 
 // ── PROCESSAR COM IA ──
 async function processarComIA() {
-    if (!arquivoSel) return;
+    if (!arquivosSel.length) return;
     const apiKey = getGeminiKey();
-    if (!apiKey) { toast('⚠️ Cole sua chave do Gemini!'); return; }
+    if (!apiKey) { toast('⚠️ Configure a chave do Gemini no código!'); return; }
 
     g('upload-section').querySelector('.up-body').style.display = 'none';
     g('ai-loading').classList.add('show');
@@ -545,8 +581,20 @@ async function processarComIA() {
         });
     }, d));
 
-    const b64  = await toB64(arquivoSel);
-    const mime = arquivoSel.type || 'image/png';
+    // Converte todos os arquivos para base64
+    const partsArquivos = [];
+    for (const a of arquivosSel) {
+        const b64  = await toB64(a.file);
+        const mime = a.file.type || 'image/png';
+        partsArquivos.push({ tipo: a.tipo, b64, mime, nome: a.file.name });
+    }
+
+    // Monta parts do Gemini — um bloco por arquivo com label do tipo
+    const parts = [];
+    partsArquivos.forEach(a => {
+        parts.push({ text: `--- ARQUIVO: ${a.nome} | TIPO: ${a.tipo} ---` });
+        parts.push({ inline_data: { mime_type: a.mime, data: a.b64 } });
+    });
 
     const prompt = `Você é especialista em auditoria hoteleira. Analise a imagem/documento e extraia TODOS os dados.
 Retorne APENAS JSON válido sem markdown.
@@ -569,7 +617,7 @@ REGRAS: obs com "Reentrada"→reentrada:true; "LCO"/"Late"→lco:true. Extraia T
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,{
             method:'POST', headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
-                contents:[{parts:[{inline_data:{mime_type:mime,data:b64}},{text:prompt}]}],
+                contents:[{parts:[...parts, {text:prompt}]}],
                 generationConfig:{temperature:0.1,maxOutputTokens:8192,responseMimeType:'application/json'}
             })
         });
@@ -581,11 +629,13 @@ REGRAS: obs com "Reentrada"→reentrada:true; "LCO"/"Late"→lco:true. Extraia T
         await sleep(500);
         let parsed;
         try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{parsed=demo();}
-        carregarAuditoria(parsed,'✨ Gemini — '+arquivoSel.name);
+        const nomes = arquivosSel.map(a=>a.file.name).join(', ');
+        carregarAuditoria(parsed,'✨ Gemini — '+arquivosSel.length+' arquivo(s)');
     } catch(e) {
         tt.forEach(clearTimeout);
         ss.forEach(s=>g(s).classList.remove('ativo','feito'));
         g('ai-loading').classList.remove('show');
+        renderFilesList();
         g('upload-section').querySelector('.up-body').style.display='';
         toast('🔴 Erro: '+e.message);
     }
@@ -930,8 +980,6 @@ function toast(msg){const t=document.createElement('div');t.className='toast';t.
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded',()=>{
-    const k=localStorage.getItem('gk');
-    if(k){const c=g('gemini-key-input');if(c){c.value=k;c.type='password';}}
     renderHistorico();
     let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
     if(h.length){
