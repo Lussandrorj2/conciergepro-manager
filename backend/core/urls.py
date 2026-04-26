@@ -31,7 +31,7 @@ urlpatterns = [
     path('<slug:hotel_slug>/dashboard/configuracoes/', views.dashboard_config, name='dashboard_config'),
     path('<slug:hotel_slug>/dashboard/quadro/', views.dashboard_quadro, name='dashboard_quadro'),
     path('<slug:hotel_slug>/dashboard/hospedagem/', views.dashboard_hospedagem, name='dashboard_hospedagem'),
-    path('<slug:hotel_slug>/dashboard/reservas-hotel/', views.dashboard_reservas-hotel, name='dashboard_reservas-hotel'),
+    path('<slug:hotel_slug>/dashboard/reservas-hotel/', views.dashboard_reservas_hotel, name='dashboard_reservas_hotel'),
 
     # =========================
     # API PÚBLICA
