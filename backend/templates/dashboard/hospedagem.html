@@ -900,43 +900,85 @@
 <!-- MODAL COLAR -->
 <div class="modal-ov" id="paste-modal">
     <div class="modal-box">
-        <div class="modal-head">
-            <h3 id="paste-titulo">📋 Colar lista</h3>
-            <button onclick="fecharColar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-soft)">✕</button>
+    <div class="modal-head">
+        <h3 id="paste-titulo">📋 Colar lista</h3>
+        <button onclick="fecharColar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-soft)">✕</button>
+    </div>
+    <div class="modal-body">
+        <!-- Abas -->
+        <div class="paste-tabs">
+            <button class="paste-tab active" id="ptab-texto" onclick="setPasteTab('texto')">📝 Colar do Oracle</button>
+            <button class="paste-tab" id="ptab-colunas" onclick="setPasteTab('colunas')">📊 Por Colunas</button>
+            <button class="paste-tab" id="ptab-livre" onclick="setPasteTab('livre')">✏️ Digitar livre</button>
         </div>
-        <div class="modal-body">
-            <!-- Abas -->
-            <div class="paste-tabs">
-                <button class="paste-tab active" id="ptab-texto" onclick="setPasteTab('texto')">📝 Colar do Oracle</button>
-                <button class="paste-tab" id="ptab-livre" onclick="setPasteTab('livre')">✏️ Digitar / colar livre</button>
-            </div>
 
-            <!-- ABA TEXTO -->
-            <div class="paste-tab-pane active" id="ppane-texto">
-                <div class="paste-hint" id="paste-hint"></div>
-                <textarea class="paste-ta" id="paste-ta"
-                    placeholder="Cole aqui os dados copiados do Oracle ou planilha…"
-                    oninput="previewColar()"></textarea>
-                <div class="paste-prev" id="paste-prev"></div>
-            </div>
+        <!-- ABA ORACLE -->
+        <div class="paste-tab-pane active" id="ppane-texto">
+            <div class="paste-hint" id="paste-hint"></div>
+            <textarea class="paste-ta" id="paste-ta"
+                placeholder="Cole aqui os dados copiados do Oracle ou planilha…"
+                oninput="previewColar()"></textarea>
+            <div class="paste-prev" id="paste-prev"></div>
+        </div>
 
-            <!-- ABA DIGITAR LIVRE -->
-            <div class="paste-tab-pane" id="ppane-livre">
-                <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px">
-                    <strong style="color:var(--text-main)">Digite um hóspede por linha</strong> — qualquer formato funciona:<br>
-                    <code style="font-size:11px">21 SUP Manuel,Rui</code> &nbsp;ou&nbsp; <code style="font-size:11px">Manuel Rui</code> &nbsp;ou&nbsp; <code style="font-size:11px">21 Manuel,Rui LCO</code>
+        <!-- ABA POR COLUNAS (estilo Excel) -->
+        <div class="paste-tab-pane" id="ppane-colunas">
+            <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px">
+                <strong style="color:var(--text-main)">Cole cada coluna separadamente</strong> — ideal para copiar colunas de PDF ou planilha.<br>
+                Cole os nomes, UHs e categorias em campos separados. Pode preencher só o que tiver.
+            </div>
+            <div style="display:grid;grid-template-columns:80px 90px 1fr;gap:10px;margin-bottom:10px">
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">UH</label>
+                    <textarea id="col-uh" class="paste-ta" placeholder="21&#10;22&#10;27&#10;33&#10;…"
+                        style="min-height:200px;font-family:monospace;font-size:13px"
+                        oninput="previewColunas()"></textarea>
                 </div>
-                <textarea class="paste-ta" id="paste-ta-livre"
-                    placeholder="Digite ou cole aqui — um hóspede por linha:&#10;21  SUP  Manuel,Rui&#10;22  SUP  Scordo,Cecilia Claudia&#10;27  STD  silva,raphael&#10;..."
-                    oninput="previewColarLivre()" style="min-height:220px;font-family:monospace"></textarea>
-                <div class="paste-prev" id="paste-prev-livre"></div>
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">CTG</label>
+                    <textarea id="col-ctg" class="paste-ta" placeholder="SUP&#10;SUP&#10;STD&#10;SUI&#10;…"
+                        style="min-height:200px;font-family:monospace;font-size:13px"
+                        oninput="previewColunas()"></textarea>
+                </div>
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Nome do Hóspede</label>
+                    <textarea id="col-nome" class="paste-ta" placeholder="Manuel,Rui&#10;Scordo,Cecilia&#10;silva,raphael&#10;Ramos,Maria Luiza&#10;…"
+                        style="min-height:200px;font-family:monospace;font-size:13px"
+                        oninput="previewColunas()"></textarea>
+                </div>
             </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Observação <span style="font-weight:400;text-transform:none">(opcional)</span></label>
+                    <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada no SUP&#10;&#10;…"
+                        style="min-height:80px;font-family:monospace;font-size:13px"
+                        oninput="previewColunas()"></textarea>
+                </div>
+                <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding-bottom:2px">
+                    <div style="font-size:11px;color:var(--text-soft);line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px">
+                        💡 <strong>Dica:</strong> Cole os nomes do PDF no campo Nome, cole as UHs no campo UH. Não precisa preencher tudo — linhas sem UH ficam em branco para preencher depois.
+                    </div>
+                </div>
+            </div>
+            <div class="paste-prev" id="paste-prev-colunas"></div>
+        </div>
 
+        <!-- ABA DIGITAR LIVRE -->
+        <div class="paste-tab-pane" id="ppane-livre">
+            <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px">
+                <strong style="color:var(--text-main)">Digite um hóspede por linha</strong> — qualquer formato funciona:<br>
+                <code style="font-size:11px">21 SUP Manuel,Rui</code> &nbsp;ou&nbsp; <code style="font-size:11px">Manuel Rui</code> &nbsp;ou&nbsp; <code style="font-size:11px">21 Manuel,Rui LCO</code>
+            </div>
+            <textarea class="paste-ta" id="paste-ta-livre"
+                placeholder="Digite ou cole aqui — um hóspede por linha:&#10;21  SUP  Manuel,Rui&#10;22  SUP  Scordo,Cecilia Claudia&#10;27  STD  silva,raphael&#10;..."
+                oninput="previewColarLivre()" style="min-height:220px;font-family:monospace"></textarea>
+            <div class="paste-prev" id="paste-prev-livre"></div>
         </div>
-        <div class="modal-foot">
-            <button class="btn-cancel" onclick="fecharColar()">Cancelar</button>
-            <button class="btn-ok" id="btn-confirmar-colar" onclick="confirmarColarAtivo()">✅ Importar linhas</button>
-        </div>
+
+    </div>
+    <div class="modal-foot">
+        <button class="btn-cancel" onclick="fecharColar()">Cancelar</button>
+        <button class="btn-ok" id="btn-confirmar-colar" onclick="confirmarColarAtivo()">✅ Importar linhas</button>
     </div>
 </div>
 
@@ -2236,22 +2278,21 @@ let imgBase64 = null;
 let imgParsed = []; // linhas extraídas pela IA da imagem
 let pasteTabAtiva = 'texto';
 
+
 function setPasteTab(tab) {
     pasteTabAtiva = tab;
     document.querySelectorAll('.paste-tab').forEach(b => b.classList.toggle('active', b.id === 'ptab-' + tab));
     document.querySelectorAll('.paste-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'ppane-' + tab));
-    if (tab === 'livre') { setTimeout(() => g('paste-ta-livre')?.focus(), 80); }
-    if (tab === 'img') {
-        // carrega chave salva
-        const k = localStorage.getItem('_gk');
-        const inp = g('gk-input-modal');
-        if (k && inp && !inp.value) { inp.value = k; inp.type = 'password'; }
-    }
+    if (tab === 'texto')   { setTimeout(() => g('paste-ta')?.focus(), 80); }
+    if (tab === 'livre')   { setTimeout(() => g('paste-ta-livre')?.focus(), 80); }
+    if (tab === 'colunas') { setTimeout(() => g('col-nome')?.focus(), 80); }
 }
+
 
 // Confirmar dependendo da aba ativa
 function confirmarColarAtivo() {
-    if (pasteTabAtiva === 'livre') confirmarColarLivre();
+    if (pasteTabAtiva === 'livre')   confirmarColarLivre();
+    else if (pasteTabAtiva === 'colunas') confirmarColarColunas();
     else confirmarColar();
 }
 
@@ -2577,6 +2618,87 @@ function confirmarColarLivre() {
     fecharColar();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
 }
+
+// ══ COLAR POR COLUNAS (estilo Excel) ══
+function previewColunas() {
+    const uhs   = (g('col-uh')?.value   || '').split('\n').map(l => l.trim());
+    const ctgs  = (g('col-ctg')?.value  || '').split('\n').map(l => l.trim());
+    const nomes = (g('col-nome')?.value || '').split('\n').map(l => l.trim());
+    const obs   = (g('col-obs')?.value  || '').split('\n').map(l => l.trim());
+
+    // Quantidade de linhas = maior das colunas preenchidas
+    const qtd = Math.max(
+        uhs.filter(v => v).length,
+        ctgs.filter(v => v).length,
+        nomes.filter(v => v).length
+    );
+
+    const pv = g('paste-prev-colunas');
+    if (!qtd) { pv.classList.remove('show'); return; }
+
+    const cats = getCats();
+    const linhas = [];
+    for (let i = 0; i < qtd; i++) {
+        linhas.push({
+            uh:   uhs[i]   || '',
+            ct:   ctgs[i]  || cats[0] || 'SUP',
+            nome: nomes[i] || '',
+            obs:  obs[i]   || '',
+        });
+    }
+
+    pv.classList.add('show');
+    pv.innerHTML = `<strong style="color:var(--gold)">${qtd} linha(s)</strong> — prévia:<br><br>` +
+        linhas.slice(0, 5).map(r =>
+            `• UH <strong>${r.uh || '—'}</strong> [${r.ct}] — ${r.nome || '<em style="opacity:.5">sem nome</em>'}${r.obs ? ' | ' + r.obs : ''}`
+        ).join('<br>') +
+        (qtd > 5 ? `<br><em>…e mais ${qtd - 5}</em>` : '');
+}
+
+function confirmarColarColunas() {
+    const uhs   = (g('col-uh')?.value   || '').split('\n').map(l => l.trim());
+    const ctgs  = (g('col-ctg')?.value  || '').split('\n').map(l => l.trim());
+    const nomes = (g('col-nome')?.value || '').split('\n').map(l => l.trim());
+    const obs   = (g('col-obs')?.value  || '').split('\n').map(l => l.trim());
+
+    const qtd = Math.max(
+        uhs.filter(v => v).length,
+        ctgs.filter(v => v).length,
+        nomes.filter(v => v).length
+    );
+
+    if (!qtd) { toast('⚠️ Preencha ao menos uma coluna'); return; }
+
+    const cats = getCats();
+    const arr  = getData(colarKey);
+
+    // Se já há linhas na tabela e só vieram nomes → preenche nomes existentes
+    const soNomes = nomes.filter(v=>v).length > 0 && uhs.filter(v=>v).length === 0 && ctgs.filter(v=>v).length === 0;
+    if (soNomes && arr.length > 0) {
+        nomes.filter(v=>v).forEach((nome, i) => {
+            if (i < arr.length) arr[i].nome = nome;
+            else arr.push({ uh:'', ct: cats[0]||'SUP', nome, obs: obs[i]||'', pre:false, trip:false, saiu:false });
+        });
+        re(colarKey); fecharColar();
+        toast(`✅ ${nomes.filter(v=>v).length} nome(s) preenchido(s)!`);
+        return;
+    }
+
+    for (let i = 0; i < qtd; i++) {
+        arr.push({
+            uh:   uhs[i]   || '',
+            ct:   ctgs[i]  || cats[0] || 'SUP',
+            nome: limpar(nomes[i] || ''),
+            obs:  obs[i]   || '',
+            pre: false, trip: false, saiu: false
+        });
+    }
+
+    re(colarKey);
+    fecharColar();
+    toast(`✅ ${qtd} linha(s) importada(s)!`);
+}
+
 
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
