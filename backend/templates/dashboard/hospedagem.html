@@ -7,162 +7,170 @@
     <title>Hospedagem — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
         /* ── TURNO ── */
-        .turno-grid { display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:10px;margin-bottom:14px; }
-        .turno-field { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 14px; }
-        .turno-field label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px; }
-        .turno-field input,.turno-field select { background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none;transition:border-color .15s; }
-        .turno-field input:focus,.turno-field select:focus { border-color:var(--gold); }
-
+        .turno-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:10px;margin-bottom:14px}
+        .turno-field{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 14px}
+        .turno-field label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px}
+        .turno-field input,.turno-field select{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none;transition:border-color .15s}
+        .turno-field input:focus,.turno-field select:focus{border-color:var(--gold)}
         /* ── KPI ── */
-        .kpi-row { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px; }
-        .kpi-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent;text-align:center; }
+        .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+        .kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent;text-align:center}
         .kpi-card.k-green{border-top-color:#15803d}.kpi-card.k-blue{border-top-color:#2563eb}
         .kpi-card.k-purple{border-top-color:#7c3aed}.kpi-card.k-amber{border-top-color:#d97706}
         .kpi-card.k-gold{border-top-color:var(--gold)}
-        .kpi-lbl { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px; }
-        .kpi-val { font-size:26px;font-weight:700;color:var(--text-main); }
-        .kpi-sub { font-size:10px;color:var(--text-soft);margin-top:2px; }
-
+        .kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px}
+        .kpi-val{font-size:26px;font-weight:700;color:var(--text-main)}
+        .kpi-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
         /* ── ABAS ── */
-        .tabs-nav { display:flex;gap:2px;padding:4px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto; }
-        .tab-btn { display:flex;align-items:center;gap:7px;padding:9px 16px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif; }
-        .tab-btn:hover { color:var(--text-main);background:rgba(255,255,255,.5); }
-        .tab-btn.active { background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 4px rgba(0,0,0,.08); }
-        .tbadge { font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--bg-hover);color:var(--text-soft); }
-        .tab-btn.active .tbadge { background:var(--gold-dim);color:var(--gold); }
-        .tab-btn[data-tab="checkout"].active  { color:#2563eb; }
-        .tab-btn[data-tab="checkout"].active .tbadge  { background:rgba(37,99,235,.1);color:#2563eb; }
-        .tab-btn[data-tab="previsao"].active  { color:#7c3aed; }
-        .tab-btn[data-tab="previsao"].active .tbadge  { background:rgba(124,58,237,.1);color:#7c3aed; }
-        .tab-btn[data-tab="especiais"].active { color:var(--gold); }
-        .tab-btn[data-tab="especiais"].active .tbadge { background:var(--gold-dim);color:var(--gold); }
-        .tab-btn[data-tab="checkins"].active  { color:#d97706; }
-        .tab-btn[data-tab="checkins"].active .tbadge  { background:rgba(217,119,6,.1);color:#d97706; }
-        .tab-btn[data-tab="ocorrencias"].active { color:#dc2626; }
-        .tab-btn[data-tab="ocorrencias"].active .tbadge { background:rgba(220,38,38,.1);color:#dc2626; }
-
-        .tab-pane { display:none; }
-        .tab-pane.active { display:block; }
-
+        .tabs-nav{display:flex;gap:2px;padding:4px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto}
+        .tab-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif}
+        .tab-btn:hover{color:var(--text-main);background:rgba(255,255,255,.5)}
+        .tab-btn.active{background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+        .tbadge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--bg-hover);color:var(--text-soft)}
+        .tab-btn.active .tbadge{background:var(--gold-dim);color:var(--gold)}
+        .tab-btn[data-tab="checkout"].active{color:#2563eb}.tab-btn[data-tab="checkout"].active .tbadge{background:rgba(37,99,235,.1);color:#2563eb}
+        .tab-btn[data-tab="previsao"].active{color:#7c3aed}.tab-btn[data-tab="previsao"].active .tbadge{background:rgba(124,58,237,.1);color:#7c3aed}
+        .tab-btn[data-tab="especiais"].active{color:var(--gold)}.tab-btn[data-tab="especiais"].active .tbadge{background:var(--gold-dim);color:var(--gold)}
+        .tab-btn[data-tab="checkins"].active{color:#d97706}.tab-btn[data-tab="checkins"].active .tbadge{background:rgba(217,119,6,.1);color:#d97706}
+        .tab-btn[data-tab="ocorrencias"].active{color:#dc2626}.tab-btn[data-tab="ocorrencias"].active .tbadge{background:rgba(220,38,38,.1);color:#dc2626}
+        .tab-pane{display:none}.tab-pane.active{display:block}
         /* ── PANEL ── */
-        .panel { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:14px; }
-        .panel-head { display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover); }
-        .panel-title { display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px; }
+        .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:14px}
+        .panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .panel-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
         .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
         .dot-green{background:#15803d}.dot-amber{background:#d97706}.dot-blue{background:#2563eb}
         .dot-purple{background:#7c3aed}.dot-gold{background:var(--gold)}.dot-red{background:#dc2626}
-        .pbadge { font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px; }
+        .pbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px}
         .pb-blue{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
         .pb-purple{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
         .pb-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
         .pb-amber{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
         .pb-red{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
-
         /* ── TABELA EDITÁVEL ── */
-        .ed-wrap { overflow-x:auto; }
-        .ed-t { width:100%;border-collapse:collapse;min-width:600px; }
-        .ed-t thead tr.head-dark { background:#0f172a; }
-        .ed-t thead tr.head-dark th { color:#94a3b8;border-bottom:2px solid #1e293b; }
-        .ed-t thead tr.head-purple { background:#1e1b4b; }
-        .ed-t thead tr.head-purple th { color:#a5b4fc;border-bottom:2px solid #312e81; }
-        .ed-t th { padding:9px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover);white-space:nowrap; }
-        .ed-t td { padding:3px 6px;border-bottom:1px solid var(--border);vertical-align:middle; }
-        .ed-t tr:last-child td { border-bottom:none; }
-        .ed-t tr:hover td { background:var(--bg-hover); }
-        .ed-t tr.r-lco td   { background:rgba(124,58,237,.04); }
-        .ed-t tr.r-reent td { background:rgba(37,99,235,.04); }
-
-        /* inputs dentro das células */
-        .ei { background:transparent;border:none;outline:none;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-main);width:100%;padding:5px 6px;border-radius:4px;transition:background .12s; }
-        .ei:focus { background:var(--gold-dim);outline:1px solid rgba(181,132,58,.35); }
-        .ei::placeholder { color:var(--border-light);font-style:italic; }
-        .ei-num  { width:52px;text-align:center; }
-        .ei-ct   { width:60px; }
-        .ei-date { width:100px; }
-        .ei-res  { width:96px; }
-        .ei-sm   { width:80px; }
-
-        /* select célula */
-        .es { background:transparent;border:none;outline:none;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-main);cursor:pointer;padding:5px 4px;border-radius:4px;transition:background .12s;width:100%; }
-        .es:focus { background:var(--gold-dim); }
-
-        /* botão remover */
-        .btn-del { background:none;border:none;color:var(--border-light);cursor:pointer;font-size:15px;padding:2px 5px;line-height:1;transition:color .12s; }
-        .btn-del:hover { color:#dc2626; }
-
-        /* checkbox */
-        .td-chk { width:36px;text-align:center;padding:4px!important; }
-        .td-chk input { width:15px;height:15px;cursor:pointer;accent-color:var(--gold); }
-        .td-del { width:32px;text-align:center;padding:4px!important; }
-
-        /* tags inline */
-        .itag { display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0; }
-        .xt-lco   { background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25); }
-        .xt-reent { background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25); }
-        .xt-esp   { background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25); }
-        .xt-ls    { background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25); }
-
-        /* footer tabela */
-        .tfoot { padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center; }
-        .tfoot .leg { font-size:11px;color:var(--text-soft); }
-        .btn-add { background:none;border:1px solid var(--border);color:var(--text-soft);padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;margin-left:auto; }
-        .btn-add:hover { border-color:var(--gold);color:var(--gold); }
-
-        /* ── PREVISÃO NÚMEROS ── */
-        .prev-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;border-bottom:1px solid var(--border); }
-        .prev-item { text-align:center; }
-        .prev-lbl { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-top:5px; }
-        .prev-sub { font-size:10px;color:var(--text-soft);margin-top:2px; }
-        .prev-inp { font-size:26px;font-weight:700;text-align:center;background:transparent;border:none;outline:none;width:100%;font-family:'Inter',sans-serif;padding:4px;border-radius:6px;transition:background .15s; }
-        .prev-inp:focus { background:var(--gold-dim);outline:1px solid rgba(181,132,58,.3); }
-        .prev-inp::placeholder { color:var(--border-light);font-size:18px; }
-        .c-green { color:#15803d; }
-        .c-red   { color:#dc2626; }
-        .c-amber { color:#d97706; }
-        .c-blue  { color:#2563eb; }
-
+        .ed-wrap{overflow-x:auto}
+        .ed-t{width:100%;border-collapse:collapse;min-width:560px}
+        .ed-t thead tr.head-dark{background:#0f172a}
+        .ed-t thead tr.head-dark th{color:#94a3b8;border-bottom:2px solid #1e293b}
+        .ed-t thead tr.head-purple{background:#1e1b4b}
+        .ed-t thead tr.head-purple th{color:#a5b4fc;border-bottom:2px solid #312e81}
+        .ed-t th{padding:9px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover);white-space:nowrap}
+        .ed-t td{padding:3px 6px;border-bottom:1px solid var(--border);vertical-align:middle}
+        .ed-t tr:last-child td{border-bottom:none}
+        .ed-t tr:hover td{background:var(--bg-hover)}
+        .ed-t tr.r-lco td{background:rgba(124,58,237,.05)}
+        .ed-t tr.r-reent td{background:rgba(37,99,235,.05)}
+        .ei{background:transparent;border:none;outline:none;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-main);width:100%;padding:5px 6px;border-radius:4px;transition:background .12s}
+        .ei:focus{background:var(--gold-dim);outline:1px solid rgba(181,132,58,.35)}
+        .ei::placeholder{color:var(--border-light);font-style:italic}
+        .ei-num{width:52px;text-align:center}.ei-ct{width:58px}.ei-date{width:100px}.ei-res{width:94px}
+        .es{background:transparent;border:none;outline:none;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-main);cursor:pointer;padding:5px 4px;border-radius:4px;width:100%}
+        .es:focus{background:var(--gold-dim)}
+        .btn-del{background:none;border:none;color:var(--border-light);cursor:pointer;font-size:15px;padding:2px 5px;line-height:1;transition:color .12s}
+        .btn-del:hover{color:#dc2626}
+        .td-chk{width:36px;text-align:center;padding:4px!important}
+        .td-chk input{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
+        .td-del{width:30px;text-align:center;padding:4px!important}
+        .itag{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+        .xt-lco{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25)}
+        .xt-reent{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
+        .xt-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
+        .xt-ls{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+        /* ── FOOTER ── */
+        .tfoot{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+        .tfoot .leg{font-size:11px;color:var(--text-soft)}
+        .btn-add{background:none;border:1px solid var(--border);color:var(--text-soft);padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+        .btn-add:hover{border-color:var(--gold);color:var(--gold)}
+        .btn-paste{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.3);color:#2563eb;padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+        .btn-paste:hover{background:rgba(37,99,235,.15)}
+        /* ── PREVISÃO ── */
+        .prev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;border-bottom:1px solid var(--border)}
+        .prev-item{text-align:center}
+        .prev-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-top:5px}
+        .prev-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
+        .prev-inp{font-size:24px;font-weight:700;text-align:center;background:transparent;border:none;outline:none;width:100%;font-family:'Inter',sans-serif;padding:4px;border-radius:6px;transition:background .15s}
+        .prev-inp:focus{background:var(--gold-dim);outline:1px solid rgba(181,132,58,.3)}
+        .prev-inp::placeholder{color:var(--border-light);font-size:16px}
+        .c-green{color:#15803d}.c-red{color:#dc2626}.c-amber{color:#d97706}.c-blue{color:#2563eb}
+        /* Categorias previsão */
+        .cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px;border-bottom:1px solid var(--border)}
+        .cat-item{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center}
+        .cat-item label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px}
+        .cat-item input{background:transparent;border:none;outline:none;width:100%;text-align:center;font-size:20px;font-weight:700;color:var(--text-main);font-family:'Inter',sans-serif;padding:2px}
+        .cat-item input:focus{background:var(--gold-dim);border-radius:4px}
+        .cat-item input::placeholder{color:var(--border-light);font-size:14px}
         /* ── OCORRÊNCIAS ── */
-        .ocorr-list  { display:flex;flex-direction:column;gap:6px;padding:12px 16px;min-height:32px; }
-        .ocorr-item  { display:flex;align-items:flex-start;gap:8px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;color:var(--text-muted); }
-        .ocorr-dot   { width:6px;height:6px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-top:5px; }
-        .ocorr-del   { background:none;border:none;color:var(--text-soft);cursor:pointer;margin-left:auto;font-size:14px;line-height:1;padding:0 2px; }
-        .ocorr-del:hover { color:#dc2626; }
-        .ocorr-add   { display:flex;gap:8px;padding:0 16px 14px; }
-        .ocorr-ta    { flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px; }
-        .ocorr-ta:focus { border-color:var(--gold); }
-        .btn-ocorr   { background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:9px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap;align-self:flex-end; }
-        .btn-ocorr:hover { background:rgba(220,38,38,.12); }
-
+        .ocorr-list{display:flex;flex-direction:column;gap:6px;padding:12px 16px;min-height:32px}
+        .ocorr-item{display:flex;align-items:flex-start;gap:8px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;color:var(--text-muted)}
+        .ocorr-dot{width:6px;height:6px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-top:5px}
+        .ocorr-del{background:none;border:none;color:var(--text-soft);cursor:pointer;margin-left:auto;font-size:14px;line-height:1;padding:0 2px}
+        .ocorr-del:hover{color:#dc2626}
+        .ocorr-add{display:flex;gap:8px;padding:0 16px 14px}
+        .ocorr-ta{flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px}
+        .ocorr-ta:focus{border-color:var(--gold)}
+        .btn-ocorr{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:9px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;align-self:flex-end}
+        .btn-ocorr:hover{background:rgba(220,38,38,.12)}
         /* ── HISTÓRICO ── */
-        .hist-item  { display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
-        .hist-item:last-child { border-bottom:none; }
-        .hist-item:hover { background:var(--bg-hover); }
-        .hist-nome  { font-size:13px;font-weight:600;color:var(--text-main); }
-        .hist-info  { font-size:11px;color:var(--text-soft);margin-top:1px; }
-        .hist-ocup  { font-size:13px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap; }
-
-        /* ── TOPBAR AUDITORIA ── */
-        .audit-bar { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap; }
-        .audit-meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
-        .badge-data { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);font-size:12px;font-weight:700;color:var(--gold); }
-        .btn-a { display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-family:'Inter',sans-serif;transition:.15s; }
-        .btn-a:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
-        .btn-a.prim { background:var(--gold);color:#0b0f19;border-color:var(--gold); }
-        .btn-a.prim:hover { filter:brightness(1.08); }
-
-        /* ── DOIS COLUNAS ── */
-        .two-col { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px; }
-
-        /* ── TAG MENU ── */
-        .btn-tp { background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.12s; }
-        .btn-tp:hover { border-color:var(--gold);color:var(--gold); }
-
+        .hist-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+        .hist-item:last-child{border-bottom:none}
+        .hist-item:hover{background:var(--bg-hover)}
+        .hist-nome{font-size:13px;font-weight:600;color:var(--text-main)}
+        .hist-info{font-size:11px;color:var(--text-soft);margin-top:1px}
+        .hist-ocup{font-size:13px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap}
+        /* ── TOPBAR ── */
+        .audit-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+        .audit-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .badge-data{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);font-size:12px;font-weight:700;color:var(--gold)}
+        .btn-a{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-family:'Inter',sans-serif;transition:.15s}
+        .btn-a:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+        .btn-a.prim{background:var(--gold);color:#0b0f19;border-color:var(--gold)}
+        .btn-a.prim:hover{filter:brightness(1.08)}
+        .btn-a.pdf{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.3);color:#dc2626}
+        .btn-a.pdf:hover{background:rgba(220,38,38,.15)}
+        /* ── 2 COLS ── */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+        /* ── TAG BTN ── */
+        .btn-tp{background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.12s}
+        .btn-tp:hover{border-color:var(--gold);color:var(--gold)}
+        /* ── BADGE TIPO ESP ── */
+        .esp-tipo-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+        .tipo-ls{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+        .tipo-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
+        .tipo-lm{background:rgba(236,72,153,.1);color:#db2777;border:1px solid rgba(236,72,153,.25)}
+        .tipo-vip{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25)}
+        .tipo-aniv{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25)}
+        /* ── MODAL COLAR ── */
+        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;padding:20px}
+        .modal-ov.open{display:flex}
+        .modal-box{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);width:100%;max-width:620px;box-shadow:0 24px 60px rgba(0,0,0,.4);overflow:hidden}
+        .modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .modal-head h3{font-size:14px;font-weight:700;color:var(--text-main)}
+        .modal-body{padding:16px 20px}
+        .paste-hint{font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px}
+        .paste-hint strong{color:var(--text-main)}
+        .paste-ta{width:100%;min-height:180px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:vertical;outline:none;line-height:1.8}
+        .paste-ta:focus{border-color:var(--gold)}
+        .paste-prev{margin-top:10px;font-size:11px;color:var(--text-soft);background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;display:none}
+        .paste-prev.show{display:block}
+        .paste-prev strong{color:var(--gold)}
+        .modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border)}
+        .btn-ok{background:var(--gold);color:#0b0f19;border:none;padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+        .btn-ok:hover{filter:brightness(1.1)}
+        .btn-cancel{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
         /* ── RESPONSIVE ── */
-        @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}}
-        @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}.turno-grid{grid-template-columns:1fr 1fr}.tab-btn{padding:7px 10px;font-size:11px}}
+        /* ── PRINT PDF ── */
+        @media print{
+            .sidebar,.topbar,.tabs-nav,.tfoot,.audit-bar,.btn-del,.btn-tp,
+            .ed-t tr.r-blank,.turno-field input,.turno-field select,
+            .prev-inp,.cat-item input,.ei,.es{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+        }
     </style>
 </head>
 <body>
@@ -183,7 +191,6 @@
             <a href="/logout/">↩ Sair</a>
         </nav>
     </aside>
-
     <main class="main">
         <div class="topbar">
             <div class="topbar-left">
@@ -196,160 +203,131 @@
             </div>
             <div class="topbar-right">
                 <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
-                <button class="btn-novo desktop-only" onclick="novaAuditoria()" style="display:none">＋ Nova Auditoria</button>
+                <button class="btn-novo desktop-only" onclick="novaAuditoria()" style="display:none">＋ Nova</button>
                 <div class="topbar-actions-menu" id="actions-menu-wrap">
-                    <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
+                    <button class="topbar-actions-btn" onclick="toggleActionsMenu()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-                            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/>
                         </svg>
                     </button>
                     <div class="topbar-actions-dropdown" id="actions-dropdown">
                         <button class="actions-item actions-item-destaque" onclick="novaAuditoria();toggleActionsMenu()">＋ Nova Auditoria</button>
                         <button class="actions-item" onclick="salvar();toggleActionsMenu()">💾 Salvar</button>
-                        <button class="actions-item" onclick="exportar();toggleActionsMenu()">📄 Exportar .txt</button>
+                        <button class="actions-item" onclick="gerarPDF();toggleActionsMenu()">📄 Gerar PDF</button>
+                        <button class="actions-item" onclick="exportarTxt();toggleActionsMenu()">📋 Exportar .txt</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="content">
-
-            <!-- ── TOPBAR ── -->
+            <!-- TOPBAR -->
             <div class="audit-bar">
                 <div class="audit-meta">
                     <div class="badge-data">📅 <span id="lbl-data">—</span></div>
+                    <span id="lbl-amanha" style="font-size:11px;color:var(--text-soft)">—</span>
                 </div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap">
                     <button class="btn-a prim" onclick="novaAuditoria()">＋ Nova Auditoria</button>
                     <button class="btn-a" onclick="salvar()">💾 Salvar</button>
-                    <button class="btn-a" onclick="exportar()">📄 Exportar</button>
+                    <button class="btn-a pdf" onclick="gerarPDF()">📄 Gerar PDF</button>
+                    <button class="btn-a" onclick="exportarTxt()">📋 .txt</button>
                 </div>
             </div>
 
-            <!-- ── TROCA DE TURNO ── -->
+            <!-- TROCA DE TURNO -->
             <div class="turno-grid">
-                <div class="turno-field">
-                    <label>Troca de Turno</label>
-                    <input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncData()">
-                </div>
-                <div class="turno-field">
-                    <label>Data</label>
-                    <input type="date" id="t-data" oninput="syncData()">
-                </div>
-                <div class="turno-field">
-                    <label>Ocupação (%)</label>
-                    <input type="text" id="t-ocup" placeholder="98,18%" oninput="syncData()">
-                </div>
-                <div class="turno-field">
-                    <label>DM — Diária Média</label>
-                    <input type="text" id="t-dm" placeholder="R$ 1.332,84" oninput="syncData()">
-                </div>
-                <div class="turno-field">
-                    <label>UH Bloq.</label>
-                    <input type="number" id="t-uh-bloq" value="0" min="0" oninput="syncData()">
-                </div>
+                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncUI()"></div>
+                <div class="turno-field"><label>Data</label><input type="date" id="t-data" oninput="syncUI();purgeEsp()"></div>
+                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="98,18%" oninput="syncUI()"></div>
+                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="R$ 1.332,84" oninput="syncUI()"></div>
+                <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
             </div>
 
-            <!-- ── KPIs ── -->
+            <!-- KPIs -->
             <div class="kpi-row">
-                <div class="kpi-card k-green">
-                    <div class="kpi-lbl">Ocupação</div>
-                    <div class="kpi-val" id="kpi-ocup">—</div>
-                </div>
-                <div class="kpi-card k-blue">
-                    <div class="kpi-lbl">Check-outs Hoje</div>
-                    <div class="kpi-val" id="kpi-co">0</div>
-                    <div class="kpi-sub">saídas previstas</div>
-                </div>
-                <div class="kpi-card k-purple">
-                    <div class="kpi-lbl">Late Check-out</div>
-                    <div class="kpi-val" id="kpi-lco">0</div>
-                    <div class="kpi-sub">com LCO</div>
-                </div>
-                <div class="kpi-card k-amber">
-                    <div class="kpi-lbl">Reentradas</div>
-                    <div class="kpi-val" id="kpi-reent">0</div>
-                </div>
-                <div class="kpi-card k-gold">
-                    <div class="kpi-lbl">Res. Especiais</div>
-                    <div class="kpi-val" id="kpi-esp">0</div>
-                </div>
+                <div class="kpi-card k-green"><div class="kpi-lbl">Ocupação</div><div class="kpi-val" id="kpi-ocup">—</div></div>
+                <div class="kpi-card k-blue"><div class="kpi-lbl">Check-outs Hoje</div><div class="kpi-val" id="kpi-co">0</div><div class="kpi-sub">saídas</div></div>
+                <div class="kpi-card k-purple"><div class="kpi-lbl">Late Check-out</div><div class="kpi-val" id="kpi-lco">0</div></div>
+                <div class="kpi-card k-amber"><div class="kpi-lbl">Reentradas</div><div class="kpi-val" id="kpi-reent">0</div></div>
+                <div class="kpi-card k-gold"><div class="kpi-lbl">Res. Especiais na Casa</div><div class="kpi-val" id="kpi-esp">0</div></div>
             </div>
 
-            <!-- ── ABAS ── -->
+            <!-- ABAS -->
             <div class="tabs-nav">
-                <button class="tab-btn active" data-tab="checkout"    onclick="setTab('checkout')">🚪 Check-outs do Dia <span class="tbadge" id="tb-co">0</span></button>
-                <button class="tab-btn"         data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
-                <button class="tab-btn"         data-tab="especiais"  onclick="setTab('especiais')">⭐ Res. Especiais <span class="tbadge" id="tb-esp">0</span></button>
-                <button class="tab-btn"         data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
-                <button class="tab-btn"         data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
-                <button class="tab-btn"         data-tab="historico"  onclick="setTab('historico')">📋 Histórico</button>
+                <button class="tab-btn active"  data-tab="checkout"    onclick="setTab('checkout')">🚪 Check-outs <span class="tbadge" id="tb-co">0</span></button>
+                <button class="tab-btn"          data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
+                <button class="tab-btn"          data-tab="especiais"  onclick="setTab('especiais')">⭐ Especiais na Casa <span class="tbadge" id="tb-esp">0</span></button>
+                <button class="tab-btn"          data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
+                <button class="tab-btn"          data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
+                <button class="tab-btn"          data-tab="historico"  onclick="setTab('historico')">📋 Histórico</button>
             </div>
 
-            <!-- ══ ABA: CHECK-OUTS DO DIA ══ -->
+            <!-- ══ CHECK-OUTS ══ -->
             <div class="tab-pane active" id="pane-checkout">
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-blue"></div> Check-outs do Dia</div>
                         <span class="pbadge pb-blue" id="b-co">0</span>
                     </div>
-                    <div class="ed-wrap">
-                        <table class="ed-t">
-                            <thead>
-                                <tr class="head-dark">
-                                    <th class="td-del"></th>
-                                    <th class="td-chk">PRE</th>
-                                    <th class="td-chk">TRIP</th>
-                                    <th style="width:56px">UH</th>
-                                    <th style="width:68px">CTG</th>
-                                    <th style="min-width:180px">Nome do Hóspede</th>
-                                    <th>Observação / LCO / Reentrada</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-co"></tbody>
-                        </table>
-                    </div>
+                    <div class="ed-wrap"><table class="ed-t">
+                        <thead><tr class="head-dark">
+                            <th class="td-del"></th><th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
+                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
+                            <th style="min-width:180px">Nome do Hóspede</th>
+                            <th>Observação / LCO / Reentrada</th>
+                        </tr></thead>
+                        <tbody id="tbody-co"></tbody>
+                    </table></div>
                     <div class="tfoot">
                         <span class="leg">Legenda:</span>
                         <span class="itag xt-lco">🕐 LCO</span>
                         <span class="itag xt-reent">🔄 Reentrada</span>
                         <span class="itag xt-esp">⭐ Especial</span>
-                        <button class="btn-add" onclick="addRow('co')">＋ Adicionar linha</button>
+                        <button class="btn-paste" onclick="abrirColar('co')">📋 Colar lista</button>
+                        <button class="btn-add" onclick="addRow('co')">＋ Linha</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ══ ABA: PREVISÃO AMANHÃ ══ -->
+            <!-- ══ PREVISÃO ══ -->
             <div class="tab-pane" id="pane-previsao">
-                <!-- Números -->
                 <div class="panel">
                     <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-purple"></div> Previsão — Amanhã</div>
-                        <span id="lbl-amanha" style="font-size:11px;color:var(--text-soft)">—</span>
+                        <div class="panel-title"><div class="dot dot-purple"></div> Previsão Geral — Amanhã</div>
+                        <span id="lbl-prev-data" style="font-size:11px;color:var(--text-soft)">—</span>
                     </div>
+                    <!-- Números gerais -->
                     <div class="prev-grid">
                         <div class="prev-item">
-                            <input class="prev-inp c-green" id="prev-ocup" placeholder="—" oninput="syncData()">
+                            <input class="prev-inp c-green" id="prev-ocup" placeholder="—%" oninput="syncUI()">
                             <div class="prev-lbl">Ocupação</div>
-                            <input class="ei" id="prev-diaria" placeholder="Diária média" style="text-align:center;font-size:11px;color:var(--text-soft)" oninput="syncData()">
+                            <input class="ei" id="prev-diaria" placeholder="DM: R$ —" style="text-align:center;font-size:11px;color:var(--text-soft);margin-top:2px" oninput="syncUI()">
                         </div>
                         <div class="prev-item">
-                            <input class="prev-inp c-green" id="prev-ent" placeholder="0" oninput="syncData()">
+                            <input class="prev-inp c-green" id="prev-uh" placeholder="0" oninput="syncUI()">
+                            <div class="prev-lbl">UHs Ocupadas</div>
+                            <div class="prev-sub">quartos ocupados</div>
+                        </div>
+                        <div class="prev-item">
+                            <input class="prev-inp c-green" id="prev-ent" placeholder="0" oninput="syncUI()">
                             <div class="prev-lbl">Entradas</div>
-                            <div class="prev-sub">check-ins previstos</div>
+                            <div class="prev-sub">total check-ins</div>
                         </div>
                         <div class="prev-item">
-                            <input class="prev-inp c-red" id="prev-sai" placeholder="0" oninput="syncData()">
+                            <input class="prev-inp c-red" id="prev-sai" placeholder="0" oninput="syncUI()">
                             <div class="prev-lbl">Saídas</div>
-                            <div class="prev-sub">check-outs previstos</div>
+                            <div class="prev-sub">total check-outs</div>
                         </div>
-                        <div class="prev-item">
-                            <input class="prev-inp c-amber" id="prev-cafe" placeholder="0" oninput="syncData()">
-                            <div class="prev-lbl">Café da Manhã</div>
-                            <div class="prev-sub">hóspedes esperados</div>
-                        </div>
+                    </div>
+                    <!-- Entradas por categoria -->
+                    <div style="padding:10px 16px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border)">Entradas por Categoria</div>
+                    <div class="cat-grid">
+                        <div class="cat-item"><label>SUP</label><input id="cat-sup" placeholder="0" oninput="syncUI()"></div>
+                        <div class="cat-item"><label>STD</label><input id="cat-std" placeholder="0" oninput="syncUI()"></div>
+                        <div class="cat-item"><label>SUI</label><input id="cat-sui" placeholder="0" oninput="syncUI()"></div>
+                        <div class="cat-item"><label>PHO</label><input id="cat-pho" placeholder="0" oninput="syncUI()"></div>
+                        <div class="cat-item"><label>Café da Manhã</label><input id="prev-cafe" placeholder="0" oninput="syncUI()" style="color:#d97706"></div>
                     </div>
                 </div>
                 <!-- Check-outs amanhã -->
@@ -358,119 +336,86 @@
                         <div class="panel-title"><div class="dot dot-purple"></div> Check-outs Previstos — Amanhã</div>
                         <span class="pbadge pb-purple" id="b-prev">0</span>
                     </div>
-                    <div class="ed-wrap">
-                        <table class="ed-t">
-                            <thead>
-                                <tr class="head-purple">
-                                    <th class="td-del"></th>
-                                    <th class="td-chk">PRE</th>
-                                    <th class="td-chk">TRIP</th>
-                                    <th style="width:56px">UH</th>
-                                    <th style="width:68px">CTG</th>
-                                    <th style="min-width:180px">Nome do Hóspede</th>
-                                    <th>Observação / LCO / Reentrada</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-prev"></tbody>
-                        </table>
-                    </div>
+                    <div class="ed-wrap"><table class="ed-t">
+                        <thead><tr class="head-purple">
+                            <th class="td-del"></th><th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
+                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
+                            <th style="min-width:180px">Nome do Hóspede</th>
+                            <th>Observação / LCO / Reentrada</th>
+                        </tr></thead>
+                        <tbody id="tbody-prev"></tbody>
+                    </table></div>
                     <div class="tfoot">
-                        <span class="leg">Legenda:</span>
                         <span class="itag xt-lco">🕐 LCO</span>
                         <span class="itag xt-reent">🔄 Reentrada</span>
-                        <button class="btn-add" onclick="addRow('prev')">＋ Adicionar linha</button>
-                    </div>
-                </div>
-                <!-- Reservas especiais amanhã -->
-                <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-purple"></div> Reservas Especiais — Amanhã</div>
-                        <span class="pbadge pb-purple" id="b-prev-esp">0</span>
-                    </div>
-                    <div class="ed-wrap">
-                        <table class="ed-t">
-                            <thead><tr>
-                                <th class="td-del"></th>
-                                <th style="width:56px">UH</th>
-                                <th style="width:68px">CTG</th>
-                                <th style="width:96px">Reserva</th>
-                                <th style="width:100px">IN</th>
-                                <th style="width:100px">OUT</th>
-                                <th>Descrição</th>
-                            </tr></thead>
-                            <tbody id="tbody-prev-esp"></tbody>
-                        </table>
-                    </div>
-                    <div class="tfoot">
-                        <button class="btn-add" onclick="addRow('prev-esp')">＋ Adicionar linha</button>
+                        <button class="btn-paste" onclick="abrirColar('prev')">📋 Colar lista</button>
+                        <button class="btn-add" onclick="addRow('prev')">＋ Linha</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ══ ABA: RESERVAS ESPECIAIS ══ -->
+            <!-- ══ ESPECIAIS NA CASA ══ -->
             <div class="tab-pane" id="pane-especiais">
                 <div class="panel">
                     <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-gold"></div> Reservas Especiais — Hoje</div>
-                        <span class="pbadge pb-gold" id="b-esp">0</span>
+                        <div class="panel-title"><div class="dot dot-gold"></div> Reservas Especiais na Casa</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span style="font-size:10px;color:var(--text-soft)">Saem automaticamente no dia do check-out</span>
+                            <span class="pbadge pb-gold" id="b-esp">0</span>
+                        </div>
                     </div>
-                    <div class="ed-wrap">
-                        <table class="ed-t">
-                            <thead><tr>
-                                <th class="td-del"></th>
-                                <th style="width:56px">UH</th>
-                                <th style="width:68px">CTG</th>
-                                <th style="width:96px">Reserva</th>
-                                <th style="width:100px">Check-in</th>
-                                <th style="width:100px">Check-out</th>
-                                <th>Descrição / Observação</th>
-                                <th style="width:120px">Tipo</th>
-                            </tr></thead>
-                            <tbody id="tbody-esp"></tbody>
-                        </table>
-                    </div>
+                    <div class="ed-wrap"><table class="ed-t">
+                        <thead><tr>
+                            <th class="td-del"></th>
+                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
+                            <th style="width:96px">Reserva</th>
+                            <th style="width:100px">Check-in</th>
+                            <th style="width:100px">Check-out</th>
+                            <th>Nome / Descrição</th>
+                            <th style="width:120px">Tipo</th>
+                        </tr></thead>
+                        <tbody id="tbody-esp"></tbody>
+                    </table></div>
                     <div class="tfoot">
-                        <button class="btn-add" onclick="addRow('esp')">＋ Adicionar linha</button>
+                        <span style="font-size:11px;color:var(--text-soft)">💡 Registre aqui os long stays, lua de mel, VIPs — saem automaticamente no check-out</span>
+                        <button class="btn-add" style="margin-left:auto" onclick="addRow('esp')">＋ Adicionar</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ══ ABA: CHECK-INS PENDENTES ══ -->
+            <!-- ══ CHECK-INS PENDENTES ══ -->
             <div class="tab-pane" id="pane-checkins">
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-amber"></div> Check-ins Pendentes</div>
                         <span class="pbadge pb-amber" id="b-ci">0</span>
                     </div>
-                    <div class="ed-wrap">
-                        <table class="ed-t">
-                            <thead><tr>
-                                <th class="td-del"></th>
-                                <th style="width:96px">Nº Reserva</th>
-                                <th style="min-width:180px">Nome do Hóspede</th>
-                                <th style="width:68px">UH</th>
-                                <th style="width:68px">CTG</th>
-                                <th>Observação</th>
-                            </tr></thead>
-                            <tbody id="tbody-ci"></tbody>
-                        </table>
-                    </div>
+                    <div class="ed-wrap"><table class="ed-t">
+                        <thead><tr>
+                            <th class="td-del"></th>
+                            <th style="width:96px">Nº Reserva</th>
+                            <th style="min-width:180px">Nome do Hóspede</th>
+                            <th style="width:52px">UH</th>
+                            <th style="width:64px">CTG</th>
+                            <th>Observação</th>
+                        </tr></thead>
+                        <tbody id="tbody-ci"></tbody>
+                    </table></div>
                     <div class="tfoot">
-                        <button class="btn-add" onclick="addRow('ci')">＋ Adicionar linha</button>
+                        <button class="btn-paste" onclick="abrirColar('ci')">📋 Colar lista</button>
+                        <button class="btn-add" onclick="addRow('ci')">＋ Linha</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ══ ABA: OCORRÊNCIAS ══ -->
+            <!-- ══ OCORRÊNCIAS ══ -->
             <div class="tab-pane" id="pane-ocorrencias">
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-red"></div> Ocorrências</div>
                         <span class="pbadge pb-red" id="b-oc">0</span>
                     </div>
-                    <div class="ocorr-list" id="ocorr-list">
-                        <div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência registrada.</div>
-                    </div>
+                    <div class="ocorr-list" id="ocorr-list"><div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência registrada.</div></div>
                     <div class="ocorr-add">
                         <textarea class="ocorr-ta" id="ocorr-input" placeholder="Descreva a ocorrência…" rows="2"></textarea>
                         <button class="btn-ocorr" onclick="addOcorr()">＋ Registrar</button>
@@ -478,416 +423,628 @@
                 </div>
             </div>
 
-            <!-- ══ ABA: HISTÓRICO ══ -->
+            <!-- ══ HISTÓRICO ══ -->
             <div class="tab-pane" id="pane-historico">
                 <div class="panel">
                     <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias Salvas</div>
+                        <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
                         <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
                     </div>
-                    <div id="hist-list">
-                        <div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>
-                    </div>
+                    <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
                 </div>
             </div>
-
-        </div><!-- /content -->
+        </div>
     </main>
+</div>
+
+<!-- MODAL COLAR -->
+<div class="modal-ov" id="paste-modal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 id="paste-titulo">📋 Colar lista</h3>
+            <button onclick="fecharColar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-soft)">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="paste-hint" id="paste-hint"></div>
+            <textarea class="paste-ta" id="paste-ta" placeholder="Cole aqui os dados copiados do Oracle ou planilha…" oninput="previewColar()"></textarea>
+            <div class="paste-prev" id="paste-prev"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn-cancel" onclick="fecharColar()">Cancelar</button>
+            <button class="btn-ok" onclick="confirmarColar()">✅ Importar linhas</button>
+        </div>
+    </div>
 </div>
 
 <script>
 const HOTEL_SLUG = "{{ hotel.slug }}";
-const LS_KEY     = `audit_v2_${HOTEL_SLUG}`;
+const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 
 // ══ ESTADO ══
-let co      = [];   // checkouts hoje
-let prev    = [];   // checkouts amanhã
-let prevEsp = [];   // especiais amanhã
-let esp     = [];   // especiais hoje
-let ci      = [];   // checkins pendentes
-let ocorr   = [];   // ocorrências
+let co      = [];
+let prev    = [];
+let esp     = [];   // especiais na casa (persistem entre auditorias)
+let ci      = [];
+let ocorr   = [];
+const LS_ESP = `audit_esp_${HOTEL_SLUG}`; // chave separada para especiais
 
 // ══ ABAS ══
-function setTab(t) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
+function setTab(t){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+t));
 }
 
-// ══ SINCRONIZA KPIs ══
-function syncData() {
+// ══ ESPECIAIS — persistência e purge automático ══
+function carregarEsp(){
+    try{ esp = JSON.parse(localStorage.getItem(LS_ESP))||[]; }catch{ esp=[]; }
+}
+function salvarEsp(){
+    localStorage.setItem(LS_ESP, JSON.stringify(esp));
+}
+function purgeEsp(){
+    // Remove especiais cujo checkout é <= data atual da auditoria
+    const dataAudit = g('t-data').value; // YYYY-MM-DD
+    if(!dataAudit) return;
+    const antes = esp.length;
+    esp = esp.filter(r => {
+        if(!r.checkout) return true;
+        // converte dd/mm/aaaa → YYYY-MM-DD para comparar
+        const co_iso = toIso(r.checkout);
+        if(!co_iso) return true;
+        return co_iso > dataAudit; // mantém só quem ainda não fez checkout
+    });
+    salvarEsp();
+    if(esp.length !== antes) renderEsp();
+}
+function toIso(d){
+    if(!d) return '';
+    if(d.includes('-')) return d;
+    const parts = d.split('/');
+    if(parts.length===3) return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    return '';
+}
+function toBr(iso){
+    if(!iso) return '';
+    if(iso.includes('/')) return iso;
+    const p = iso.split('-');
+    if(p.length===3) return `${p[2]}/${p[1]}/${p[0]}`;
+    return iso;
+}
+
+// ══ SYNC UI ══
+function syncUI(){
     const ocup = g('t-ocup').value;
-    g('kpi-ocup').textContent   = ocup || '—';
-    g('lbl-data').textContent   = fmtDate(g('t-data').value) || '—';
-    g('lbl-amanha').textContent = dataAmanha(g('t-data').value);
+    g('kpi-ocup').textContent = ocup||'—';
+    const di = g('t-data').value;
+    g('lbl-data').textContent     = fmtDate(di)||'—';
+    g('lbl-amanha').textContent   = dataAmanha(di);
+    g('lbl-prev-data').textContent = dataAmanha(di);
 }
 
-// ══ RENDER TABELAS ══
-
-/* ── Checkouts (hoje e amanhã) ── */
-function renderCo() {
-    renderCoTable(co, 'tbody-co', 'co');
-    const lcos  = co.filter(r => /lco|late/i.test(r.obs)).length;
-    const reent = co.filter(r => /reentrada|reent/i.test(r.obs)).length;
+// ══ RENDER ══
+function renderCo(){
+    renderCoTable(co,'tbody-co','co');
     g('kpi-co').textContent    = co.length;
-    g('kpi-lco').textContent   = lcos;
-    g('kpi-reent').textContent = reent;
-    g('b-co').textContent      = co.length;
-    g('tb-co').textContent     = co.length;
+    g('kpi-lco').textContent   = co.filter(r=>/lco|late/i.test(r.obs)).length;
+    g('kpi-reent').textContent = co.filter(r=>/reentrada|reent/i.test(r.obs)).length;
+    g('b-co').textContent = g('tb-co').textContent = co.length;
 }
-function renderPrev() {
-    renderCoTable(prev, 'tbody-prev', 'prev');
-    g('b-prev').textContent  = prev.length;
-    g('tb-prev').textContent = prev.length;
+function renderPrev(){
+    renderCoTable(prev,'tbody-prev','prev');
+    g('b-prev').textContent = g('tb-prev').textContent = prev.length;
 }
-function renderCoTable(arr, tbodyId, key) {
-    const tbody = g(tbodyId);
-    if (!arr.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
-            Nenhum registro — clique em ＋ para adicionar</td></tr>`;
+function renderCoTable(arr,tbodyId,key){
+    const tbody=g(tbodyId);
+    if(!arr.length){
+        tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhum registro — clique em 📋 Colar lista ou ＋ Linha</td></tr>`;
         return;
     }
-    tbody.innerHTML = arr.map((r, i) => {
-        const cls = /reentrada|reent/i.test(r.obs) ? 'r-reent' : /lco|late/i.test(r.obs) ? 'r-lco' : '';
-        let tags = '';
-        if (/lco|late/i.test(r.obs))       tags += '<span class="itag xt-lco">🕐 LCO</span> ';
-        if (/reentrada|reent/i.test(r.obs)) tags += '<span class="itag xt-reent">🔄 Reentrada</span> ';
+    tbody.innerHTML=arr.map((r,i)=>{
+        const cls=/reentrada|reent/i.test(r.obs)?'r-reent':/lco|late/i.test(r.obs)?'r-lco':'';
+        let tags='';
+        if(/lco|late/i.test(r.obs))       tags+='<span class="itag xt-lco">🕐 LCO</span> ';
+        if(/reentrada|reent/i.test(r.obs)) tags+='<span class="itag xt-reent">🔄</span> ';
         return `<tr class="${cls}">
             <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
-            <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setField('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
-            <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setField('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
-            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setField('${key}',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setField('${key}',${i},'ct',this.value)">
-                ${['SUP','STD','SUI','PHO','DLX'].map(o=>`<option ${r.ct===o?'selected':''}>${o}</option>`).join('')}
-            </select></td>
-            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome" oninput="setField('${key}',${i},'nome',this.value)" style="min-width:150px"></td>
-            <td><div style="display:flex;align-items:center;gap:4px">
-                ${tags}<input class="ei" value="${esc(r.obs)}" placeholder="LCO / Reentrada no SUP / observação…"
-                    oninput="setField('${key}',${i},'obs',this.value);re('${key}')"
-                    style="min-width:160px">
+            <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
+            <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
+            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('${key}',${i},'uh',this.value)"></td>
+            <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome" oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
+            <td><div style="display:flex;align-items:center;gap:4px">${tags}
+                <input class="ei" value="${esc(r.obs)}" placeholder="LCO / Reentrada no SUP / observação…"
+                    oninput="setF('${key}',${i},'obs',this.value);re('${key}')"
+                    style="min-width:150px">
                 <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
             </div></td>
         </tr>`;
     }).join('');
 }
 
-/* ── Reservas Especiais ── */
-function renderEsp() {
-    renderEspTable(esp, 'tbody-esp', 'esp', true);
-    g('b-esp').textContent  = esp.length;
-    g('tb-esp').textContent = esp.length;
-    g('kpi-esp').textContent = esp.length;
-}
-function renderPrevEsp() {
-    renderEspTable(prevEsp, 'tbody-prev-esp', 'prev-esp', false);
-    g('b-prev-esp').textContent = prevEsp.length;
-}
-function renderEspTable(arr, tbodyId, key, showTipo) {
-    const tbody = g(tbodyId);
-    if (!arr.length) {
-        const cols = showTipo ? 8 : 7;
-        tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
-            Nenhuma reserva especial — clique em ＋ para adicionar</td></tr>`;
-        return;
+function renderEsp(){
+    purgeEsp(); // garante que especiais expiradas saem
+    const tbody=g('tbody-esp');
+    const hoje = g('t-data').value;
+    const ativas = esp; // já filtrado pelo purge
+    if(!ativas.length){
+        tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial na casa — clique em ＋ para adicionar</td></tr>`;
+    } else {
+        tbody.innerHTML=ativas.map((r,i)=>{
+            // dias restantes
+            const coIso = toIso(r.checkout);
+            let diasRestantes = '';
+            if(coIso && hoje){
+                const diff = Math.ceil((new Date(coIso)-new Date(hoje))/86400000);
+                if(diff===0) diasRestantes='<span style="color:#dc2626;font-size:10px;font-weight:700"> (HOJE)</span>';
+                else if(diff>0) diasRestantes=`<span style="color:var(--text-soft);font-size:10px"> (${diff}d)</span>`;
+            }
+            const tipoInfo = {
+                'long_stay':   {l:'🏷️ Long Stay',  c:'tipo-ls'},
+                'especial':    {l:'⭐ Especial',    c:'tipo-esp'},
+                'lua_de_mel':  {l:'💑 Lua de Mel',  c:'tipo-lm'},
+                'vip':         {l:'👑 VIP',          c:'tipo-vip'},
+                'aniversario': {l:'🎂 Aniversário', c:'tipo-aniv'},
+            }[r.tipo||'long_stay']||{l:'⭐',c:'tipo-esp'};
+            return `<tr>
+                <td class="td-del"><button class="btn-del" onclick="delRow('esp',${i})">✕</button></td>
+                <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="esp[${i}].uh=this.value;salvarEsp()"></td>
+                <td><select class="es" onchange="esp[${i}].ct=this.value;salvarEsp()">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="esp[${i}].reserva=this.value;salvarEsp()"></td>
+                <td><input class="ei ei-date" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkin=this.value;salvarEsp()"></td>
+                <td><input class="ei ei-date" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkout=this.value;salvarEsp()">${diasRestantes}</td>
+                <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - Long stay / motivo" oninput="esp[${i}].descricao=this.value;salvarEsp()" style="min-width:160px"></td>
+                <td><select class="es" onchange="esp[${i}].tipo=this.value;salvarEsp();renderEsp()">
+                    ${[['long_stay','🏷️ Long Stay'],['especial','⭐ Especial'],['lua_de_mel','💑 Lua de Mel'],['vip','👑 VIP'],['aniversario','🎂 Aniversário']].map(([v,l])=>`<option value="${v}" ${(r.tipo||'long_stay')===v?'selected':''}>${l}</option>`).join('')}
+                </select></td>
+            </tr>`;
+        }).join('');
     }
-    tbody.innerHTML = arr.map((r, i) => `<tr>
-        <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
-        <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setField('${key}',${i},'uh',this.value)"></td>
-        <td><select class="es" onchange="setField('${key}',${i},'ct',this.value)">
-            ${['SUP','STD','SUI','PHO','DLX'].map(o=>`<option ${r.ct===o?'selected':''}>${o}</option>`).join('')}
-        </select></td>
-        <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setField('${key}',${i},'reserva',this.value)"></td>
-        <td><input class="ei ei-date" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="setField('${key}',${i},'checkin',this.value)"></td>
-        <td><input class="ei ei-date" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="setField('${key}',${i},'checkout',this.value)"></td>
-        <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - Long stay / Lua de mel…" oninput="setField('${key}',${i},'descricao',this.value)" style="min-width:180px"></td>
-        ${showTipo ? `<td><select class="es" onchange="setField('${key}',${i},'tipo',this.value)">
-            ${[['long_stay','🏷️ Long Stay'],['especial','⭐ Especial'],['lua_de_mel','💑 Lua de Mel'],['vip','👑 VIP'],['aniversario','🎂 Aniversário']].map(([v,l])=>`<option value="${v}" ${r.tipo===v?'selected':''}>${l}</option>`).join('')}
-        </select></td>` : ''}
-    </tr>`).join('');
+    g('b-esp').textContent = g('tb-esp').textContent = ativas.length;
+    g('kpi-esp').textContent = ativas.length;
 }
 
-/* ── Check-ins Pendentes ── */
-function renderCi() {
-    const tbody = g('tbody-ci');
-    if (!ci.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
-            Sem check-ins pendentes — clique em ＋ para adicionar</td></tr>`;
+function renderCi(){
+    const tbody=g('tbody-ci');
+    if(!ci.length){
+        tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Sem check-ins pendentes — clique em 📋 Colar lista ou ＋ Linha</td></tr>`;
     } else {
-        tbody.innerHTML = ci.map((r, i) => `<tr>
+        tbody.innerHTML=ci.map((r,i)=>`<tr>
             <td class="td-del"><button class="btn-del" onclick="delRow('ci',${i})">✕</button></td>
-            <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Nº Reserva" oninput="setField('ci',${i},'reserva',this.value)"></td>
-            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome" oninput="setField('ci',${i},'nome',this.value)" style="min-width:150px"></td>
-            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setField('ci',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setField('ci',${i},'ct',this.value)">
-                ${['SUP','STD','SUI','PHO','DLX'].map(o=>`<option ${r.ct===o?'selected':''}>${o}</option>`).join('')}
-            </select></td>
-            <td><input class="ei" value="${esc(r.obs)}" placeholder="Observação" oninput="setField('ci',${i},'obs',this.value)" style="min-width:120px"></td>
+            <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Nº Reserva" oninput="setF('ci',${i},'reserva',this.value)"></td>
+            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome" oninput="setF('ci',${i},'nome',this.value)" style="min-width:150px"></td>
+            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('ci',${i},'uh',this.value)"></td>
+            <td><select class="es" onchange="setF('ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td><input class="ei" value="${esc(r.obs)}" placeholder="Observação" oninput="setF('ci',${i},'obs',this.value)" style="min-width:120px"></td>
         </tr>`).join('');
     }
-    g('b-ci').textContent  = ci.length;
-    g('tb-ci').textContent = ci.length;
+    g('b-ci').textContent = g('tb-ci').textContent = ci.length;
 }
 
-/* ── Ocorrências ── */
-function renderOcorr() {
-    const list = g('ocorr-list');
-    list.innerHTML = ocorr.length
-        ? ocorr.map((o, i) => `<div class="ocorr-item">
-            <div class="ocorr-dot"></div>
-            <span style="flex:1">${esc(o)}</span>
-            <button class="ocorr-del" onclick="delOcorr(${i})">✕</button>
-          </div>`).join('')
-        : '<div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência registrada.</div>';
-    g('b-oc').textContent  = ocorr.length;
-    g('tb-oc').textContent = ocorr.length;
+function renderOcorr(){
+    const list=g('ocorr-list');
+    list.innerHTML=ocorr.length
+        ? ocorr.map((o,i)=>`<div class="ocorr-item"><div class="ocorr-dot"></div><span style="flex:1">${esc(o)}</span><button class="ocorr-del" onclick="delOcorr(${i})">✕</button></div>`).join('')
+        : '<div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência.</div>';
+    g('b-oc').textContent = g('tb-oc').textContent = ocorr.length;
 }
-function addOcorr() {
-    const txt = g('ocorr-input').value.trim();
-    if (!txt) return;
-    ocorr.push(txt);
-    g('ocorr-input').value = '';
-    renderOcorr();
-}
-function delOcorr(i) { ocorr.splice(i, 1); renderOcorr(); }
+function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); }
+function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
 
-// ══ ADD / DEL / SET ══
-const ARRAYS = {
-    'co':       () => ({ uh:'', ct:'SUP', nome:'', obs:'', pre:false, trip:false }),
-    'prev':     () => ({ uh:'', ct:'SUP', nome:'', obs:'', pre:false, trip:false }),
-    'esp':      () => ({ uh:'', ct:'SUP', reserva:'', checkin:'', checkout:'', descricao:'', tipo:'long_stay' }),
-    'prev-esp': () => ({ uh:'', ct:'SUP', reserva:'', checkin:'', checkout:'', descricao:'' }),
-    'ci':       () => ({ reserva:'', nome:'', uh:'', ct:'SUP', obs:'' }),
-};
-const DATA = { co, prev, 'prev-esp': prevEsp, esp, ci };
-const RENDER = {
-    'co': renderCo, 'prev': renderPrev,
-    'esp': renderEsp, 'prev-esp': renderPrevEsp, 'ci': renderCi,
-};
+function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderCi(); renderOcorr(); }
 
-function getData(key) {
-    if (key === 'co')       return co;
-    if (key === 'prev')     return prev;
-    if (key === 'esp')      return esp;
-    if (key === 'prev-esp') return prevEsp;
-    if (key === 'ci')       return ci;
-    return [];
+// ══ HELPERS ══
+function ctOpts(sel){
+    return ['SUP','STD','SUI','PHO','DLX'].map(o=>`<option ${(sel||'SUP')===o?'selected':''}>${o}</option>`).join('');
 }
-function addRow(key) {
-    getData(key).push(ARRAYS[key]());
-    re(key);
-    // foca no primeiro input da última linha
-    setTimeout(() => {
-        const tbody = g('tbody-' + key.replace('-',''));
-        if (!tbody) return;
-        const rows = tbody.querySelectorAll('tr');
-        const last = rows[rows.length - 1];
-        if (last) { const inp = last.querySelector('input.ei'); if (inp) { inp.focus(); inp.select(); } }
-    }, 60);
+function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:ci; }
+function setF(k,i,f,v){ getData(k)[i][f]=v; }
+function addRow(k){
+    const def = {
+        co:   {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false},
+        prev: {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false},
+        esp:  {uh:'',ct:'SUP',reserva:'',checkin:'',checkout:'',descricao:'',tipo:'long_stay'},
+        ci:   {reserva:'',nome:'',uh:'',ct:'SUP',obs:''},
+    }[k];
+    getData(k).push({...def});
+    re(k);
+    setTimeout(()=>{
+        const id = k==='esp'?'tbody-esp':k==='ci'?'tbody-ci':`tbody-${k}`;
+        const rows=g(id)?.querySelectorAll('tr'); if(!rows?.length)return;
+        const inp=rows[rows.length-1].querySelector('input.ei'); if(inp){inp.focus();inp.select();}
+    },60);
 }
-function delRow(key, i) { getData(key).splice(i, 1); re(key); }
-function setField(key, i, field, val) { getData(key)[i][field] = val; }
-function re(key) { RENDER[key] && RENDER[key](); syncData(); }
+function delRow(k,i){
+    getData(k).splice(i,1);
+    if(k==='esp') salvarEsp();
+    re(k);
+}
+function re(k){
+    ({co:renderCo,prev:renderPrev,esp:renderEsp,ci:renderCi}[k]||renderCi)();
+}
 
 // ══ TAG MENU ══
-function tagMenu(key, i, btn) {
+function tagMenu(k,i,btn){
     document.getElementById('__tm')?.remove();
-    const opts = [
-        { l:'🕐 Late Check-out', v:'LCO' },
-        { l:'🔄 Reentrada no SUP', v:'Reentrada no SUP' },
-        { l:'🔄 Reentrada no STD', v:'Reentrada no STD' },
-        { l:'⭐ Reserva Especial', v:'Reserva Especial' },
-        { l:'💑 Lua de Mel', v:'Lua de Mel' },
-        { l:'🎂 Aniversário', v:'Aniversário' },
+    const opts=[
+        {l:'🕐 Late Check-out',v:'LCO'},
+        {l:'🔄 Reentrada no SUP',v:'Reentrada no SUP'},
+        {l:'🔄 Reentrada no STD',v:'Reentrada no STD'},
+        {l:'🔄 Reentrada no SUI',v:'Reentrada no SUI'},
+        {l:'⭐ Reserva Especial',v:'Reserva Especial'},
+        {l:'💑 Lua de Mel',v:'Lua de Mel'},
+        {l:'🎂 Aniversário',v:'Aniversário'},
     ];
-    const m = document.createElement('div');
-    m.id = '__tm';
-    m.style.cssText = 'position:fixed;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:600;padding:5px;min-width:190px;';
-    opts.forEach(o => {
-        const b = document.createElement('button');
-        b.textContent = o.l;
-        b.style.cssText = 'display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;color:var(--text-main);';
-        b.onmouseover = () => b.style.background = 'var(--bg-hover)';
-        b.onmouseout  = () => b.style.background = 'none';
-        b.onclick = () => {
-            const arr = getData(key);
-            arr[i].obs = o.v; re(key); m.remove();
-        };
+    const m=document.createElement('div');
+    m.id='__tm';
+    m.style.cssText='position:fixed;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:600;padding:5px;min-width:200px;';
+    opts.forEach(o=>{
+        const b=document.createElement('button');
+        b.textContent=o.l;
+        b.style.cssText='display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;color:var(--text-main);';
+        b.onmouseover=()=>b.style.background='var(--bg-hover)';
+        b.onmouseout=()=>b.style.background='none';
+        b.onclick=()=>{ getData(k)[i].obs=o.v; re(k); m.remove(); };
         m.appendChild(b);
     });
-    const r = btn.getBoundingClientRect();
-    m.style.top  = (r.bottom + 4) + 'px';
-    m.style.left = Math.min(r.left, window.innerWidth - 210) + 'px';
+    const r=btn.getBoundingClientRect();
+    m.style.top=(r.bottom+4)+'px';
+    m.style.left=Math.min(r.left,window.innerWidth-210)+'px';
     document.body.appendChild(m);
-    setTimeout(() => document.addEventListener('click', () => m.remove(), { once: true }), 50);
+    setTimeout(()=>document.addEventListener('click',()=>m.remove(),{once:true}),50);
 }
+
+// ══ MODAL COLAR ══
+let colarKey='co';
+const HINTS={
+    co:   '<strong>Check-outs do dia.</strong> Cole do Oracle ou planilha.<br>Exemplos aceitos:<br>• <code>21  SUP  Manuel,Rui</code><br>• <code>Manuel,Rui</code><br>• <code>21  SUP  Manuel,Rui  LCO</code>',
+    prev: '<strong>Check-outs previstos amanhã.</strong> Mesmo formato dos check-outs.<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code>',
+    ci:   '<strong>Check-ins pendentes.</strong> Cole do Oracle ou planilha.<br>• <code>336271347  Ramos,Maria Luiza</code><br>• <code>Ramos,Maria Luiza</code>',
+};
+const TITULOS={co:'📋 Colar — Check-outs do Dia',prev:'📋 Colar — Check-outs Amanhã',ci:'📋 Colar — Check-ins Pendentes'};
+
+function abrirColar(k){
+    colarKey=k;
+    g('paste-titulo').textContent=TITULOS[k]||'📋 Colar lista';
+    g('paste-hint').innerHTML=HINTS[k]||'';
+    g('paste-ta').value='';
+    g('paste-prev').classList.remove('show');
+    g('paste-modal').classList.add('open');
+    setTimeout(()=>g('paste-ta').focus(),100);
+}
+function fecharColar(){ g('paste-modal').classList.remove('open'); }
+
+function parseLinha(linha,key){
+    const raw=linha.trim(); if(!raw||raw.startsWith('#'))return null;
+    let cols=raw.split('\t').map(s=>s.trim()).filter(s=>s);
+    if(cols.length===1) cols=raw.split(/  +/).map(s=>s.trim()).filter(s=>s);
+    if(cols.length===1) cols=raw.split(';').map(s=>s.trim()).filter(s=>s);
+
+    const isCT=s=>/^(SUP|STD|SUI|PHO|DLX|DBL|SGL|TRP|SUT)$/i.test(s.trim());
+    const isNum=s=>/^\d+$/.test(s.trim());
+
+    if(key==='ci'){
+        let reserva='',nome='',uh='',ct='SUP',obs='';
+        if(cols.length>=2){
+            if(isNum(cols[0])&&!isCT(cols[0])){ reserva=cols[0]; nome=cols[1]; uh=isNum(cols[2]||'')?cols[2]:''; ct=isCT(cols[3]||'')?cols[3]:'SUP'; obs=cols[4]||''; }
+            else { nome=cols[0]; uh=isNum(cols[1]||'')?cols[1]:''; ct=isCT(cols[2]||'')?cols[2]:'SUP'; obs=cols[3]||''; }
+        } else { nome=raw; }
+        return{reserva,nome:limpar(nome),uh,ct:ct||'SUP',obs};
+    }
+    // co / prev
+    let uh='',ct='SUP',nome='',obs='';
+    if(cols.length===1){ nome=raw; }
+    else if(cols.length===2){
+        if(isNum(cols[0])){ uh=cols[0]; nome=cols[1]; }
+        else if(isCT(cols[0])){ ct=cols[0]; nome=cols[1]; }
+        else { nome=cols[0]; obs=cols[1]; }
+    } else {
+        let idx=0;
+        if(isNum(cols[idx])&&!isCT(cols[idx])) uh=cols[idx++];
+        if(isCT(cols[idx])) ct=cols[idx++];
+        else if(isNum(cols[idx])) uh=cols[idx++];
+        nome=cols[idx++]||'';
+        obs=cols.slice(idx).join(' ');
+    }
+    return{uh:uh.trim(),ct:ct||'SUP',nome:limpar(nome),obs:obs.trim(),pre:false,trip:false};
+}
+function limpar(s){ return s.replace(/[\r\n]+/g,'').replace(/  +/g,' ').trim(); }
+
+function previewColar(){
+    const linhas=g('paste-ta').value.split('\n').map(l=>l.trim()).filter(l=>l);
+    const pv=g('paste-prev');
+    if(!linhas.length){pv.classList.remove('show');return;}
+    const parsed=linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
+    pv.classList.add('show');
+    pv.innerHTML=`<strong>${parsed.length} linha(s) detectada(s)</strong> — prévia das 3 primeiras:<br><br>`+
+        parsed.slice(0,3).map(r=>
+            colarKey==='ci'
+                ? `• ${r.nome} ${r.reserva?'('+r.reserva+')':''} UH ${r.uh||'?'} [${r.ct}]`
+                : `• UH ${r.uh||'?'} [${r.ct}] — ${r.nome}${r.obs?' | '+r.obs:''}`
+        ).join('<br>')+(parsed.length>3?`<br><em>…e mais ${parsed.length-3}</em>`:'');
+}
+
+function confirmarColar(){
+    const linhas=g('paste-ta').value.split('\n').map(l=>l.trim()).filter(l=>l);
+    const parsed=linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
+    if(!parsed.length){toast('⚠️ Nenhuma linha reconhecida');return;}
+    parsed.forEach(r=>getData(colarKey).push(r));
+    re(colarKey);
+    fecharColar();
+    toast(`✅ ${parsed.length} linha(s) importada(s)!`);
+}
+g('paste-modal').addEventListener('click',e=>{if(e.target===g('paste-modal'))fecharColar();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharColar();});
 
 // ══ NOVA AUDITORIA ══
-function novaAuditoria() {
-    if (co.length + prev.length + esp.length + ci.length > 0) {
-        if (!confirm('Criar nova auditoria vai limpar os dados atuais. Deseja salvar primeiro?')) return;
+function novaAuditoria(){
+    if(co.length+prev.length+ci.length>0){
+        if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
     }
-    co = []; prev = []; prevEsp = []; esp = []; ci = []; ocorr = [];
-    g('t-turno').value   = '';
-    g('t-data').value    = new Date().toISOString().split('T')[0];
-    g('t-ocup').value    = '';
-    g('t-dm').value      = '';
-    g('t-uh-bloq').value = '0';
-    g('prev-ocup').value  = '';
-    g('prev-diaria').value = '';
-    g('prev-ent').value   = '';
-    g('prev-sai').value   = '';
-    g('prev-cafe').value  = '';
-    renderTudo();
-    syncData();
-    setTab('checkout');
-    g('t-turno').focus();
-}
-
-function renderTudo() {
-    renderCo(); renderPrev(); renderEsp(); renderPrevEsp(); renderCi(); renderOcorr();
+    co=[]; prev=[]; ci=[]; ocorr=[];
+    ['t-turno','t-ocup','t-dm','prev-ocup','prev-diaria','prev-uh','prev-ent','prev-sai','prev-cafe','cat-sup','cat-std','cat-sui','cat-pho'].forEach(id=>{const el=g(id);if(el)el.value='';});
+    g('t-data').value=new Date().toISOString().split('T')[0];
+    g('t-uh-bloq').value='0';
+    renderTudo(); syncUI(); setTab('checkout'); g('t-turno').focus();
+    purgeEsp(); // purge com nova data
 }
 
 // ══ SALVAR ══
-function salvar() {
-    const snap = {
-        id: Date.now(),
-        turno:    g('t-turno').value,
-        data:     g('t-data').value,
-        ocupacao: g('t-ocup').value,
-        dm:       g('t-dm').value,
-        uh_bloq:  g('t-uh-bloq').value,
-        prev_ocup:   g('prev-ocup').value,
-        prev_diaria: g('prev-diaria').value,
-        prev_ent:    g('prev-ent').value,
-        prev_sai:    g('prev-sai').value,
-        prev_cafe:   g('prev-cafe').value,
-        co: JSON.parse(JSON.stringify(co)),
-        prev: JSON.parse(JSON.stringify(prev)),
-        prevEsp: JSON.parse(JSON.stringify(prevEsp)),
-        esp: JSON.parse(JSON.stringify(esp)),
-        ci: JSON.parse(JSON.stringify(ci)),
-        ocorr: [...ocorr],
+function salvar(){
+    const snap={
+        id:Date.now(),
+        turno:g('t-turno').value, data:g('t-data').value,
+        ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
+        prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
+        prev_uh:g('prev-uh').value, prev_ent:g('prev-ent').value,
+        prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
+        cat_sup:g('cat-sup').value, cat_std:g('cat-std').value,
+        cat_sui:g('cat-sui').value, cat_pho:g('cat-pho').value,
+        co:JSON.parse(JSON.stringify(co)),
+        prev:JSON.parse(JSON.stringify(prev)),
+        ci:JSON.parse(JSON.stringify(ci)),
+        ocorr:[...ocorr],
     };
-    let hist = []; try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
-    hist.unshift(snap);
-    if (hist.length > 30) hist = hist.slice(0, 30);
-    localStorage.setItem(LS_KEY, JSON.stringify(hist));
-    renderHist();
-    toast('✅ Auditoria salva!');
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    hist.unshift(snap); if(hist.length>30)hist=hist.slice(0,30);
+    localStorage.setItem(LS_KEY,JSON.stringify(hist));
+    salvarEsp(); // especiais salvas separadamente e persistem
+    renderHist(); toast('✅ Auditoria salva!');
 }
 
-// ══ EXPORTAR ══
-function exportar() {
-    let txt = '════════════════════════════════\n   AUDITORIA HOTELEIRA\n════════════════════════════════\n';
-    txt += `Turno: ${g('t-turno').value}\nData: ${fmtDate(g('t-data').value)}\n`;
-    txt += `Ocupação: ${g('t-ocup').value}  |  DM: ${g('t-dm').value}  |  UH Bloq: ${g('t-uh-bloq').value}\n\n`;
-    txt += `PREVISÃO AMANHÃ:\n`;
-    txt += `  Ocupação: ${g('prev-ocup').value}  |  Entradas: ${g('prev-ent').value}  |  Saídas: ${g('prev-sai').value}  |  Café: ${g('prev-cafe').value}\n\n`;
+// ══ GERAR PDF ══
+function gerarPDF(){
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const hotNome = "{{ hotel.nome|striptags }}";
+    const data    = fmtDate(g('t-data').value)||'—';
+    const turno   = g('t-turno').value||'—';
+    const azul=[37,99,235], roxo=[124,58,237], amber=[180,90,0], dourado=[181,132,58], verm=[200,40,40];
+    const cinza=[100,100,100], escuro=[15,23,42];
 
-    txt += `── CHECK-OUTS DO DIA (${co.length}) ──\n`;
-    co.forEach(r => {
-        const f = [r.lco||/lco|late/i.test(r.obs)?'LCO':'', /reentrada/i.test(r.obs)?'REENTRADA':'', r.pre?'PRE':'', r.trip?'TRIP':''].filter(Boolean).join(' | ');
-        txt += `  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}${f?' ('+f+')':''}\n`;
+    // ── CABEÇALHO ──
+    doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16); doc.setFont('helvetica','bold');
+    doc.text('AUDITORIA HOTELEIRA', 14, 12);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(hotNome, 14, 18);
+    doc.setTextColor(181,132,58);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(data, 14, 24);
+    doc.setTextColor(255,255,255); doc.setFontSize(9);
+    doc.text(`Turno: ${turno}`, 80, 18);
+    doc.text(`Ocupação: ${g('t-ocup').value||'—'}`, 80, 23);
+    doc.text(`DM: ${g('t-dm').value||'—'}`, 140, 18);
+    doc.text(`UH Bloq: ${g('t-uh-bloq').value||'0'}`, 140, 23);
+
+    let y = 34;
+
+    // ── FUNÇÃO SEÇÃO ──
+    function secao(titulo, cor){
+        doc.setFillColor(...cor); doc.rect(0,y,210,7,'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+        doc.text(titulo, 14, y+5); y+=10;
+    }
+
+    // ── CHECK-OUTS DO DIA ──
+    if(co.length){
+        secao(`CHECK-OUTS DO DIA (${co.length})`, azul);
+        doc.autoTable({
+            startY:y, margin:{left:10,right:10},
+            head:[['UH','CTG','Nome do Hóspede','Observação','PRE','TRIP']],
+            body:co.map(r=>[r.uh,r.ct,r.nome,r.obs,r.pre?'✓':'',r.trip?'✓':'']),
+            styles:{fontSize:8,cellPadding:2},
+            headStyles:{fillColor:azul,textColor:255,fontStyle:'bold'},
+            alternateRowStyles:{fillColor:[245,248,255]},
+            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:55},3:{cellWidth:70},4:{cellWidth:10,halign:'center'},5:{cellWidth:10,halign:'center'}},
+        });
+        y = doc.lastAutoTable.finalY + 6;
+    }
+
+    // ── PREVISÃO ──
+    secao('PREVISÃO — AMANHÃ', roxo);
+    const prevRows=[
+        ['Ocupação',g('prev-ocup').value||'—','Diária Média',g('prev-diaria').value||'—'],
+        ['UHs Ocupadas',g('prev-uh').value||'—','Café da Manhã',g('prev-cafe').value||'—'],
+        ['Entradas',g('prev-ent').value||'—','Saídas',g('prev-sai').value||'—'],
+        ['SUP',g('cat-sup').value||'—','STD',g('cat-std').value||'—'],
+        ['SUI',g('cat-sui').value||'—','PHO',g('cat-pho').value||'—'],
+    ];
+    doc.autoTable({
+        startY:y, margin:{left:10,right:10},
+        head:[['Indicador','Valor','Indicador','Valor']],
+        body:prevRows,
+        styles:{fontSize:8,cellPadding:2},
+        headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
+        alternateRowStyles:{fillColor:[248,245,255]},
+        columnStyles:{0:{cellWidth:40,fontStyle:'bold'},1:{cellWidth:40},2:{cellWidth:40,fontStyle:'bold'},3:{cellWidth:40}},
     });
+    y = doc.lastAutoTable.finalY + 6;
 
-    txt += `\n── CHECK-OUTS PREVISTOS — AMANHÃ (${prev.length}) ──\n`;
-    prev.forEach(r => { txt += `  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`; });
+    // ── CHECK-OUTS AMANHÃ ──
+    if(prev.length){
+        secao(`CHECK-OUTS PREVISTOS AMANHÃ (${prev.length})`, roxo);
+        doc.autoTable({
+            startY:y, margin:{left:10,right:10},
+            head:[['UH','CTG','Nome do Hóspede','Observação']],
+            body:prev.map(r=>[r.uh,r.ct,r.nome,r.obs]),
+            styles:{fontSize:8,cellPadding:2},
+            headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
+            alternateRowStyles:{fillColor:[248,245,255]},
+            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:60},3:{cellWidth:80}},
+        });
+        y = doc.lastAutoTable.finalY + 6;
+    }
 
-    txt += `\n── RESERVAS ESPECIAIS — HOJE (${esp.length}) ──\n`;
-    esp.forEach(r => { txt += `  UH ${r.uh} [${r.ct}] ${r.reserva} | ${r.checkin}→${r.checkout} | ${r.descricao} | ${r.tipo||''}\n`; });
+    // ── RESERVAS ESPECIAIS ──
+    if(esp.length){
+        if(y>220){ doc.addPage(); y=14; }
+        secao(`RESERVAS ESPECIAIS NA CASA (${esp.length})`, dourado);
+        doc.autoTable({
+            startY:y, margin:{left:10,right:10},
+            head:[['UH','CTG','Reserva','Check-in','Check-out','Nome / Descrição','Tipo']],
+            body:esp.map(r=>[r.uh,r.ct,r.reserva,r.checkin,r.checkout,r.descricao,r.tipo?.replace('_',' ')||'']),
+            styles:{fontSize:7.5,cellPadding:2},
+            headStyles:{fillColor:dourado,textColor:255,fontStyle:'bold'},
+            alternateRowStyles:{fillColor:[255,252,245]},
+            columnStyles:{0:{cellWidth:12},1:{cellWidth:12},2:{cellWidth:22},3:{cellWidth:20},4:{cellWidth:20},5:{cellWidth:65},6:{cellWidth:19}},
+        });
+        y = doc.lastAutoTable.finalY + 6;
+    }
 
-    txt += `\n── RESERVAS ESPECIAIS — AMANHÃ (${prevEsp.length}) ──\n`;
-    prevEsp.forEach(r => { txt += `  UH ${r.uh} [${r.ct}] ${r.reserva} | ${r.checkin}→${r.checkout} | ${r.descricao}\n`; });
+    // ── CHECK-INS PENDENTES ──
+    if(ci.length){
+        if(y>230){ doc.addPage(); y=14; }
+        secao(`CHECK-INS PENDENTES (${ci.length})`, amber);
+        doc.autoTable({
+            startY:y, margin:{left:10,right:10},
+            head:[['Reserva','Nome do Hóspede','UH','CTG','Observação']],
+            body:ci.map(r=>[r.reserva,r.nome,r.uh,r.ct,r.obs]),
+            styles:{fontSize:8,cellPadding:2},
+            headStyles:{fillColor:amber,textColor:255,fontStyle:'bold'},
+            alternateRowStyles:{fillColor:[255,252,235]},
+            columnStyles:{0:{cellWidth:24},1:{cellWidth:60},2:{cellWidth:12},3:{cellWidth:14},4:{cellWidth:56}},
+        });
+        y = doc.lastAutoTable.finalY + 6;
+    }
 
-    txt += `\n── CHECK-INS PENDENTES (${ci.length}) ──\n`;
-    ci.forEach(r => { txt += `  ${r.reserva} | UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`; });
+    // ── OCORRÊNCIAS ──
+    if(ocorr.length){
+        if(y>240){ doc.addPage(); y=14; }
+        secao(`OCORRÊNCIAS (${ocorr.length})`, verm);
+        doc.autoTable({
+            startY:y, margin:{left:10,right:10},
+            head:[['#','Descrição']],
+            body:ocorr.map((o,i)=>[i+1,o]),
+            styles:{fontSize:8,cellPadding:2},
+            headStyles:{fillColor:verm,textColor:255,fontStyle:'bold'},
+            alternateRowStyles:{fillColor:[255,245,245]},
+            columnStyles:{0:{cellWidth:10},1:{cellWidth:160}},
+        });
+        y = doc.lastAutoTable.finalY + 6;
+    }
 
-    txt += `\n── OCORRÊNCIAS (${ocorr.length}) ──\n`;
-    ocorr.forEach(o => { txt += `  • ${o}\n`; });
+    // ── RODAPÉ ──
+    const pTotal=doc.getNumberOfPages();
+    for(let p=1;p<=pTotal;p++){
+        doc.setPage(p);
+        doc.setDrawColor(200,200,200); doc.line(10,285,200,285);
+        doc.setTextColor(150,150,150); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(`${hotNome} — Auditoria ${data} — Turno: ${turno}`, 10, 289);
+        doc.text(`Página ${p} de ${pTotal}`, 190, 289, {align:'right'});
+    }
 
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
-    a.download = `auditoria_${g('t-data').value || 'hoje'}.txt`;
+    // Download + abrir para email
+    const filename=`Auditoria_${g('t-data').value||'hoje'}.pdf`;
+    doc.save(filename);
+    toast('📄 PDF gerado! Abra o arquivo para enviar por email.');
+}
+
+// ══ EXPORTAR TXT ══
+function exportarTxt(){
+    let txt='════════════════════════════════\n   AUDITORIA HOTELEIRA\n════════════════════════════════\n';
+    txt+=`Turno: ${g('t-turno').value}\nData: ${fmtDate(g('t-data').value)}\n`;
+    txt+=`Ocupação: ${g('t-ocup').value}  |  DM: ${g('t-dm').value}  |  UH Bloq: ${g('t-uh-bloq').value}\n\n`;
+    txt+=`PREVISÃO AMANHÃ:\n  Ocupação: ${g('prev-ocup').value} | UHs: ${g('prev-uh').value} | Entradas: ${g('prev-ent').value} | Saídas: ${g('prev-sai').value} | Café: ${g('prev-cafe').value}\n`;
+    txt+=`  Entradas por CTG: SUP ${g('cat-sup').value} | STD ${g('cat-std').value} | SUI ${g('cat-sui').value} | PHO ${g('cat-pho').value}\n\n`;
+    txt+=`── CHECK-OUTS DO DIA (${co.length}) ──\n`;
+    co.forEach(r=>{ const f=[/lco|late/i.test(r.obs)?'LCO':'',/reentrada/i.test(r.obs)?'REENTRADA':'',r.pre?'PRE':'',r.trip?'TRIP':''].filter(Boolean).join('|'); txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}${f?' ('+f+')':''}\n`; });
+    txt+=`\n── CHECK-OUTS PREVISTOS AMANHÃ (${prev.length}) ──\n`;
+    prev.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`);
+    txt+=`\n── RESERVAS ESPECIAIS NA CASA (${esp.length}) ──\n`;
+    esp.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.reserva} | ${r.checkin}→${r.checkout} | ${r.descricao} | ${r.tipo||''}\n`);
+    txt+=`\n── CHECK-INS PENDENTES (${ci.length}) ──\n`;
+    ci.forEach(r=>txt+=`  ${r.reserva} | UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`);
+    txt+=`\n── OCORRÊNCIAS (${ocorr.length}) ──\n`;
+    ocorr.forEach(o=>txt+=`  • ${o}\n`);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+    a.download=`Auditoria_${g('t-data').value||'hoje'}.txt`;
     a.click();
 }
 
 // ══ HISTÓRICO ══
-function renderHist() {
-    let hist = []; try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
-    const el = g('hist-list');
-    if (!hist.length) {
-        el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';
-        return;
-    }
-    el.innerHTML = hist.map((h, i) => `
+function renderHist(){
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const el=g('hist-list');
+    if(!hist.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';return;}
+    el.innerHTML=hist.map((h,i)=>`
         <div class="hist-item" onclick="carregarHist(${i})">
             <span style="font-size:18px">📋</span>
             <div>
-                <div class="hist-nome">${h.turno || 'Auditoria'}</div>
-                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | Prev: ${(h.prev||[]).length} | Esp: ${(h.esp||[]).length}</div>
+                <div class="hist-nome">${h.turno||'Auditoria'}</div>
+                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | Prev: ${(h.prev||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
-            <span class="hist-ocup">${h.ocupacao || '—'}</span>
+            <div style="text-align:right">
+                <div class="hist-ocup">${h.ocupacao||'—'}</div>
+                <div style="font-size:10px;color:var(--text-soft);margin-top:2px">DM: ${h.dm||'—'}</div>
+            </div>
         </div>`).join('');
 }
-
-function carregarHist(i) {
-    let hist = []; try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
-    const h = hist[i]; if (!h) return;
-    co      = h.co      ? JSON.parse(JSON.stringify(h.co))      : [];
-    prev    = h.prev    ? JSON.parse(JSON.stringify(h.prev))    : [];
-    prevEsp = h.prevEsp ? JSON.parse(JSON.stringify(h.prevEsp)) : [];
-    esp     = h.esp     ? JSON.parse(JSON.stringify(h.esp))     : [];
-    ci      = h.ci      ? JSON.parse(JSON.stringify(h.ci))      : [];
-    ocorr   = h.ocorr   ? [...h.ocorr]                          : [];
-    g('t-turno').value    = h.turno    || '';
-    g('t-data').value     = h.data     || '';
-    g('t-ocup').value     = h.ocupacao || '';
-    g('t-dm').value       = h.dm       || '';
-    g('t-uh-bloq').value  = h.uh_bloq  || '0';
-    g('prev-ocup').value   = h.prev_ocup   || '';
-    g('prev-diaria').value = h.prev_diaria || '';
-    g('prev-ent').value    = h.prev_ent    || '';
-    g('prev-sai').value    = h.prev_sai    || '';
-    g('prev-cafe').value   = h.prev_cafe   || '';
-    renderTudo(); syncData();
-    setTab('checkout');
+function carregarHist(i){
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const h=hist[i]; if(!h)return;
+    co    = h.co   ?JSON.parse(JSON.stringify(h.co))  :[];
+    prev  = h.prev ?JSON.parse(JSON.stringify(h.prev)):[];
+    ci    = h.ci   ?JSON.parse(JSON.stringify(h.ci))  :[];
+    ocorr = h.ocorr?[...h.ocorr]:[];
+    ['turno','data','ocup','dm','uh_bloq'].forEach(k=>{ const el=g('t-'+k.replace('_bloq','-bloq')); if(el)el.value=h[k]||''; });
+    g('t-turno').value=h.turno||''; g('t-data').value=h.data||''; g('t-ocup').value=h.ocupacao||'';
+    g('t-dm').value=h.dm||''; g('t-uh-bloq').value=h.uh_bloq||'0';
+    g('prev-ocup').value=h.prev_ocup||''; g('prev-diaria').value=h.prev_diaria||'';
+    g('prev-uh').value=h.prev_uh||''; g('prev-ent').value=h.prev_ent||'';
+    g('prev-sai').value=h.prev_sai||''; g('prev-cafe').value=h.prev_cafe||'';
+    g('cat-sup').value=h.cat_sup||''; g('cat-std').value=h.cat_std||'';
+    g('cat-sui').value=h.cat_sui||''; g('cat-pho').value=h.cat_pho||'';
+    renderTudo(); syncUI(); setTab('checkout');
     toast('📋 Auditoria carregada!');
 }
-
-function limparHist() {
-    if (!confirm('Apagar todo o histórico de auditorias?')) return;
-    localStorage.removeItem(LS_KEY);
-    renderHist();
+function limparHist(){
+    if(!confirm('Apagar todo o histórico?'))return;
+    localStorage.removeItem(LS_KEY); renderHist();
 }
 
 // ══ UTILS ══
-function g(id) { return document.getElementById(id); }
-function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmtDate(iso) {
-    if (!iso) return '';
-    try { return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }); }
-    catch { return iso; }
+function g(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtDate(iso){
+    if(!iso)return'';
+    try{return new Date(iso+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});}catch{return iso;}
 }
-function dataAmanha(iso) {
-    if (!iso) return '—';
-    try {
-        const d = new Date(iso + 'T12:00:00');
-        d.setDate(d.getDate() + 1);
-        return 'Amanhã — ' + d.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
-    } catch { return '—'; }
+function dataAmanha(iso){
+    if(!iso)return'—';
+    try{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+1);return'Amanhã — '+d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});}catch{return'—';}
 }
-function toast(msg) {
-    const t = document.createElement('div');
-    t.className = 'toast'; t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
+function toast(msg){
+    const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+    document.body.appendChild(t); setTimeout(()=>t.remove(),3500);
 }
 
 // ══ INIT ══
-document.addEventListener('DOMContentLoaded', () => {
-    g('t-data').value = new Date().toISOString().split('T')[0];
-    syncData();
-    renderTudo();
-    renderHist();
+document.addEventListener('DOMContentLoaded',()=>{
+    g('t-data').value=new Date().toISOString().split('T')[0];
+    carregarEsp(); // carrega especiais persistidas
+    syncUI(); renderTudo(); renderHist();
 });
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
