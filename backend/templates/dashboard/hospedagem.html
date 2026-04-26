@@ -661,7 +661,8 @@
                             <th style="width:96px;color:#a5b4fc">Reserva</th>
                             <th style="width:96px;color:#a5b4fc">IN</th>
                             <th style="width:96px;color:#a5b4fc">OUT</th>
-                            <th style="color:#a5b4fc">Descrição / Nome — Tipo — Configuração</th>
+                            <th style="color:#a5b4fc">Descrição / Nome</th>
+                             <th style="width:130px;color:#a5b4fc">Tipo</th>
                             <th style="width:52px;color:#a5b4fc">UH</th>
                             <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">C</th>
                             <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">M</th>
@@ -2081,9 +2082,6 @@ function renderCatGrid() {
                 placeholder="0"
                 oninput="syncUI()">
         </div>`).join('');
-
-    // Atualiza também os selects de CTG nas tabelas (recria ctOpts)
-    renderCatOpts();
 }
 
 function renderCats() {
@@ -2474,7 +2472,7 @@ function renderEspCi() {
     const tbody = g('tbody-esp-ci');
     if (!tbody) return;
     if (!espCi.length) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
             Nenhuma reserva especial prevista — clique em ＋ para adicionar<br>
             <span style="font-size:11px">VIPs, Long Stays, Reentradas, Grupos, configuração de camas</span>
         </td></tr>`;
@@ -2485,7 +2483,10 @@ function renderEspCi() {
             <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setF('esp-ci',${i},'reserva',this.value)"></td>
             <td><input class="ei" style="width:88px" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'in',this.value)"></td>
             <td><input class="ei" style="width:88px" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'out',this.value)"></td>
-            <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - ex: Maxwell,Josh - 1 de 5 - Cama twin" oninput="setF('esp-ci',${i},'descricao',this.value)" style="min-width:220px"></td>
+            <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - ex: Maxwell,Josh - 1 de 5 - Cama twin" oninput="setF('esp-ci',${i},'descricao',this.value)" style="min-width:180px"></td>
+            <td><select class="es" onchange="setF('esp-ci',${i},'tipo',this.value)">
+                ${tipoOpts(r.tipo)}
+            </select></td>
             <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('esp-ci',${i},'uh',this.value)"></td>
             <td class="td-cme"><input type="checkbox" ${r.c?'checked':''} onchange="setF('esp-ci',${i},'c',this.checked)" title="Configuração de cama confirmada"></td>
             <td class="td-cme"><input type="checkbox" ${r.m?'checked':''} onchange="setF('esp-ci',${i},'m',this.checked)" title="Mesa/berço/extra confirmado"></td>
