@@ -13,21 +13,21 @@
     <style>
         /* ── TURNO ── */
         .turno-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:10px;margin-bottom:14px}
-        .turno-field{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 14px}
+        .turno-field{background:linear-gradient(135deg,#fff,#f8fafc);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
         .turno-field label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px}
         .turno-field input,.turno-field select{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none;transition:border-color .15s}
         .turno-field input:focus,.turno-field select:focus{border-color:var(--gold)}
         /* ── KPI ── */
         .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
         .kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent;text-align:center}
-        .kpi-card.k-green{border-top-color:#15803d}.kpi-card.k-blue{border-top-color:#2563eb}
-        .kpi-card.k-purple{border-top-color:#7c3aed}.kpi-card.k-amber{border-top-color:#d97706}
+        .kpi-card.k-green{border-top-color:#00c896}.kpi-card.k-blue{border-top-color:#0ea5e9}
+        .kpi-card.k-purple{border-top-color:#8b5cf6}.kpi-card.k-amber{border-top-color:#f59e0b}
         .kpi-card.k-gold{border-top-color:var(--gold)}
         .kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px}
         .kpi-val{font-size:26px;font-weight:700;color:var(--text-main)}
         .kpi-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
         /* ── ABAS ── */
-        .tabs-nav{display:flex;gap:2px;padding:4px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto}
+        .tabs-nav{display:flex;gap:2px;padding:4px;background:linear-gradient(135deg,#f0f4f8,#e8edf5);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto}
         .tab-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif}
         .tab-btn:hover{color:var(--text-main);background:rgba(255,255,255,.5)}
         .tab-btn.active{background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 4px rgba(0,0,0,.08)}
@@ -41,7 +41,7 @@
         .tab-pane{display:none}.tab-pane.active{display:block}
         /* ── PANEL ── */
         .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:14px}
-        .panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#f8fafc,#f0f4f8)}
         .panel-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
         .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
         .dot-green{background:#15803d}.dot-amber{background:#d97706}.dot-blue{background:#2563eb}
@@ -55,7 +55,7 @@
         /* ── TABELA EDITÁVEL ── */
         .ed-wrap{overflow-x:auto}
         .ed-t{width:100%;border-collapse:collapse;min-width:560px}
-        .ed-t thead tr.head-dark{background:#0f172a}
+        .ed-t thead tr.head-dark{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)}
         .ed-t thead tr.head-dark th{color:#94a3b8;border-bottom:2px solid #1e293b}
         .ed-t thead tr.head-purple{background:#1e1b4b}
         .ed-t thead tr.head-purple th{color:#a5b4fc;border-bottom:2px solid #312e81}
@@ -239,7 +239,8 @@
         tr.row-saiu td { opacity:.65; text-decoration:line-through; text-decoration-color:#dc2626; color:#dc2626 !important; }
         tr.row-saiu td input, tr.row-saiu td select { color:#dc2626 !important; text-decoration:line-through; text-decoration-color:#dc2626; }
         tr.row-saiu .btn-saiu { opacity:1 !important; text-decoration:none !important; color:#15803d !important; }
-        tr.row-saiu td.td-chk, tr.row-saiu td.td-del { opacity:1; text-decoration:none; }
+        tr.row-saiu td.td-chk, tr.row-saiu td.td-del { opacity:1; text-decoration:none; pointer-events:all; }
+        tr.row-saiu td.td-chk input { pointer-events:all; cursor:pointer; accent-color:#dc2626; }
         tr.row-saiu { background:rgba(220,38,38,.04) !important; }
 
         /* ── PREVISÃO — layout melhorado ── */
@@ -445,6 +446,61 @@
             padding: 0 4px; user-select: none; flex-shrink: 0;
         }
         .drag-handle:hover { color: var(--text-soft); }
+
+        /* ── SUMMARY BAR TOPO ── */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .sum-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,.15);
+        }
+        .sum-card::before {
+            content: '';
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            opacity: .06;
+            background: white;
+        }
+        .sum-card.sc-teal  { background: linear-gradient(135deg,#0d4d3a,#0f766e); }
+        .sum-card.sc-blue  { background: linear-gradient(135deg,#0c2461,#1e40af); }
+        .sum-card.sc-purple{ background: linear-gradient(135deg,#2d1b69,#6d28d9); }
+        .sum-card.sc-gold  { background: linear-gradient(135deg,#4a2c00,#b45309); }
+        .sum-card-icon { font-size: 22px; margin-bottom: 6px; opacity: .9; }
+        .sum-card-val {
+            font-size: 28px; font-weight: 800; line-height: 1;
+            letter-spacing: -1px; color: white;
+        }
+        .sum-card-lbl {
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: .6px; color: rgba(255,255,255,.6); margin-top: 5px;
+        }
+        .sum-card-sub {
+            font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px;
+        }
+        .sum-card-items {
+            margin-top: 8px; display: flex; flex-direction: column; gap: 3px;
+        }
+        .sum-item {
+            font-size: 11px; color: rgba(255,255,255,.75);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .sum-item-dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: rgba(255,255,255,.4); flex-shrink: 0;
+        }
+        @media(max-width:900px){ .summary-bar{grid-template-columns:1fr 1fr} }
+        @media(max-width:600px){ .summary-bar{grid-template-columns:1fr} }
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
@@ -516,6 +572,42 @@
                     <button class="btn-a" onclick="salvar()">💾 Salvar</button>
                     <button class="btn-a pdf" onclick="gerarPDF()">📄 Gerar PDF</button>
                     <button class="btn-a" onclick="exportarTxt()">📋 .txt</button>
+                </div>
+            </div>
+
+            <!-- SUMMARY BAR -->
+            <div class="summary-bar" id="summary-bar">
+                <!-- Card Ocupação -->
+                <div class="sum-card sc-teal">
+                    <div class="sum-card-icon">🏨</div>
+                    <div class="sum-card-val" id="sum-ocup">—</div>
+                    <div class="sum-card-lbl">Ocupação</div>
+                    <div class="sum-card-sub" id="sum-dm">DM: —</div>
+                </div>
+                <!-- Card Especiais na Casa -->
+                <div class="sum-card sc-gold">
+                    <div class="sum-card-icon">⭐</div>
+                    <div class="sum-card-val" id="sum-esp">0</div>
+                    <div class="sum-card-lbl">Especiais na Casa</div>
+                    <div class="sum-card-items" id="sum-esp-list"></div>
+                </div>
+                <!-- Card Previsão -->
+                <div class="sum-card sc-blue">
+                    <div class="sum-card-icon">🔮</div>
+                    <div class="sum-card-val" id="sum-prev-ocup">—</div>
+                    <div class="sum-card-lbl">Previsão Amanhã</div>
+                    <div class="sum-card-items">
+                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-ent">— entradas</span></div>
+                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-sai">— saídas</span></div>
+                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-dm">DM: —</span></div>
+                    </div>
+                </div>
+                <!-- Card Check-ins Especiais Previstos -->
+                <div class="sum-card sc-purple">
+                    <div class="sum-card-icon">🟡</div>
+                    <div class="sum-card-val" id="sum-esp-ci">0</div>
+                    <div class="sum-card-lbl">Check-ins Especiais Previstos</div>
+                    <div class="sum-card-items" id="sum-esp-ci-list"></div>
                 </div>
             </div>
 
@@ -695,7 +787,6 @@
                             <th style="width:100px">Check-in</th>
                             <th style="width:100px">Check-out</th>
                             <th>Nome / Descrição</th>
-                            <th style="width:120px">Tipo</th>
                         </tr></thead>
                         <tbody id="tbody-esp"></tbody>
                     </table></div>
@@ -1038,6 +1129,7 @@ function toBr(iso){
 
 // ══ SYNC UI ══
 function syncUI(){
+    syncSummary();
     const ocup = g('t-ocup').value;
     g('kpi-ocup').textContent = ocup||'—';
     const di = g('t-data').value;
@@ -1102,7 +1194,11 @@ function renderCoTable(arr,tbodyId,key){
                             data-key="${key}" data-i="${i}"
                             onblur="commitObs(this)"
                             onkeydown="if(event.key==='Enter'){this.blur();}">
-                        <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
+                        ${r.obs
+                            ? `<button class="btn-tp" style="color:#dc2626;border-color:rgba(220,38,38,.3)"
+                                onclick="clearObs('${key}',${i})" title="Remover">✕</button>`
+                            : `<button class="btn-tp" onclick="tagMenu('${key}',${i},this)" title="Adicionar tag">＋</button>`
+                        }
                     </div>
                 </td>
             </tr>`;
@@ -1124,7 +1220,11 @@ function renderCoTable(arr,tbodyId,key){
                             data-key="${key}" data-i="${i}"
                             onblur="commitObs(this)"
                             onkeydown="if(event.key==='Enter'){this.blur();}">
-                        <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
+                        ${r.obs
+                            ? `<button class="btn-tp" style="color:#dc2626;border-color:rgba(220,38,38,.3)"
+                                onclick="clearObs('${key}',${i})" title="Remover">✕</button>`
+                            : `<button class="btn-tp" onclick="tagMenu('${key}',${i},this)" title="Adicionar tag">＋</button>`
+                        }
                     </div>
                 </td>
             </tr>`;
@@ -1170,7 +1270,7 @@ function renderEsp(){
     const hoje = g('t-data').value;
     const ativas = esp; // já filtrado pelo purge
     if(!ativas.length){
-        tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial na casa — clique em ＋ para adicionar</td></tr>`;
+        tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial na casa — clique em ＋ para adicionar</td></tr>`;
     } else {
         tbody.innerHTML=ativas.map((r,i)=>{
             // dias restantes
@@ -1196,14 +1296,13 @@ function renderEsp(){
                 <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkin=this.value;salvarEsp()" maxlength="10" inputmode="numeric"></td>
                 <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkout=this.value;salvarEsp()" maxlength="10" inputmode="numeric">${diasRestantes}</td>
                 <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - Long stay / motivo" oninput="esp[${i}].descricao=this.value;salvarEsp()" style="min-width:160px"></td>
-                <td><select class="es" onchange="esp[${i}].tipo=this.value;salvarEsp();renderEsp()">
-                    ${[['long_stay','🏷️ Long Stay'],['returning','🔄 Returning Guest'],['habitue','⭐ Habitué'],['vip','👑 VIP'],['lua_de_mel','💑 Lua de Mel'],['aniversario','🎂 Aniversário'],['grupo','👥 Grupo'],['reentrada','↩️ Reentrada'],['twin','🛏️🛏️ Cama Twin'],['cama_adicional','➕ Cama Adicional'],['bercinho','🍼 Berço/Cama Bebê']].map(([v,l])=>`<option value="${v}" ${(r.tipo||'long_stay')===v?'selected':''}>${l}</option>`).join('')}
-                </select></td>
+
             </tr>`;
         }).join('');
     }
     g('b-esp').textContent = g('tb-esp').textContent = ativas.length;
     g('kpi-esp').textContent = ativas.length;
+    syncSummary();
 }
 
 function renderCi(){
@@ -1503,7 +1602,7 @@ function gerarPDF(){
     doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('AUDITORIA HOTELEIRA', 14, 12);
+    doc.text('AUDITORIA', 14, 12);
     doc.setFontSize(9); doc.setFont('helvetica','normal');
     doc.text(hotNome, 14, 18);
     doc.setTextColor(181,132,58);
@@ -1626,7 +1725,7 @@ function gerarPDF(){
 
 // ══ EXPORTAR TXT ══
 function exportarTxt(){
-    let txt='════════════════════════════════\n   AUDITORIA HOTELEIRA\n════════════════════════════════\n';
+    let txt='════════════════════════════════\n   AUDITORIA\n════════════════════════════════\n';
     txt+=`Turno: ${g('t-turno').value}\nData: ${fmtDate(g('t-data').value)}\n`;
     txt+=`Ocupação: ${g('t-ocup').value}  |  DM: ${g('t-dm').value}  |  UH Bloq: ${g('t-uh-bloq').value}\n\n`;
     txt+=`PREVISÃO AMANHÃ:\n  Ocupação: ${g('prev-ocup').value} | UHs: ${g('prev-uh').value} | Entradas: ${g('prev-ent').value} | Saídas: ${g('prev-sai').value} | Café: ${g('prev-cafe').value}\n`;
@@ -2466,11 +2565,6 @@ const TIPOS_ESP = {
     'vip':            {l:'👑 VIP',                cls:'t-vip'},
     'lua_de_mel':     {l:'💑 Lua de Mel',         cls:'t-lm'},
     'aniversario':    {l:'🎂 Aniversário',        cls:'t-aniv'},
-    'grupo':          {l:'👥 Grupo',              cls:'t-grp'},
-    'reentrada':      {l:'↩️ Reentrada',          cls:'t-reent'},
-    'twin':           {l:'🛏️🛏️ Cama Twin',       cls:'t-twin'},
-    'cama_adicional': {l:'➕ Cama Adicional',     cls:'t-grp'},
-    'bercinho':       {l:'🍼 Berço/Cama Bebê',   cls:'t-grp'},
 };
 
 function tipoOpts(sel) {
@@ -2744,12 +2838,57 @@ function dragEnd(e) {
     dragIdx = null;
 }
 
+
+function clearObs(key, i) {
+    getData(key)[i].obs = '';
+    getData(key)[i]._prevObs = '';
+    re(key);
+}
+
+
+// ══ SUMMARY BAR ══
+function syncSummary() {
+    // Ocupação
+    const ocup = g('t-ocup')?.value || '—';
+    const dm   = g('t-dm')?.value   || '—';
+    if(g('sum-ocup')) g('sum-ocup').textContent = ocup || '—';
+    if(g('sum-dm'))   g('sum-dm').textContent   = 'DM: ' + (dm || '—');
+
+    // Especiais na casa
+    if(g('sum-esp')) g('sum-esp').textContent = esp.length;
+    const espList = g('sum-esp-list');
+    if(espList) {
+        espList.innerHTML = esp.slice(0,3).map(r =>
+            `<div class="sum-item"><div class="sum-item-dot"></div><span>UH ${r.uh||'?'} — ${(r.descricao||r.reserva||'').slice(0,22)}</span></div>`
+        ).join('') + (esp.length > 3 ? `<div class="sum-item" style="opacity:.5">…e mais ${esp.length-3}</div>` : '');
+    }
+
+    // Previsão
+    const prevOcup = g('prev-ocup')?.value || '—';
+    const prevEnt  = g('prev-ent')?.value  || '—';
+    const prevSai  = g('prev-sai')?.value  || '—';
+    const prevDM   = g('prev-diaria')?.value || '—';
+    if(g('sum-prev-ocup')) g('sum-prev-ocup').textContent = prevOcup;
+    if(g('sum-prev-ent'))  g('sum-prev-ent').textContent  = prevEnt + ' entradas';
+    if(g('sum-prev-sai'))  g('sum-prev-sai').textContent  = prevSai + ' saídas';
+    if(g('sum-prev-dm'))   g('sum-prev-dm').textContent   = 'DM: ' + prevDM;
+
+    // Check-ins especiais previstos
+    if(g('sum-esp-ci')) g('sum-esp-ci').textContent = espCi.length;
+    const espCiList = g('sum-esp-ci-list');
+    if(espCiList) {
+        espCiList.innerHTML = espCi.slice(0,3).map(r =>
+            `<div class="sum-item"><div class="sum-item-dot"></div><span>${(r.descricao||r.reserva||'').slice(0,24)}</span></div>`
+        ).join('') + (espCi.length > 3 ? `<div class="sum-item" style="opacity:.5">…e mais ${espCi.length-3}</div>` : '');
+    }
+}
+
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
     g('t-data').value=new Date().toISOString().split('T')[0];
     carregarEsp();
-    renderCats(); // categorias configuráveis
-    syncUI(); renderTudo(); renderHist();
+    renderCats();
+    syncUI(); syncSummary(); renderTudo(); renderHist();
 });
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
