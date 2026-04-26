@@ -219,12 +219,7 @@ def dashboard_quadro(request, hotel_slug):
 
 @login_required
 def dashboard_hospedagem(request, hotel_slug):
-    hotel = get_object_or_404(Hotel, slug=hotel_slug)
-    context = {
-        'hotel': hotel,
-        'groq_key': settings.GROQ_API_KEY,
-    }
-    return render(request, 'dashboard/hospedagem.html', context)
+   return render(request, 'dashboard/hospedagem.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
 
 @login_required
 def dashboard_reservas_hotel(request, hotel_slug):
