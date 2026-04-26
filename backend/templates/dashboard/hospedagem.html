@@ -8,387 +8,191 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ═══════════════════════════════════════════
-           HOSPEDAGEM — AUDITORIA & CHECKOUT
-        ═══════════════════════════════════════════ */
-
-        /* ── UPLOAD CARD ── */
-        .upload-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .upload-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 20px; border-bottom: 1px solid var(--border);
-            background: var(--bg-hover); gap: 12px; flex-wrap: wrap;
-        }
-        .upload-card-title {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 13px; font-weight: 700; color: var(--text-main);
-        }
-        .upload-card-icon {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: var(--gold-dim); border: 1px solid rgba(181,132,58,.25);
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-        }
-        .upload-card-body { padding: 16px 20px; }
-
-        .upload-drop-zone {
-            border: 2px dashed var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 36px 20px;
-            text-align: center; cursor: pointer; transition: all .2s;
-            position: relative; background: var(--bg-hover);
-        }
-        .upload-drop-zone:hover,
-        .upload-drop-zone.drag-over { border-color: var(--gold); background: var(--gold-dim); }
-        .upload-drop-zone input[type=file] {
-            position: absolute; inset: 0; opacity: 0; cursor: pointer;
-            width: 100%; height: 100%; z-index: 2;
-        }
-        .upload-drop-icon { font-size: 36px; display: block; margin-bottom: 10px; }
-        .upload-drop-text { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-        .upload-drop-hint { font-size: 12px; color: var(--text-soft); }
-        .upload-drop-hint span { color: var(--gold); font-weight: 600; }
-        .upload-file-selected {
-            display: none; align-items: center; gap: 10px; margin-top: 14px;
-            background: rgba(22,163,74,.06); border: 1px solid rgba(22,163,74,.25);
-            border-radius: var(--radius-sm); padding: 10px 14px;
-        }
-        .upload-file-selected.show { display: flex; }
-        .upload-file-name { font-size: 13px; font-weight: 600; color: #15803d; }
-        .upload-file-size { font-size: 11px; color: var(--text-soft); margin-left: auto; }
-        .btn-upload-ia {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--gold); color: #0b0f19;
-            border: none; padding: 10px 20px; border-radius: var(--radius-sm);
-            font-size: 13px; font-weight: 700; cursor: pointer;
-            font-family: 'Inter', sans-serif; transition: filter .15s;
-            margin-top: 14px; width: 100%; justify-content: center;
-        }
-        .btn-upload-ia:hover { filter: brightness(1.1); }
-        .btn-upload-ia:disabled { opacity: .5; cursor: not-allowed; }
-
-        /* ── IA PROCESSANDO ── */
-        .ai-processing {
-            display: none; padding: 28px 20px;
-            flex-direction: column; align-items: center; gap: 12px;
-        }
-        .ai-processing.show { display: flex; }
-        .ai-spinner {
-            width: 44px; height: 44px;
-            border: 3px solid var(--border);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.85s linear infinite;
-        }
-        .ai-processing-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
-        .ai-steps { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 360px; }
-        .ai-step {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 12px; border-radius: var(--radius-sm);
-            background: var(--bg-hover); border: 1px solid var(--border);
-            font-size: 12px; color: var(--text-soft); transition: all .4s;
-        }
-        .ai-step.ativo  { border-color: var(--gold); color: var(--text-main); background: var(--gold-dim); }
-        .ai-step.feito  { border-color: rgba(22,163,74,.3); color: #15803d; background: rgba(22,163,74,.06); }
-        .ai-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); flex-shrink: 0; transition: .3s; }
-        .ai-step.ativo .ai-step-dot { background: var(--gold); animation: pulse-dot 1s infinite; }
-        .ai-step.feito .ai-step-dot { background: #15803d; }
-
-        /* ── AUDITORIA HEADER ── */
-        .audit-wrap { display: none; }
-        .audit-wrap.show { display: block; }
-
-        .audit-top-bar {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
-        }
-        .audit-top-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .audit-data-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px; border-radius: 999px;
-            background: var(--gold-dim); border: 1px solid rgba(181,132,58,.25);
-            font-size: 13px; font-weight: 700; color: var(--gold);
-        }
-        .audit-fonte-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 12px; border-radius: 999px;
-            background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2);
-            font-size: 11px; font-weight: 600; color: #15803d;
-        }
-        .audit-top-actions { display: flex; gap: 8px; }
-        .btn-audit-action {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 14px; border-radius: var(--radius-sm);
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            border: 1px solid var(--border); background: var(--bg-hover);
-            color: var(--text-muted); font-family: 'Inter', sans-serif; transition: .15s;
-        }
-        .btn-audit-action:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
-        .btn-audit-action.primary { background: var(--gold); color: #0b0f19; border-color: var(--gold); }
-        .btn-audit-action.primary:hover { filter: brightness(1.08); }
-
-        /* ── CARDS TOPO ── */
-        .audit-kpis {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 12px; margin-bottom: 16px;
-        }
-        .audit-kpi {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 14px 16px;
-            border-top: 3px solid transparent; transition: .15s;
-        }
-        .audit-kpi.k-green  { border-top-color: #15803d; }
-        .audit-kpi.k-blue   { border-top-color: #2563eb; }
-        .audit-kpi.k-amber  { border-top-color: #d97706; }
-        .audit-kpi.k-purple { border-top-color: #7c3aed; }
-        .audit-kpi.k-gold   { border-top-color: var(--gold); }
-        .audit-kpi.k-red    { border-top-color: #dc2626; }
-        .audit-kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); margin-bottom: 6px; }
-        .audit-kpi-value { font-size: 26px; font-weight: 700; line-height: 1; color: var(--text-main); }
-        .audit-kpi-sub { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
-
-        /* ── GRID PRINCIPAL ── */
-        .audit-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 16px; margin-bottom: 16px;
-        }
-        .audit-panel {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); overflow: hidden;
-        }
-        .audit-panel.full { grid-column: 1 / -1; }
-        .audit-panel-head {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 11px 16px; border-bottom: 1px solid var(--border);
-            background: var(--bg-hover);
-        }
-        .audit-panel-title {
-            display: flex; align-items: center; gap: 7px;
-            font-size: 11px; font-weight: 700; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: .5px;
-        }
-        .apd { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .apd-green  { background: #15803d; }
-        .apd-amber  { background: #d97706; }
-        .apd-blue   { background: #2563eb; }
-        .apd-purple { background: #7c3aed; }
-        .apd-gold   { background: var(--gold); }
-        .apd-red    { background: #dc2626; }
-
-        .audit-panel-badge {
-            font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-        }
-        .badge-green  { background: rgba(22,163,74,.1); color: #15803d; border: 1px solid rgba(22,163,74,.2); }
-        .badge-amber  { background: rgba(245,158,11,.1); color: #d97706; border: 1px solid rgba(245,158,11,.2); }
-        .badge-blue   { background: rgba(37,99,235,.1);  color: #2563eb; border: 1px solid rgba(37,99,235,.2); }
-        .badge-purple { background: rgba(124,58,237,.1); color: #7c3aed; border: 1px solid rgba(124,58,237,.2); }
-        .badge-gold   { background: var(--gold-dim);     color: var(--gold); border: 1px solid rgba(181,132,58,.2); }
-        .badge-red    { background: rgba(220,38,38,.08); color: #dc2626; border: 1px solid rgba(220,38,38,.2); }
-
-        /* ── TABELAS INTERNAS ── */
-        .at { width: 100%; border-collapse: collapse; }
-        .at th {
-            padding: 8px 12px; text-align: left;
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .5px; color: var(--text-soft);
-            border-bottom: 1px solid var(--border); background: var(--bg-hover);
-        }
-        .at td {
-            padding: 10px 12px; font-size: 12.5px; color: var(--text-muted);
-            border-bottom: 1px solid var(--border); vertical-align: middle;
-        }
-        .at tr:last-child td { border-bottom: none; }
-        .at tr:hover td { background: var(--bg-hover); }
-        .at .td-bold { font-weight: 600; color: var(--text-main); }
-        .at .td-num {
-            font-size: 11px; font-weight: 700; font-family: monospace;
-            background: var(--bg-hover); border: 1px solid var(--border);
-            padding: 2px 6px; border-radius: 4px; color: var(--text-muted);
-        }
-        .at .td-center { text-align: center; }
-
-        .audit-tag {
-            display: inline-flex; align-items: center; gap: 3px;
-            padding: 2px 8px; border-radius: 999px;
-            font-size: 10px; font-weight: 700; white-space: nowrap;
-        }
-        .tag-lco    { background: rgba(124,58,237,.1); color: #7c3aed; border: 1px solid rgba(124,58,237,.25); }
-        .tag-reent  { background: rgba(37,99,235,.1);  color: #2563eb; border: 1px solid rgba(37,99,235,.25); }
-        .tag-esp    { background: rgba(181,132,58,.1); color: var(--gold); border: 1px solid rgba(181,132,58,.25); }
-        .tag-normal { background: rgba(22,163,74,.08); color: #15803d; border: 1px solid rgba(22,163,74,.2); }
-        .tag-ls     { background: rgba(245,158,11,.1); color: #d97706; border: 1px solid rgba(245,158,11,.25); }
-
-        /* ── CHECK-OUTS TABELA ── */
-        .checkout-table-wrap { overflow-x: auto; }
-        .checkout-table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        .checkout-table thead tr { background: #1a1a2e; }
-        .checkout-table thead th {
-            padding: 10px 12px; text-align: left;
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .5px; color: #94a3b8; border-bottom: 2px solid #333;
-        }
-        .checkout-table td {
-            padding: 0; border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-        .checkout-table tr:last-child td { border-bottom: none; }
-        .checkout-table tr:hover td { background: var(--bg-hover); }
-        .checkout-table tr.lco-row td { background: rgba(124,58,237,.04); }
-        .checkout-table tr.reent-row td { background: rgba(37,99,235,.04); }
-        .checkout-table tr.lco-row:hover td { background: rgba(124,58,237,.08); }
-        .checkout-table tr.reent-row:hover td { background: rgba(37,99,235,.08); }
-
-        /* Célula checkbox PRE/TRIP */
-        .td-check {
-            width: 44px; padding: 10px 8px !important;
-            text-align: center;
-        }
-        .td-check input[type=checkbox] {
-            width: 16px; height: 16px; cursor: pointer;
-            accent-color: var(--gold); flex-shrink: 0;
-        }
-
-        /* Observação inline editável */
-        .td-obs { padding: 0 !important; min-width: 160px; }
-        .obs-cell {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 10px; min-height: 42px;
-        }
-        .obs-input {
-            background: transparent; border: none; outline: none;
-            font-size: 12px; color: var(--text-muted); width: 100%;
-            font-family: 'Inter', sans-serif; cursor: text;
-        }
-        .obs-input::placeholder { color: var(--border-light); font-style: italic; }
-        .obs-input:focus { color: var(--text-main); }
-
-        .td-uh-val { font-size: 13px; font-weight: 700; color: var(--text-main); padding: 10px 12px !important; }
-        .td-ct-badge {
-            display: inline-block; padding: 2px 8px; border-radius: 4px;
-            font-size: 11px; font-weight: 700;
-        }
-        .ct-sup { background: rgba(37,99,235,.1); color: #2563eb; }
-        .ct-std { background: rgba(22,163,74,.08); color: #15803d; }
-        .ct-sui { background: rgba(181,132,58,.1); color: var(--gold); }
-        .ct-pho { background: rgba(245,158,11,.1); color: #d97706; }
-
-        .td-nome { font-size: 13px; font-weight: 600; color: var(--text-main); padding: 10px 12px !important; }
-
-        /* Tag obs inline */
-        .obs-tag {
-            display: inline-flex; align-items: center; gap: 3px;
-            padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700;
-            white-space: nowrap; flex-shrink: 0;
-        }
-
-        /* ── OCORRÊNCIAS ── */
-        .ocorr-input-wrap { padding: 14px 16px; }
-        .ocorr-input {
-            width: 100%; background: var(--bg-hover); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); padding: 10px 12px;
-            font-size: 13px; font-family: 'Inter', sans-serif;
-            color: var(--text-main); resize: vertical; min-height: 90px; outline: none;
-        }
-        .ocorr-input:focus { border-color: var(--gold); }
-        .ocorr-list { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 6px; }
-        .ocorr-item {
-            display: flex; align-items: flex-start; gap: 8px;
-            background: rgba(220,38,38,.04); border: 1px solid rgba(220,38,38,.15);
-            border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px;
-            color: var(--text-muted);
-        }
-        .ocorr-item-dot { width: 6px; height: 6px; border-radius: 50%; background: #dc2626; flex-shrink: 0; margin-top: 4px; }
-        .btn-ocorr-add {
-            margin: 0 16px 14px; display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 14px; border-radius: var(--radius-sm);
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            border: 1px solid rgba(220,38,38,.3);
-            background: rgba(220,38,38,.06); color: #dc2626;
-            font-family: 'Inter', sans-serif; transition: .15s;
-        }
-        .btn-ocorr-add:hover { background: rgba(220,38,38,.12); }
-
-        /* ── TROCA DE TURNO ── */
-        .turno-row {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 12px; margin-bottom: 16px;
-        }
-        .turno-field {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 12px 14px;
-        }
-        .turno-field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); display: block; margin-bottom: 6px; }
-        .turno-field input, .turno-field select {
-            background: var(--bg-hover); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); padding: 8px 10px;
-            font-size: 13px; font-family: 'Inter', sans-serif;
-            color: var(--text-main); width: 100%; outline: none;
-        }
-        .turno-field input:focus, .turno-field select:focus { border-color: var(--gold); }
-
-        /* ── PREVISÃO AMANHÃ ── */
-        .prev-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 12px; padding: 14px;
-        }
-        .prev-item { text-align: center; }
-        .prev-num   { font-size: 24px; font-weight: 700; line-height: 1; }
-        .prev-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--text-soft); margin-top: 4px; }
-        .prev-sub   { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
-        .c-green  { color: #15803d; }
-        .c-red    { color: #dc2626; }
-        .c-amber  { color: #d97706; }
-        .c-blue   { color: #2563eb; }
-        .c-gold   { color: var(--gold); }
-
-        /* ── ESTADO VAZIO ── */
-        .audit-empty-state {
-            padding: 64px 24px; text-align: center;
-        }
-        .audit-empty-icon { font-size: 56px; margin-bottom: 16px; display: block; opacity: .3; }
-        .audit-empty-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .audit-empty-desc  { font-size: 13px; color: var(--text-soft); max-width: 380px; margin: 0 auto; line-height: 1.7; }
-
-        /* ── HISTÓRICO AUDITORIAS ── */
-        .hist-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 11px 16px; border-bottom: 1px solid var(--border);
-            cursor: pointer; transition: background .12s;
-        }
-        .hist-item:last-child { border-bottom: none; }
-        .hist-item:hover { background: var(--bg-hover); }
-        .hist-icon { font-size: 18px; }
-        .hist-nome { font-size: 13px; font-weight: 600; color: var(--text-main); }
-        .hist-data { font-size: 11px; color: var(--text-soft); margin-top: 1px; }
-        .hist-ocup { font-size: 13px; font-weight: 700; color: var(--gold); margin-left: auto; white-space: nowrap; }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 1100px) {
-            .audit-kpis { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 900px) {
-            .audit-grid { grid-template-columns: 1fr; }
-            .audit-panel.full { grid-column: 1; }
-        }
-        @media (max-width: 768px) {
-            .audit-kpis { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .turno-row  { grid-template-columns: repeat(2, 1fr); }
-            .prev-grid  { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 480px) {
-            .audit-kpis { grid-template-columns: 1fr 1fr; }
-            .turno-row  { grid-template-columns: 1fr 1fr; }
-        }
+        /* ── UPLOAD ── */
+        .up-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px; }
+        .up-header { display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg-hover);gap:12px;flex-wrap:wrap; }
+        .up-title { display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--text-main); }
+        .up-icon { width:30px;height:30px;border-radius:8px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);display:flex;align-items:center;justify-content:center;font-size:15px; }
+        .up-body { padding:14px 18px; }
+        .up-key-row { display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px; }
+        .up-key-label { font-size:10px;font-weight:700;color:#4285f4;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px; }
+        .up-key-input { flex:1;min-width:160px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;transition:border-color .15s; }
+        .up-key-input:focus { border-color:#4285f4; }
+        .up-key-link { display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#4285f4;white-space:nowrap;text-decoration:none;padding:6px 12px;border:1px solid rgba(66,133,244,.3);border-radius:999px;background:rgba(66,133,244,.06);transition:.15s; }
+        .up-key-link:hover { background:rgba(66,133,244,.14); }
+        .drop-zone { border:2px dashed var(--border-light);border-radius:var(--radius-md);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg-hover); }
+        .drop-zone:hover,.drop-zone.drag-over { border-color:var(--gold);background:var(--gold-dim); }
+        .drop-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2; }
+        .drop-icon { font-size:30px;display:block;margin-bottom:8px; }
+        .drop-text { font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:3px; }
+        .drop-hint { font-size:11px;color:var(--text-soft); }
+        .drop-hint span { color:var(--gold);font-weight:600; }
+        .file-sel { display:none;align-items:center;gap:10px;margin-top:10px;background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:9px 12px; }
+        .file-sel.show { display:flex; }
+        .file-sel-name { font-size:13px;font-weight:600;color:#15803d; }
+        .file-sel-size { font-size:11px;color:var(--text-soft);margin-left:auto; }
+        .btn-process { display:inline-flex;align-items:center;gap:8px;justify-content:center;background:var(--gold);color:#0b0f19;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:filter .15s;margin-top:12px;width:100%; }
+        .btn-process:hover { filter:brightness(1.1); }
+        .btn-process:disabled { opacity:.45;cursor:not-allowed; }
+        /* SPINNER */
+        .ai-load { display:none;padding:24px 18px;flex-direction:column;align-items:center;gap:10px; }
+        .ai-load.show { display:flex; }
+        .ai-spin { width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .85s linear infinite; }
+        .ai-load-label { font-size:13px;font-weight:600;color:var(--text-main); }
+        .ai-steps { display:flex;flex-direction:column;gap:5px;width:100%;max-width:340px; }
+        .ai-step { display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:var(--radius-sm);background:var(--bg-hover);border:1px solid var(--border);font-size:12px;color:var(--text-soft);transition:all .35s; }
+        .ai-step.ativo { border-color:var(--gold);color:var(--text-main);background:var(--gold-dim); }
+        .ai-step.feito { border-color:rgba(22,163,74,.3);color:#15803d;background:rgba(22,163,74,.06); }
+        .ai-dot { width:7px;height:7px;border-radius:50%;background:var(--border-light);flex-shrink:0;transition:.3s; }
+        .ai-step.ativo .ai-dot { background:var(--gold); }
+        .ai-step.feito .ai-dot { background:#15803d; }
+        /* TOPBAR AUDITORIA */
+        .audit-topbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap; }
+        .audit-meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+        .badge-data { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);font-size:12px;font-weight:700;color:var(--gold); }
+        .badge-fonte { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);font-size:11px;font-weight:600;color:#15803d; }
+        .btn-a { display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-family:'Inter',sans-serif;transition:.15s; }
+        .btn-a:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+        /* TURNO GRID */
+        .turno-grid { display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:10px;margin-bottom:14px; }
+        .turno-field { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px; }
+        .turno-field label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px; }
+        .turno-field input { background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none; }
+        .turno-field input:focus { border-color:var(--gold); }
+        /* KPI */
+        .kpi-row { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px; }
+        .kpi-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent; }
+        .kpi-card.k-green{border-top-color:#15803d}.kpi-card.k-blue{border-top-color:#2563eb}.kpi-card.k-amber{border-top-color:#d97706}.kpi-card.k-purple{border-top-color:#7c3aed}.kpi-card.k-gold{border-top-color:var(--gold)}
+        .kpi-label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:5px; }
+        .kpi-value { font-size:24px;font-weight:700;line-height:1;color:var(--text-main); }
+        .kpi-sub { font-size:10px;color:var(--text-soft);margin-top:3px; }
+        /* ABAS */
+        .tabs-nav { display:flex;gap:2px;padding:4px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto; }
+        .tab-btn { display:flex;align-items:center;gap:7px;padding:9px 16px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif; }
+        .tab-btn:hover { color:var(--text-main);background:rgba(255,255,255,.5); }
+        .tab-btn.active { background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 4px rgba(0,0,0,.08); }
+        .tbadge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--bg-hover);color:var(--text-soft);min-width:18px;text-align:center; }
+        .tab-btn.active .tbadge { background:var(--gold-dim);color:var(--gold); }
+        .tab-btn[data-tab="auditoria"].active { color:#d97706; }
+        .tab-btn[data-tab="auditoria"].active .tbadge { background:rgba(217,119,6,.1);color:#d97706; }
+        .tab-btn[data-tab="checkout"].active { color:#2563eb; }
+        .tab-btn[data-tab="checkout"].active .tbadge { background:rgba(37,99,235,.1);color:#2563eb; }
+        .tab-btn[data-tab="previsao"].active { color:#7c3aed; }
+        .tab-btn[data-tab="previsao"].active .tbadge { background:rgba(124,58,237,.1);color:#7c3aed; }
+        .tab-btn[data-tab="especiais"].active { color:var(--gold); }
+        .tab-btn[data-tab="especiais"].active .tbadge { background:var(--gold-dim);color:var(--gold); }
+        .tab-btn[data-tab="checkins"].active { color:#d97706; }
+        .tab-btn[data-tab="checkins"].active .tbadge { background:rgba(217,119,6,.1);color:#d97706; }
+        /* PANES */
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; }
+        /* PANEL */
+        .panel { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:14px; }
+        .panel-head { display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover); }
+        .panel-title { display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px; }
+        .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .dot-green{background:#15803d}.dot-amber{background:#d97706}.dot-blue{background:#2563eb}.dot-purple{background:#7c3aed}.dot-gold{background:var(--gold)}.dot-red{background:#dc2626}
+        .pbadge { font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px; }
+        .pb-green{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.2)}
+        .pb-amber{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .pb-blue{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+        .pb-purple{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
+        .pb-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
+        .pb-red{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* TABELA GENÉRICA */
+        .t-wrap { overflow-x:auto; }
+        .t{width:100%;border-collapse:collapse}
+        .t th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover);white-space:nowrap}
+        .t td{padding:10px 12px;font-size:12.5px;color:var(--text-muted);border-bottom:1px solid var(--border);vertical-align:middle}
+        .t tr:last-child td{border-bottom:none}
+        .t tr:hover td{background:var(--bg-hover)}
+        .td-b{font-weight:600;color:var(--text-main)}
+        .td-num{font-size:11px;font-weight:700;font-family:monospace;background:var(--bg-hover);border:1px solid var(--border);padding:2px 6px;border-radius:4px;color:var(--text-muted)}
+        .td-c{text-align:center}
+        /* TAGS */
+        .xtag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
+        .xt-lco{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25)}
+        .xt-reent{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
+        .xt-ls{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+        .xt-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
+        /* TABELA CHECKOUT (header escuro) */
+        .co-wrap{overflow-x:auto}
+        .co-t{width:100%;border-collapse:collapse;min-width:660px}
+        .co-t thead tr{background:#0f172a}
+        .co-t thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;border-bottom:2px solid #1e293b;white-space:nowrap}
+        .co-t td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle}
+        .co-t tr:last-child td{border-bottom:none}
+        .co-t tr:hover td{background:var(--bg-hover)}
+        .co-t tr.r-lco td{background:rgba(124,58,237,.04)}
+        .co-t tr.r-reent td{background:rgba(37,99,235,.04)}
+        .co-t tr.r-lco:hover td{background:rgba(124,58,237,.09)}
+        .co-t tr.r-reent:hover td{background:rgba(37,99,235,.09)}
+        .co-t tr.r-blank td{background:var(--bg-hover);height:34px;opacity:.55}
+        .co-t tr.r-blank:nth-child(even) td{background:transparent}
+        .td-chk{width:40px;padding:9px 8px!important;text-align:center}
+        .td-chk input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
+        .td-obs-c{padding:0!important;min-width:150px}
+        .obs-inner{display:flex;align-items:center;gap:5px;padding:7px 9px;min-height:40px}
+        .obs-inp{background:transparent;border:none;outline:none;font-size:12px;color:var(--text-muted);width:100%;font-family:'Inter',sans-serif}
+        .obs-inp::placeholder{color:var(--border-light);font-style:italic}
+        .obs-inp:focus{color:var(--text-main)}
+        .td-uh{font-size:13px;font-weight:700;color:var(--text-main);padding:9px 12px!important}
+        .td-ct{padding:9px 10px!important}
+        .td-nome{font-size:12.5px;font-weight:600;color:var(--text-main);padding:9px 12px!important;white-space:nowrap}
+        .ct-b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+        .ct-sup{background:rgba(37,99,235,.1);color:#2563eb}
+        .ct-std{background:rgba(22,163,74,.08);color:#15803d}
+        .ct-sui{background:var(--gold-dim);color:var(--gold)}
+        .ct-pho{background:rgba(245,158,11,.1);color:#d97706}
+        .itag{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+        .btn-tp{background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.12s}
+        .btn-tp:hover{border-color:var(--gold);color:var(--gold)}
+        /* OCORRÊNCIAS */
+        .ocorr-list{display:flex;flex-direction:column;gap:6px;padding:12px 16px;min-height:40px}
+        .ocorr-item{display:flex;align-items:flex-start;gap:8px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text-muted)}
+        .ocorr-dot{width:6px;height:6px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-top:4px}
+        .ocorr-del{background:none;border:none;color:var(--text-soft);cursor:pointer;margin-left:auto;font-size:13px;line-height:1;padding:0 2px}
+        .ocorr-del:hover{color:#dc2626}
+        .ocorr-add{display:flex;gap:8px;padding:0 16px 14px}
+        .ocorr-ta{flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px}
+        .ocorr-ta:focus{border-color:var(--gold)}
+        .btn-ocorr{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:8px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap;align-self:flex-end}
+        .btn-ocorr:hover{background:rgba(220,38,38,.12)}
+        /* PREVISÃO NÚMEROS */
+        .prev-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-bottom:1px solid var(--border)}
+        .prev-item{text-align:center}
+        .prev-val{font-size:26px;font-weight:700;line-height:1}
+        .prev-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-top:4px}
+        .prev-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
+        .c-green{color:#15803d}.c-red{color:#dc2626}.c-amber{color:#d97706}.c-blue{color:#2563eb}.c-gold{color:var(--gold)}
+        /* 2 COLUNAS */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        /* FOOTER TABELA */
+        .tfoot{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .tfoot .leg{font-size:11px;color:var(--text-soft)}
+        .btn-add-row{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-soft);padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+        .btn-add-row:hover{border-color:var(--gold);color:var(--gold)}
+        /* HISTÓRICO */
+        .hist-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+        .hist-item:last-child{border-bottom:none}
+        .hist-item:hover{background:var(--bg-hover)}
+        .hist-nome{font-size:13px;font-weight:600;color:var(--text-main)}
+        .hist-data{font-size:11px;color:var(--text-soft);margin-top:1px}
+        .hist-ocup{font-size:13px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap}
+        /* EMPTY */
+        .empty-state{padding:52px 24px;text-align:center}
+        .empty-icon{font-size:48px;margin-bottom:14px;display:block;opacity:.3}
+        .empty-title{font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px}
+        .empty-desc{font-size:13px;color:var(--text-soft);max-width:360px;margin:0 auto;line-height:1.7}
+        /* RESPONSIVE */
+        @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}}
+        @media(max-width:900px){.two-col{grid-template-columns:1fr}}
+        @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}.turno-grid{grid-template-columns:1fr 1fr}.prev-nums{grid-template-columns:repeat(2,1fr)}.tab-btn{padding:7px 11px;font-size:11px}}
+        @keyframes spin{to{transform:rotate(360deg)}}
     </style>
 </head>
 <body>
 <div class="layout">
-
     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
         <nav>
@@ -411,31 +215,24 @@
             <div class="topbar-left">
                 <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <line x1="3" y1="12" x2="21" y2="12"/>
-                        <line x1="3" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
                 <span class="topbar-title">🏨 Hospedagem — Auditoria</span>
             </div>
             <div class="topbar-right">
                 <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
-                <button class="btn-novo desktop-only" id="btn-nova-auditoria-top" onclick="novaAuditoria()" style="display:none">＋ Nova Auditoria</button>
+                <button class="btn-novo desktop-only" onclick="novaAuditoria()" style="display:none">＋ Nova Auditoria</button>
                 <div class="topbar-actions-menu" id="actions-menu-wrap">
                     <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-                            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/>
                         </svg>
                     </button>
                     <div class="topbar-actions-dropdown" id="actions-dropdown">
-                        <button class="actions-item actions-item-destaque" onclick="novaAuditoria(); toggleActionsMenu()">
-                            ＋ Nova Auditoria
-                        </button>
-                        <button class="actions-item" onclick="exportarAuditoria(); toggleActionsMenu()">
-                            📄 Exportar PDF
-                        </button>
+                        <button class="actions-item actions-item-destaque" onclick="novaAuditoria();toggleActionsMenu()">＋ Nova Auditoria</button>
+                        <button class="actions-item" onclick="salvarAuditoria();toggleActionsMenu()">💾 Salvar</button>
+                        <button class="actions-item" onclick="exportarAuditoria();toggleActionsMenu()">📄 Exportar</button>
                     </div>
                 </div>
             </div>
@@ -443,1054 +240,710 @@
 
         <div class="content">
 
-            <!-- ═══ UPLOAD + IA ═══ -->
-            <div class="upload-card" id="upload-section">
-                <div class="upload-card-header">
-                    <div class="upload-card-title">
-                        <div class="upload-card-icon">🤖</div>
+            <!-- ═══ UPLOAD ═══ -->
+            <div class="up-card" id="upload-section">
+                <div class="up-header">
+                    <div class="up-title">
+                        <div class="up-icon">🤖</div>
                         <div>
                             <div>Importar Relatório via IA</div>
-                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">
-                                Faça upload do PDF da auditoria e a IA extrai todos os dados automaticamente
-                            </div>
+                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">Gemini analisa a imagem/PDF e preenche tudo automaticamente</div>
                         </div>
                     </div>
-                    <button class="btn-audit-action" onclick="novaAuditoria()">＋ Manual</button>
+                    <button class="btn-a" onclick="novaAuditoria()">＋ Manual</button>
                 </div>
-
-                <div class="upload-card-body">
-
-                    <!-- ── CHAVE GEMINI ── -->
-                    <div style="
-                        display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-                        background:rgba(66,133,244,.05); border:1px solid rgba(66,133,244,.2);
-                        border-radius:var(--radius-sm); padding:11px 14px; margin-bottom:14px;
-                    ">
-                        <span style="font-size:20px;flex-shrink:0">🔑</span>
-                        <div style="flex:1;min-width:180px">
-                            <div style="font-size:10px;font-weight:700;color:#4285f4;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">
-                                Chave Gemini API — Google AI Studio
-                            </div>
-                            <input id="gemini-key-input" type="password"
-                                placeholder="Cole sua chave aqui: AIzaSy..."
-                                style="width:100%;background:var(--bg-hover);border:1px solid var(--border);
-                                       border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;
-                                       font-family:'Inter',sans-serif;color:var(--text-main);outline:none;
-                                       transition:border-color .15s;"
+                <div class="up-body">
+                    <div class="up-key-row">
+                        <span style="font-size:18px;flex-shrink:0">🔑</span>
+                        <div style="flex:1;min-width:160px">
+                            <div class="up-key-label">Chave Gemini API</div>
+                            <input id="gemini-key-input" type="password" class="up-key-input" placeholder="Cole sua chave: AIzaSy..."
                                 oninput="salvarKeyLocal(this.value)"
                                 onfocus="this.type='text';this.style.borderColor='#4285f4'"
                                 onblur="if(this.value)this.type='password';this.style.borderColor='var(--border)'">
                         </div>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener"
-                           style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
-                                  color:#4285f4;white-space:nowrap;text-decoration:none;padding:7px 13px;
-                                  border:1px solid rgba(66,133,244,.3);border-radius:999px;
-                                  background:rgba(66,133,244,.06);transition:.15s;"
-                           onmouseover="this.style.background='rgba(66,133,244,.14)'"
-                           onmouseout="this.style.background='rgba(66,133,244,.06)'">
-                            Obter grátis ↗
-                        </a>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="up-key-link">Obter grátis ↗</a>
                     </div>
-
-                    <!-- Drop Zone -->
-                    <div class="upload-drop-zone" id="drop-zone">
+                    <div class="drop-zone" id="drop-zone">
                         <input type="file" id="pdf-input" accept=".pdf,image/*" onchange="onFileSelect(this)">
-                        <span class="upload-drop-icon">📄</span>
-                        <div class="upload-drop-text">Arraste o PDF da auditoria aqui</div>
-                        <div class="upload-drop-hint">ou <span>clique para selecionar</span> — PDF, PNG, JPG aceitos</div>
+                        <span class="drop-icon">📄</span>
+                        <div class="drop-text">Arraste a imagem ou PDF da auditoria aqui</div>
+                        <div class="drop-hint">ou <span>clique para selecionar</span> — PDF, PNG, JPG aceitos</div>
                     </div>
-
-                    <!-- Arquivo selecionado -->
-                    <div class="upload-file-selected" id="file-selected-info">
+                    <div class="file-sel" id="file-sel-info">
                         <span>📎</span>
-                        <span class="upload-file-name" id="file-name-label">—</span>
-                        <span class="upload-file-size" id="file-size-label">—</span>
+                        <span class="file-sel-name" id="file-name-lbl">—</span>
+                        <span class="file-sel-size" id="file-size-lbl">—</span>
                         <button onclick="limparArquivo()" style="background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:14px;margin-left:4px">✕</button>
                     </div>
-
-                    <button class="btn-upload-ia" id="btn-processar" onclick="processarComIA()" disabled>
+                    <button class="btn-process" id="btn-processar" onclick="processarComIA()" disabled>
                         ✨ Processar com Gemini — Extrair Dados da Auditoria
                     </button>
                 </div>
-
-                <!-- Processando -->
-                <div class="ai-processing" id="ai-processing">
-                    <div class="ai-spinner"></div>
-                    <div class="ai-processing-label">IA analisando o relatório…</div>
-                    <div class="ai-steps" id="ai-steps">
-                        <div class="ai-step" id="step-1"><div class="ai-step-dot"></div>Lendo documento</div>
-                        <div class="ai-step" id="step-2"><div class="ai-step-dot"></div>Extraindo dados de ocupação</div>
-                        <div class="ai-step" id="step-3"><div class="ai-step-dot"></div>Identificando check-outs do dia</div>
-                        <div class="ai-step" id="step-4"><div class="ai-step-dot"></div>Mapeando reservas especiais</div>
-                        <div class="ai-step" id="step-5"><div class="ai-step-dot"></div>Calculando previsão para amanhã</div>
-                        <div class="ai-step" id="step-6"><div class="ai-step-dot"></div>Montando auditoria completa</div>
+                <div class="ai-load" id="ai-loading">
+                    <div class="ai-spin"></div>
+                    <div class="ai-load-label">Gemini analisando o relatório…</div>
+                    <div class="ai-steps">
+                        <div class="ai-step" id="s1"><div class="ai-dot"></div>Lendo documento</div>
+                        <div class="ai-step" id="s2"><div class="ai-dot"></div>Extraindo dados de ocupação</div>
+                        <div class="ai-step" id="s3"><div class="ai-dot"></div>Identificando check-outs do dia</div>
+                        <div class="ai-step" id="s4"><div class="ai-dot"></div>Mapeando reservas especiais</div>
+                        <div class="ai-step" id="s5"><div class="ai-dot"></div>Calculando previsão</div>
+                        <div class="ai-step" id="s6"><div class="ai-dot"></div>Montando auditoria completa</div>
                     </div>
                 </div>
             </div>
 
             <!-- ═══ AUDITORIA ═══ -->
-            <div class="audit-wrap" id="audit-wrap">
+            <div id="audit-wrap" style="display:none">
 
-                <!-- Topo ação -->
-                <div class="audit-top-bar">
-                    <div class="audit-top-left">
-                        <div class="audit-data-badge">📅 <span id="audit-data-label">—</span></div>
-                        <div class="audit-fonte-badge" id="audit-fonte-badge">🤖 Extraído por IA</div>
+                <div class="audit-topbar">
+                    <div class="audit-meta">
+                        <div class="badge-data">📅 <span id="lbl-data">—</span></div>
+                        <div class="badge-fonte" id="lbl-fonte">🤖 Gemini</div>
                     </div>
-                    <div class="audit-top-actions">
-                        <button class="btn-audit-action" onclick="salvarAuditoria()">💾 Salvar</button>
-                        <button class="btn-audit-action" onclick="exportarAuditoria()">📄 Exportar</button>
-                        <button class="btn-audit-action" onclick="novaAuditoria()">＋ Nova</button>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn-a" onclick="salvarAuditoria()">💾 Salvar</button>
+                        <button class="btn-a" onclick="exportarAuditoria()">📄 Exportar</button>
+                        <button class="btn-a" onclick="novaAuditoria()">＋ Nova</button>
                     </div>
                 </div>
 
-                <!-- TROCA DE TURNO + CAMPOS GERAIS -->
-                <div class="turno-row" id="turno-row">
-                    <div class="turno-field">
-                        <label>Troca de Turno</label>
-                        <input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro">
-                    </div>
-                    <div class="turno-field">
-                        <label>Data</label>
-                        <input type="date" id="t-data">
-                    </div>
-                    <div class="turno-field">
-                        <label>Ocupação (%)</label>
-                        <input type="text" id="t-ocup" placeholder="Ex: 98,18%">
-                    </div>
-                    <div class="turno-field">
-                        <label>DM (Diária Média)</label>
-                        <input type="text" id="t-dm" placeholder="Ex: R$ 1.332,84">
-                    </div>
-                    <div class="turno-field">
-                        <label>QNT UH Bloq.</label>
-                        <input type="number" id="t-uh-bloq" value="0" min="0">
-                    </div>
+                <!-- Troca de turno -->
+                <div class="turno-grid">
+                    <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro"></div>
+                    <div class="turno-field"><label>Data</label><input type="date" id="t-data"></div>
+                    <div class="turno-field"><label>Ocupação</label><input type="text" id="t-ocup" placeholder="98,18%"></div>
+                    <div class="turno-field"><label>DM (Diária Média)</label><input type="text" id="t-dm" placeholder="R$ 1.332,84"></div>
+                    <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
                 </div>
 
                 <!-- KPIs -->
-                <div class="audit-kpis">
-                    <div class="audit-kpi k-green">
-                        <div class="audit-kpi-label">Ocupação Hoje</div>
-                        <div class="audit-kpi-value" id="kpi-ocup">—</div>
-                        <div class="audit-kpi-sub" id="kpi-ocup-sub"></div>
+                <div class="kpi-row">
+                    <div class="kpi-card k-green"><div class="kpi-label">Ocupação Hoje</div><div class="kpi-value" id="kpi-ocup">—</div></div>
+                    <div class="kpi-card k-blue"><div class="kpi-label">Check-outs Hoje</div><div class="kpi-value" id="kpi-co">—</div><div class="kpi-sub">saídas previstas</div></div>
+                    <div class="kpi-card k-purple"><div class="kpi-label">Late Check-out</div><div class="kpi-value" id="kpi-lco">—</div><div class="kpi-sub">com LCO</div></div>
+                    <div class="kpi-card k-amber"><div class="kpi-label">Reentradas</div><div class="kpi-value" id="kpi-reent">—</div></div>
+                    <div class="kpi-card k-gold"><div class="kpi-label">Reservas Especiais</div><div class="kpi-value" id="kpi-esp">—</div></div>
+                </div>
+
+                <!-- ABAS -->
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="auditoria" onclick="setTab('auditoria')">📋 Auditoria <span class="tbadge" id="tb-audit">—</span></button>
+                    <button class="tab-btn" data-tab="checkout"  onclick="setTab('checkout')">🚪 Check-outs do Dia <span class="tbadge" id="tb-co">0</span></button>
+                    <button class="tab-btn" data-tab="previsao"  onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
+                    <button class="tab-btn" data-tab="especiais" onclick="setTab('especiais')">⭐ Res. Especiais <span class="tbadge" id="tb-esp">0</span></button>
+                    <button class="tab-btn" data-tab="checkins"  onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
+                </div>
+
+                <!-- ABA: AUDITORIA -->
+                <div class="tab-pane active" id="pane-auditoria">
+                    <div class="two-col">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div class="panel-title"><div class="dot dot-amber"></div> Check-ins Pendentes</div>
+                                <span class="pbadge pb-amber" id="b-ci">0</span>
+                            </div>
+                            <div class="t-wrap"><table class="t"><thead><tr><th>Reserva</th><th>Nome do Hóspede</th></tr></thead><tbody id="tb-ci-a"></tbody></table></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div class="panel-title"><div class="dot dot-red"></div> Ocorrências</div>
+                                <span class="pbadge pb-red" id="b-ocorr">0</span>
+                            </div>
+                            <div class="ocorr-list" id="ocorr-list"></div>
+                            <div class="ocorr-add">
+                                <textarea class="ocorr-ta" id="ocorr-input" placeholder="Descreva a ocorrência…" rows="2"></textarea>
+                                <button class="btn-ocorr" onclick="adicionarOcorrencia()">＋ Registrar</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="audit-kpi k-blue">
-                        <div class="audit-kpi-label">Check-outs</div>
-                        <div class="audit-kpi-value" id="kpi-checkouts">—</div>
-                        <div class="audit-kpi-sub">saídas previstas</div>
-                    </div>
-                    <div class="audit-kpi k-purple">
-                        <div class="audit-kpi-label">Late Check-out</div>
-                        <div class="audit-kpi-value" id="kpi-lco">—</div>
-                        <div class="audit-kpi-sub">com LCO solicitado</div>
-                    </div>
-                    <div class="audit-kpi k-amber">
-                        <div class="audit-kpi-label">Reentradas</div>
-                        <div class="audit-kpi-value" id="kpi-reentradas">—</div>
-                        <div class="audit-kpi-sub">checkouts com reentrada</div>
-                    </div>
-                    <div class="audit-kpi k-gold">
-                        <div class="audit-kpi-label">Reservas Especiais</div>
-                        <div class="audit-kpi-value" id="kpi-esp">—</div>
-                        <div class="audit-kpi-sub">long stay + especiais</div>
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
+                            <button onclick="limparHistorico()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
+                        </div>
+                        <div id="historico-list"><div style="padding:20px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
                     </div>
                 </div>
 
-                <!-- GRID PRINCIPAL -->
-                <div class="audit-grid">
-
-                    <!-- CHECK-INS PENDENTES -->
-                    <div class="audit-panel">
-                        <div class="audit-panel-head">
-                            <div class="audit-panel-title"><div class="apd apd-amber"></div> Check-ins Pendentes</div>
-                            <span class="audit-panel-badge badge-amber" id="badge-checkins">0</span>
+                <!-- ABA: CHECK-OUTS DO DIA -->
+                <div class="tab-pane" id="pane-checkout">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-blue"></div> Check-outs do Dia <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">— marque PRE/TRIP e adicione observações</span></div>
+                            <span class="pbadge pb-blue" id="b-co">0</span>
                         </div>
-                        <table class="at">
-                            <thead>
-                                <tr>
-                                    <th>Reserva</th>
-                                    <th>Nome do Hóspede</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-checkins">
-                                <tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px;">Sem check-ins pendentes</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- OCORRÊNCIAS -->
-                    <div class="audit-panel">
-                        <div class="audit-panel-head">
-                            <div class="audit-panel-title"><div class="apd apd-red"></div> Ocorrências</div>
-                            <span class="audit-panel-badge badge-red" id="badge-ocorr">0</span>
-                        </div>
-                        <div class="ocorr-list" id="ocorr-list"></div>
-                        <div class="ocorr-input-wrap">
-                            <textarea class="ocorr-input" id="ocorr-nova-input" placeholder="Descreva uma ocorrência…" rows="2"></textarea>
-                        </div>
-                        <button class="btn-ocorr-add" onclick="adicionarOcorrencia()">＋ Registrar Ocorrência</button>
-                    </div>
-
-                    <!-- RESERVAS ESPECIAIS -->
-                    <div class="audit-panel full">
-                        <div class="audit-panel-head">
-                            <div class="audit-panel-title"><div class="apd apd-gold"></div> Reservas Especiais</div>
-                            <span class="audit-panel-badge badge-gold" id="badge-esp">0</span>
-                        </div>
-                        <div style="overflow-x:auto">
-                            <table class="at">
-                                <thead>
-                                    <tr>
-                                        <th>UH</th>
-                                        <th>Reserva</th>
-                                        <th>Check-in</th>
-                                        <th>Check-out</th>
-                                        <th>Descrição / Observação</th>
-                                        <th>Tipo</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-esp"></tbody>
+                        <div class="co-wrap">
+                            <table class="co-t">
+                                <thead><tr><th class="td-c" style="width:44px">PRE</th><th class="td-c" style="width:44px">TRIP</th><th>Observação</th><th class="td-c" style="width:52px">UH</th><th style="width:60px">CT</th><th>Nome do Hóspede</th></tr></thead>
+                                <tbody id="tb-co-body"></tbody>
                             </table>
                         </div>
-                    </div>
-
-                </div><!-- /audit-grid -->
-
-                <!-- ═══ PREVISÃO AMANHÃ ═══ -->
-                <div class="audit-panel" style="margin-bottom:16px">
-                    <div class="audit-panel-head">
-                        <div class="audit-panel-title"><div class="apd apd-blue"></div> Previsão — Amanhã</div>
-                        <span id="prev-data-label" style="font-size:11px;color:var(--text-soft)">—</span>
-                    </div>
-                    <div class="prev-grid">
-                        <div class="prev-item">
-                            <div class="prev-num c-green" id="prev-ocup">—</div>
-                            <div class="prev-label">Ocupação</div>
-                            <div class="prev-sub" id="prev-diaria">—</div>
+                        <div class="tfoot">
+                            <span class="leg">Legenda:</span>
+                            <span class="xtag xt-lco">🕐 LCO</span>
+                            <span class="xtag xt-reent">🔄 Reentrada</span>
+                            <span class="xtag xt-esp">⭐ Especial</span>
+                            <button class="btn-add-row" onclick="addCoRow('checkoutsHoje','tb-co-body',renderCheckoutsHoje)">＋ Adicionar linha</button>
                         </div>
-                        <div class="prev-item">
-                            <div class="prev-num c-green" id="prev-entradas">—</div>
-                            <div class="prev-label">Entradas</div>
-                            <div class="prev-sub">novos check-ins</div>
-                        </div>
-                        <div class="prev-item">
-                            <div class="prev-num c-red" id="prev-saidas">—</div>
-                            <div class="prev-label">Saídas</div>
-                            <div class="prev-sub">check-outs previstos</div>
-                        </div>
-                        <div class="prev-item">
-                            <div class="prev-num c-amber" id="prev-cafe">—</div>
-                            <div class="prev-label">Café da Manhã</div>
-                            <div class="prev-sub">hóspedes esperados</div>
-                        </div>
-                    </div>
-
-                    <!-- RESERVAS ESPECIAIS DA PREVISÃO -->
-                    <div style="border-top:1px solid var(--border);overflow-x:auto">
-                        <div style="padding:10px 16px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">
-                            Reservas Especiais — Amanhã
-                        </div>
-                        <table class="at">
-                            <thead>
-                                <tr>
-                                    <th>Categoria</th>
-                                    <th>Reserva</th>
-                                    <th>IN</th>
-                                    <th>OUT</th>
-                                    <th>Descrição</th>
-                                    <th>UH</th>
-                                    <th>C</th>
-                                    <th>M</th>
-                                    <th>E</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-prev-esp"></tbody>
-                        </table>
                     </div>
                 </div>
 
-                <!-- ═══ CHECK-OUTS DO DIA ═══ -->
-                <div class="audit-panel" style="margin-bottom:16px">
-                    <div class="audit-panel-head">
-                        <div class="audit-panel-title">
-                            <div class="apd apd-blue"></div> Check-outs do Dia
-                            <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">
-                                — marque PRE/TRIP e adicione observações (LCO, Reentrada, etc.)
-                            </span>
+                <!-- ABA: PREVISÃO -->
+                <div class="tab-pane" id="pane-previsao">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-purple"></div> Previsão — Amanhã</div>
+                            <span id="lbl-amanha" style="font-size:11px;color:var(--text-soft)">—</span>
                         </div>
-                        <span class="audit-panel-badge badge-blue" id="badge-checkouts">0</span>
+                        <div class="prev-nums">
+                            <div class="prev-item"><div class="prev-val c-green" id="prev-ocup">—</div><div class="prev-lbl">Ocupação</div><div class="prev-sub" id="prev-diaria">—</div></div>
+                            <div class="prev-item"><div class="prev-val c-green" id="prev-ent">—</div><div class="prev-lbl">Entradas</div><div class="prev-sub">check-ins previstos</div></div>
+                            <div class="prev-item"><div class="prev-val c-red" id="prev-sai">—</div><div class="prev-lbl">Saídas</div><div class="prev-sub">check-outs previstos</div></div>
+                            <div class="prev-item"><div class="prev-val c-amber" id="prev-cafe">—</div><div class="prev-lbl">Café da Manhã</div><div class="prev-sub">hóspedes esperados</div></div>
+                        </div>
                     </div>
-                    <div class="checkout-table-wrap">
-                        <table class="checkout-table">
-                            <thead>
-                                <tr style="background:#0f172a">
-                                    <th class="td-center">PRE</th>
-                                    <th class="td-center">TRIP</th>
-                                    <th>Observação</th>
-                                    <th class="td-center">UH</th>
-                                    <th>CT</th>
-                                    <th>Nome do Hóspede</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-checkouts"></tbody>
-                        </table>
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-purple"></div> Check-outs Previstos — Amanhã <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">— marque e adicione observações</span></div>
+                            <span class="pbadge pb-purple" id="b-prev-co">0</span>
+                        </div>
+                        <div class="co-wrap">
+                            <table class="co-t">
+                                <thead><tr style="background:#1e1b4b"><th class="td-c" style="width:44px">PRE</th><th class="td-c" style="width:44px">TRIP</th><th>Observação</th><th class="td-c" style="width:52px">UH</th><th style="width:60px">CT</th><th>Nome do Hóspede</th></tr></thead>
+                                <tbody id="tb-prev-co-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="tfoot">
+                            <span class="leg">Legenda:</span>
+                            <span class="xtag xt-lco">🕐 LCO</span>
+                            <span class="xtag xt-reent">🔄 Reentrada</span>
+                            <button class="btn-add-row" onclick="addCoRow('checkoutsPrev','tb-prev-co-body',renderCheckoutsPrev)">＋ Adicionar linha</button>
+                        </div>
                     </div>
-                    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-                        <span style="font-size:11px;color:var(--text-soft)">Legenda:</span>
-                        <span class="audit-tag tag-lco">🕐 LCO</span>
-                        <span class="audit-tag tag-reent">🔄 Reentrada</span>
-                        <span class="audit-tag tag-esp">⭐ Especial</span>
-                        <button onclick="adicionarCheckout()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-soft);padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'">＋ Adicionar linha</button>
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-purple"></div> Reservas Especiais — Amanhã</div>
+                            <span class="pbadge pb-purple" id="b-prev-esp">0</span>
+                        </div>
+                        <div class="t-wrap">
+                            <table class="t"><thead><tr><th>Cat.</th><th>Reserva</th><th>IN</th><th>OUT</th><th>Descrição</th><th>UH</th><th class="td-c">C</th><th class="td-c">M</th><th class="td-c">E</th></tr></thead>
+                            <tbody id="tb-prev-esp"></tbody></table>
+                        </div>
                     </div>
                 </div>
 
-                <!-- HISTÓRICO -->
-                <div class="audit-panel">
-                    <div class="audit-panel-head">
-                        <div class="audit-panel-title"><div class="apd apd-gold"></div> Histórico de Auditorias</div>
-                        <button onclick="limparHistorico()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar</button>
+                <!-- ABA: RESERVAS ESPECIAIS -->
+                <div class="tab-pane" id="pane-especiais">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-gold"></div> Reservas Especiais — Hoje</div>
+                            <span class="pbadge pb-gold" id="b-esp">0</span>
+                        </div>
+                        <div class="t-wrap">
+                            <table class="t"><thead><tr><th>UH</th><th>Reserva</th><th>Check-in</th><th>Check-out</th><th>Descrição</th><th>Tipo</th></tr></thead>
+                            <tbody id="tb-esp"></tbody></table>
+                        </div>
                     </div>
-                    <div id="historico-list">
-                        <div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px;">Nenhuma auditoria salva ainda.</div>
+                </div>
+
+                <!-- ABA: CHECK-INS PENDENTES -->
+                <div class="tab-pane" id="pane-checkins">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div class="panel-title"><div class="dot dot-amber"></div> Check-ins Pendentes</div>
+                            <span class="pbadge pb-amber" id="b-ci2">0</span>
+                        </div>
+                        <div class="t-wrap">
+                            <table class="t"><thead><tr><th>Reserva</th><th>Nome do Hóspede</th></tr></thead>
+                            <tbody id="tb-ci-b"></tbody></table>
+                        </div>
                     </div>
                 </div>
 
             </div><!-- /audit-wrap -->
 
-            <!-- ESTADO VAZIO INICIAL -->
+            <!-- ESTADO VAZIO -->
             <div id="empty-state">
-                <div class="audit-panel" style="margin-bottom:0">
-                    <div class="audit-empty-state">
-                        <span class="audit-empty-icon">📋</span>
-                        <div class="audit-empty-title">Nenhuma auditoria aberta</div>
-                        <div class="audit-empty-desc">
-                            Faça upload do PDF/imagem da auditoria acima para a IA extrair os dados automaticamente,
-                            ou clique em <strong>＋ Manual</strong> para preencher manualmente.
-                        </div>
+                <div class="panel">
+                    <div class="empty-state">
+                        <span class="empty-icon">📋</span>
+                        <div class="empty-title">Nenhuma auditoria aberta</div>
+                        <div class="empty-desc">Faça upload da imagem ou PDF para a IA extrair tudo automaticamente, ou clique em <strong>＋ Manual</strong>.</div>
                     </div>
                 </div>
             </div>
 
-        </div><!-- /content -->
+        </div>
     </main>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════ -->
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}";
-const LS_KEY_HIST = `hosp_audit_hist_${HOTEL_SLUG}`;
-
-let arquivoSelecionado = null;
-let auditoriaAtual     = null;
-let ocorrencias        = [];
-let checkoutsData      = [];
-let espData            = [];
-let checkinsData       = [];
-let prevEspData        = [];
-
-// ── DRAG & DROP ──
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-    e.preventDefault(); dropZone.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if (f) setArquivo(f);
-});
-
-function onFileSelect(input) {
-    if (input.files[0]) setArquivo(input.files[0]);
-}
-
-function setArquivo(f) {
-    arquivoSelecionado = f;
-    document.getElementById('file-name-label').textContent = f.name;
-    document.getElementById('file-size-label').textContent = (f.size / 1024).toFixed(0) + ' KB';
-    document.getElementById('file-selected-info').classList.add('show');
-    document.getElementById('btn-processar').disabled = false;
-}
-
-function limparArquivo() {
-    arquivoSelecionado = null;
-    document.getElementById('pdf-input').value = '';
-    document.getElementById('file-selected-info').classList.remove('show');
-    document.getElementById('btn-processar').disabled = true;
-}
-
-// ── GEMINI — CHAVE E MODELO ──
-const GEMINI_API_KEY = 'AIzaSyBUnHx3ovQfMiwQYrr-kn2eEUb6COoQRbU';
+const HOTEL_SLUG  = "{{ hotel.slug }}";
+const LS_KEY      = `hosp_audit_hist_${HOTEL_SLUG}`;
 const GEMINI_MODEL = 'gemini-2.0-flash';
 
+// ↓↓↓ COLE SUA CHAVE AQUI ↓↓↓
+const GEMINI_API_KEY = 'COLE_SUA_CHAVE_AQUI';
+
+let arquivoSel    = null;
+let auditoriaAtual = null;
+let ocorrencias   = [];
+let checkoutsHoje = [];
+let checkoutsPrev = [];
+let especiais     = [];
+let prevEspeciais  = [];
+let checkins      = [];
+
+// ── GEMINI KEY ──
 function getGeminiKey() {
-    // 1. Constante no código (funciona sempre que preenchida)
-    if (GEMINI_API_KEY && GEMINI_API_KEY !== 'COLE_SUA_CHAVE_AQUI') {
-        return GEMINI_API_KEY;
-    }
-    // 2. Campo visual na tela (se existir)
-    const campo = document.getElementById('gemini-key-input');
-    if (campo && campo.value.trim()) {
-        localStorage.setItem('gemini_api_key', campo.value.trim());
-        return campo.value.trim();
-    }
-    // 3. localStorage (salvo anteriormente)
-    return localStorage.getItem('gemini_api_key') || '';
+    if (GEMINI_API_KEY && GEMINI_API_KEY !== 'COLE_SUA_CHAVE_AQUI') return GEMINI_API_KEY;
+    const c = document.getElementById('gemini-key-input');
+    if (c && c.value.trim()) { localStorage.setItem('gk', c.value.trim()); return c.value.trim(); }
+    return localStorage.getItem('gk') || '';
+}
+function salvarKeyLocal(v) { if (v.trim()) localStorage.setItem('gk', v.trim()); }
+
+// ── DRAG & DROP ──
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) setArquivo(f); });
+function onFileSelect(inp) { if (inp.files[0]) setArquivo(inp.files[0]); }
+function setArquivo(f) {
+    arquivoSel = f;
+    g('file-name-lbl').textContent = f.name;
+    g('file-size-lbl').textContent = (f.size/1024).toFixed(0)+' KB';
+    g('file-sel-info').classList.add('show');
+    g('btn-processar').disabled = false;
+}
+function limparArquivo() {
+    arquivoSel = null;
+    g('pdf-input').value = '';
+    g('file-sel-info').classList.remove('show');
+    g('btn-processar').disabled = true;
 }
 
-// ── PROCESSAR COM IA (Gemini) ──
+// ── PROCESSAR COM IA ──
 async function processarComIA() {
-    if (!arquivoSelecionado) return;
-
+    if (!arquivoSel) return;
     const apiKey = getGeminiKey();
-    if (!apiKey) {
-        mostrarToast('⚠️ Cole sua chave do Gemini antes de processar!');
-        document.getElementById('gemini-key-input')?.focus();
-        return;
-    }
+    if (!apiKey) { toast('⚠️ Cole sua chave do Gemini!'); return; }
 
-    // Mostra loading, esconde corpo do upload
-    document.querySelector('.upload-card-body').style.display = 'none';
-    document.getElementById('ai-processing').classList.add('show');
-    document.getElementById('empty-state').style.display = 'none';
+    g('upload-section').querySelector('.up-body').style.display = 'none';
+    g('ai-loading').classList.add('show');
+    g('empty-state').style.display = 'none';
 
-    // Anima steps progressivamente
-    const steps  = ['step-1','step-2','step-3','step-4','step-5','step-6'];
-    const delays = [0, 1400, 2800, 4000, 5200, 6200];
-    let stepTimer = delays.map((d, i) => setTimeout(() => {
-        steps.forEach((s, j) => {
-            const el = document.getElementById(s);
-            if (j < i)      { el.classList.add('feito'); el.classList.remove('ativo'); }
-            else if (j === i){ el.classList.add('ativo'); el.classList.remove('feito'); }
-            else             { el.classList.remove('ativo','feito'); }
+    const ss = ['s1','s2','s3','s4','s5','s6'];
+    const dd = [0,1400,2800,4000,5200,6200];
+    const tt = dd.map((d,i) => setTimeout(() => {
+        ss.forEach((s,j) => {
+            const el = g(s);
+            if (j<i){el.classList.add('feito');el.classList.remove('ativo');}
+            else if(j===i){el.classList.add('ativo');el.classList.remove('feito');}
+            else{el.classList.remove('ativo','feito');}
         });
     }, d));
 
-    // Converte arquivo para base64
-    const base64    = await fileToBase64(arquivoSelecionado);
-    const mimeType  = arquivoSelecionado.type || 'image/png';
-    const isPdf     = mimeType === 'application/pdf';
+    const b64  = await toB64(arquivoSel);
+    const mime = arquivoSel.type || 'image/png';
 
-    // Prompt idêntico ao anterior — apenas muda o provider
-    const prompt = `Você é um assistente especializado em auditoria hoteleira.
-Analise a imagem/documento fornecido e extraia TODOS os dados visíveis.
-Retorne APENAS JSON válido, sem markdown, sem blocos de código, sem explicações.
+    const prompt = `Você é especialista em auditoria hoteleira. Analise a imagem/documento e extraia TODOS os dados.
+Retorne APENAS JSON válido sem markdown.
 
-Formato exato:
 {
-  "data": "DD/MM/AAAA",
-  "turno": "Nome / Nome",
-  "ocupacao": "XX,XX%",
-  "dm": "R$ X.XXX,XX",
-  "uh_bloq": 0,
-  "checkouts": [
-    { "uh": 21, "ct": "SUP", "nome": "Sobrenome, Nome", "obs": "", "lco": false, "reentrada": false, "pre": false, "trip": false }
-  ],
-  "checkins_pendentes": [
-    { "reserva": "XXXXXX", "nome": "Nome do Hóspede" }
-  ],
-  "ocorrencias": ["texto da ocorrência 1"],
-  "reservas_especiais": [
-    { "uh": 31, "reserva": "335778852", "checkin": "19/04/2026", "checkout": "27/04/2026", "descricao": "Jazlyn Raggio - Long stay", "tipo": "long_stay" }
-  ],
-  "previsao": {
-    "ocupacao": "XX,XX%",
-    "diaria": "R$ X.XXX,XX",
-    "uhs": 50,
-    "entradas": 19,
-    "saidas": 23,
-    "cafe": 90,
-    "sut": 1, "sup": 11, "std": 7,
-    "especiais": [
-      { "categoria": "SUP", "reserva": "XXXXX", "in": "DD/MM/AAAA", "out": "DD/MM/AAAA", "descricao": "Descrição", "uh": 34 }
-    ]
+  "data":"DD/MM/AAAA","turno":"Nome/Nome","ocupacao":"XX,XX%","dm":"R$ X.XXX,XX","uh_bloq":0,
+  "checkouts":[{"uh":21,"ct":"SUP","nome":"Sobrenome,Nome","obs":"","lco":false,"reentrada":false,"pre":false,"trip":false}],
+  "checkins_pendentes":[{"reserva":"XXXXXX","nome":"Nome"}],
+  "ocorrencias":[],
+  "reservas_especiais":[{"uh":31,"reserva":"335778852","checkin":"19/04/2026","checkout":"27/04/2026","descricao":"Jazlyn Raggio - Long stay","tipo":"long_stay"}],
+  "previsao":{
+    "ocupacao":"XX,XX%","diaria":"R$ X.XXX,XX","uhs":50,"entradas":19,"saidas":23,"cafe":90,
+    "checkouts_amanha":[{"uh":34,"ct":"SUP","nome":"Nome,Sobrenome","obs":"Reentrada no STD","lco":false,"reentrada":true,"pre":false,"trip":false}],
+    "especiais":[{"categoria":"SUP","reserva":"XXXXX","in":"DD/MM/AAAA","out":"DD/MM/AAAA","descricao":"Desc","uh":34}]
   }
 }
-
-REGRAS:
-- checkouts: se "Reentrada" na obs → reentrada:true; se "LCO" ou "Late" → lco:true
-- Extraia TODOS os hóspedes da tabela de check-outs
-- Extraia TODAS as reservas especiais
-- Campos ausentes: use null ou []
-- Responda SOMENTE com o JSON, nada mais`;
-
-    // Monta parts do Gemini
-    const parts = [
-        {
-            inline_data: {
-                mime_type: mimeType,
-                data: base64,
-            }
-        },
-        { text: prompt }
-    ];
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+REGRAS: obs com "Reentrada"→reentrada:true; "LCO"/"Late"→lco:true. Extraia TODOS os hóspedes visíveis.`;
 
     try {
-        const resp = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts }],
-                generationConfig: {
-                    temperature:     0.1,   // baixo — queremos precisão, não criatividade
-                    maxOutputTokens: 8192,
-                    responseMimeType: 'application/json', // força JSON puro no Gemini 2.0
-                }
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                contents:[{parts:[{inline_data:{mime_type:mime,data:b64}},{text:prompt}]}],
+                generationConfig:{temperature:0.1,maxOutputTokens:8192,responseMimeType:'application/json'}
             })
         });
-
-        if (!resp.ok) {
-            const err = await resp.json().catch(() => ({}));
-            throw new Error(err?.error?.message || `HTTP ${resp.status}`);
-        }
-
-        const data = await resp.json();
-
-        // Extrai texto da resposta do Gemini
-        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-        // Conclui todos os steps
-        stepTimer.forEach(clearTimeout);
-        steps.forEach(s => {
-            const el = document.getElementById(s);
-            el.classList.add('feito'); el.classList.remove('ativo');
-        });
+        if (!r.ok){const e=await r.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${r.status}`);}
+        const data = await r.json();
+        const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+        tt.forEach(clearTimeout);
+        ss.forEach(s=>{const el=g(s);el.classList.add('feito');el.classList.remove('ativo');});
         await sleep(500);
-
-        // Parse JSON
         let parsed;
-        try {
-            const clean = raw.replace(/```json|```/g, '').trim();
-            parsed = JSON.parse(clean);
-        } catch (e) {
-            console.warn('JSON parse falhou, usando demo:', e);
-            parsed = gerarDadosDemonstracao();
-        }
-
-        carregarAuditoria(parsed, '✨ Gemini — ' + arquivoSelecionado.name);
-
-    } catch (e) {
-        stepTimer.forEach(clearTimeout);
-        console.error('Erro Gemini:', e);
-
-        // Mostra erro amigável e volta ao estado inicial
-        document.getElementById('ai-processing').classList.remove('show');
-        document.querySelector('.upload-card-body').style.display = '';
-        steps.forEach(s => document.getElementById(s).classList.remove('ativo','feito'));
-
-        mostrarToast('🔴 Erro Gemini: ' + e.message);
+        try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{parsed=demo();}
+        carregarAuditoria(parsed,'✨ Gemini — '+arquivoSel.name);
+    } catch(e) {
+        tt.forEach(clearTimeout);
+        ss.forEach(s=>g(s).classList.remove('ativo','feito'));
+        g('ai-loading').classList.remove('show');
+        g('upload-section').querySelector('.up-body').style.display='';
+        toast('🔴 Erro: '+e.message);
     }
 }
 
-function fileToBase64(file) {
-    return new Promise((res, rej) => {
-        const r = new FileReader();
-        r.onload  = () => res(r.result.split(',')[1]);
-        r.onerror = () => rej(new Error('Leitura falhou'));
-        r.readAsDataURL(file);
-    });
-}
+function toB64(f){return new Promise((r,j)=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.onerror=()=>j(new Error('Falhou'));fr.readAsDataURL(f);});}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ── DADOS DEMO (espelho fiel do Google Sheets das imagens) ──
-function gerarDadosDemonstracao() {
+// ── DEMO ──
+function demo(){
     return {
-        data: '25/04/2026',
-        turno: 'Margiore / Lussandro',
-        ocupacao: '98,18%',
-        dm: 'R$ 1.332,84',
-        uh_bloq: 1,
-        checkins_pendentes: [],
-        ocorrencias: [],
-        reservas_especiais: [
-            { uh: 31, reserva: '335778852', checkin: '19/04/2026', checkout: '27/04/2026', descricao: 'Jazlyn Raggio - Long stay',              tipo: 'long_stay' },
-            { uh: 51, reserva: '336154889', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Jason Mancuso - Long stay',              tipo: 'long_stay' },
-            { uh: 64, reserva: '336139503', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Will Hu - Long stay',                    tipo: 'long_stay' },
-            { uh: 85, reserva: '336079102', checkin: '21/04/2026', checkout: '29/04/2026', descricao: 'Monishee Matin - Long stay',             tipo: 'long_stay' },
-            { uh: 91, reserva: '335707707', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Roff, Esther - Long stay',              tipo: 'long_stay' },
-            { uh: 94, reserva: '335707292', checkin: '21/04/2026', checkout: '29/04/2026', descricao: 'Juliet Qian Ying Teoh - Long stay',     tipo: 'long_stay' },
-            { uh: 66, reserva: '335519123', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'JESSE PETERS - Long stay',              tipo: 'long_stay' },
-            { uh: 87, reserva: '335076706', checkin: '22/04/2026', checkout: '26/04/2026', descricao: 'Eduardo Vidal e Maria Angelica - Lua de mel', tipo: 'especial' },
+        data:'25/04/2026',turno:'Margiore / Lussandro',ocupacao:'98,18%',dm:'R$ 1.332,84',uh_bloq:1,
+        checkins_pendentes:[],ocorrencias:[],
+        reservas_especiais:[
+            {uh:31,reserva:'335778852',checkin:'19/04/2026',checkout:'27/04/2026',descricao:'Jazlyn Raggio - Long stay',tipo:'long_stay'},
+            {uh:51,reserva:'336154889',checkin:'21/04/2026',checkout:'28/04/2026',descricao:'Jason Mancuso - Long stay',tipo:'long_stay'},
+            {uh:64,reserva:'336139503',checkin:'21/04/2026',checkout:'28/04/2026',descricao:'Will Hu - Long stay',tipo:'long_stay'},
+            {uh:85,reserva:'336079102',checkin:'21/04/2026',checkout:'29/04/2026',descricao:'Monishee Matin - Long stay',tipo:'long_stay'},
+            {uh:87,reserva:'335076706',checkin:'22/04/2026',checkout:'26/04/2026',descricao:'Eduardo Vidal e Maria Angelica - Lua de mel',tipo:'especial'},
         ],
-        checkouts: [
-            { uh: 21, ct: 'SUP', nome: 'Manuel,Rui',                   obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 22, ct: 'SUP', nome: 'Scordo,Cecilia Claudia',        obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 27, ct: 'STD', nome: 'silva,raphael',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 33, ct: 'SUP', nome: 'Fabbri Ratcliff,Katia',         obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 34, ct: 'SUP', nome: 'Ramos,Maria Luiza',             obs: 'Reentrada no STD', lco: false, reentrada: true, pre: false, trip: false },
-            { uh: 37, ct: 'STD', nome: 'Pereira,Diego',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 42, ct: 'SUP', nome: 'Workman,Greta',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 43, ct: 'SUP', nome: 'MARTINEZ,RAFAEL',               obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 45, ct: 'STD', nome: 'Kurniawan,Grace Jasmine',       obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 46, ct: 'STD', nome: 'Lemaitre,Cecilia Gurgel',       obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 53, ct: 'SUP', nome: 'Scipioni,Mercedes',             obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 54, ct: 'SUP', nome: 'De Laurentis,Carlos',           obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 57, ct: 'STD', nome: 'Berger,Sandra',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 61, ct: 'SUP', nome: 'Vignart,Juan Pablo',            obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 62, ct: 'SUP', nome: 'Vignart,Oscar',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 63, ct: 'SUP', nome: 'Mauler Da Cruz,Bruno',          obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 65, ct: 'STD', nome: 'Cardum,Matheus',                obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 67, ct: 'STD', nome: 'Xavier,Beatriz',                obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 76, ct: 'STD', nome: 'Gottardi,Ana Maria',            obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 77, ct: 'STD', nome: 'Gottardi,Luciana',              obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 87, ct: 'STD', nome: 'Vidal,Eduardo',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
-            { uh: 92, ct: 'SUI', nome: 'Reid,Naomi',                    obs: 'Reentrada no SUP', lco: false, reentrada: true, pre: false, trip: false },
-            { uh: 96, ct: 'STD', nome: 'Carmona dos Santos,Guermann',   obs: '', lco: false, reentrada: false, pre: false, trip: false },
+        checkouts:[
+            {uh:21,ct:'SUP',nome:'Manuel,Rui',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:22,ct:'SUP',nome:'Scordo,Cecilia Claudia',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:27,ct:'STD',nome:'silva,raphael',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:33,ct:'SUP',nome:'Fabbri Ratcliff,Katia',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:34,ct:'SUP',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
+            {uh:37,ct:'STD',nome:'Pereira,Diego',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:42,ct:'SUP',nome:'Workman,Greta',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:43,ct:'SUP',nome:'MARTINEZ,RAFAEL',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:45,ct:'STD',nome:'Kurniawan,Grace Jasmine',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:46,ct:'STD',nome:'Lemaitre,Cecilia Gurgel',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:53,ct:'SUP',nome:'Scipioni,Mercedes',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:54,ct:'SUP',nome:'De Laurentis,Carlos',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:57,ct:'STD',nome:'Berger,Sandra',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:61,ct:'SUP',nome:'Vignart,Juan Pablo',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:62,ct:'SUP',nome:'Vignart,Oscar',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:63,ct:'SUP',nome:'Mauler Da Cruz,Bruno',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:65,ct:'STD',nome:'Cardum,Matheus',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:67,ct:'STD',nome:'Xavier,Beatriz',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:76,ct:'STD',nome:'Gottardi,Ana Maria',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:77,ct:'STD',nome:'Gottardi,Luciana',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:87,ct:'STD',nome:'Vidal,Eduardo',obs:'',lco:false,reentrada:false,pre:false,trip:false},
+            {uh:92,ct:'SUI',nome:'Reid,Naomi',obs:'Reentrada no SUP',lco:false,reentrada:true,pre:false,trip:false},
+            {uh:96,ct:'STD',nome:'Carmona dos Santos,Guermann',obs:'',lco:false,reentrada:false,pre:false,trip:false},
         ],
-        previsao: {
-            ocupacao: '92,59%',
-            diaria: 'R$ 1.286,97',
-            uhs: 50,
-            entradas: 19,
-            saidas: 23,
-            cafe: 90,
-            sut: 1, sup: 11, std: 7,
-            especiais: [
-                { categoria: 'STD', reserva: '336271347', in: '26/04/2026', out: '27/04/2026', descricao: 'Ramos,Maria Luiza - Reentrada no STD', uh: 34 },
-                { categoria: 'SUP', reserva: '334532990', in: '26/04/2026', out: '27/04/2026', descricao: 'Almeida,Luis - 1 de 3', uh: '' },
-                { categoria: 'SUP', reserva: '334532824', in: '26/04/2026', out: '27/04/2026', descricao: 'Pandiella,Rosa - 2 de 3 - Cama twin', uh: '' },
-                { categoria: 'SUP', reserva: '334532988', in: '26/04/2026', out: '27/04/2026', descricao: 'Alves,Luisa Maria - 3 de 3', uh: '' },
-                { categoria: 'SUP', reserva: '335321782', in: '26/04/2026', out: '01/05/2026', descricao: 'Maxwell,Josh - 1 de 5', uh: '' },
-                { categoria: 'SUP', reserva: '335321832', in: '26/04/2026', out: '01/05/2026', descricao: 'Corriveau,Philip - 2 de 5', uh: '' },
-                { categoria: 'SUP', reserva: '335322109', in: '26/04/2026', out: '01/05/2026', descricao: 'Miyoung - 4 de 5 - Reentrada no SUP - Pax está na u…', uh: '' },
-                { categoria: 'SUP', reserva: '335322110', in: '26/04/2026', out: '01/05/2026', descricao: 'Reentrada no SUP - Pax está na uh…', uh: '' },
-                { categoria: 'STD', reserva: '335710091', in: '26/04/2026', out: '05/05/2026', descricao: 'Silva Reis,Pedro - Long stay', uh: '' },
-                { categoria: 'STD', reserva: '335849542', in: '26/04/2026', out: '27/04/2026', descricao: 'Queiroz, Marcelo - Preferência final 05 e andar alto', uh: '' },
+        previsao:{
+            ocupacao:'92,59%',diaria:'R$ 1.286,97',uhs:50,entradas:19,saidas:23,cafe:90,
+            checkouts_amanha:[
+                {uh:34,ct:'STD',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
+                {uh:92,ct:'SUP',nome:'Reid,Naomi',obs:'Reentrada no SUP',lco:false,reentrada:true,pre:false,trip:false},
+            ],
+            especiais:[
+                {categoria:'STD',reserva:'336271347',in:'26/04/2026',out:'27/04/2026',descricao:'Ramos,Maria Luiza - Reentrada no STD',uh:34},
+                {categoria:'SUP',reserva:'334532990',in:'26/04/2026',out:'27/04/2026',descricao:'Almeida,Luis - 1 de 3',uh:''},
+                {categoria:'STD',reserva:'335710091',in:'26/04/2026',out:'05/05/2026',descricao:'Silva Reis,Pedro - Long stay',uh:''},
             ]
         }
     };
 }
 
-// ── CARREGAR AUDITORIA ──
-function carregarAuditoria(dados, fonte) {
-    auditoriaAtual = dados;
-    ocorrencias    = dados.ocorrencias || [];
-    checkoutsData  = dados.checkouts   || [];
-    espData        = dados.reservas_especiais || [];
-    checkinsData   = dados.checkins_pendentes || [];
-    prevEspData    = dados.previsao?.especiais || [];
+// ── CARREGAR ──
+function carregarAuditoria(d, fonte) {
+    auditoriaAtual = d;
+    ocorrencias   = d.ocorrencias||[];
+    checkoutsHoje = d.checkouts||[];
+    checkoutsPrev = d.previsao?.checkouts_amanha||[];
+    especiais     = d.reservas_especiais||[];
+    prevEspeciais  = d.previsao?.especiais||[];
+    checkins      = d.checkins_pendentes||[];
 
-    // Esconde loading e upload body
-    document.getElementById('ai-processing').classList.remove('show');
-    document.querySelector('.upload-card-body').style.display = '';
+    g('upload-section').querySelector('.up-body').style.display='';
+    g('ai-loading').classList.remove('show');
+    g('empty-state').style.display='none';
+    g('audit-wrap').style.display='block';
 
-    // Esconde empty
-    document.getElementById('empty-state').style.display = 'none';
+    g('lbl-data').textContent  = d.data||'—';
+    g('lbl-fonte').textContent = fonte||'🤖 Gemini';
+    g('t-turno').value   = d.turno||'';
+    g('t-data').value    = isoDate(d.data);
+    g('t-ocup').value    = d.ocupacao||'';
+    g('t-dm').value      = d.dm||'';
+    g('t-uh-bloq').value = d.uh_bloq||0;
 
-    // Mostra auditoria
-    document.getElementById('audit-wrap').classList.add('show');
+    const lcos  = checkoutsHoje.filter(c=>c.lco).length;
+    const reent = checkoutsHoje.filter(c=>c.reentrada).length;
+    g('kpi-ocup').textContent  = d.ocupacao||'—';
+    g('kpi-co').textContent    = checkoutsHoje.length;
+    g('kpi-lco').textContent   = lcos;
+    g('kpi-reent').textContent = reent;
+    g('kpi-esp').textContent   = especiais.length;
 
-    // Popula campos topo
-    document.getElementById('audit-data-label').textContent = dados.data || '—';
-    document.getElementById('audit-fonte-badge').textContent = fonte || '🤖 Extraído por IA';
-    document.getElementById('t-turno').value   = dados.turno    || '';
-    document.getElementById('t-data').value    = isoDate(dados.data) || '';
-    document.getElementById('t-ocup').value    = dados.ocupacao || '';
-    document.getElementById('t-dm').value      = dados.dm       || '';
-    document.getElementById('t-uh-bloq').value = dados.uh_bloq  || 0;
+    // tab badges
+    g('tb-audit').textContent = d.turno?d.turno.split('/')[0].trim():'—';
+    g('tb-co').textContent    = checkoutsHoje.length;
+    g('tb-prev').textContent  = checkoutsPrev.length;
+    g('tb-esp').textContent   = especiais.length;
+    g('tb-ci').textContent    = checkins.length;
 
-    // KPIs
-    const lcos    = checkoutsData.filter(c => c.lco).length;
-    const reents  = checkoutsData.filter(c => c.reentrada).length;
-    document.getElementById('kpi-ocup').textContent       = dados.ocupacao || '—';
-    document.getElementById('kpi-checkouts').textContent  = checkoutsData.length;
-    document.getElementById('kpi-lco').textContent        = lcos;
-    document.getElementById('kpi-reentradas').textContent = reents;
-    document.getElementById('kpi-esp').textContent        = espData.length;
+    // previsão
+    const pv = d.previsao||{};
+    g('prev-ocup').textContent  = pv.ocupacao||'—';
+    g('prev-diaria').textContent= pv.diaria||'—';
+    g('prev-ent').textContent   = pv.entradas!==undefined?pv.entradas:'—';
+    g('prev-sai').textContent   = pv.saidas!==undefined?pv.saidas:'—';
+    g('prev-cafe').textContent  = pv.cafe!==undefined?pv.cafe:'—';
+    g('lbl-amanha').textContent = dataAmanha(d.data);
 
-    // Badges count
-    document.getElementById('badge-checkins').textContent  = checkinsData.length;
-    document.getElementById('badge-ocorr').textContent     = ocorrencias.length;
-    document.getElementById('badge-esp').textContent       = espData.length;
-    document.getElementById('badge-checkouts').textContent = checkoutsData.length;
-
-    // Check-ins pendentes
-    renderCheckins();
-
-    // Ocorrências
-    renderOcorrencias();
-
-    // Reservas especiais
-    renderEspeciais();
-
-    // Previsão
-    const prev = dados.previsao || {};
-    document.getElementById('prev-ocup').textContent    = prev.ocupacao  || '—';
-    document.getElementById('prev-diaria').textContent  = prev.diaria    || '—';
-    document.getElementById('prev-entradas').textContent = prev.entradas !== undefined ? prev.entradas : '—';
-    document.getElementById('prev-saidas').textContent   = prev.saidas   !== undefined ? prev.saidas  : '—';
-    document.getElementById('prev-cafe').textContent     = prev.cafe     !== undefined ? prev.cafe    : '—';
-
-    const amanha = dataAmanha(dados.data);
-    document.getElementById('prev-data-label').textContent = amanha ? 'Amanhã — ' + amanha : '';
-
-    renderPrevEspeciais();
-
-    // Check-outs
-    renderCheckouts();
+    renderTudo();
+    setTab('auditoria');
 }
 
-// ── RENDER FUNÇÕES ──
-function renderCheckins() {
-    const tbody = document.getElementById('tbody-checkins');
-    if (!checkinsData.length) {
-        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Sem check-ins pendentes</td></tr>';
-        return;
-    }
-    tbody.innerHTML = checkinsData.map(c =>
-        `<tr>
-            <td><span class="at td-num">${esc(c.reserva)}</span></td>
-            <td class="td-bold">${esc(c.nome)}</td>
-        </tr>`
-    ).join('');
-    document.getElementById('badge-checkins').textContent = checkinsData.length;
+function renderTudo(){renderCheckins();renderOcorrencias();renderEspeciais();renderCheckoutsHoje();renderCheckoutsPrev();renderPrevEsp();}
+
+// ── ABAS ──
+function setTab(tab){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+tab));
 }
 
-function renderOcorrencias() {
-    const list = document.getElementById('ocorr-list');
-    list.innerHTML = ocorrencias.map(o =>
-        `<div class="ocorr-item"><div class="ocorr-item-dot"></div>${esc(o)}</div>`
-    ).join('');
-    document.getElementById('badge-ocorr').textContent = ocorrencias.length;
+// ── CHECKINS ──
+function renderCheckins(){
+    const html = checkins.length
+        ? checkins.map(c=>`<tr><td><span class="td-num">${esc(c.reserva)}</span></td><td class="td-b">${esc(c.nome)}</td></tr>`).join('')
+        : '<tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:18px;font-size:12px">Sem check-ins pendentes</td></tr>';
+    ['tb-ci-a','tb-ci-b'].forEach(id=>{const el=g(id);if(el)el.innerHTML=html;});
+    ['b-ci','b-ci2','tb-ci'].forEach(id=>{const el=g(id);if(el)el.textContent=checkins.length;});
 }
 
-function adicionarOcorrencia() {
-    const txt = document.getElementById('ocorr-nova-input').value.trim();
-    if (!txt) return;
-    ocorrencias.push(txt);
-    document.getElementById('ocorr-nova-input').value = '';
-    renderOcorrencias();
+// ── OCORRÊNCIAS ──
+function renderOcorrencias(){
+    const list=g('ocorr-list');
+    list.innerHTML=ocorrencias.map((o,i)=>
+        `<div class="ocorr-item"><div class="ocorr-dot"></div><span style="flex:1">${esc(o)}</span><button class="ocorr-del" onclick="remOcorr(${i})">✕</button></div>`
+    ).join('')||'<div style="padding:8px 0;font-size:12px;color:var(--text-soft)">Nenhuma ocorrência.</div>';
+    g('b-ocorr').textContent=ocorrencias.length;
 }
+function adicionarOcorrencia(){const t=g('ocorr-input').value.trim();if(!t)return;ocorrencias.push(t);g('ocorr-input').value='';renderOcorrencias();}
+function remOcorr(i){ocorrencias.splice(i,1);renderOcorrencias();}
 
-function renderEspeciais() {
-    const tbody = document.getElementById('tbody-esp');
-    if (!espData.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial</td></tr>';
-        return;
-    }
-    tbody.innerHTML = espData.map(e => {
-        const tipo = e.tipo === 'long_stay' ? '<span class="audit-tag tag-ls">🏷️ Long Stay</span>'
-                   : e.tipo === 'especial'  ? '<span class="audit-tag tag-esp">⭐ Especial</span>'
-                   : '';
-        return `<tr>
-            <td><span class="at td-num">${esc(e.uh||'')}</span></td>
-            <td class="td-bold">${esc(e.reserva||'')}</td>
-            <td class="td-date">${esc(e.checkin||'')}</td>
-            <td class="td-date">${esc(e.checkout||'')}</td>
+// ── ESPECIAIS ──
+function renderEspeciais(){
+    const tbody=g('tb-esp');
+    tbody.innerHTML=especiais.length
+        ? especiais.map(e=>`<tr>
+            <td><span class="td-num">${esc(e.uh||'')}</span></td>
+            <td class="td-b">${esc(e.reserva||'')}</td>
+            <td style="font-size:12px;white-space:nowrap">${esc(e.checkin||'')}</td>
+            <td style="font-size:12px;white-space:nowrap">${esc(e.checkout||'')}</td>
             <td>${esc(e.descricao||'')}</td>
-            <td>${tipo}</td>
-        </tr>`;
-    }).join('');
-    document.getElementById('badge-esp').textContent = espData.length;
+            <td>${e.tipo==='long_stay'?'<span class="xtag xt-ls">🏷️ Long Stay</span>':'<span class="xtag xt-esp">⭐ Especial</span>'}</td>
+          </tr>`).join('')
+        : '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial</td></tr>';
+    ['b-esp','tb-esp-badge'].forEach(id=>{const el=g(id);if(el)el.textContent=especiais.length;});
+    g('tb-esp-badge')&&(g('tb-esp-badge').textContent=especiais.length);
 }
 
-function renderPrevEspeciais() {
-    const tbody = document.getElementById('tbody-prev-esp');
-    if (!prevEspData.length) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px">Nenhuma reserva especial para amanhã</td></tr>';
-        return;
-    }
-    tbody.innerHTML = prevEspData.map(e => {
-        const catCls = e.categoria === 'SUP' ? 'ct-sup' : e.categoria === 'STD' ? 'ct-std' : e.categoria === 'SUI' ? 'ct-sui' : '';
-        return `<tr>
-            <td style="padding:9px 12px"><span class="td-ct-badge ${catCls}">${esc(e.categoria||'')}</span></td>
-            <td class="td-bold" style="padding:9px 12px">${esc(e.reserva||'')}</td>
-            <td style="padding:9px 12px;font-size:12px">${esc(e.in||'')}</td>
-            <td style="padding:9px 12px;font-size:12px">${esc(e.out||'')}</td>
-            <td style="padding:9px 12px;font-size:12px">${esc(e.descricao||'')}</td>
-            <td style="padding:9px 12px"><span class="at td-num">${esc(e.uh||'')}</span></td>
-            <td class="td-check"><input type="checkbox"></td>
-            <td class="td-check"><input type="checkbox"></td>
-            <td class="td-check"><input type="checkbox"></td>
-        </tr>`;
-    }).join('');
+// ── CHECKOUTS ──
+function renderCheckoutsHoje(){
+    const tbody=g('tb-co-body');
+    let rows=checkoutsHoje.map((c,i)=>coRow(c,i,'checkoutsHoje')).join('');
+    for(let b=0;b<Math.max(5,28-checkoutsHoje.length);b++) rows+=blankRow(b);
+    tbody.innerHTML=rows;
+    ['b-co','tb-co'].forEach(id=>{const el=g(id);if(el)el.textContent=checkoutsHoje.length;});
+    g('kpi-co').textContent   = checkoutsHoje.length;
+    g('kpi-lco').textContent  = checkoutsHoje.filter(c=>c.lco).length;
+    g('kpi-reent').textContent = checkoutsHoje.filter(c=>c.reentrada).length;
 }
 
-function renderCheckouts() {
-    const tbody = document.getElementById('tbody-checkouts');
-    if (!checkoutsData.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:28px;font-size:12px">Nenhum checkout para hoje</td></tr>';
-        return;
-    }
-    tbody.innerHTML = checkoutsData.map((c, i) => {
-        const rowClass = c.reentrada ? 'reent-row' : c.lco ? 'lco-row' : '';
-        const ctCls    = c.ct === 'SUP' ? 'ct-sup' : c.ct === 'STD' ? 'ct-std' : c.ct === 'SUI' ? 'ct-sui' : 'ct-pho';
-
-        // Obs tags
-        let tagsHtml = '';
-        if (c.lco)      tagsHtml += '<span class="obs-tag tag-lco">🕐 LCO</span>';
-        if (c.reentrada) tagsHtml += '<span class="obs-tag tag-reent">🔄 Reentrada</span>';
-
-        return `<tr class="${rowClass}" data-idx="${i}">
-            <td class="td-check">
-                <input type="checkbox" ${c.pre?'checked':''} onchange="toggleCheck(${i},'pre',this.checked)">
-            </td>
-            <td class="td-check">
-                <input type="checkbox" ${c.trip?'checked':''} onchange="toggleCheck(${i},'trip',this.checked)">
-            </td>
-            <td class="td-obs">
-                <div class="obs-cell">
-                    ${tagsHtml}
-                    <input class="obs-input" value="${esc(c.obs||'')}"
-                        placeholder="observação…"
-                        oninput="checkoutsData[${i}].obs=this.value"
-                        onchange="detectarTags(${i},this.value)">
-                    <button onclick="abrirObsMenu(${i}, this)" title="Inserir tag"
-                        style="background:none;border:1px solid var(--border);border-radius:4px;width:22px;height:22px;
-                               cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;
-                               align-items:center;justify-content:center;transition:.12s"
-                        onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
-                        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'">＋</button>
-                </div>
-            </td>
-            <td class="td-uh-val">${c.uh}</td>
-            <td style="padding:9px 12px"><span class="td-ct-badge ${ctCls}">${esc(c.ct||'')}</span></td>
-            <td class="td-nome">${esc(c.nome||'')}</td>
-        </tr>`;
-    }).join('');
-    document.getElementById('badge-checkouts').textContent = checkoutsData.length;
+function renderCheckoutsPrev(){
+    const tbody=g('tb-prev-co-body');
+    let rows=checkoutsPrev.map((c,i)=>coRow(c,i,'checkoutsPrev')).join('');
+    for(let b=0;b<Math.max(5,28-checkoutsPrev.length);b++) rows+=blankRow(b);
+    tbody.innerHTML=rows;
+    ['b-prev-co','tb-prev'].forEach(id=>{const el=g(id);if(el)el.textContent=checkoutsPrev.length;});
 }
 
-function toggleCheck(idx, field, val) {
-    checkoutsData[idx][field] = val;
+function coRow(c,i,arr){
+    const cls   = c.reentrada?'r-reent':c.lco?'r-lco':'';
+    const ctCls = c.ct==='SUP'?'ct-sup':c.ct==='STD'?'ct-std':c.ct==='SUI'?'ct-sui':'ct-pho';
+    let tags='';
+    if(c.lco)       tags+='<span class="itag xt-lco">🕐 LCO</span>';
+    if(c.reentrada) tags+='<span class="itag xt-reent">🔄 Reentrada</span>';
+    return `<tr class="${cls}" data-arr="${arr}" data-i="${i}">
+        <td class="td-chk"><input type="checkbox" ${c.pre?'checked':''} onchange="${arr}[${i}].pre=this.checked"></td>
+        <td class="td-chk"><input type="checkbox" ${c.trip?'checked':''} onchange="${arr}[${i}].trip=this.checked"></td>
+        <td class="td-obs-c"><div class="obs-inner">${tags}
+            <input class="obs-inp" value="${esc(c.obs||'')}" placeholder="observação…"
+                oninput="${arr}[${i}].obs=this.value"
+                onchange="detectTag('${arr}',${i},this.value)">
+            <button class="btn-tp" onclick="tagMenu('${arr}',${i},this)">＋</button>
+        </div></td>
+        <td class="td-uh">${c.uh}</td>
+        <td class="td-ct"><span class="ct-b ${ctCls}">${esc(c.ct||'')}</span></td>
+        <td class="td-nome">${esc(c.nome||'')}</td>
+    </tr>`;
 }
 
-function detectarTags(idx, val) {
-    const up = val.toUpperCase();
-    checkoutsData[idx].lco       = up.includes('LCO') || up.includes('LATE');
-    checkoutsData[idx].reentrada = up.includes('REENTRADA') || up.includes('REENT');
-    renderCheckouts();
+function blankRow(b){
+    return `<tr class="r-blank" style="${b%2===0?'background:var(--bg-hover)':''}">
+        <td class="td-chk"><input type="checkbox" disabled style="opacity:.25"></td>
+        <td class="td-chk"><input type="checkbox" disabled style="opacity:.25"></td>
+        <td class="td-obs-c"><div class="obs-inner"></div></td>
+        <td></td><td></td><td></td>
+    </tr>`;
 }
 
-// Menu rápido de tags
-let obsMenuIdx = null;
-function abrirObsMenu(idx, btn) {
-    // Remove menu anterior
-    document.getElementById('obs-menu')?.remove();
-    obsMenuIdx = idx;
-    const menu = document.createElement('div');
-    menu.id = 'obs-menu';
-    menu.style.cssText = `position:fixed;background:var(--bg-card);border:1px solid var(--border);
-        border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);
-        z-index:500;padding:6px;min-width:160px;`;
-    const tags = [
-        { label:'🕐 Late Check-out',   val:'LCO',         cls:'tag-lco'  },
-        { label:'🔄 Reentrada no SUP', val:'Reentrada no SUP', cls:'tag-reent'},
-        { label:'🔄 Reentrada no STD', val:'Reentrada no STD', cls:'tag-reent'},
-        { label:'⭐ Reserva Especial', val:'Reserva Especial', cls:'tag-esp'  },
+function detectTag(arr,i,val){
+    const up=val.toUpperCase();
+    window[arr][i].lco       = up.includes('LCO')||up.includes('LATE');
+    window[arr][i].reentrada = up.includes('REENTRADA')||up.includes('REENT');
+    if(arr==='checkoutsHoje') renderCheckoutsHoje(); else renderCheckoutsPrev();
+}
+
+function addCoRow(arr,tbodyId,renderFn){
+    window[arr].push({uh:'',ct:'STD',nome:'',obs:'',lco:false,reentrada:false,pre:false,trip:false});
+    renderFn();
+}
+
+function tagMenu(arr,i,btn){
+    document.getElementById('__tm')?.remove();
+    const opts=[
+        {l:'🕐 Late Check-out',v:'LCO'},
+        {l:'🔄 Reentrada no SUP',v:'Reentrada no SUP'},
+        {l:'🔄 Reentrada no STD',v:'Reentrada no STD'},
+        {l:'⭐ Reserva Especial',v:'Reserva Especial'},
     ];
-    tags.forEach(t => {
-        const btn2 = document.createElement('button');
-        btn2.textContent = t.label;
-        btn2.style.cssText = `display:block;width:100%;text-align:left;padding:8px 12px;
-            background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;
-            font-family:'Inter',sans-serif;color:var(--text-main);transition:.12s;`;
-        btn2.onmouseover = () => btn2.style.background = 'var(--bg-hover)';
-        btn2.onmouseout  = () => btn2.style.background = 'none';
-        btn2.onclick = () => {
-            const row = document.querySelector(`tr[data-idx="${obsMenuIdx}"]`);
-            const input = row?.querySelector('.obs-input');
-            if (input) {
-                input.value = t.val;
-                checkoutsData[obsMenuIdx].obs = t.val;
-                detectarTags(obsMenuIdx, t.val);
-            }
-            menu.remove();
-        };
-        menu.appendChild(btn2);
+    const m=document.createElement('div');
+    m.id='__tm';
+    m.style.cssText='position:fixed;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:600;padding:5px;min-width:180px;';
+    opts.forEach(o=>{
+        const b=document.createElement('button');
+        b.textContent=o.l;
+        b.style.cssText='display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;color:var(--text-main);';
+        b.onmouseover=()=>b.style.background='var(--bg-hover)';
+        b.onmouseout=()=>b.style.background='none';
+        b.onclick=()=>{window[arr][i].obs=o.v;detectTag(arr,i,o.v);m.remove();};
+        m.appendChild(b);
     });
-    const rect = btn.getBoundingClientRect();
-    menu.style.top  = (rect.bottom + 4) + 'px';
-    menu.style.left = Math.min(rect.left, window.innerWidth - 180) + 'px';
-    document.body.appendChild(menu);
-    setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
+    const r=btn.getBoundingClientRect();
+    m.style.top=(r.bottom+4)+'px';
+    m.style.left=Math.min(r.left,window.innerWidth-200)+'px';
+    document.body.appendChild(m);
+    setTimeout(()=>document.addEventListener('click',()=>m.remove(),{once:true}),50);
 }
 
-function adicionarCheckout() {
-    checkoutsData.push({ uh: '', ct: 'STD', nome: '', obs: '', lco: false, reentrada: false, pre: false, trip: false });
-    renderCheckouts();
-    // Foca no último campo nome
-    setTimeout(() => {
-        const rows = document.querySelectorAll('#tbody-checkouts tr');
-        const last = rows[rows.length - 1];
-        last?.querySelector('.obs-input')?.focus();
-    }, 100);
+// ── PREV ESPECIAIS ──
+function renderPrevEsp(){
+    const tbody=g('tb-prev-esp');
+    const ctCls=ct=>ct==='SUP'?'ct-sup':ct==='STD'?'ct-std':ct==='SUI'?'ct-sui':'ct-pho';
+    tbody.innerHTML=prevEspeciais.length
+        ? prevEspeciais.map(e=>`<tr>
+            <td><span class="ct-b ${ctCls(e.categoria||'')}">${esc(e.categoria||'')}</span></td>
+            <td class="td-b" style="font-size:12px">${esc(e.reserva||'')}</td>
+            <td style="font-size:12px;white-space:nowrap">${esc(e.in||'')}</td>
+            <td style="font-size:12px;white-space:nowrap">${esc(e.out||'')}</td>
+            <td style="font-size:12px">${esc(e.descricao||'')}</td>
+            <td><span class="td-num">${esc(e.uh||'')}</span></td>
+            <td class="td-chk"><input type="checkbox"></td>
+            <td class="td-chk"><input type="checkbox"></td>
+            <td class="td-chk"><input type="checkbox"></td>
+          </tr>`).join('')
+        : '<tr><td colspan="9" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px">Nenhuma reserva especial para amanhã</td></tr>';
+    const el=g('b-prev-esp');if(el)el.textContent=prevEspeciais.length;
 }
 
-// ── NOVA AUDITORIA MANUAL ──
-function novaAuditoria() {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const dados = {
-        data: hoje, turno: '', ocupacao: '', dm: '', uh_bloq: 0,
-        checkins_pendentes: [], ocorrencias: [], reservas_especiais: [], checkouts: [],
-        previsao: { ocupacao: '', diaria: '', uhs: 0, entradas: 0, saidas: 0, cafe: 0, especiais: [] }
-    };
-    carregarAuditoria(dados, '✏️ Criada manualmente');
+// ── MANUAL ──
+function novaAuditoria(){
+    carregarAuditoria({
+        data:new Date().toLocaleDateString('pt-BR'),turno:'',ocupacao:'',dm:'',uh_bloq:0,
+        checkins_pendentes:[],ocorrencias:[],reservas_especiais:[],checkouts:[],
+        previsao:{ocupacao:'',diaria:'',uhs:0,entradas:0,saidas:0,cafe:0,checkouts_amanha:[],especiais:[]}
+    },'✏️ Manual');
 }
 
 // ── SALVAR ──
-function salvarAuditoria() {
-    if (!auditoriaAtual) return;
-
-    const snap = {
-        id: Date.now(),
-        data: document.getElementById('t-data').value || auditoriaAtual.data,
-        turno: document.getElementById('t-turno').value,
-        ocupacao: document.getElementById('t-ocup').value,
-        dm: document.getElementById('t-dm').value,
-        uh_bloq: document.getElementById('t-uh-bloq').value,
-        ocorrencias, checkoutsData, espData, checkinsData, prevEspData,
-        previsao: auditoriaAtual.previsao,
-        fonte: document.getElementById('audit-fonte-badge').textContent,
+function salvarAuditoria(){
+    const snap={id:Date.now(),
+        data:g('t-data').value||auditoriaAtual?.data,
+        turno:g('t-turno').value,ocupacao:g('t-ocup').value,dm:g('t-dm').value,
+        fonte:g('lbl-fonte').textContent,
+        ocorrencias,checkoutsHoje,checkoutsPrev,especiais,prevEspeciais,checkins,
+        previsao:auditoriaAtual?.previsao||{},
     };
-
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
-    hist.unshift(snap);
-    if (hist.length > 30) hist = hist.slice(0, 30);
-    localStorage.setItem(LS_KEY_HIST, JSON.stringify(hist));
-
+    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    h.unshift(snap);if(h.length>30)h=h.slice(0,30);
+    localStorage.setItem(LS_KEY,JSON.stringify(h));
     renderHistorico();
-    mostrarToast('✅ Auditoria salva com sucesso!');
+    toast('✅ Auditoria salva!');
 }
 
 // ── EXPORTAR ──
-function exportarAuditoria() {
-    const conteudo = gerarTextoExport();
-    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `auditoria_${document.getElementById('t-data').value || 'hoje'}.txt`;
-    a.click();
-}
-
-function gerarTextoExport() {
-    let txt = '═══════════════════════════════════\n';
-    txt += '         AUDITORIA HOTELEIRA\n';
-    txt += '═══════════════════════════════════\n';
-    txt += `Data: ${document.getElementById('t-data').value}\n`;
-    txt += `Turno: ${document.getElementById('t-turno').value}\n`;
-    txt += `Ocupação: ${document.getElementById('t-ocup').value}\n`;
-    txt += `DM: ${document.getElementById('t-dm').value}\n\n`;
-    txt += '── CHECK-OUTS DO DIA ──\n';
-    checkoutsData.forEach(c => {
-        const flags = [c.lco?'LCO':'', c.reentrada?'REENTRADA':'', c.pre?'PRE':'', c.trip?'TRIP':''].filter(Boolean).join(' | ');
-        txt += `UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}${flags?' ('+flags+')':''}\n`;
-    });
-    txt += '\n── RESERVAS ESPECIAIS ──\n';
-    espData.forEach(e => txt += `UH ${e.uh} | ${e.reserva} | ${e.checkin}→${e.checkout} | ${e.descricao}\n`);
-    txt += '\n── OCORRÊNCIAS ──\n';
-    ocorrencias.forEach(o => txt += `• ${o}\n`);
-    return txt;
+function exportarAuditoria(){
+    let txt='═══════════════════════════\n   AUDITORIA HOTELEIRA\n═══════════════════════════\n';
+    txt+=`Data: ${g('t-data').value}\nTurno: ${g('t-turno').value}\nOcupação: ${g('t-ocup').value} | DM: ${g('t-dm').value}\n\n`;
+    txt+='── CHECK-OUTS DO DIA ──\n';
+    checkoutsHoje.forEach(c=>{const f=[c.lco?'LCO':'',c.reentrada?'REENTRADA':'',c.pre?'PRE':'',c.trip?'TRIP':''].filter(Boolean).join('|');txt+=`UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}${f?' ('+f+')':''}\n`;});
+    txt+='\n── CHECK-OUTS PREVISTOS (AMANHÃ) ──\n';
+    checkoutsPrev.forEach(c=>txt+=`UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}\n`);
+    txt+='\n── RESERVAS ESPECIAIS ──\n';
+    especiais.forEach(e=>txt+=`UH ${e.uh} | ${e.reserva} | ${e.checkin}→${e.checkout} | ${e.descricao}\n`);
+    txt+='\n── OCORRÊNCIAS ──\n';
+    ocorrencias.forEach(o=>txt+=`• ${o}\n`);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+    a.download=`auditoria_${g('t-data').value||'hoje'}.txt`;a.click();
 }
 
 // ── HISTÓRICO ──
-function renderHistorico() {
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
-    const el = document.getElementById('historico-list');
-    if (!hist.length) {
-        el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';
-        return;
-    }
-    el.innerHTML = hist.map((h, i) =>
-        `<div class="hist-item" onclick="carregarDoHistorico(${i})">
-            <span class="hist-icon">📋</span>
-            <div>
-                <div class="hist-nome">${h.turno || 'Auditoria'}</div>
-                <div class="hist-data">${formatDataHist(h.data)} — ${h.fonte||''}</div>
-            </div>
-            <span class="hist-ocup">${h.ocupacao||'—'}</span>
-        </div>`
-    ).join('');
+function renderHistorico(){
+    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const el=g('historico-list');
+    if(!h.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';return;}
+    el.innerHTML=h.map((x,i)=>`<div class="hist-item" onclick="carregarHist(${i})">
+        <span style="font-size:18px">📋</span>
+        <div><div class="hist-nome">${x.turno||'Auditoria'}</div><div class="hist-data">${fmtData(x.data)} — ${x.fonte||''}</div></div>
+        <span class="hist-ocup">${x.ocupacao||'—'}</span>
+    </div>`).join('');
 }
 
-function carregarDoHistorico(idx) {
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
-    const h = hist[idx];
-    if (!h) return;
-    auditoriaAtual = h;
-    ocorrencias   = h.ocorrencias   || [];
-    checkoutsData = h.checkoutsData || [];
-    espData       = h.espData       || [];
-    checkinsData  = h.checkinsData  || [];
-    prevEspData   = h.prevEspData   || [];
-    carregarAuditoria({ ...h, checkouts: checkoutsData, reservas_especiais: espData, checkins_pendentes: checkinsData }, h.fonte || '📋 Do histórico');
+function carregarHist(i){
+    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const x=h[i];if(!x)return;
+    auditoriaAtual=x;
+    ocorrencias   =x.ocorrencias||[];
+    checkoutsHoje =x.checkoutsHoje||[];
+    checkoutsPrev =x.checkoutsPrev||[];
+    especiais     =x.especiais||[];
+    prevEspeciais  =x.prevEspeciais||[];
+    checkins      =x.checkins||[];
+    carregarAuditoria({...x,checkouts:checkoutsHoje,reservas_especiais:especiais,checkins_pendentes:checkins},x.fonte||'📋 Histórico');
 }
 
-function limparHistorico() {
-    if (!confirm('Limpar todo o histórico de auditorias?')) return;
-    localStorage.removeItem(LS_KEY_HIST);
-    renderHistorico();
-}
-
-function formatDataHist(d) {
-    if (!d) return '—';
-    if (d.includes('-')) return new Date(d).toLocaleDateString('pt-BR');
-    return d;
-}
+function limparHistorico(){if(!confirm('Limpar todo o histórico?'))return;localStorage.removeItem(LS_KEY);renderHistorico();}
 
 // ── UTILS ──
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function isoDate(br) {
-    if (!br) return '';
-    if (br.includes('-')) return br;
-    const [d,m,y] = br.split('/');
-    return `${y}-${m}-${d}`;
-}
-
-function dataAmanha(dataBr) {
-    if (!dataBr) return '';
-    const [d,m,y] = dataBr.includes('/') ? dataBr.split('/') : dataBr.split('-').reverse();
-    const dt = new Date(+y, +m - 1, +d + 1);
-    return dt.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
-}
-
-function mostrarToast(msg) {
-    const t = document.createElement('div');
-    t.className = 'toast';
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
-}
-
-function salvarKeyLocal(val) {
-    if (val.trim()) localStorage.setItem('gemini_api_key', val.trim());
-}
+function g(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function isoDate(br){if(!br)return'';if(br.includes('-'))return br;const[d,m,y]=br.split('/');return`${y}-${m}-${d}`;}
+function dataAmanha(br){if(!br)return'';const[d,m,y]=br.includes('/')?br.split('/'):br.split('-').reverse();const dt=new Date(+y,+m-1,+d+1);return'Amanhã — '+dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});}
+function fmtData(d){if(!d)return'—';if(d.includes('-'))return new Date(d+'T12:00:00').toLocaleDateString('pt-BR');return d;}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-    // Restaura chave Gemini salva
-    const savedKey = localStorage.getItem('gemini_api_key');
-    if (savedKey) {
-        const campo = document.getElementById('gemini-key-input');
-        if (campo) { campo.value = savedKey; campo.type = 'password'; }
-    }
-
+document.addEventListener('DOMContentLoaded',()=>{
+    const k=localStorage.getItem('gk');
+    if(k){const c=g('gemini-key-input');if(c){c.value=k;c.type='password';}}
     renderHistorico();
-    // Verifica se há auditoria recente no histórico
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
-    if (hist.length) {
-        // Mostra hint
-        document.getElementById('empty-state').innerHTML += `
-            <div style="text-align:center;margin-top:12px">
-                <button onclick="carregarDoHistorico(0)" style="background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);
-                    color:var(--gold);padding:8px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
-                    cursor:pointer;font-family:'Inter',sans-serif">
-                    📋 Carregar última auditoria
-                </button>
-            </div>`;
+    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    if(h.length){
+        const btn=document.createElement('button');
+        btn.textContent='📋 Carregar última auditoria';
+        btn.style.cssText='margin-top:14px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);color:var(--gold);padding:8px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;display:block;margin-left:auto;margin-right:auto;';
+        btn.onclick=()=>carregarHist(0);
+        g('empty-state')?.querySelector('.empty-state')?.appendChild(btn);
     }
 });
 </script>
-
 <script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
 </html>
