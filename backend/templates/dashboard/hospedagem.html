@@ -17,15 +17,6 @@
         .turno-field label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px}
         .turno-field input,.turno-field select{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none;transition:border-color .15s}
         .turno-field input:focus,.turno-field select:focus{border-color:var(--gold)}
-        /* ── KPI ── */
-        .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-        .kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent;text-align:center}
-        .kpi-card.k-green{border-top-color:#00c896}.kpi-card.k-blue{border-top-color:#0ea5e9}
-        .kpi-card.k-purple{border-top-color:#8b5cf6}.kpi-card.k-amber{border-top-color:#f59e0b}
-        .kpi-card.k-gold{border-top-color:var(--gold)}
-        .kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px}
-        .kpi-val{font-size:26px;font-weight:700;color:var(--text-main)}
-        .kpi-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
         /* ── ABAS ── */
         .tabs-nav{display:flex;gap:2px;padding:4px;background:linear-gradient(135deg,#f0f4f8,#e8edf5);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto}
         .tab-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif}
@@ -239,8 +230,9 @@
         tr.row-saiu td { opacity:.65; text-decoration:line-through; text-decoration-color:#dc2626; color:#dc2626 !important; }
         tr.row-saiu td input, tr.row-saiu td select { color:#dc2626 !important; text-decoration:line-through; text-decoration-color:#dc2626; }
         tr.row-saiu .btn-saiu { opacity:1 !important; text-decoration:none !important; color:#15803d !important; }
-        tr.row-saiu td.td-chk, tr.row-saiu td.td-del { opacity:1; text-decoration:none; pointer-events:all; }
-        tr.row-saiu td.td-chk input { pointer-events:all; cursor:pointer; accent-color:#dc2626; }
+        tr.row-saiu td.td-chk { opacity:1 !important; text-decoration:none !important; pointer-events:all !important; }
+        tr.row-saiu td.td-chk input[type=checkbox] { pointer-events:all !important; cursor:pointer !important; opacity:1 !important; accent-color:#dc2626; }
+        tr.row-saiu td.td-del { opacity:1 !important; text-decoration:none !important; }
         tr.row-saiu { background:rgba(220,38,38,.04) !important; }
 
         /* ── PREVISÃO — layout melhorado ── */
@@ -447,60 +439,208 @@
         }
         .drag-handle:hover { color: var(--text-soft); }
 
-        /* ── SUMMARY BAR TOPO ── */
-        .summary-bar {
+        
+
+        /* ══ APPLE WIDGET STYLE ══ */
+        .hw-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 14px;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
         }
-        .sum-card {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            color: white;
+        .hw-card {
+            border-radius: 20px;
+            padding: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,.15);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .sum-card::before {
+        /* Ocupação — verde escuro */
+        .hw-ocup {
+            background: linear-gradient(145deg, #003d2e 0%, #00664d 60%, #00a878 100%);
+            box-shadow: 0 8px 32px rgba(0,168,120,.25), 0 2px 8px rgba(0,0,0,.15);
+        }
+        /* Especiais — âmbar escuro */
+        .hw-esp {
+            background: linear-gradient(145deg, #3d2200 0%, #7a4500 60%, #b5690a 100%);
+            box-shadow: 0 8px 32px rgba(181,105,10,.25), 0 2px 8px rgba(0,0,0,.15);
+        }
+        /* Previsão — azul naval */
+        .hw-prev {
+            background: linear-gradient(145deg, #001a4d 0%, #003399 60%, #0055cc 100%);
+            box-shadow: 0 8px 32px rgba(0,85,204,.25), 0 2px 8px rgba(0,0,0,.15);
+        }
+        /* Check-ins especiais — roxo */
+        .hw-esci {
+            background: linear-gradient(145deg, #1a0040 0%, #3d0080 60%, #6600cc 100%);
+            box-shadow: 0 8px 32px rgba(102,0,204,.25), 0 2px 8px rgba(0,0,0,.15);
+        }
+        .hw-card::after {
             content: '';
             position: absolute;
-            top: -20px; right: -20px;
-            width: 80px; height: 80px;
+            top: -30px; right: -30px;
+            width: 120px; height: 120px;
             border-radius: 50%;
-            opacity: .06;
-            background: white;
+            background: rgba(255,255,255,.06);
         }
-        .sum-card.sc-teal  { background: linear-gradient(135deg,#0d4d3a,#0f766e); }
-        .sum-card.sc-blue  { background: linear-gradient(135deg,#0c2461,#1e40af); }
-        .sum-card.sc-purple{ background: linear-gradient(135deg,#2d1b69,#6d28d9); }
-        .sum-card.sc-gold  { background: linear-gradient(135deg,#4a2c00,#b45309); }
-        .sum-card-icon { font-size: 22px; margin-bottom: 6px; opacity: .9; }
-        .sum-card-val {
-            font-size: 28px; font-weight: 800; line-height: 1;
-            letter-spacing: -1px; color: white;
+        .hw-card::before {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -20px;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.04);
         }
-        .sum-card-lbl {
-            font-size: 10px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: .6px; color: rgba(255,255,255,.6); margin-top: 5px;
+        .hw-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .sum-card-sub {
-            font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px;
+        .hw-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: rgba(255,255,255,.5);
         }
-        .sum-card-items {
-            margin-top: 8px; display: flex; flex-direction: column; gap: 3px;
+        .hw-icon {
+            font-size: 16px;
+            opacity: .7;
         }
-        .sum-item {
-            font-size: 11px; color: rgba(255,255,255,.75);
-            display: flex; align-items: center; gap: 5px;
+        .hw-val {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            letter-spacing: -1.5px;
+            margin: 6px 0 4px;
         }
-        .sum-item-dot {
-            width: 5px; height: 5px; border-radius: 50%;
-            background: rgba(255,255,255,.4); flex-shrink: 0;
+        .hw-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,.5);
+            font-weight: 500;
         }
-        @media(max-width:900px){ .summary-bar{grid-template-columns:1fr 1fr} }
-        @media(max-width:600px){ .summary-bar{grid-template-columns:1fr} }
+        .hw-items {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 6px;
+        }
+        .hw-item {
+            font-size: 11px;
+            color: rgba(255,255,255,.65);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            line-height: 1.3;
+        }
+        .hw-item::before {
+            content: '•';
+            color: rgba(255,255,255,.3);
+            flex-shrink: 0;
+        }
+        .hw-stat-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .hw-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .hw-stat-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+        .hw-stat-lbl {
+            font-size: 9px;
+            color: rgba(255,255,255,.4);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        /* ══ TOPBAR AUDITORIA — compacta ══ */
+        .audit-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .audit-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .audit-badge-data {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(181,132,58,.1);
+            border: 1px solid rgba(181,132,58,.2);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        .audit-badge-amanha {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+        .audit-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* ══ TURNO COMPACTO ══ */
+        .turno-compact {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 70px;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        }
+        .tc-field { display: flex; flex-direction: column; gap: 3px; }
+        .tc-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--text-soft);
+        }
+        .tc-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            padding: 0;
+            width: 100%;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 3px;
+            transition: border-color .15s;
+        }
+        .tc-input:focus { border-color: var(--gold); }
+        .tc-input::placeholder { color: var(--border-light); font-weight: 400; }
+
+        @media(max-width:1000px){ .hw-grid{grid-template-columns:1fr 1fr} }
+        @media(max-width:600px){ .hw-grid{grid-template-columns:1fr} .turno-compact{grid-template-columns:1fr 1fr} }
+
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
@@ -575,58 +715,102 @@
                 </div>
             </div>
 
-            <!-- SUMMARY BAR -->
-            <div class="summary-bar" id="summary-bar">
-                <!-- Card Ocupação -->
-                <div class="sum-card sc-teal">
-                    <div class="sum-card-icon">🏨</div>
-                    <div class="sum-card-val" id="sum-ocup">—</div>
-                    <div class="sum-card-lbl">Ocupação</div>
-                    <div class="sum-card-sub" id="sum-dm">DM: —</div>
+            <!-- AUDIT TOPBAR -->
+            <div class="audit-topbar">
+                <div class="audit-info">
+                    <div class="audit-badge-data">📅 <span id="lbl-data">—</span></div>
+                    <span class="audit-badge-amanha" id="lbl-amanha"></span>
                 </div>
-                <!-- Card Especiais na Casa -->
-                <div class="sum-card sc-gold">
-                    <div class="sum-card-icon">⭐</div>
-                    <div class="sum-card-val" id="sum-esp">0</div>
-                    <div class="sum-card-lbl">Especiais na Casa</div>
-                    <div class="sum-card-items" id="sum-esp-list"></div>
+                <div class="audit-actions">
+                    <button class="btn-a prim" onclick="novaAuditoria()">＋ Nova</button>
+                    <button class="btn-a" onclick="salvar()">💾 Salvar</button>
+                    <button class="btn-a pdf" onclick="gerarPDF()">📄 PDF</button>
+                    <button class="btn-a" onclick="exportarTxt()">📋 .txt</button>
                 </div>
-                <!-- Card Previsão -->
-                <div class="sum-card sc-blue">
-                    <div class="sum-card-icon">🔮</div>
-                    <div class="sum-card-val" id="sum-prev-ocup">—</div>
-                    <div class="sum-card-lbl">Previsão Amanhã</div>
-                    <div class="sum-card-items">
-                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-ent">— entradas</span></div>
-                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-sai">— saídas</span></div>
-                        <div class="sum-item"><div class="sum-item-dot"></div><span id="sum-prev-dm">DM: —</span></div>
+            </div>
+
+            <!-- TURNO COMPACTO -->
+            <div class="turno-compact">
+                <div class="tc-field">
+                    <span class="tc-label">Troca de Turno</span>
+                    <input class="tc-input" id="t-turno" placeholder="Ex: Lussandro / Margiore" oninput="syncUI()">
+                </div>
+                <div class="tc-field">
+                    <span class="tc-label">Data</span>
+                    <input class="tc-input" type="date" id="t-data" oninput="syncUI();purgeEsp()">
+                </div>
+                <div class="tc-field">
+                    <span class="tc-label">Ocupação</span>
+                    <input class="tc-input" id="t-ocup" placeholder="98,18%" oninput="syncUI()" onblur="fmtPctInput(this)">
+                </div>
+                <div class="tc-field">
+                    <span class="tc-label">DM</span>
+                    <input class="tc-input" id="t-dm" placeholder="R$ 1.332,84" oninput="syncUI()" onblur="fmtDMInput(this)">
+                </div>
+                <div class="tc-field">
+                    <span class="tc-label">UH Bloq.</span>
+                    <input class="tc-input" type="number" id="t-uh-bloq" value="0" min="0">
+                </div>
+            </div>
+
+            <!-- APPLE WIDGETS -->
+            <div class="hw-grid">
+                <!-- Ocupação -->
+                <div class="hw-card hw-ocup">
+                    <div class="hw-top">
+                        <span class="hw-label">Ocupação</span>
+                        <span class="hw-icon">🏨</span>
+                    </div>
+                    <div>
+                        <div class="hw-val" id="hw-ocup">—</div>
+                        <div class="hw-sub" id="hw-dm">DM: —</div>
+                    </div>
+                    <div class="hw-stat-row">
+                        <div class="hw-stat">
+                            <span class="hw-stat-val" id="hw-co">0</span>
+                            <span class="hw-stat-lbl">Check-outs</span>
+                        </div>
+                        <div class="hw-stat">
+                            <span class="hw-stat-val" id="hw-lco">0</span>
+                            <span class="hw-stat-lbl">LCO</span>
+                        </div>
+                        <div class="hw-stat">
+                            <span class="hw-stat-val" id="hw-reent">0</span>
+                            <span class="hw-stat-lbl">Reentradas</span>
+                        </div>
                     </div>
                 </div>
-                <!-- Card Check-ins Especiais Previstos -->
-                <div class="sum-card sc-purple">
-                    <div class="sum-card-icon">🟡</div>
-                    <div class="sum-card-val" id="sum-esp-ci">0</div>
-                    <div class="sum-card-lbl">Check-ins Especiais Previstos</div>
-                    <div class="sum-card-items" id="sum-esp-ci-list"></div>
+                <!-- Especiais na Casa -->
+                <div class="hw-card hw-esp">
+                    <div class="hw-top">
+                        <span class="hw-label">Especiais na Casa</span>
+                        <span class="hw-icon">⭐</span>
+                    </div>
+                    <div class="hw-val" id="hw-esp">0</div>
+                    <div class="hw-items" id="hw-esp-list"></div>
                 </div>
-            </div>
-
-            <!-- TROCA DE TURNO -->
-            <div class="turno-grid">
-                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncUI()"></div>
-                <div class="turno-field"><label>Data</label><input type="date" id="t-data" oninput="syncUI();purgeEsp()"></div>
-                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="98,18" oninput="syncUI()" onblur="fmtPctInput(this)"></div>
-                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="1.332,84" oninput="syncUI()" onblur="fmtDMInput(this)"></div>
-                <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
-            </div>
-
-            <!-- KPIs -->
-            <div class="kpi-row">
-                <div class="kpi-card k-green"><div class="kpi-lbl">Ocupação</div><div class="kpi-val" id="kpi-ocup">—</div></div>
-                <div class="kpi-card k-blue"><div class="kpi-lbl">Check-outs Previstos</div><div class="kpi-val" id="kpi-co">0</div><div class="kpi-sub">saídas do dia</div></div>
-                <div class="kpi-card k-purple"><div class="kpi-lbl">Late Check-out</div><div class="kpi-val" id="kpi-lco">0</div><div class="kpi-sub">na lista do dia</div></div>
-                <div class="kpi-card k-amber"><div class="kpi-lbl">Reentradas</div><div class="kpi-val" id="kpi-reent">0</div><div class="kpi-sub">na lista do dia</div></div>
-                <div class="kpi-card k-gold"><div class="kpi-lbl">Especiais na Casa</div><div class="kpi-val" id="kpi-esp">0</div><div class="kpi-sub">long stays e VIPs</div></div>
+                <!-- Previsão Amanhã -->
+                <div class="hw-card hw-prev">
+                    <div class="hw-top">
+                        <span class="hw-label">Previsão Amanhã</span>
+                        <span class="hw-icon">🔮</span>
+                    </div>
+                    <div class="hw-val" id="hw-prev-ocup">—</div>
+                    <div class="hw-items">
+                        <div class="hw-item" id="hw-prev-ent">— entradas</div>
+                        <div class="hw-item" id="hw-prev-sai">— saídas</div>
+                        <div class="hw-item" id="hw-prev-dm">DM: —</div>
+                    </div>
+                </div>
+                <!-- Check-ins Especiais Previstos -->
+                <div class="hw-card hw-esci">
+                    <div class="hw-top">
+                        <span class="hw-label">Check-ins Especiais</span>
+                        <span class="hw-icon">🟡</span>
+                    </div>
+                    <div class="hw-val" id="hw-esci">0</div>
+                    <div class="hw-items" id="hw-esci-list"></div>
+                </div>
             </div>
 
             <!-- ABAS -->
@@ -1129,9 +1313,8 @@ function toBr(iso){
 
 // ══ SYNC UI ══
 function syncUI(){
-    syncSummary();
+    syncWidgets();
     const ocup = g('t-ocup').value;
-    g('kpi-ocup').textContent = ocup||'—';
     const di = g('t-data').value;
     g('lbl-data').textContent     = fmtDate(di)||'—';
     g('lbl-amanha').textContent   = dataAmanha(di);
@@ -1178,8 +1361,8 @@ function renderCoTable(arr,tbodyId,key){
                 </td>
                 <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
                 ${saiuCol}
-                <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
-                <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
+                <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold);cursor:pointer"></td>
+                <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold);cursor:pointer"></td>
                 <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
                     oninput="setF('${key}',${i},'uh',this.value)"></td>
                 <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
@@ -1248,14 +1431,11 @@ function commitObs(input) {
 }
 
 function syncKpisCo() {
-    g('kpi-co').textContent    = co.length;
-    g('kpi-lco').textContent   = co.filter(r=>/lco|late/i.test(r.obs)).length;
-    g('kpi-reent').textContent = co.filter(r=>/reentrada|reent/i.test(r.obs)).length;
     const saidos = co.filter(r=>r.saiu).length;
-    g('b-co').textContent = g('tb-co').textContent = co.length;
-    // atualiza badge com contador de saídas
     const bco = g('b-co');
     if (bco) bco.textContent = saidos > 0 ? `${co.length} (${saidos} saíram)` : co.length;
+    const tco = g('tb-co'); if(tco) tco.textContent = co.length;
+    syncWidgets();
 }
 
 function toggleSaiu(key, i) {
@@ -1301,8 +1481,7 @@ function renderEsp(){
         }).join('');
     }
     g('b-esp').textContent = g('tb-esp').textContent = ativas.length;
-    g('kpi-esp').textContent = ativas.length;
-    syncSummary();
+    syncWidgets();
 }
 
 function renderCi(){
@@ -2846,40 +3025,30 @@ function clearObs(key, i) {
 }
 
 
-// ══ SUMMARY BAR ══
-function syncSummary() {
-    // Ocupação
-    const ocup = g('t-ocup')?.value || '—';
-    const dm   = g('t-dm')?.value   || '—';
-    if(g('sum-ocup')) g('sum-ocup').textContent = ocup || '—';
-    if(g('sum-dm'))   g('sum-dm').textContent   = 'DM: ' + (dm || '—');
+
+// ══ WIDGETS ══
+function syncWidgets() {
+    // Ocupação widget stats
+    if(g('hw-co'))   g('hw-co').textContent   = co.length;
+    if(g('hw-lco'))  g('hw-lco').textContent  = co.filter(r=>/lco|late/i.test(r.obs)).length;
+    if(g('hw-reent'))g('hw-reent').textContent = co.filter(r=>/reentrada|reent/i.test(r.obs)).length;
 
     // Especiais na casa
-    if(g('sum-esp')) g('sum-esp').textContent = esp.length;
-    const espList = g('sum-esp-list');
+    if(g('hw-esp')) g('hw-esp').textContent = esp.length;
+    const espList = g('hw-esp-list');
     if(espList) {
-        espList.innerHTML = esp.slice(0,3).map(r =>
-            `<div class="sum-item"><div class="sum-item-dot"></div><span>UH ${r.uh||'?'} — ${(r.descricao||r.reserva||'').slice(0,22)}</span></div>`
-        ).join('') + (esp.length > 3 ? `<div class="sum-item" style="opacity:.5">…e mais ${esp.length-3}</div>` : '');
+        espList.innerHTML = esp.slice(0,3).map(r=>
+            `<div class="hw-item">UH ${r.uh||'?'} — ${(r.descricao||r.reserva||'').slice(0,20)}</div>`
+        ).join('') + (esp.length>3?`<div class="hw-item" style="opacity:.4">+${esp.length-3} mais</div>`:'');
     }
 
-    // Previsão
-    const prevOcup = g('prev-ocup')?.value || '—';
-    const prevEnt  = g('prev-ent')?.value  || '—';
-    const prevSai  = g('prev-sai')?.value  || '—';
-    const prevDM   = g('prev-diaria')?.value || '—';
-    if(g('sum-prev-ocup')) g('sum-prev-ocup').textContent = prevOcup;
-    if(g('sum-prev-ent'))  g('sum-prev-ent').textContent  = prevEnt + ' entradas';
-    if(g('sum-prev-sai'))  g('sum-prev-sai').textContent  = prevSai + ' saídas';
-    if(g('sum-prev-dm'))   g('sum-prev-dm').textContent   = 'DM: ' + prevDM;
-
     // Check-ins especiais previstos
-    if(g('sum-esp-ci')) g('sum-esp-ci').textContent = espCi.length;
-    const espCiList = g('sum-esp-ci-list');
-    if(espCiList) {
-        espCiList.innerHTML = espCi.slice(0,3).map(r =>
-            `<div class="sum-item"><div class="sum-item-dot"></div><span>${(r.descricao||r.reserva||'').slice(0,24)}</span></div>`
-        ).join('') + (espCi.length > 3 ? `<div class="sum-item" style="opacity:.5">…e mais ${espCi.length-3}</div>` : '');
+    if(g('hw-esci')) g('hw-esci').textContent = espCi.length;
+    const esciList = g('hw-esci-list');
+    if(esciList) {
+        esciList.innerHTML = espCi.slice(0,3).map(r=>
+            `<div class="hw-item">${(r.descricao||r.reserva||'').slice(0,24)}</div>`
+        ).join('') + (espCi.length>3?`<div class="hw-item" style="opacity:.4">+${espCi.length-3} mais</div>`:'');
     }
 }
 
@@ -2888,7 +3057,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     g('t-data').value=new Date().toISOString().split('T')[0];
     carregarEsp();
     renderCats();
-    syncUI(); syncSummary(); renderTudo(); renderHist();
+    syncUI(); syncWidgets(); renderTudo(); renderHist();
 });
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
