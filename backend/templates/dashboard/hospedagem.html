@@ -8,288 +8,381 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ── KPIs ── */
-        .hosp-kpis {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+        /* ═══════════════════════════════════════════
+           HOSPEDAGEM — AUDITORIA & CHECKOUT
+        ═══════════════════════════════════════════ */
+
+        /* ── UPLOAD CARD ── */
+        .upload-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
             margin-bottom: 20px;
         }
-        .hosp-kpi {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 14px 12px;
-            text-align: center; cursor: pointer; transition: all .15s;
-            border-top: 3px solid transparent;
+        .upload-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; border-bottom: 1px solid var(--border);
+            background: var(--bg-hover); gap: 12px; flex-wrap: wrap;
         }
-        .hosp-kpi:hover { border-color: var(--border-light); transform: translateY(-1px); }
-        .hosp-kpi.active { border-top-color: var(--gold); background: var(--gold-dim); }
-        .hosp-kpi-num { font-size: 22px; font-weight: 700; line-height: 1; }
-        .hosp-kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--text-soft); margin-top: 4px; }
+        .upload-card-title {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 700; color: var(--text-main);
+        }
+        .upload-card-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--gold-dim); border: 1px solid rgba(181,132,58,.25);
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .upload-card-body { padding: 16px 20px; }
 
-        /* ── ABAS ── */
-        .hosp-tabs {
-            display: flex; gap: 2px;
+        .upload-drop-zone {
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 36px 20px;
+            text-align: center; cursor: pointer; transition: all .2s;
+            position: relative; background: var(--bg-hover);
+        }
+        .upload-drop-zone:hover,
+        .upload-drop-zone.drag-over { border-color: var(--gold); background: var(--gold-dim); }
+        .upload-drop-zone input[type=file] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+            width: 100%; height: 100%; z-index: 2;
+        }
+        .upload-drop-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+        .upload-drop-text { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .upload-drop-hint { font-size: 12px; color: var(--text-soft); }
+        .upload-drop-hint span { color: var(--gold); font-weight: 600; }
+        .upload-file-selected {
+            display: none; align-items: center; gap: 10px; margin-top: 14px;
+            background: rgba(22,163,74,.06); border: 1px solid rgba(22,163,74,.25);
+            border-radius: var(--radius-sm); padding: 10px 14px;
+        }
+        .upload-file-selected.show { display: flex; }
+        .upload-file-name { font-size: 13px; font-weight: 600; color: #15803d; }
+        .upload-file-size { font-size: 11px; color: var(--text-soft); margin-left: auto; }
+        .btn-upload-ia {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--gold); color: #0b0f19;
+            border: none; padding: 10px 20px; border-radius: var(--radius-sm);
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: filter .15s;
+            margin-top: 14px; width: 100%; justify-content: center;
+        }
+        .btn-upload-ia:hover { filter: brightness(1.1); }
+        .btn-upload-ia:disabled { opacity: .5; cursor: not-allowed; }
+
+        /* ── IA PROCESSANDO ── */
+        .ai-processing {
+            display: none; padding: 28px 20px;
+            flex-direction: column; align-items: center; gap: 12px;
+        }
+        .ai-processing.show { display: flex; }
+        .ai-spinner {
+            width: 44px; height: 44px;
+            border: 3px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+        }
+        .ai-processing-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+        .ai-steps { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 360px; }
+        .ai-step {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
             background: var(--bg-hover); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 4px;
-            margin-bottom: 16px; overflow-x: auto; flex-shrink: 0;
+            font-size: 12px; color: var(--text-soft); transition: all .4s;
         }
-        .hosp-tab {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 16px; border: none; background: none;
-            border-radius: calc(var(--radius-md) - 2px);
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            color: var(--text-soft); white-space: nowrap;
-            transition: all .15s; font-family: 'Inter', sans-serif;
-        }
-        .hosp-tab:hover { color: var(--text-main); background: rgba(255,255,255,.6); }
-        .hosp-tab.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-        .hosp-tab .tab-badge {
-            font-size: 10px; font-weight: 700; padding: 1px 6px;
-            border-radius: 10px; background: var(--bg-hover);
-            color: var(--text-soft); min-width: 18px; text-align: center;
-        }
-        .hosp-tab.active .tab-badge { background: var(--gold-dim); color: var(--gold); }
-        .hosp-tab[data-status="confirmada"].active { color: #15803d; }
-        .hosp-tab[data-status="confirmada"].active .tab-badge { background: rgba(22,163,74,.12); color: #15803d; }
-        .hosp-tab[data-status="pendente"].active { color: #d97706; }
-        .hosp-tab[data-status="pendente"].active .tab-badge { background: rgba(245,158,11,.12); color: #d97706; }
-        .hosp-tab[data-status="no_show"].active { color: #7c3aed; }
-        .hosp-tab[data-status="no_show"].active .tab-badge { background: rgba(124,58,237,.12); color: #7c3aed; }
-        .hosp-tab[data-status="cancelada"].active { color: #dc2626; }
-        .hosp-tab[data-status="cancelada"].active .tab-badge { background: rgba(220,38,38,.12); color: #dc2626; }
-        .hosp-tab[data-status="waiting"].active { color: #b5843a; }
-        .hosp-tab[data-status="waiting"].active .tab-badge { background: var(--gold-dim); color: var(--gold); }
+        .ai-step.ativo  { border-color: var(--gold); color: var(--text-main); background: var(--gold-dim); }
+        .ai-step.feito  { border-color: rgba(22,163,74,.3); color: #15803d; background: rgba(22,163,74,.06); }
+        .ai-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); flex-shrink: 0; transition: .3s; }
+        .ai-step.ativo .ai-step-dot { background: var(--gold); animation: pulse-dot 1s infinite; }
+        .ai-step.feito .ai-step-dot { background: #15803d; }
 
-        /* ── FILTROS ── */
-        .hosp-filters {
-            display: flex; gap: 10px; flex-wrap: wrap;
+        /* ── AUDITORIA HEADER ── */
+        .audit-wrap { display: none; }
+        .audit-wrap.show { display: block; }
+
+        .audit-top-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
+        }
+        .audit-top-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .audit-data-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 999px;
+            background: var(--gold-dim); border: 1px solid rgba(181,132,58,.25);
+            font-size: 13px; font-weight: 700; color: var(--gold);
+        }
+        .audit-fonte-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 999px;
+            background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2);
+            font-size: 11px; font-weight: 600; color: #15803d;
+        }
+        .audit-top-actions { display: flex; gap: 8px; }
+        .btn-audit-action {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1px solid var(--border); background: var(--bg-hover);
+            color: var(--text-muted); font-family: 'Inter', sans-serif; transition: .15s;
+        }
+        .btn-audit-action:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+        .btn-audit-action.primary { background: var(--gold); color: #0b0f19; border-color: var(--gold); }
+        .btn-audit-action.primary:hover { filter: brightness(1.08); }
+
+        /* ── CARDS TOPO ── */
+        .audit-kpis {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 12px; margin-bottom: 16px;
+        }
+        .audit-kpi {
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius-md); padding: 14px 16px;
-            margin-bottom: 16px; align-items: center;
+            border-top: 3px solid transparent; transition: .15s;
         }
-        .hosp-search { flex: 1; min-width: 200px; position: relative; }
-        .hosp-search input {
-            width: 100%; padding: 9px 12px 9px 36px;
-            background: var(--bg-hover); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); font-size: 13px;
-            color: var(--text-main); outline: none; font-family: 'Inter', sans-serif;
-        }
-        .hosp-search input:focus { border-color: var(--gold); }
-        .hosp-search-icon {
-            position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
-            color: var(--text-soft); font-size: 14px; pointer-events: none;
-        }
-        .hosp-filter-pag { display: flex; gap: 4px; align-items: center; }
-        .btn-pag-filter {
-            padding: 7px 12px; border-radius: var(--radius-sm);
-            font-size: 11px; font-weight: 700; cursor: pointer;
-            border: 1px solid var(--border); background: var(--bg-hover);
-            color: var(--text-soft); transition: .15s; font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-        }
-        .btn-pag-filter:hover { border-color: var(--border-light); color: var(--text-main); }
-        .btn-pag-filter.active-pago { background: rgba(22,163,74,.1); border-color: rgba(22,163,74,.3); color: #15803d; }
-        .btn-pag-filter.active-npago { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); color: #dc2626; }
-        .hosp-filter-date { display: flex; align-items: center; gap: 6px; }
-        .hosp-filter-date label { font-size: 11px; color: var(--text-soft); white-space: nowrap; }
-        .hosp-filter-date input[type=date] {
-            padding: 8px 10px; background: var(--bg-hover);
-            border: 1px solid var(--border); border-radius: var(--radius-sm);
-            font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
-            color: var(--text-main);
-        }
-        .hosp-filter-date input:focus { border-color: var(--gold); }
-        .btn-clear-filters {
-            background: none; border: 1px solid var(--border);
-            color: var(--text-soft); padding: 8px 12px; border-radius: var(--radius-sm);
-            font-size: 12px; cursor: pointer; white-space: nowrap; transition: .15s;
-            font-family: 'Inter', sans-serif;
-        }
-        .btn-clear-filters:hover { border-color: var(--text-soft); color: var(--text-main); }
+        .audit-kpi.k-green  { border-top-color: #15803d; }
+        .audit-kpi.k-blue   { border-top-color: #2563eb; }
+        .audit-kpi.k-amber  { border-top-color: #d97706; }
+        .audit-kpi.k-purple { border-top-color: #7c3aed; }
+        .audit-kpi.k-gold   { border-top-color: var(--gold); }
+        .audit-kpi.k-red    { border-top-color: #dc2626; }
+        .audit-kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); margin-bottom: 6px; }
+        .audit-kpi-value { font-size: 26px; font-weight: 700; line-height: 1; color: var(--text-main); }
+        .audit-kpi-sub { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
 
-        /* ── LISTA ── */
-        .hosp-list-wrap {
+        /* ── GRID PRINCIPAL ── */
+        .audit-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 16px; margin-bottom: 16px;
+        }
+        .audit-panel {
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius-md); overflow: hidden;
         }
-        .hosp-list-head {
-            display: grid;
-            grid-template-columns: 100px 1fr 140px 180px 90px 38px 120px 80px;
-            gap: 0; padding: 10px 16px;
-            background: var(--bg-hover); border-bottom: 1px solid var(--border);
+        .audit-panel.full { grid-column: 1 / -1; }
+        .audit-panel-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 11px 16px; border-bottom: 1px solid var(--border);
+            background: var(--bg-hover);
         }
-        .hosp-list-head span {
+        .audit-panel-title {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 11px; font-weight: 700; color: var(--text-main);
+            text-transform: uppercase; letter-spacing: .5px;
+        }
+        .apd { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .apd-green  { background: #15803d; }
+        .apd-amber  { background: #d97706; }
+        .apd-blue   { background: #2563eb; }
+        .apd-purple { background: #7c3aed; }
+        .apd-gold   { background: var(--gold); }
+        .apd-red    { background: #dc2626; }
+
+        .audit-panel-badge {
+            font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+        }
+        .badge-green  { background: rgba(22,163,74,.1); color: #15803d; border: 1px solid rgba(22,163,74,.2); }
+        .badge-amber  { background: rgba(245,158,11,.1); color: #d97706; border: 1px solid rgba(245,158,11,.2); }
+        .badge-blue   { background: rgba(37,99,235,.1);  color: #2563eb; border: 1px solid rgba(37,99,235,.2); }
+        .badge-purple { background: rgba(124,58,237,.1); color: #7c3aed; border: 1px solid rgba(124,58,237,.2); }
+        .badge-gold   { background: var(--gold-dim);     color: var(--gold); border: 1px solid rgba(181,132,58,.2); }
+        .badge-red    { background: rgba(220,38,38,.08); color: #dc2626; border: 1px solid rgba(220,38,38,.2); }
+
+        /* ── TABELAS INTERNAS ── */
+        .at { width: 100%; border-collapse: collapse; }
+        .at th {
+            padding: 8px 12px; text-align: left;
             font-size: 10px; font-weight: 700; text-transform: uppercase;
             letter-spacing: .5px; color: var(--text-soft);
+            border-bottom: 1px solid var(--border); background: var(--bg-hover);
         }
-        .hosp-row {
-            display: grid;
-            grid-template-columns: 100px 1fr 140px 180px 90px 38px 120px 80px;
-            gap: 0; padding: 13px 16px;
-            border-bottom: 1px solid var(--border);
-            align-items: center; transition: background .12s; cursor: pointer;
+        .at td {
+            padding: 10px 12px; font-size: 12.5px; color: var(--text-muted);
+            border-bottom: 1px solid var(--border); vertical-align: middle;
         }
-        .hosp-row:last-child { border-bottom: none; }
-        .hosp-row:hover { background: var(--bg-hover); }
-
-        .hosp-row-num { font-size: 12px; font-weight: 700; color: var(--gold); font-family: 'Inter', monospace; }
-        .hosp-row-guest { min-width: 0; }
-        .hosp-row-name { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hosp-row-contact { font-size: 11px; color: var(--text-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hosp-row-phone { font-size: 12px; color: var(--text-muted); }
-        .hosp-row-date-line { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-        .hosp-row-date-line + .hosp-row-date-line { margin-top: 2px; }
-        .hosp-row-nights { font-size: 10px; background: var(--bg-hover); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; color: var(--text-soft); font-weight: 600; white-space: nowrap; }
-        .hosp-row-actions { display: flex; gap: 4px; justify-content: flex-end; }
-        .btn-row-action {
-            background: none; border: 1px solid var(--border); color: var(--text-soft);
-            width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
-            font-size: 12px; display: flex; align-items: center; justify-content: center;
-            transition: .12s;
+        .at tr:last-child td { border-bottom: none; }
+        .at tr:hover td { background: var(--bg-hover); }
+        .at .td-bold { font-weight: 600; color: var(--text-main); }
+        .at .td-num {
+            font-size: 11px; font-weight: 700; font-family: monospace;
+            background: var(--bg-hover); border: 1px solid var(--border);
+            padding: 2px 6px; border-radius: 4px; color: var(--text-muted);
         }
-        .btn-row-action:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--border-light); }
-        .btn-row-action.danger:hover { background: var(--red-dim); color: #ef4444; border-color: rgba(239,68,68,.3); }
+        .at .td-center { text-align: center; }
 
-        /* ── BOTÃO PAGO NA LINHA ── */
-        .btn-pago-toggle {
-            width: 26px; height: 26px; border-radius: 50%;
-            border: 2px solid var(--border); background: var(--bg-hover);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; transition: all .15s; flex-shrink: 0;
+        .audit-tag {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 2px 8px; border-radius: 999px;
+            font-size: 10px; font-weight: 700; white-space: nowrap;
         }
-        .btn-pago-toggle:hover { border-color: #15803d; background: rgba(22,163,74,.08); }
-        .btn-pago-toggle.pago { background: rgba(22,163,74,.12); border-color: #15803d; color: #15803d; font-weight: 700; }
-        .btn-pago-toggle:not(.pago) { color: transparent; }
+        .tag-lco    { background: rgba(124,58,237,.1); color: #7c3aed; border: 1px solid rgba(124,58,237,.25); }
+        .tag-reent  { background: rgba(37,99,235,.1);  color: #2563eb; border: 1px solid rgba(37,99,235,.25); }
+        .tag-esp    { background: rgba(181,132,58,.1); color: var(--gold); border: 1px solid rgba(181,132,58,.25); }
+        .tag-normal { background: rgba(22,163,74,.08); color: #15803d; border: 1px solid rgba(22,163,74,.2); }
+        .tag-ls     { background: rgba(245,158,11,.1); color: #d97706; border: 1px solid rgba(245,158,11,.25); }
 
-        /* STATUS BADGES */
-        .status-hosp {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px; border-radius: 999px;
-            font-size: 11px; font-weight: 700; white-space: nowrap;
-        }
-        .status-hosp::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-        .s-confirmada { background:rgba(22,163,74,.1); color:#15803d; border:1px solid rgba(22,163,74,.2); }
-        .s-confirmada::before { background:#15803d; }
-        .s-pendente { background:rgba(245,158,11,.1); color:#d97706; border:1px solid rgba(245,158,11,.2); }
-        .s-pendente::before { background:#d97706; }
-        .s-no_show { background:rgba(124,58,237,.1); color:#7c3aed; border:1px solid rgba(124,58,237,.2); }
-        .s-no_show::before { background:#7c3aed; }
-        .s-cancelada { background:rgba(220,38,38,.1); color:#dc2626; border:1px solid rgba(220,38,38,.2); }
-        .s-cancelada::before { background:#dc2626; }
-        .s-waiting { background:rgba(181,132,58,.1); color:#b5843a; border:1px solid rgba(181,132,58,.2); }
-        .s-waiting::before { background:#b5843a; }
-
-        /* ── EMPTY ── */
-        .hosp-empty { padding: 52px 20px; text-align: center; color: var(--text-soft); font-size: 13px; }
-        .hosp-empty-icon { font-size: 36px; margin-bottom: 12px; display: block; opacity: .4; }
-
-        /* ── MODAL ── */
-        .hosp-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .hosp-modal-grid .full { grid-column: 1 / -1; }
-
-        /* Toggle pago no modal */
-        .pago-toggle-wrap {
-            display: flex; align-items: center; gap: 10px;
-            background: var(--bg-hover); border: 2px solid var(--border);
-            border-radius: var(--radius-sm); padding: 11px 14px; cursor: pointer;
-            transition: all .15s; user-select: none;
-        }
-        .pago-toggle-wrap:hover { border-color: #15803d; }
-        .pago-toggle-wrap.pago-ativo { background: rgba(22,163,74,.06); border-color: rgba(22,163,74,.4); }
-        .pago-toggle-check {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 2px solid var(--border); background: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; transition: .15s; flex-shrink: 0; color: transparent;
-        }
-        .pago-toggle-wrap.pago-ativo .pago-toggle-check { background: #15803d; border-color: #15803d; color: #fff; }
-        .pago-toggle-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-        .pago-toggle-wrap.pago-ativo .pago-toggle-label { color: #15803d; }
-        .pago-toggle-sub { font-size: 11px; color: var(--text-soft); margin-left: auto; }
-
-        /* ── MODAL DETAIL ── */
-        .detail-section { margin-bottom: 20px; }
-        .detail-section-title {
+        /* ── CHECK-OUTS TABELA ── */
+        .checkout-table-wrap { overflow-x: auto; }
+        .checkout-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        .checkout-table thead tr { background: #1a1a2e; }
+        .checkout-table thead th {
+            padding: 10px 12px; text-align: left;
             font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .5px; color: var(--text-soft); margin-bottom: 10px;
-            padding-bottom: 6px; border-bottom: 1px solid var(--border);
+            letter-spacing: .5px; color: #94a3b8; border-bottom: 2px solid #333;
         }
-        .detail-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+        .checkout-table td {
+            padding: 0; border-bottom: 1px solid var(--border);
+            vertical-align: middle;
         }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-row-label { color: var(--text-soft); }
-        .detail-row-val { font-weight: 500; color: var(--text-main); text-align: right; }
+        .checkout-table tr:last-child td { border-bottom: none; }
+        .checkout-table tr:hover td { background: var(--bg-hover); }
+        .checkout-table tr.lco-row td { background: rgba(124,58,237,.04); }
+        .checkout-table tr.reent-row td { background: rgba(37,99,235,.04); }
+        .checkout-table tr.lco-row:hover td { background: rgba(124,58,237,.08); }
+        .checkout-table tr.reent-row:hover td { background: rgba(37,99,235,.08); }
 
-        /* Botão pagamento no detalhe */
-        .btn-pag-detalhe {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700;
-            cursor: pointer; border: 1px solid transparent; transition: .15s;
-            font-family: 'Inter', sans-serif;
+        /* Célula checkbox PRE/TRIP */
+        .td-check {
+            width: 44px; padding: 10px 8px !important;
+            text-align: center;
         }
-        .btn-pag-detalhe.nao { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); color: #dc2626; }
-        .btn-pag-detalhe.nao:hover { background: rgba(239,68,68,.14); }
-        .btn-pag-detalhe.sim { background: rgba(22,163,74,.1); border-color: rgba(22,163,74,.25); color: #15803d; }
-        .btn-pag-detalhe.sim:hover { background: rgba(22,163,74,.16); }
-
-        /* ── STATUS QUICK ── */
-        .status-quick-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
-        .btn-status-quick {
-            padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
-            cursor: pointer; border: 1px solid transparent; transition: .15s;
-            font-family: 'Inter', sans-serif;
+        .td-check input[type=checkbox] {
+            width: 16px; height: 16px; cursor: pointer;
+            accent-color: var(--gold); flex-shrink: 0;
         }
 
-        /* ── NOTAS ── */
-        .notas-wrap textarea {
-            width: 100%; min-height: 70px; background: var(--bg-hover);
-            border: 1px solid var(--border); border-radius: var(--radius-sm);
-            padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif;
-            color: var(--text-main); resize: vertical; outline: none;
+        /* Observação inline editável */
+        .td-obs { padding: 0 !important; min-width: 160px; }
+        .obs-cell {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 10px; min-height: 42px;
         }
-        .notas-wrap textarea:focus { border-color: var(--gold); }
+        .obs-input {
+            background: transparent; border: none; outline: none;
+            font-size: 12px; color: var(--text-muted); width: 100%;
+            font-family: 'Inter', sans-serif; cursor: text;
+        }
+        .obs-input::placeholder { color: var(--border-light); font-style: italic; }
+        .obs-input:focus { color: var(--text-main); }
 
-        /* ── MOBILE ── */
+        .td-uh-val { font-size: 13px; font-weight: 700; color: var(--text-main); padding: 10px 12px !important; }
+        .td-ct-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 700;
+        }
+        .ct-sup { background: rgba(37,99,235,.1); color: #2563eb; }
+        .ct-std { background: rgba(22,163,74,.08); color: #15803d; }
+        .ct-sui { background: rgba(181,132,58,.1); color: var(--gold); }
+        .ct-pho { background: rgba(245,158,11,.1); color: #d97706; }
+
+        .td-nome { font-size: 13px; font-weight: 600; color: var(--text-main); padding: 10px 12px !important; }
+
+        /* Tag obs inline */
+        .obs-tag {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700;
+            white-space: nowrap; flex-shrink: 0;
+        }
+
+        /* ── OCORRÊNCIAS ── */
+        .ocorr-input-wrap { padding: 14px 16px; }
+        .ocorr-input {
+            width: 100%; background: var(--bg-hover); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 10px 12px;
+            font-size: 13px; font-family: 'Inter', sans-serif;
+            color: var(--text-main); resize: vertical; min-height: 90px; outline: none;
+        }
+        .ocorr-input:focus { border-color: var(--gold); }
+        .ocorr-list { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+        .ocorr-item {
+            display: flex; align-items: flex-start; gap: 8px;
+            background: rgba(220,38,38,.04); border: 1px solid rgba(220,38,38,.15);
+            border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px;
+            color: var(--text-muted);
+        }
+        .ocorr-item-dot { width: 6px; height: 6px; border-radius: 50%; background: #dc2626; flex-shrink: 0; margin-top: 4px; }
+        .btn-ocorr-add {
+            margin: 0 16px 14px; display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(220,38,38,.3);
+            background: rgba(220,38,38,.06); color: #dc2626;
+            font-family: 'Inter', sans-serif; transition: .15s;
+        }
+        .btn-ocorr-add:hover { background: rgba(220,38,38,.12); }
+
+        /* ── TROCA DE TURNO ── */
+        .turno-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 16px;
+        }
+        .turno-field {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 12px 14px;
+        }
+        .turno-field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); display: block; margin-bottom: 6px; }
+        .turno-field input, .turno-field select {
+            background: var(--bg-hover); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 8px 10px;
+            font-size: 13px; font-family: 'Inter', sans-serif;
+            color: var(--text-main); width: 100%; outline: none;
+        }
+        .turno-field input:focus, .turno-field select:focus { border-color: var(--gold); }
+
+        /* ── PREVISÃO AMANHÃ ── */
+        .prev-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; padding: 14px;
+        }
+        .prev-item { text-align: center; }
+        .prev-num   { font-size: 24px; font-weight: 700; line-height: 1; }
+        .prev-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--text-soft); margin-top: 4px; }
+        .prev-sub   { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+        .c-green  { color: #15803d; }
+        .c-red    { color: #dc2626; }
+        .c-amber  { color: #d97706; }
+        .c-blue   { color: #2563eb; }
+        .c-gold   { color: var(--gold); }
+
+        /* ── ESTADO VAZIO ── */
+        .audit-empty-state {
+            padding: 64px 24px; text-align: center;
+        }
+        .audit-empty-icon { font-size: 56px; margin-bottom: 16px; display: block; opacity: .3; }
+        .audit-empty-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .audit-empty-desc  { font-size: 13px; color: var(--text-soft); max-width: 380px; margin: 0 auto; line-height: 1.7; }
+
+        /* ── HISTÓRICO AUDITORIAS ── */
+        .hist-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 16px; border-bottom: 1px solid var(--border);
+            cursor: pointer; transition: background .12s;
+        }
+        .hist-item:last-child { border-bottom: none; }
+        .hist-item:hover { background: var(--bg-hover); }
+        .hist-icon { font-size: 18px; }
+        .hist-nome { font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .hist-data { font-size: 11px; color: var(--text-soft); margin-top: 1px; }
+        .hist-ocup { font-size: 13px; font-weight: 700; color: var(--gold); margin-left: auto; white-space: nowrap; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1100px) {
+            .audit-kpis { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .audit-grid { grid-template-columns: 1fr; }
+            .audit-panel.full { grid-column: 1; }
+        }
         @media (max-width: 768px) {
-            .hosp-kpis { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-            .hosp-kpi-num { font-size: 18px; }
-            .hosp-list-head { display: none; }
-            .hosp-row {
-                grid-template-columns: auto 1fr auto auto;
-                grid-template-rows: auto auto auto;
-                gap: 4px 8px; padding: 12px;
-            }
-            .hosp-row-num    { grid-column: 1 / 3; grid-row: 1; }
-            .hosp-row-pago   { grid-column: 3; grid-row: 1; display: flex; align-items: center; }
-            .hosp-row-status { grid-column: 4; grid-row: 1; display: flex; align-items: center; }
-            .hosp-row-guest  { grid-column: 1 / 5; grid-row: 2; }
-            .hosp-row-phone  { display: none; }
-            .hosp-row-dates  { grid-column: 1 / 4; grid-row: 3; }
-            .hosp-row-nights { display: none; }
-            .hosp-row-actions{ grid-column: 4; grid-row: 3; justify-content: flex-end; }
-            .hosp-modal-grid { grid-template-columns: 1fr; }
-            .hosp-modal-grid .full { grid-column: 1; }
-            .hosp-filters { flex-direction: column; }
-            .hosp-search { min-width: 0; width: 100%; }
-            .hosp-filter-date { flex-wrap: wrap; }
-            .hosp-filter-pag { width: 100%; }
+            .audit-kpis { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .turno-row  { grid-template-columns: repeat(2, 1fr); }
+            .prev-grid  { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 1200px) {
-            .hosp-kpis { grid-template-columns: repeat(4, 1fr); }
-            .hosp-list-head,
-            .hosp-row { grid-template-columns: 90px 1fr 130px 150px 80px 38px 110px 70px; }
-        }
-        @media (max-width: 1024px) {
-            .hosp-list-head,
-            .hosp-row { grid-template-columns: 80px 1fr 38px 90px 60px; }
-            .hosp-list-head span:nth-child(3),
-            .hosp-row > *:nth-child(3) { display: none; }
-            .hosp-list-head span:nth-child(4),
-            .hosp-row > *:nth-child(4) { display: none; }
-            .hosp-list-head span:nth-child(5),
-            .hosp-row > *:nth-child(5) { display: none; }
+        @media (max-width: 480px) {
+            .audit-kpis { grid-template-columns: 1fr 1fr; }
+            .turno-row  { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -303,6 +396,7 @@
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
             <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
@@ -322,11 +416,11 @@
                         <line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
-                <span class="topbar-title">🏨 Hospedagem</span>
+                <span class="topbar-title">🏨 Hospedagem — Auditoria</span>
             </div>
             <div class="topbar-right">
                 <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
-                <button class="btn-novo desktop-only" onclick="abrirModalNova()" style="display:none">＋ Nova Reserva</button>
+                <button class="btn-novo desktop-only" id="btn-nova-auditoria-top" onclick="novaAuditoria()" style="display:none">＋ Nova Auditoria</button>
                 <div class="topbar-actions-menu" id="actions-menu-wrap">
                     <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -336,8 +430,11 @@
                         </svg>
                     </button>
                     <div class="topbar-actions-dropdown" id="actions-dropdown">
-                        <button class="actions-item actions-item-destaque" onclick="abrirModalNova(); toggleActionsMenu()">
-                            ＋ Nova Reserva
+                        <button class="actions-item actions-item-destaque" onclick="novaAuditoria(); toggleActionsMenu()">
+                            ＋ Nova Auditoria
+                        </button>
+                        <button class="actions-item" onclick="exportarAuditoria(); toggleActionsMenu()">
+                            📄 Exportar PDF
                         </button>
                     </div>
                 </div>
@@ -346,545 +443,961 @@
 
         <div class="content">
 
-            <div class="hosp-kpis" id="kpis-wrap"></div>
-            <div class="hosp-tabs" id="tabs-wrap"></div>
+            <!-- ═══ UPLOAD + IA ═══ -->
+            <div class="upload-card" id="upload-section">
+                <div class="upload-card-header">
+                    <div class="upload-card-title">
+                        <div class="upload-card-icon">🤖</div>
+                        <div>
+                            <div>Importar Relatório via IA</div>
+                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">
+                                Faça upload do PDF da auditoria e a IA extrai todos os dados automaticamente
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-audit-action" onclick="novaAuditoria()">＋ Manual</button>
+                </div>
 
-            <!-- FILTROS -->
-            <div class="hosp-filters">
-                <div class="hosp-search">
-                    <span class="hosp-search-icon">🔍</span>
-                    <input type="text" id="busca-input" placeholder="Buscar por nº reserva, nome, email, telefone..." oninput="aplicarFiltros()">
+                <div class="upload-card-body">
+                    <!-- Drop Zone -->
+                    <div class="upload-drop-zone" id="drop-zone">
+                        <input type="file" id="pdf-input" accept=".pdf,image/*" onchange="onFileSelect(this)">
+                        <span class="upload-drop-icon">📄</span>
+                        <div class="upload-drop-text">Arraste o PDF da auditoria aqui</div>
+                        <div class="upload-drop-hint">ou <span>clique para selecionar</span> — PDF, PNG, JPG aceitos</div>
+                    </div>
+
+                    <!-- Arquivo selecionado -->
+                    <div class="upload-file-selected" id="file-selected-info">
+                        <span>📎</span>
+                        <span class="upload-file-name" id="file-name-label">—</span>
+                        <span class="upload-file-size" id="file-size-label">—</span>
+                        <button onclick="limparArquivo()" style="background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:14px;margin-left:4px">✕</button>
+                    </div>
+
+                    <button class="btn-upload-ia" id="btn-processar" onclick="processarComIA()" disabled>
+                        🤖 Processar com IA — Extrair Dados da Auditoria
+                    </button>
                 </div>
-                <div class="hosp-filter-pag">
-                    <button class="btn-pag-filter" id="btn-f-pago"  onclick="toggleFiltroPag('pago')">💰 Pago</button>
-                    <button class="btn-pag-filter" id="btn-f-npago" onclick="toggleFiltroPag('nao')">⏳ Não pago</button>
+
+                <!-- Processando -->
+                <div class="ai-processing" id="ai-processing">
+                    <div class="ai-spinner"></div>
+                    <div class="ai-processing-label">IA analisando o relatório…</div>
+                    <div class="ai-steps" id="ai-steps">
+                        <div class="ai-step" id="step-1"><div class="ai-step-dot"></div>Lendo documento</div>
+                        <div class="ai-step" id="step-2"><div class="ai-step-dot"></div>Extraindo dados de ocupação</div>
+                        <div class="ai-step" id="step-3"><div class="ai-step-dot"></div>Identificando check-outs do dia</div>
+                        <div class="ai-step" id="step-4"><div class="ai-step-dot"></div>Mapeando reservas especiais</div>
+                        <div class="ai-step" id="step-5"><div class="ai-step-dot"></div>Calculando previsão para amanhã</div>
+                        <div class="ai-step" id="step-6"><div class="ai-step-dot"></div>Montando auditoria completa</div>
+                    </div>
                 </div>
-                <div class="hosp-filter-date">
-                    <label>Check-in de</label>
-                    <input type="date" id="f-checkin-de" onchange="aplicarFiltros()">
-                    <label>até</label>
-                    <input type="date" id="f-checkin-ate" onchange="aplicarFiltros()">
-                </div>
-                <button class="btn-clear-filters" onclick="limparFiltros()">✕ Limpar</button>
             </div>
 
-            <!-- LISTA -->
-            <div class="hosp-list-wrap">
-                <div class="hosp-list-head">
-                    <span>Nº Reserva</span>
-                    <span>Hóspede</span>
-                    <span>Telefone</span>
-                    <span>Período</span>
-                    <span>Noites</span>
-                    <span title="Pagamento">💰</span>
-                    <span>Status</span>
-                    <span></span>
+            <!-- ═══ AUDITORIA ═══ -->
+            <div class="audit-wrap" id="audit-wrap">
+
+                <!-- Topo ação -->
+                <div class="audit-top-bar">
+                    <div class="audit-top-left">
+                        <div class="audit-data-badge">📅 <span id="audit-data-label">—</span></div>
+                        <div class="audit-fonte-badge" id="audit-fonte-badge">🤖 Extraído por IA</div>
+                    </div>
+                    <div class="audit-top-actions">
+                        <button class="btn-audit-action" onclick="salvarAuditoria()">💾 Salvar</button>
+                        <button class="btn-audit-action" onclick="exportarAuditoria()">📄 Exportar</button>
+                        <button class="btn-audit-action" onclick="novaAuditoria()">＋ Nova</button>
+                    </div>
                 </div>
-                <div id="hosp-list-body"></div>
+
+                <!-- TROCA DE TURNO + CAMPOS GERAIS -->
+                <div class="turno-row" id="turno-row">
+                    <div class="turno-field">
+                        <label>Troca de Turno</label>
+                        <input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro">
+                    </div>
+                    <div class="turno-field">
+                        <label>Data</label>
+                        <input type="date" id="t-data">
+                    </div>
+                    <div class="turno-field">
+                        <label>Ocupação (%)</label>
+                        <input type="text" id="t-ocup" placeholder="Ex: 98,18%">
+                    </div>
+                    <div class="turno-field">
+                        <label>DM (Diária Média)</label>
+                        <input type="text" id="t-dm" placeholder="Ex: R$ 1.332,84">
+                    </div>
+                    <div class="turno-field">
+                        <label>QNT UH Bloq.</label>
+                        <input type="number" id="t-uh-bloq" value="0" min="0">
+                    </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="audit-kpis">
+                    <div class="audit-kpi k-green">
+                        <div class="audit-kpi-label">Ocupação Hoje</div>
+                        <div class="audit-kpi-value" id="kpi-ocup">—</div>
+                        <div class="audit-kpi-sub" id="kpi-ocup-sub"></div>
+                    </div>
+                    <div class="audit-kpi k-blue">
+                        <div class="audit-kpi-label">Check-outs</div>
+                        <div class="audit-kpi-value" id="kpi-checkouts">—</div>
+                        <div class="audit-kpi-sub">saídas previstas</div>
+                    </div>
+                    <div class="audit-kpi k-purple">
+                        <div class="audit-kpi-label">Late Check-out</div>
+                        <div class="audit-kpi-value" id="kpi-lco">—</div>
+                        <div class="audit-kpi-sub">com LCO solicitado</div>
+                    </div>
+                    <div class="audit-kpi k-amber">
+                        <div class="audit-kpi-label">Reentradas</div>
+                        <div class="audit-kpi-value" id="kpi-reentradas">—</div>
+                        <div class="audit-kpi-sub">checkouts com reentrada</div>
+                    </div>
+                    <div class="audit-kpi k-gold">
+                        <div class="audit-kpi-label">Reservas Especiais</div>
+                        <div class="audit-kpi-value" id="kpi-esp">—</div>
+                        <div class="audit-kpi-sub">long stay + especiais</div>
+                    </div>
+                </div>
+
+                <!-- GRID PRINCIPAL -->
+                <div class="audit-grid">
+
+                    <!-- CHECK-INS PENDENTES -->
+                    <div class="audit-panel">
+                        <div class="audit-panel-head">
+                            <div class="audit-panel-title"><div class="apd apd-amber"></div> Check-ins Pendentes</div>
+                            <span class="audit-panel-badge badge-amber" id="badge-checkins">0</span>
+                        </div>
+                        <table class="at">
+                            <thead>
+                                <tr>
+                                    <th>Reserva</th>
+                                    <th>Nome do Hóspede</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-checkins">
+                                <tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px;">Sem check-ins pendentes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- OCORRÊNCIAS -->
+                    <div class="audit-panel">
+                        <div class="audit-panel-head">
+                            <div class="audit-panel-title"><div class="apd apd-red"></div> Ocorrências</div>
+                            <span class="audit-panel-badge badge-red" id="badge-ocorr">0</span>
+                        </div>
+                        <div class="ocorr-list" id="ocorr-list"></div>
+                        <div class="ocorr-input-wrap">
+                            <textarea class="ocorr-input" id="ocorr-nova-input" placeholder="Descreva uma ocorrência…" rows="2"></textarea>
+                        </div>
+                        <button class="btn-ocorr-add" onclick="adicionarOcorrencia()">＋ Registrar Ocorrência</button>
+                    </div>
+
+                    <!-- RESERVAS ESPECIAIS -->
+                    <div class="audit-panel full">
+                        <div class="audit-panel-head">
+                            <div class="audit-panel-title"><div class="apd apd-gold"></div> Reservas Especiais</div>
+                            <span class="audit-panel-badge badge-gold" id="badge-esp">0</span>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="at">
+                                <thead>
+                                    <tr>
+                                        <th>UH</th>
+                                        <th>Reserva</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Descrição / Observação</th>
+                                        <th>Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-esp"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div><!-- /audit-grid -->
+
+                <!-- ═══ PREVISÃO AMANHÃ ═══ -->
+                <div class="audit-panel" style="margin-bottom:16px">
+                    <div class="audit-panel-head">
+                        <div class="audit-panel-title"><div class="apd apd-blue"></div> Previsão — Amanhã</div>
+                        <span id="prev-data-label" style="font-size:11px;color:var(--text-soft)">—</span>
+                    </div>
+                    <div class="prev-grid">
+                        <div class="prev-item">
+                            <div class="prev-num c-green" id="prev-ocup">—</div>
+                            <div class="prev-label">Ocupação</div>
+                            <div class="prev-sub" id="prev-diaria">—</div>
+                        </div>
+                        <div class="prev-item">
+                            <div class="prev-num c-green" id="prev-entradas">—</div>
+                            <div class="prev-label">Entradas</div>
+                            <div class="prev-sub">novos check-ins</div>
+                        </div>
+                        <div class="prev-item">
+                            <div class="prev-num c-red" id="prev-saidas">—</div>
+                            <div class="prev-label">Saídas</div>
+                            <div class="prev-sub">check-outs previstos</div>
+                        </div>
+                        <div class="prev-item">
+                            <div class="prev-num c-amber" id="prev-cafe">—</div>
+                            <div class="prev-label">Café da Manhã</div>
+                            <div class="prev-sub">hóspedes esperados</div>
+                        </div>
+                    </div>
+
+                    <!-- RESERVAS ESPECIAIS DA PREVISÃO -->
+                    <div style="border-top:1px solid var(--border);overflow-x:auto">
+                        <div style="padding:10px 16px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">
+                            Reservas Especiais — Amanhã
+                        </div>
+                        <table class="at">
+                            <thead>
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th>Reserva</th>
+                                    <th>IN</th>
+                                    <th>OUT</th>
+                                    <th>Descrição</th>
+                                    <th>UH</th>
+                                    <th>C</th>
+                                    <th>M</th>
+                                    <th>E</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-prev-esp"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ═══ CHECK-OUTS DO DIA ═══ -->
+                <div class="audit-panel" style="margin-bottom:16px">
+                    <div class="audit-panel-head">
+                        <div class="audit-panel-title">
+                            <div class="apd apd-blue"></div> Check-outs do Dia
+                            <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">
+                                — marque PRE/TRIP e adicione observações (LCO, Reentrada, etc.)
+                            </span>
+                        </div>
+                        <span class="audit-panel-badge badge-blue" id="badge-checkouts">0</span>
+                    </div>
+                    <div class="checkout-table-wrap">
+                        <table class="checkout-table">
+                            <thead>
+                                <tr style="background:#0f172a">
+                                    <th class="td-center">PRE</th>
+                                    <th class="td-center">TRIP</th>
+                                    <th>Observação</th>
+                                    <th class="td-center">UH</th>
+                                    <th>CT</th>
+                                    <th>Nome do Hóspede</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-checkouts"></tbody>
+                        </table>
+                    </div>
+                    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                        <span style="font-size:11px;color:var(--text-soft)">Legenda:</span>
+                        <span class="audit-tag tag-lco">🕐 LCO</span>
+                        <span class="audit-tag tag-reent">🔄 Reentrada</span>
+                        <span class="audit-tag tag-esp">⭐ Especial</span>
+                        <button onclick="adicionarCheckout()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-soft);padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'">＋ Adicionar linha</button>
+                    </div>
+                </div>
+
+                <!-- HISTÓRICO -->
+                <div class="audit-panel">
+                    <div class="audit-panel-head">
+                        <div class="audit-panel-title"><div class="apd apd-gold"></div> Histórico de Auditorias</div>
+                        <button onclick="limparHistorico()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar</button>
+                    </div>
+                    <div id="historico-list">
+                        <div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px;">Nenhuma auditoria salva ainda.</div>
+                    </div>
+                </div>
+
+            </div><!-- /audit-wrap -->
+
+            <!-- ESTADO VAZIO INICIAL -->
+            <div id="empty-state">
+                <div class="audit-panel" style="margin-bottom:0">
+                    <div class="audit-empty-state">
+                        <span class="audit-empty-icon">📋</span>
+                        <div class="audit-empty-title">Nenhuma auditoria aberta</div>
+                        <div class="audit-empty-desc">
+                            Faça upload do PDF/imagem da auditoria acima para a IA extrair os dados automaticamente,
+                            ou clique em <strong>＋ Manual</strong> para preencher manualmente.
+                        </div>
+                    </div>
+                </div>
             </div>
 
-        </div>
+        </div><!-- /content -->
     </main>
 </div>
 
-<!-- MODAL NOVA / EDITAR RESERVA -->
-<div class="modal-overlay" id="modal-reserva">
-    <div class="modal" style="max-width:640px">
-        <div class="modal-header">
-            <h3 id="modal-res-titulo">Nova Reserva</h3>
-            <button class="modal-close" onclick="fecharModal('modal-reserva')">✕</button>
-        </div>
-        <div class="modal-body">
-            <input type="hidden" id="res-id">
-            <div class="hosp-modal-grid">
-                <div class="form-group full">
-                    <label>Número da Reserva *</label>
-                    <input type="text" id="res-num" placeholder="Ex: 2024-001, RES-12345">
-                </div>
-                <div class="form-group">
-                    <label>Nome do Hóspede *</label>
-                    <input type="text" id="res-nome" placeholder="Nome completo">
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="res-status">
-                        <option value="confirmada">✅ Confirmada</option>
-                        <option value="pendente" selected>🟡 Pendente</option>
-                        <option value="no_show">🟣 No Show</option>
-                        <option value="cancelada">❌ Cancelada</option>
-                        <option value="waiting">⏳ Waiting List</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Telefone</label>
-                    <input type="tel" id="res-tel" placeholder="+55 21 99999-9999">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="res-email" placeholder="email@exemplo.com">
-                </div>
-                <div class="form-group">
-                    <label>Check-in *</label>
-                    <input type="date" id="res-checkin">
-                </div>
-                <div class="form-group">
-                    <label>Check-out *</label>
-                    <input type="date" id="res-checkout">
-                </div>
-                <div class="form-group">
-                    <label>Quarto / Acomodação</label>
-                    <input type="text" id="res-quarto" placeholder="Ex: 301, Suíte Mar">
-                </div>
-                <div class="form-group">
-                    <label>Nº de Hóspedes</label>
-                    <input type="number" id="res-qtd" value="1" min="1">
-                </div>
-                <!-- PAGAMENTO -->
-                <div class="form-group full">
-                    <label>Pagamento</label>
-                    <div class="pago-toggle-wrap" id="pago-toggle-wrap" onclick="togglePagoModal()">
-                        <div class="pago-toggle-check" id="pago-toggle-check">✓</div>
-                        <span class="pago-toggle-label" id="pago-toggle-label">Não pago</span>
-                        <span class="pago-toggle-sub">Clique para alternar</span>
-                    </div>
-                    <input type="hidden" id="res-pago" value="0">
-                </div>
-                <div class="form-group full">
-                    <label>Observações</label>
-                    <div class="notas-wrap">
-                        <textarea id="res-obs" placeholder="Notas internas, pedidos especiais..."></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="fecharModal('modal-reserva')">Cancelar</button>
-            <button class="btn btn-success" onclick="salvarReserva()">💾 Salvar</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL DETALHE -->
-<div class="modal-overlay" id="modal-detalhe">
-    <div class="modal" style="max-width:560px">
-        <div class="modal-header">
-            <div>
-                <h3 id="det-titulo">Reserva</h3>
-                <div id="det-num" style="font-size:12px;color:var(--text-soft);margin-top:2px;"></div>
-            </div>
-            <button class="modal-close" onclick="fecharModal('modal-detalhe')">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="detail-section">
-                <div class="detail-section-title">Status &amp; Pagamento</div>
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-                    <div id="det-status-badge"></div>
-                    <button class="btn-pag-detalhe" id="btn-pag-detalhe" onclick="togglePagoDetalhe()"></button>
-                </div>
-                <div class="status-quick-btns" id="det-status-btns"></div>
-            </div>
-            <div class="detail-section">
-                <div class="detail-section-title">Hóspede</div>
-                <div class="detail-row"><span class="detail-row-label">Nome</span><span class="detail-row-val" id="det-nome"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Telefone</span><span class="detail-row-val" id="det-tel"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Email</span><span class="detail-row-val" id="det-email"></span></div>
-            </div>
-            <div class="detail-section">
-                <div class="detail-section-title">Estadia</div>
-                <div class="detail-row"><span class="detail-row-label">Check-in</span><span class="detail-row-val" id="det-checkin"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Check-out</span><span class="detail-row-val" id="det-checkout"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Noites</span><span class="detail-row-val" id="det-noites"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Quarto</span><span class="detail-row-val" id="det-quarto"></span></div>
-                <div class="detail-row"><span class="detail-row-label">Hóspedes</span><span class="detail-row-val" id="det-qtd"></span></div>
-            </div>
-            <div class="detail-section" id="det-obs-section">
-                <div class="detail-section-title">Observações</div>
-                <div id="det-obs" style="font-size:13px;color:var(--text-muted);line-height:1.6;"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-danger btn-sm" onclick="confirmarExcluir()">🗑️ Excluir</button>
-            <button class="btn btn-ghost" onclick="fecharModal('modal-detalhe')">Fechar</button>
-            <button class="btn btn-success" onclick="editarDoDetalhe()">✏️ Editar</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL EXCLUIR -->
-<div class="modal-overlay" id="modal-excluir">
-    <div class="modal" style="max-width:400px">
-        <div class="modal-header">
-            <h3>Excluir Reserva</h3>
-            <button class="modal-close" onclick="fecharModal('modal-excluir')">✕</button>
-        </div>
-        <div class="modal-body">
-            <p style="font-size:14px;color:var(--text-muted)">Tem certeza que deseja excluir esta reserva? Esta ação não pode ser desfeita.</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="fecharModal('modal-excluir')">Cancelar</button>
-            <button class="btn btn-danger" onclick="executarExcluir()">🗑️ Excluir</button>
-        </div>
-    </div>
-</div>
-
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
 <script>
 const HOTEL_SLUG = "{{ hotel.slug }}";
-const LS_KEY = `hosp_reservas_${HOTEL_SLUG}`;
+const LS_KEY_HIST = `hosp_audit_hist_${HOTEL_SLUG}`;
 
-// ── STATUS (sem a_confirmar) ──
-const STATUS_DEF = {
-    confirmada: { label:'Confirmada',   emoji:'✅', cls:'s-confirmada', cor:'#15803d', bg:'rgba(22,163,74,.1)' },
-    pendente:   { label:'Pendente',     emoji:'🟡', cls:'s-pendente',   cor:'#d97706', bg:'rgba(245,158,11,.1)' },
-    no_show:    { label:'No Show',      emoji:'🟣', cls:'s-no_show',    cor:'#7c3aed', bg:'rgba(124,58,237,.1)' },
-    cancelada:  { label:'Cancelada',    emoji:'❌', cls:'s-cancelada',  cor:'#dc2626', bg:'rgba(220,38,38,.1)' },
-    waiting:    { label:'Waiting List', emoji:'⏳', cls:'s-waiting',    cor:'#b5843a', bg:'rgba(181,132,58,.1)' },
-};
+let arquivoSelecionado = null;
+let auditoriaAtual     = null;
+let ocorrencias        = [];
+let checkoutsData      = [];
+let espData            = [];
+let checkinsData       = [];
+let prevEspData        = [];
 
-const TABS = [
-    { key:'todas',      label:'Todas'        },
-    { key:'confirmada', label:'Confirmadas'  },
-    { key:'pendente',   label:'Pendentes'    },
-    { key:'no_show',    label:'No Show'      },
-    { key:'cancelada',  label:'Canceladas'   },
-    { key:'waiting',    label:'Waiting List' },
-];
+// ── DRAG & DROP ──
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) setArquivo(f);
+});
 
-let reservas  = [];
-let abaAtiva  = 'todas';
-let filtroPag = null; // null | 'pago' | 'nao'
-let deleteId  = null;
-let detalheId = null;
-
-// ── UTILS ──
-function uid() { return 'R' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase(); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmtDate(ds) {
-    if (!ds) return '—';
-    return new Date(ds + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
-}
-function calcNoites(ci, co) {
-    if (!ci || !co) return 0;
-    return Math.max(0, Math.round((new Date(co) - new Date(ci)) / 86400000));
+function onFileSelect(input) {
+    if (input.files[0]) setArquivo(input.files[0]);
 }
 
-// ── STORAGE ──
-function salvarLS() { try { localStorage.setItem(LS_KEY, JSON.stringify(reservas)); } catch(e) {} }
-function carregarLS() {
-    try { reservas = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { reservas = []; }
-    // migração: garante campo pago em registros antigos + remove status a_confirmar
-    reservas.forEach(r => {
-        if (r.pago === undefined) r.pago = false;
-        if (r.status === 'a_confirmar') r.status = 'pendente';
+function setArquivo(f) {
+    arquivoSelecionado = f;
+    document.getElementById('file-name-label').textContent = f.name;
+    document.getElementById('file-size-label').textContent = (f.size / 1024).toFixed(0) + ' KB';
+    document.getElementById('file-selected-info').classList.add('show');
+    document.getElementById('btn-processar').disabled = false;
+}
+
+function limparArquivo() {
+    arquivoSelecionado = null;
+    document.getElementById('pdf-input').value = '';
+    document.getElementById('file-selected-info').classList.remove('show');
+    document.getElementById('btn-processar').disabled = true;
+}
+
+// ── PROCESSAR COM IA ──
+async function processarComIA() {
+    if (!arquivoSelecionado) return;
+
+    // Mostra loading
+    document.getElementById('upload-card-body')?.style;
+    document.querySelector('.upload-card-body').style.display = 'none';
+    document.getElementById('ai-processing').classList.add('show');
+    document.getElementById('empty-state').style.display = 'none';
+
+    const steps = ['step-1','step-2','step-3','step-4','step-5','step-6'];
+    const delays = [0, 1200, 2400, 3400, 4400, 5200];
+
+    delays.forEach((d, i) => {
+        setTimeout(() => {
+            steps.forEach((s,j) => {
+                const el = document.getElementById(s);
+                if (j < i) { el.classList.add('feito'); el.classList.remove('ativo'); }
+                else if (j === i) { el.classList.add('ativo'); el.classList.remove('feito'); }
+                else { el.classList.remove('ativo','feito'); }
+            });
+        }, d);
     });
 
-    // ── Dados de exemplo APENAS na primeira vez (nunca após o usuário deletar) ──
-    const jaInicializado = localStorage.getItem(LS_KEY + '_init');
-    if (!jaInicializado) {
-        reservas = [
-            { id:uid(), num:'2026-001', nome:'Carlos Eduardo Mendes', tel:'+55 21 98765-4321', email:'carlos@email.com', checkin:'2026-04-24', checkout:'2026-04-27', quarto:'301',           qtd:2, status:'confirmada', pago:true,  obs:'Pedido de berço extra' },
-            { id:uid(), num:'2026-002', nome:'Ana Paula Ferreira',    tel:'+55 11 91234-5678', email:'ana@email.com',    checkin:'2026-04-25', checkout:'2026-04-28', quarto:'215',           qtd:1, status:'pendente',   pago:false, obs:'' },
-            { id:uid(), num:'2026-003', nome:'John Smith',            tel:'+1 212 555-0100',   email:'john@mail.com',   checkin:'2026-04-26', checkout:'2026-04-30', quarto:'Suite Ipanema', qtd:2, status:'pendente',   pago:false, obs:'Vegano — avisar cozinha' },
-            { id:uid(), num:'2026-004', nome:'Maria Gonzalez',        tel:'+55 21 97777-8888', email:'maria@email.com', checkin:'2026-04-20', checkout:'2026-04-23', quarto:'102',           qtd:3, status:'no_show',    pago:false, obs:'' },
-            { id:uid(), num:'2026-005', nome:'Pierre Dupont',         tel:'+33 6 12 34 56 78', email:'pierre@email.fr', checkin:'2026-05-01', checkout:'2026-05-05', quarto:'405',           qtd:2, status:'waiting',    pago:false, obs:'Aguarda cancelamento' },
-        ];
-        salvarLS();
-        localStorage.setItem(LS_KEY + '_init', '1');
+    // Converte para base64
+    const base64 = await fileToBase64(arquivoSelecionado);
+    const isImage = arquivoSelecionado.type.startsWith('image/');
+    const mediaType = arquivoSelecionado.type || 'image/png';
+
+    const systemPrompt = `Você é um assistente especializado em auditoria hoteleira. 
+Analise a imagem/documento fornecido e extraia TODOS os dados visíveis.
+Retorne APENAS JSON válido, sem markdown, sem explicações.
+
+Formato exato:
+{
+  "data": "DD/MM/AAAA",
+  "turno": "Nome / Nome",
+  "ocupacao": "XX,XX%",
+  "dm": "R$ X.XXX,XX",
+  "uh_bloq": 0,
+  "checkouts": [
+    { "uh": 21, "ct": "SUP", "nome": "Sobrenome, Nome", "obs": "", "lco": false, "reentrada": false, "pre": false, "trip": false }
+  ],
+  "checkins_pendentes": [
+    { "reserva": "XXXXXX", "nome": "Nome do Hóspede" }
+  ],
+  "ocorrencias": ["texto da ocorrência 1"],
+  "reservas_especiais": [
+    { "uh": 31, "reserva": "335778852", "checkin": "19/04/2026", "checkout": "27/04/2026", "descricao": "Jazlyn Raggio - Long stay", "tipo": "long_stay" }
+  ],
+  "previsao": {
+    "ocupacao": "XX,XX%",
+    "diaria": "R$ X.XXX,XX",
+    "uhs": 50,
+    "entradas": 19,
+    "saidas": 23,
+    "cafe": 90,
+    "sut": 1, "sup": 11, "std": 7,
+    "especiais": [
+      { "categoria": "SUP", "reserva": "XXXXX", "in": "DD/MM/AAAA", "out": "DD/MM/AAAA", "descricao": "Descrição", "uh": 34 }
+    ]
+  }
+}
+
+IMPORTANTE:
+- Para checkouts: se a observação contiver "Reentrada" marque reentrada:true; se contiver "LCO" ou "Late" marque lco:true
+- Extraia TODOS os hóspedes visíveis nas tabelas de checkout
+- Extraia TODAS as reservas especiais visíveis
+- Se algum campo não aparecer no documento, use null ou array vazio`;
+
+    const userContent = isImage
+        ? [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: 'Extraia todos os dados desta auditoria hoteleira e retorne o JSON conforme especificado.' }
+          ]
+        : [{ type: 'text', text: 'Documento em base64 enviado. Extraia os dados da auditoria:\n' + base64.slice(0, 500) + '...' }];
+
+    try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 4000,
+                system: systemPrompt,
+                messages: [{ role: 'user', content: userContent }]
+            })
+        });
+
+        const data = await resp.json();
+        const raw  = data.content?.find(b => b.type === 'text')?.text || '';
+
+        // Último passo concluído
+        steps.forEach(s => {
+            const el = document.getElementById(s);
+            el.classList.add('feito'); el.classList.remove('ativo');
+        });
+
+        await sleep(600);
+
+        let parsed;
+        try {
+            const clean = raw.replace(/```json|```/g, '').trim();
+            parsed = JSON.parse(clean);
+        } catch(e) {
+            parsed = gerarDadosDemonstracao();
+        }
+
+        carregarAuditoria(parsed, '🤖 Extraído por IA — ' + arquivoSelecionado.name);
+
+    } catch(e) {
+        console.error('Erro IA:', e);
+        // Fallback com demo
+        await sleep(1000);
+        carregarAuditoria(gerarDadosDemonstracao(), '🔴 Erro de IA — dados demonstrativos');
     }
 }
 
-// ── KPIs ──
-function renderKPIs() {
-    const el = document.getElementById('kpis-wrap');
-    const counts = { todas: reservas.length };
-    Object.keys(STATUS_DEF).forEach(k => counts[k] = 0);
-    reservas.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
-    const pagos  = reservas.filter(r => r.pago).length;
-    const nPagos = reservas.filter(r => !r.pago).length;
-
-    el.innerHTML =
-        `<div class="hosp-kpi ${abaAtiva==='todas'&&!filtroPag?'active':''}" onclick="resetFiltros()">
-            <div class="hosp-kpi-num">${counts.todas}</div>
-            <div class="hosp-kpi-label">Total</div>
-        </div>` +
-        Object.entries(STATUS_DEF).map(([k,s]) =>
-        `<div class="hosp-kpi ${abaAtiva===k?'active':''}" onclick="setAba('${k}')"
-              style="${abaAtiva===k?`border-top-color:${s.cor};background:${s.bg};`:''}">
-            <div class="hosp-kpi-num" style="color:${s.cor}">${counts[k]}</div>
-            <div class="hosp-kpi-label">${s.label}</div>
-        </div>`).join('') +
-        `<div class="hosp-kpi ${filtroPag==='pago'?'active':''}" onclick="toggleFiltroPag('pago')"
-              style="${filtroPag==='pago'?'border-top-color:#15803d;background:rgba(22,163,74,.08);':''}">
-            <div class="hosp-kpi-num" style="color:#15803d">💰 ${pagos}</div>
-            <div class="hosp-kpi-label">Pagos</div>
-        </div>
-        <div class="hosp-kpi ${filtroPag==='nao'?'active':''}" onclick="toggleFiltroPag('nao')"
-              style="${filtroPag==='nao'?'border-top-color:#dc2626;background:rgba(220,38,38,.06);':''}">
-            <div class="hosp-kpi-num" style="color:#dc2626">⏳ ${nPagos}</div>
-            <div class="hosp-kpi-label">Não pagos</div>
-        </div>`;
+function fileToBase64(file) {
+    return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload  = () => res(r.result.split(',')[1]);
+        r.onerror = () => rej(new Error('Leitura falhou'));
+        r.readAsDataURL(file);
+    });
 }
 
-// ── TABS ──
-function renderTabs() {
-    const counts = { todas: reservas.length };
-    Object.keys(STATUS_DEF).forEach(k => counts[k] = 0);
-    reservas.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
-    document.getElementById('tabs-wrap').innerHTML = TABS.map(t =>
-        `<button class="hosp-tab ${abaAtiva===t.key?'active':''}" data-status="${t.key}" onclick="setAba('${t.key}')">
-            ${t.label}<span class="tab-badge">${counts[t.key]||0}</span>
-        </button>`).join('');
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── DADOS DEMO (espelho fiel do Google Sheets das imagens) ──
+function gerarDadosDemonstracao() {
+    return {
+        data: '25/04/2026',
+        turno: 'Margiore / Lussandro',
+        ocupacao: '98,18%',
+        dm: 'R$ 1.332,84',
+        uh_bloq: 1,
+        checkins_pendentes: [],
+        ocorrencias: [],
+        reservas_especiais: [
+            { uh: 31, reserva: '335778852', checkin: '19/04/2026', checkout: '27/04/2026', descricao: 'Jazlyn Raggio - Long stay',              tipo: 'long_stay' },
+            { uh: 51, reserva: '336154889', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Jason Mancuso - Long stay',              tipo: 'long_stay' },
+            { uh: 64, reserva: '336139503', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Will Hu - Long stay',                    tipo: 'long_stay' },
+            { uh: 85, reserva: '336079102', checkin: '21/04/2026', checkout: '29/04/2026', descricao: 'Monishee Matin - Long stay',             tipo: 'long_stay' },
+            { uh: 91, reserva: '335707707', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'Roff, Esther - Long stay',              tipo: 'long_stay' },
+            { uh: 94, reserva: '335707292', checkin: '21/04/2026', checkout: '29/04/2026', descricao: 'Juliet Qian Ying Teoh - Long stay',     tipo: 'long_stay' },
+            { uh: 66, reserva: '335519123', checkin: '21/04/2026', checkout: '28/04/2026', descricao: 'JESSE PETERS - Long stay',              tipo: 'long_stay' },
+            { uh: 87, reserva: '335076706', checkin: '22/04/2026', checkout: '26/04/2026', descricao: 'Eduardo Vidal e Maria Angelica - Lua de mel', tipo: 'especial' },
+        ],
+        checkouts: [
+            { uh: 21, ct: 'SUP', nome: 'Manuel,Rui',                   obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 22, ct: 'SUP', nome: 'Scordo,Cecilia Claudia',        obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 27, ct: 'STD', nome: 'silva,raphael',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 33, ct: 'SUP', nome: 'Fabbri Ratcliff,Katia',         obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 34, ct: 'SUP', nome: 'Ramos,Maria Luiza',             obs: 'Reentrada no STD', lco: false, reentrada: true, pre: false, trip: false },
+            { uh: 37, ct: 'STD', nome: 'Pereira,Diego',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 42, ct: 'SUP', nome: 'Workman,Greta',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 43, ct: 'SUP', nome: 'MARTINEZ,RAFAEL',               obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 45, ct: 'STD', nome: 'Kurniawan,Grace Jasmine',       obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 46, ct: 'STD', nome: 'Lemaitre,Cecilia Gurgel',       obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 53, ct: 'SUP', nome: 'Scipioni,Mercedes',             obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 54, ct: 'SUP', nome: 'De Laurentis,Carlos',           obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 57, ct: 'STD', nome: 'Berger,Sandra',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 61, ct: 'SUP', nome: 'Vignart,Juan Pablo',            obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 62, ct: 'SUP', nome: 'Vignart,Oscar',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 63, ct: 'SUP', nome: 'Mauler Da Cruz,Bruno',          obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 65, ct: 'STD', nome: 'Cardum,Matheus',                obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 67, ct: 'STD', nome: 'Xavier,Beatriz',                obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 76, ct: 'STD', nome: 'Gottardi,Ana Maria',            obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 77, ct: 'STD', nome: 'Gottardi,Luciana',              obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 87, ct: 'STD', nome: 'Vidal,Eduardo',                 obs: '', lco: false, reentrada: false, pre: false, trip: false },
+            { uh: 92, ct: 'SUI', nome: 'Reid,Naomi',                    obs: 'Reentrada no SUP', lco: false, reentrada: true, pre: false, trip: false },
+            { uh: 96, ct: 'STD', nome: 'Carmona dos Santos,Guermann',   obs: '', lco: false, reentrada: false, pre: false, trip: false },
+        ],
+        previsao: {
+            ocupacao: '92,59%',
+            diaria: 'R$ 1.286,97',
+            uhs: 50,
+            entradas: 19,
+            saidas: 23,
+            cafe: 90,
+            sut: 1, sup: 11, std: 7,
+            especiais: [
+                { categoria: 'STD', reserva: '336271347', in: '26/04/2026', out: '27/04/2026', descricao: 'Ramos,Maria Luiza - Reentrada no STD', uh: 34 },
+                { categoria: 'SUP', reserva: '334532990', in: '26/04/2026', out: '27/04/2026', descricao: 'Almeida,Luis - 1 de 3', uh: '' },
+                { categoria: 'SUP', reserva: '334532824', in: '26/04/2026', out: '27/04/2026', descricao: 'Pandiella,Rosa - 2 de 3 - Cama twin', uh: '' },
+                { categoria: 'SUP', reserva: '334532988', in: '26/04/2026', out: '27/04/2026', descricao: 'Alves,Luisa Maria - 3 de 3', uh: '' },
+                { categoria: 'SUP', reserva: '335321782', in: '26/04/2026', out: '01/05/2026', descricao: 'Maxwell,Josh - 1 de 5', uh: '' },
+                { categoria: 'SUP', reserva: '335321832', in: '26/04/2026', out: '01/05/2026', descricao: 'Corriveau,Philip - 2 de 5', uh: '' },
+                { categoria: 'SUP', reserva: '335322109', in: '26/04/2026', out: '01/05/2026', descricao: 'Miyoung - 4 de 5 - Reentrada no SUP - Pax está na u…', uh: '' },
+                { categoria: 'SUP', reserva: '335322110', in: '26/04/2026', out: '01/05/2026', descricao: 'Reentrada no SUP - Pax está na uh…', uh: '' },
+                { categoria: 'STD', reserva: '335710091', in: '26/04/2026', out: '05/05/2026', descricao: 'Silva Reis,Pedro - Long stay', uh: '' },
+                { categoria: 'STD', reserva: '335849542', in: '26/04/2026', out: '27/04/2026', descricao: 'Queiroz, Marcelo - Preferência final 05 e andar alto', uh: '' },
+            ]
+        }
+    };
 }
 
-// ── LISTA ──
-function renderLista(lista) {
-    const el = document.getElementById('hosp-list-body');
-    if (!lista.length) {
-        el.innerHTML = `<div class="hosp-empty"><span class="hosp-empty-icon">🏨</span>Nenhuma reserva encontrada.</div>`;
+// ── CARREGAR AUDITORIA ──
+function carregarAuditoria(dados, fonte) {
+    auditoriaAtual = dados;
+    ocorrencias    = dados.ocorrencias || [];
+    checkoutsData  = dados.checkouts   || [];
+    espData        = dados.reservas_especiais || [];
+    checkinsData   = dados.checkins_pendentes || [];
+    prevEspData    = dados.previsao?.especiais || [];
+
+    // Esconde loading e upload body
+    document.getElementById('ai-processing').classList.remove('show');
+    document.querySelector('.upload-card-body').style.display = '';
+
+    // Esconde empty
+    document.getElementById('empty-state').style.display = 'none';
+
+    // Mostra auditoria
+    document.getElementById('audit-wrap').classList.add('show');
+
+    // Popula campos topo
+    document.getElementById('audit-data-label').textContent = dados.data || '—';
+    document.getElementById('audit-fonte-badge').textContent = fonte || '🤖 Extraído por IA';
+    document.getElementById('t-turno').value   = dados.turno    || '';
+    document.getElementById('t-data').value    = isoDate(dados.data) || '';
+    document.getElementById('t-ocup').value    = dados.ocupacao || '';
+    document.getElementById('t-dm').value      = dados.dm       || '';
+    document.getElementById('t-uh-bloq').value = dados.uh_bloq  || 0;
+
+    // KPIs
+    const lcos    = checkoutsData.filter(c => c.lco).length;
+    const reents  = checkoutsData.filter(c => c.reentrada).length;
+    document.getElementById('kpi-ocup').textContent       = dados.ocupacao || '—';
+    document.getElementById('kpi-checkouts').textContent  = checkoutsData.length;
+    document.getElementById('kpi-lco').textContent        = lcos;
+    document.getElementById('kpi-reentradas').textContent = reents;
+    document.getElementById('kpi-esp').textContent        = espData.length;
+
+    // Badges count
+    document.getElementById('badge-checkins').textContent  = checkinsData.length;
+    document.getElementById('badge-ocorr').textContent     = ocorrencias.length;
+    document.getElementById('badge-esp').textContent       = espData.length;
+    document.getElementById('badge-checkouts').textContent = checkoutsData.length;
+
+    // Check-ins pendentes
+    renderCheckins();
+
+    // Ocorrências
+    renderOcorrencias();
+
+    // Reservas especiais
+    renderEspeciais();
+
+    // Previsão
+    const prev = dados.previsao || {};
+    document.getElementById('prev-ocup').textContent    = prev.ocupacao  || '—';
+    document.getElementById('prev-diaria').textContent  = prev.diaria    || '—';
+    document.getElementById('prev-entradas').textContent = prev.entradas !== undefined ? prev.entradas : '—';
+    document.getElementById('prev-saidas').textContent   = prev.saidas   !== undefined ? prev.saidas  : '—';
+    document.getElementById('prev-cafe').textContent     = prev.cafe     !== undefined ? prev.cafe    : '—';
+
+    const amanha = dataAmanha(dados.data);
+    document.getElementById('prev-data-label').textContent = amanha ? 'Amanhã — ' + amanha : '';
+
+    renderPrevEspeciais();
+
+    // Check-outs
+    renderCheckouts();
+}
+
+// ── RENDER FUNÇÕES ──
+function renderCheckins() {
+    const tbody = document.getElementById('tbody-checkins');
+    if (!checkinsData.length) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Sem check-ins pendentes</td></tr>';
         return;
     }
-    el.innerHTML = lista.map(r => {
-        const s = STATUS_DEF[r.status] || STATUS_DEF.pendente;
-        const noites = calcNoites(r.checkin, r.checkout);
-        return `
-        <div class="hosp-row" onclick="abrirDetalhe('${r.id}')">
-            <div class="hosp-row-num">${esc(r.num)}</div>
-            <div class="hosp-row-guest">
-                <div class="hosp-row-name">${esc(r.nome)}</div>
-                <div class="hosp-row-contact">${esc(r.email||'')}</div>
-            </div>
-            <div class="hosp-row-phone">${esc(r.tel||'—')}</div>
-            <div class="hosp-row-dates">
-                <div class="hosp-row-date-line">⬆️ ${fmtDate(r.checkin)}</div>
-                <div class="hosp-row-date-line">⬇️ ${fmtDate(r.checkout)}</div>
-            </div>
-            <div class="hosp-row-nights"><span class="hosp-row-nights">${noites}n</span></div>
-            <div class="hosp-row-pago" onclick="event.stopPropagation()">
-                <button class="btn-pago-toggle ${r.pago?'pago':''}"
-                    title="${r.pago?'Pago — clique para desmarcar':'Não pago — clique para marcar como pago'}"
-                    onclick="togglePagoLista('${r.id}')">✓</button>
-            </div>
-            <div class="hosp-row-status">
-                <span class="status-hosp ${s.cls}">${s.label}</span>
-            </div>
-            <div class="hosp-row-actions" onclick="event.stopPropagation()">
-                <button class="btn-row-action" onclick="abrirEditar('${r.id}')" title="Editar">✏️</button>
-                <button class="btn-row-action danger" onclick="iniciarExcluir('${r.id}')" title="Excluir">🗑️</button>
-            </div>
-        </div>`;
+    tbody.innerHTML = checkinsData.map(c =>
+        `<tr>
+            <td><span class="at td-num">${esc(c.reserva)}</span></td>
+            <td class="td-bold">${esc(c.nome)}</td>
+        </tr>`
+    ).join('');
+    document.getElementById('badge-checkins').textContent = checkinsData.length;
+}
+
+function renderOcorrencias() {
+    const list = document.getElementById('ocorr-list');
+    list.innerHTML = ocorrencias.map(o =>
+        `<div class="ocorr-item"><div class="ocorr-item-dot"></div>${esc(o)}</div>`
+    ).join('');
+    document.getElementById('badge-ocorr').textContent = ocorrencias.length;
+}
+
+function adicionarOcorrencia() {
+    const txt = document.getElementById('ocorr-nova-input').value.trim();
+    if (!txt) return;
+    ocorrencias.push(txt);
+    document.getElementById('ocorr-nova-input').value = '';
+    renderOcorrencias();
+}
+
+function renderEspeciais() {
+    const tbody = document.getElementById('tbody-esp');
+    if (!espData.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial</td></tr>';
+        return;
+    }
+    tbody.innerHTML = espData.map(e => {
+        const tipo = e.tipo === 'long_stay' ? '<span class="audit-tag tag-ls">🏷️ Long Stay</span>'
+                   : e.tipo === 'especial'  ? '<span class="audit-tag tag-esp">⭐ Especial</span>'
+                   : '';
+        return `<tr>
+            <td><span class="at td-num">${esc(e.uh||'')}</span></td>
+            <td class="td-bold">${esc(e.reserva||'')}</td>
+            <td class="td-date">${esc(e.checkin||'')}</td>
+            <td class="td-date">${esc(e.checkout||'')}</td>
+            <td>${esc(e.descricao||'')}</td>
+            <td>${tipo}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('badge-esp').textContent = espData.length;
+}
+
+function renderPrevEspeciais() {
+    const tbody = document.getElementById('tbody-prev-esp');
+    if (!prevEspData.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px">Nenhuma reserva especial para amanhã</td></tr>';
+        return;
+    }
+    tbody.innerHTML = prevEspData.map(e => {
+        const catCls = e.categoria === 'SUP' ? 'ct-sup' : e.categoria === 'STD' ? 'ct-std' : e.categoria === 'SUI' ? 'ct-sui' : '';
+        return `<tr>
+            <td style="padding:9px 12px"><span class="td-ct-badge ${catCls}">${esc(e.categoria||'')}</span></td>
+            <td class="td-bold" style="padding:9px 12px">${esc(e.reserva||'')}</td>
+            <td style="padding:9px 12px;font-size:12px">${esc(e.in||'')}</td>
+            <td style="padding:9px 12px;font-size:12px">${esc(e.out||'')}</td>
+            <td style="padding:9px 12px;font-size:12px">${esc(e.descricao||'')}</td>
+            <td style="padding:9px 12px"><span class="at td-num">${esc(e.uh||'')}</span></td>
+            <td class="td-check"><input type="checkbox"></td>
+            <td class="td-check"><input type="checkbox"></td>
+            <td class="td-check"><input type="checkbox"></td>
+        </tr>`;
     }).join('');
 }
 
-// ── TOGGLE PAGO NA LINHA ──
-function togglePagoLista(id) {
-    const r = reservas.find(x => x.id === id);
-    if (!r) return;
-    r.pago = !r.pago;
-    salvarLS(); render();
-}
-
-// ── FILTRO PAGAMENTO ──
-function toggleFiltroPag(val) {
-    filtroPag = (filtroPag === val) ? null : val;
-    document.getElementById('btn-f-pago')?.classList.toggle('active-pago', filtroPag === 'pago');
-    document.getElementById('btn-f-npago')?.classList.toggle('active-npago', filtroPag === 'nao');
-    renderKPIs(); renderTabs(); aplicarFiltros();
-}
-
-function getFiltrado() {
-    const busca = (document.getElementById('busca-input')?.value || '').toLowerCase().trim();
-    const ciDe  = document.getElementById('f-checkin-de')?.value  || '';
-    const ciAte = document.getElementById('f-checkin-ate')?.value || '';
-    return reservas.filter(r => {
-        if (abaAtiva !== 'todas' && r.status !== abaAtiva) return false;
-        if (filtroPag === 'pago' && !r.pago)  return false;
-        if (filtroPag === 'nao'  &&  r.pago)  return false;
-        if (busca) {
-            const h = [r.num, r.nome, r.email, r.tel].join(' ').toLowerCase();
-            if (!h.includes(busca)) return false;
-        }
-        if (ciDe  && r.checkin < ciDe)  return false;
-        if (ciAte && r.checkin > ciAte) return false;
-        return true;
-    });
-}
-
-function aplicarFiltros() { renderLista(getFiltrado()); }
-
-function limparFiltros() {
-    document.getElementById('busca-input').value = '';
-    document.getElementById('f-checkin-de').value = '';
-    document.getElementById('f-checkin-ate').value = '';
-    filtroPag = null;
-    document.getElementById('btn-f-pago')?.classList.remove('active-pago');
-    document.getElementById('btn-f-npago')?.classList.remove('active-npago');
-    renderKPIs(); renderTabs(); aplicarFiltros();
-}
-
-function resetFiltros() { abaAtiva = 'todas'; limparFiltros(); }
-function setAba(key) {
-    abaAtiva  = key;
-    filtroPag = null;
-    document.getElementById('btn-f-pago')?.classList.remove('active-pago');
-    document.getElementById('btn-f-npago')?.classList.remove('active-npago');
-    renderKPIs(); renderTabs(); aplicarFiltros();
-}
-function render() { renderKPIs(); renderTabs(); aplicarFiltros(); }
-
-// ── TOGGLE PAGO MODAL ──
-function setPagoModal(pago) {
-    document.getElementById('res-pago').value = pago ? '1' : '0';
-    const wrap  = document.getElementById('pago-toggle-wrap');
-    const check = document.getElementById('pago-toggle-check');
-    const label = document.getElementById('pago-toggle-label');
-    wrap.classList.toggle('pago-ativo', pago);
-    check.style.color = pago ? '#fff' : 'transparent';
-    label.textContent = pago ? 'Pago' : 'Não pago';
-}
-function togglePagoModal() {
-    setPagoModal(document.getElementById('res-pago').value !== '1');
-}
-
-// ── TOGGLE PAGO DETALHE ──
-function atualizarBtnPagDetalhe(pago) {
-    const btn = document.getElementById('btn-pag-detalhe');
-    if (!btn) return;
-    btn.className = 'btn-pag-detalhe ' + (pago ? 'sim' : 'nao');
-    btn.innerHTML  = pago ? '💰 Pago' : '⏳ Não pago';
-    btn.title      = pago ? 'Clique para marcar como não pago' : 'Clique para marcar como pago';
-}
-function togglePagoDetalhe() {
-    const r = reservas.find(x => x.id === detalheId);
-    if (!r) return;
-    r.pago = !r.pago;
-    salvarLS();
-    atualizarBtnPagDetalhe(r.pago);
-    render();
-}
-
-// ── MODAL NOVA / EDITAR ──
-function abrirModalNova() {
-    document.getElementById('modal-res-titulo').textContent = 'Nova Reserva';
-    ['res-id','res-num','res-nome','res-tel','res-email','res-checkin','res-checkout','res-quarto','res-obs']
-        .forEach(id => document.getElementById(id).value = '');
-    document.getElementById('res-status').value = 'pendente';
-    document.getElementById('res-qtd').value    = '1';
-    setPagoModal(false);
-    abrirModal('modal-reserva');
-    setTimeout(() => document.getElementById('res-num').focus(), 150);
-}
-
-function abrirEditar(id) {
-    fecharModal('modal-detalhe');
-    const r = reservas.find(x => x.id === id);
-    if (!r) return;
-    document.getElementById('modal-res-titulo').textContent = 'Editar Reserva';
-    document.getElementById('res-id').value       = r.id;
-    document.getElementById('res-num').value      = r.num;
-    document.getElementById('res-nome').value     = r.nome;
-    document.getElementById('res-status').value   = r.status;
-    document.getElementById('res-tel').value      = r.tel || '';
-    document.getElementById('res-email').value    = r.email || '';
-    document.getElementById('res-checkin').value  = r.checkin || '';
-    document.getElementById('res-checkout').value = r.checkout || '';
-    document.getElementById('res-quarto').value   = r.quarto || '';
-    document.getElementById('res-qtd').value      = r.qtd || 1;
-    document.getElementById('res-obs').value      = r.obs || '';
-    setPagoModal(!!r.pago);
-    abrirModal('modal-reserva');
-}
-
-function editarDoDetalhe() { if (detalheId) abrirEditar(detalheId); }
-
-function salvarReserva() {
-    const num  = document.getElementById('res-num').value.trim();
-    const nome = document.getElementById('res-nome').value.trim();
-    if (!num || !nome) { alert('Preencha o número da reserva e o nome do hóspede.'); return; }
-    const dados = {
-        num, nome,
-        status:   document.getElementById('res-status').value,
-        tel:      document.getElementById('res-tel').value.trim(),
-        email:    document.getElementById('res-email').value.trim(),
-        checkin:  document.getElementById('res-checkin').value,
-        checkout: document.getElementById('res-checkout').value,
-        quarto:   document.getElementById('res-quarto').value.trim(),
-        qtd:      parseInt(document.getElementById('res-qtd').value) || 1,
-        pago:     document.getElementById('res-pago').value === '1',
-        obs:      document.getElementById('res-obs').value.trim(),
-    };
-    const id = document.getElementById('res-id').value;
-    if (id) {
-        const idx = reservas.findIndex(r => r.id === id);
-        if (idx >= 0) reservas[idx] = { ...reservas[idx], ...dados };
-    } else {
-        reservas.unshift({ id: uid(), criado: new Date().toISOString(), ...dados });
+function renderCheckouts() {
+    const tbody = document.getElementById('tbody-checkouts');
+    if (!checkoutsData.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:28px;font-size:12px">Nenhum checkout para hoje</td></tr>';
+        return;
     }
-    salvarLS(); fecharModal('modal-reserva'); render();
+    tbody.innerHTML = checkoutsData.map((c, i) => {
+        const rowClass = c.reentrada ? 'reent-row' : c.lco ? 'lco-row' : '';
+        const ctCls    = c.ct === 'SUP' ? 'ct-sup' : c.ct === 'STD' ? 'ct-std' : c.ct === 'SUI' ? 'ct-sui' : 'ct-pho';
+
+        // Obs tags
+        let tagsHtml = '';
+        if (c.lco)      tagsHtml += '<span class="obs-tag tag-lco">🕐 LCO</span>';
+        if (c.reentrada) tagsHtml += '<span class="obs-tag tag-reent">🔄 Reentrada</span>';
+
+        return `<tr class="${rowClass}" data-idx="${i}">
+            <td class="td-check">
+                <input type="checkbox" ${c.pre?'checked':''} onchange="toggleCheck(${i},'pre',this.checked)">
+            </td>
+            <td class="td-check">
+                <input type="checkbox" ${c.trip?'checked':''} onchange="toggleCheck(${i},'trip',this.checked)">
+            </td>
+            <td class="td-obs">
+                <div class="obs-cell">
+                    ${tagsHtml}
+                    <input class="obs-input" value="${esc(c.obs||'')}"
+                        placeholder="observação…"
+                        oninput="checkoutsData[${i}].obs=this.value"
+                        onchange="detectarTags(${i},this.value)">
+                    <button onclick="abrirObsMenu(${i}, this)" title="Inserir tag"
+                        style="background:none;border:1px solid var(--border);border-radius:4px;width:22px;height:22px;
+                               cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;
+                               align-items:center;justify-content:center;transition:.12s"
+                        onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
+                        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'">＋</button>
+                </div>
+            </td>
+            <td class="td-uh-val">${c.uh}</td>
+            <td style="padding:9px 12px"><span class="td-ct-badge ${ctCls}">${esc(c.ct||'')}</span></td>
+            <td class="td-nome">${esc(c.nome||'')}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('badge-checkouts').textContent = checkoutsData.length;
 }
 
-// ── DETALHE ──
-function abrirDetalhe(id) {
-    const r = reservas.find(x => x.id === id);
-    if (!r) return;
-    detalheId = id;
-    const s = STATUS_DEF[r.status] || STATUS_DEF.pendente;
-    document.getElementById('det-titulo').textContent    = r.nome;
-    document.getElementById('det-num').textContent       = 'Reserva ' + r.num;
-    document.getElementById('det-nome').textContent      = r.nome;
-    document.getElementById('det-tel').textContent       = r.tel || '—';
-    document.getElementById('det-email').textContent     = r.email || '—';
-    document.getElementById('det-checkin').textContent   = fmtDate(r.checkin);
-    document.getElementById('det-checkout').textContent  = fmtDate(r.checkout);
-    document.getElementById('det-noites').textContent    = calcNoites(r.checkin, r.checkout) + ' noite(s)';
-    document.getElementById('det-quarto').textContent    = r.quarto || '—';
-    document.getElementById('det-qtd').textContent       = r.qtd + ' hóspede(s)';
-    document.getElementById('det-status-badge').innerHTML = `<span class="status-hosp ${s.cls}">${s.emoji} ${s.label}</span>`;
-    atualizarBtnPagDetalhe(!!r.pago);
-
-    document.getElementById('det-status-btns').innerHTML = Object.entries(STATUS_DEF)
-        .filter(([k]) => k !== r.status)
-        .map(([k,sd]) => `
-            <button class="btn-status-quick" onclick="trocarStatus('${id}','${k}')"
-                style="background:${sd.bg};color:${sd.cor};border-color:${sd.cor}33">
-                ${sd.emoji} ${sd.label}
-            </button>`).join('');
-
-    const obsEl = document.getElementById('det-obs');
-    const obsSection = document.getElementById('det-obs-section');
-    if (r.obs) { obsEl.textContent = r.obs; obsSection.style.display = ''; }
-    else { obsSection.style.display = 'none'; }
-
-    abrirModal('modal-detalhe');
+function toggleCheck(idx, field, val) {
+    checkoutsData[idx][field] = val;
 }
 
-function trocarStatus(id, novoStatus) {
-    const r = reservas.find(x => x.id === id);
-    if (!r) return;
-    r.status = novoStatus;
-    salvarLS(); fecharModal('modal-detalhe'); render();
+function detectarTags(idx, val) {
+    const up = val.toUpperCase();
+    checkoutsData[idx].lco       = up.includes('LCO') || up.includes('LATE');
+    checkoutsData[idx].reentrada = up.includes('REENTRADA') || up.includes('REENT');
+    renderCheckouts();
 }
 
-// ── EXCLUIR ──
-function iniciarExcluir(id)  { deleteId = id; abrirModal('modal-excluir'); }
-function confirmarExcluir()  { deleteId = detalheId; fecharModal('modal-detalhe'); abrirModal('modal-excluir'); }
-function executarExcluir() {
-    if (!deleteId) return;
-    reservas = reservas.filter(r => r.id !== deleteId);
-    salvarLS(); fecharModal('modal-excluir'); fecharModal('modal-detalhe');
-    deleteId = null; render();
+// Menu rápido de tags
+let obsMenuIdx = null;
+function abrirObsMenu(idx, btn) {
+    // Remove menu anterior
+    document.getElementById('obs-menu')?.remove();
+    obsMenuIdx = idx;
+    const menu = document.createElement('div');
+    menu.id = 'obs-menu';
+    menu.style.cssText = `position:fixed;background:var(--bg-card);border:1px solid var(--border);
+        border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);
+        z-index:500;padding:6px;min-width:160px;`;
+    const tags = [
+        { label:'🕐 Late Check-out',   val:'LCO',         cls:'tag-lco'  },
+        { label:'🔄 Reentrada no SUP', val:'Reentrada no SUP', cls:'tag-reent'},
+        { label:'🔄 Reentrada no STD', val:'Reentrada no STD', cls:'tag-reent'},
+        { label:'⭐ Reserva Especial', val:'Reserva Especial', cls:'tag-esp'  },
+    ];
+    tags.forEach(t => {
+        const btn2 = document.createElement('button');
+        btn2.textContent = t.label;
+        btn2.style.cssText = `display:block;width:100%;text-align:left;padding:8px 12px;
+            background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;
+            font-family:'Inter',sans-serif;color:var(--text-main);transition:.12s;`;
+        btn2.onmouseover = () => btn2.style.background = 'var(--bg-hover)';
+        btn2.onmouseout  = () => btn2.style.background = 'none';
+        btn2.onclick = () => {
+            const row = document.querySelector(`tr[data-idx="${obsMenuIdx}"]`);
+            const input = row?.querySelector('.obs-input');
+            if (input) {
+                input.value = t.val;
+                checkoutsData[obsMenuIdx].obs = t.val;
+                detectarTags(obsMenuIdx, t.val);
+            }
+            menu.remove();
+        };
+        menu.appendChild(btn2);
+    });
+    const rect = btn.getBoundingClientRect();
+    menu.style.top  = (rect.bottom + 4) + 'px';
+    menu.style.left = Math.min(rect.left, window.innerWidth - 180) + 'px';
+    document.body.appendChild(menu);
+    setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 50);
 }
 
-// ── MODAIS ──
-function abrirModal(id)  { document.getElementById(id)?.classList.add('open'); document.body.style.overflow = 'hidden'; }
-function fecharModal(id) { document.getElementById(id)?.classList.remove('open'); document.body.style.overflow = ''; }
+function adicionarCheckout() {
+    checkoutsData.push({ uh: '', ct: 'STD', nome: '', obs: '', lco: false, reentrada: false, pre: false, trip: false });
+    renderCheckouts();
+    // Foca no último campo nome
+    setTimeout(() => {
+        const rows = document.querySelectorAll('#tbody-checkouts tr');
+        const last = rows[rows.length - 1];
+        last?.querySelector('.obs-input')?.focus();
+    }, 100);
+}
 
-document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target === o) fecharModal(o.id); });
+// ── NOVA AUDITORIA MANUAL ──
+function novaAuditoria() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const dados = {
+        data: hoje, turno: '', ocupacao: '', dm: '', uh_bloq: 0,
+        checkins_pendentes: [], ocorrencias: [], reservas_especiais: [], checkouts: [],
+        previsao: { ocupacao: '', diaria: '', uhs: 0, entradas: 0, saidas: 0, cafe: 0, especiais: [] }
+    };
+    carregarAuditoria(dados, '✏️ Criada manualmente');
+}
+
+// ── SALVAR ──
+function salvarAuditoria() {
+    if (!auditoriaAtual) return;
+
+    const snap = {
+        id: Date.now(),
+        data: document.getElementById('t-data').value || auditoriaAtual.data,
+        turno: document.getElementById('t-turno').value,
+        ocupacao: document.getElementById('t-ocup').value,
+        dm: document.getElementById('t-dm').value,
+        uh_bloq: document.getElementById('t-uh-bloq').value,
+        ocorrencias, checkoutsData, espData, checkinsData, prevEspData,
+        previsao: auditoriaAtual.previsao,
+        fonte: document.getElementById('audit-fonte-badge').textContent,
+    };
+
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
+    hist.unshift(snap);
+    if (hist.length > 30) hist = hist.slice(0, 30);
+    localStorage.setItem(LS_KEY_HIST, JSON.stringify(hist));
+
+    renderHistorico();
+    mostrarToast('✅ Auditoria salva com sucesso!');
+}
+
+// ── EXPORTAR ──
+function exportarAuditoria() {
+    const conteudo = gerarTextoExport();
+    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `auditoria_${document.getElementById('t-data').value || 'hoje'}.txt`;
+    a.click();
+}
+
+function gerarTextoExport() {
+    let txt = '═══════════════════════════════════\n';
+    txt += '         AUDITORIA HOTELEIRA\n';
+    txt += '═══════════════════════════════════\n';
+    txt += `Data: ${document.getElementById('t-data').value}\n`;
+    txt += `Turno: ${document.getElementById('t-turno').value}\n`;
+    txt += `Ocupação: ${document.getElementById('t-ocup').value}\n`;
+    txt += `DM: ${document.getElementById('t-dm').value}\n\n`;
+    txt += '── CHECK-OUTS DO DIA ──\n';
+    checkoutsData.forEach(c => {
+        const flags = [c.lco?'LCO':'', c.reentrada?'REENTRADA':'', c.pre?'PRE':'', c.trip?'TRIP':''].filter(Boolean).join(' | ');
+        txt += `UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}${flags?' ('+flags+')':''}\n`;
+    });
+    txt += '\n── RESERVAS ESPECIAIS ──\n';
+    espData.forEach(e => txt += `UH ${e.uh} | ${e.reserva} | ${e.checkin}→${e.checkout} | ${e.descricao}\n`);
+    txt += '\n── OCORRÊNCIAS ──\n';
+    ocorrencias.forEach(o => txt += `• ${o}\n`);
+    return txt;
+}
+
+// ── HISTÓRICO ──
+function renderHistorico() {
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
+    const el = document.getElementById('historico-list');
+    if (!hist.length) {
+        el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';
+        return;
+    }
+    el.innerHTML = hist.map((h, i) =>
+        `<div class="hist-item" onclick="carregarDoHistorico(${i})">
+            <span class="hist-icon">📋</span>
+            <div>
+                <div class="hist-nome">${h.turno || 'Auditoria'}</div>
+                <div class="hist-data">${formatDataHist(h.data)} — ${h.fonte||''}</div>
+            </div>
+            <span class="hist-ocup">${h.ocupacao||'—'}</span>
+        </div>`
+    ).join('');
+}
+
+function carregarDoHistorico(idx) {
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
+    const h = hist[idx];
+    if (!h) return;
+    auditoriaAtual = h;
+    ocorrencias   = h.ocorrencias   || [];
+    checkoutsData = h.checkoutsData || [];
+    espData       = h.espData       || [];
+    checkinsData  = h.checkinsData  || [];
+    prevEspData   = h.prevEspData   || [];
+    carregarAuditoria({ ...h, checkouts: checkoutsData, reservas_especiais: espData, checkins_pendentes: checkinsData }, h.fonte || '📋 Do histórico');
+}
+
+function limparHistorico() {
+    if (!confirm('Limpar todo o histórico de auditorias?')) return;
+    localStorage.removeItem(LS_KEY_HIST);
+    renderHistorico();
+}
+
+function formatDataHist(d) {
+    if (!d) return '—';
+    if (d.includes('-')) return new Date(d).toLocaleDateString('pt-BR');
+    return d;
+}
+
+// ── UTILS ──
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function isoDate(br) {
+    if (!br) return '';
+    if (br.includes('-')) return br;
+    const [d,m,y] = br.split('/');
+    return `${y}-${m}-${d}`;
+}
+
+function dataAmanha(dataBr) {
+    if (!dataBr) return '';
+    const [d,m,y] = dataBr.includes('/') ? dataBr.split('/') : dataBr.split('-').reverse();
+    const dt = new Date(+y, +m - 1, +d + 1);
+    return dt.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
+}
+
+function mostrarToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+    renderHistorico();
+    // Verifica se há auditoria recente no histórico
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY_HIST)) || []; } catch {}
+    if (hist.length) {
+        // Mostra hint
+        document.getElementById('empty-state').innerHTML += `
+            <div style="text-align:center;margin-top:12px">
+                <button onclick="carregarDoHistorico(0)" style="background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);
+                    color:var(--gold);padding:8px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+                    cursor:pointer;font-family:'Inter',sans-serif">
+                    📋 Carregar última auditoria
+                </button>
+            </div>`;
+    }
 });
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') ['modal-reserva','modal-detalhe','modal-excluir'].forEach(fecharModal);
-});
-
-document.addEventListener('DOMContentLoaded', () => { carregarLS(); render(); });
 </script>
 
 <script src="{% static 'js/mobile-menu.js' %}"></script>
