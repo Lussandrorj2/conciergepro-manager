@@ -180,7 +180,8 @@
         .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
         .chart-panel-title{font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
         .chart-panel-body{padding:14px;position:relative}
-        .chart-canvas-wrap{position:relative;height:220px}
+        .chart-canvas-wrap{position:relative;height:220px;min-height:180px}
+        .chart-panel-body{padding:14px;position:relative;overflow:hidden}
         .chart-canvas-wrap.tall{height:280px}
 
         .stats-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px}
@@ -438,10 +439,10 @@
 
             <!-- TROCA DE TURNO -->
             <div class="turno-grid">
-                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncUI()"></div>
+                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Nome passagem de turno" oninput="syncUI()"></div>
                 <div class="turno-field"><label>Data</label><input type="date" id="t-data" oninput="syncUI();purgeEsp()"></div>
-                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="98,18%" oninput="syncUI()"></div>
-                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="R$ 1.332,84" oninput="syncUI()"></div>
+                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="" oninput="syncUI()" onblur="fmtPctInput(this)"></div>
+                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="" oninput="syncUI()" onblur="fmtDMInput(this)"></div>
                 <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
             </div>
 
@@ -489,6 +490,7 @@
                         <span class="itag xt-reent">🔄 Reentrada</span>
                         <span class="itag xt-esp">⭐ Especial</span>
                         <button class="btn-paste" onclick="abrirColar('co')">📋 Colar lista</button>
+                        <button class="btn-add" style="background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.3);color:#15803d" onclick="imprimirCheckouts()">🖨️ Imprimir lista</button>
                         <button class="btn-add" onclick="addRow('co')">＋ Linha</button>
                     </div>
                 </div>
@@ -504,7 +506,7 @@
                     <!-- Ocupação + UHs + Entradas + Saídas -->
                     <div class="prev-main-grid">
                         <div class="prev-main-item" style="border-bottom:1px solid var(--border)">
-                            <input class="prev-main-val c-green" id="prev-ocup" placeholder="—%" oninput="syncUI()">
+                            <input class="prev-main-val c-green" id="prev-ocup" placeholder="92,59" oninput="syncUI()" onblur="fmtPctInput(this)">
                             <div class="prev-main-lbl">Taxa de Ocupação</div>
                             <div class="prev-main-sub">previsão para amanhã</div>
                         </div>
@@ -527,7 +529,7 @@
                     <!-- DM -->
                     <div class="prev-dm-row">
                         <label>💰 Diária Média (DM):</label>
-                        <input class="prev-dm-inp" id="prev-diaria" placeholder="R$ 0,00" oninput="syncUI()">
+                        <input class="prev-dm-inp" id="prev-diaria" placeholder="1.286,97" oninput="syncUI()" onblur="fmtDMInput(this)">
                     </div>
                     <!-- Entradas por categoria — dinâmico -->
                     <div class="prev-section-title">
@@ -1234,7 +1236,7 @@ function gerarPDF(){
     doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('AUDITORIA HOTELEIRA', 14, 12);
+    doc.text('AUDITORIA', 14, 12);
     doc.setFontSize(9); doc.setFont('helvetica','normal');
     doc.text(hotNome, 14, 18);
     doc.setTextColor(181,132,58);
@@ -1469,13 +1471,39 @@ function getHistFiltrado() {
 
 function parsePct(s) {
     if (!s) return null;
-    const n = parseFloat(String(s).replace(',', '.').replace('%', '').trim());
+    // aceita "98,18%", "98.18%", "98,18", "98"
+    const clean = String(s).replace('%','').replace(/\s/g,'').trim();
+    const n = parseFloat(clean.replace(',','.'));
     return isNaN(n) ? null : n;
 }
 function parseDM(s) {
     if (!s) return null;
-    const n = parseFloat(String(s).replace(/[R$\s.]/g, '').replace(',', '.').trim());
+    // aceita "R$ 1.332,84", "1.332,84", "1332,84", "1332.84"
+    let clean = String(s).replace(/R\$|\s/gi,'').trim();
+    // formato pt-BR: ponto = milhar, vírgula = decimal
+    if (clean.includes(',')) {
+        clean = clean.replace(/\./g,'').replace(',','.');
+    }
+    const n = parseFloat(clean);
     return isNaN(n) ? null : n;
+}
+function fmtPctInput(input) {
+    const val = input.value.trim();
+    if (!val) return;
+    const n = parsePct(val);
+    if (n === null) return;
+    // sempre salva como "XX,XX%"
+    input.value = n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '%';
+    syncUI();
+}
+function fmtDMInput(input) {
+    const val = input.value.trim();
+    if (!val) return;
+    const n = parseDM(val);
+    if (n === null) return;
+    // sempre salva como "R$ X.XXX,XX"
+    input.value = 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+    syncUI();
 }
 function nomeMes(iso) {
     if (!iso) return '';
@@ -1583,6 +1611,10 @@ function renderStats() {
 
     // ── 2. DM por dia (linha) ──
     const valDM = porData.map(d => d.dm);
+    // Calcula min/max para escala inteligente do DM
+    const dmValidos = valDM.filter(v => v !== null && v > 0);
+    const dmMin = dmValidos.length ? Math.floor(Math.min(...dmValidos) * 0.9) : 0;
+    const dmMax = dmValidos.length ? Math.ceil(Math.max(...dmValidos) * 1.05) : 100;
     destroyChart('chart-dm');
     chartInstances['chart-dm'] = new Chart(g('chart-dm'), {
         type:'line',
@@ -1593,8 +1625,11 @@ function renderStats() {
             spanGaps:true
         }]},
         options:{...cfgBase,
-            plugins:{...cfgBase.plugins, tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}`}}},
-            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$'+v.toLocaleString('pt-BR')}}}
+            plugins:{...cfgBase.plugins, tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}`}}},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y,
+                min: dmMin, max: dmMax,
+                ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0})}
+            }}
         }
     });
 
@@ -1634,6 +1669,9 @@ function renderStats() {
         const arr = porMes[m].dms;
         return arr.length ? +(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2) : null;
     });
+    const dmMesValidos = valDMMes.filter(v => v !== null && v > 0);
+    const dmMesMin = dmMesValidos.length ? Math.floor(Math.min(...dmMesValidos) * 0.9) : 0;
+    const dmMesMax = dmMesValidos.length ? Math.ceil(Math.max(...dmMesValidos) * 1.05) : 100;
     destroyChart('chart-dm-mes');
     chartInstances['chart-dm-mes'] = new Chart(g('chart-dm-mes'), {
         type:'line',
@@ -1644,9 +1682,12 @@ function renderStats() {
             fill:true, tension:.3, spanGaps:true,
         }]},
         options:{...cfgBase,
-            plugins:{...cfgBase.plugins, legend:{display:true, labels:{color:'#94a3b8', font:{size:11}}},
-                tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}`}}},
-            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0})}}}
+            plugins:{...cfgBase.plugins, legend:{display:false},
+                tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}`}}},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y,
+                min: dmMesMin, max: dmMesMax,
+                ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0})}
+            }}
         }
     });
 
@@ -1870,6 +1911,110 @@ function carregarValoresCats(catsVals) {
             if (inp) inp.value = cv.val || '';
         });
     }, 50);
+}
+
+
+// ══ IMPRIMIR LISTA DE CHECK-OUTS ══
+function imprimirCheckouts() {
+    const data    = fmtDate(g('t-data').value) || '—';
+    const turno   = g('t-turno').value || '—';
+    const hotel   = document.querySelector('.hotel-badge span')?.textContent || '';
+
+    // Ordena: pendentes primeiro (não saíram), depois saídas
+    const ordenados = [...co].sort((a, b) => {
+        if (a.saiu === b.saiu) return (parseInt(a.uh)||0) - (parseInt(b.uh)||0);
+        return a.saiu ? 1 : -1; // pendentes primeiro
+    });
+
+    const linhas = ordenados.map(r => {
+        const tags = [];
+        if (r.pre)                               tags.push('PRE');
+        if (r.trip)                              tags.push('TRIP');
+        if (/lco|late/i.test(r.obs))             tags.push('🕐 LCO');
+        if (/reentrada|reent/i.test(r.obs))      tags.push('🔄 Reentrada');
+        const statusCell = r.saiu
+            ? '<td style="color:#15803d;font-weight:700;text-align:center">✓ Saiu</td>'
+            : '<td style="text-align:center">—</td>';
+        const tagsBadge = tags.map(t =>
+            `<span style="display:inline-block;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;background:#f0f0f0;margin-right:3px">${t}</span>`
+        ).join('');
+        return `<tr style="background:${r.saiu?'#f0fdf4':''};${r.saiu?'opacity:.7':''}">
+            ${statusCell}
+            <td style="text-align:center;font-weight:700">${r.uh||'—'}</td>
+            <td style="text-align:center">${r.ct||'—'}</td>
+            <td>${r.nome||'—'}</td>
+            <td>${r.obs||''} ${tagsBadge}</td>
+        </tr>`;
+    }).join('');
+
+    const pendentes = ordenados.filter(r => !r.saiu).length;
+    const saidos    = ordenados.filter(r =>  r.saiu).length;
+
+    const html = `<!DOCTYPE html><html lang="pt-br"><head>
+        <meta charset="UTF-8">
+        <title>Check-outs — ${data}</title>
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #1e293b; padding: 20px; }
+            .header { background: #0f172a; color: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 16px; }
+            .header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+            .header-meta { display: flex; gap: 24px; font-size: 11px; opacity: .8; margin-top: 6px; }
+            .header-meta span { display: flex; align-items: center; gap: 4px; }
+            .badges { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+            .badge { padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+            .badge-pend { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+            .badge-saiu { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+            .badge-total { background: #fafafa; color: #475569; border: 1px solid #e2e8f0; }
+            table { width: 100%; border-collapse: collapse; }
+            thead tr { background: #1e293b; color: white; }
+            th { padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
+            td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+            tr:last-child td { border-bottom: none; }
+            tr:hover td { background: #f8fafc; }
+            .footer { margin-top: 20px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+            @media print {
+                body { padding: 10px; }
+                .no-print { display: none; }
+            }
+        </style>
+    </head><body>
+        <div class="header">
+            <h1>CHECK-OUTS DO DIA</h1>
+            <div style="color:#b5843a;font-size:13px;font-weight:700;margin-top:2px">${hotel}</div>
+            <div class="header-meta">
+                <span>📅 ${data}</span>
+                <span>👤 Turno: ${turno}</span>
+                <span>🏨 Ocupação: ${g('t-ocup').value||'—'}</span>
+            </div>
+        </div>
+        <div class="badges">
+            <span class="badge badge-total">Total: ${ordenados.length}</span>
+            <span class="badge badge-pend">⏳ Pendentes: ${pendentes}</span>
+            <span class="badge badge-saiu">✓ Saídas confirmadas: ${saidos}</span>
+        </div>
+        <table>
+            <thead><tr>
+                <th style="width:70px;text-align:center">Status</th>
+                <th style="width:50px;text-align:center">UH</th>
+                <th style="width:55px;text-align:center">CTG</th>
+                <th>Nome do Hóspede</th>
+                <th>Observação</th>
+            </tr></thead>
+            <tbody>${linhas}</tbody>
+        </table>
+        <div class="footer">
+            Gerado em ${new Date().toLocaleString('pt-BR')} — Concierge Dashboard
+        </div>
+        <div class="no-print" style="margin-top:16px;text-align:center">
+            <button onclick="window.print()" style="background:#0f172a;color:white;border:none;padding:10px 24px;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit">
+                🖨️ Imprimir / Salvar PDF
+            </button>
+        </div>
+    </body></html>`;
+
+    const w = window.open('', '_blank', 'width=800,height=700');
+    w.document.write(html);
+    w.document.close();
 }
 
 // ══ INIT ══
