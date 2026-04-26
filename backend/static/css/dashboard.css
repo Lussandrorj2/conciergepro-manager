@@ -1084,4 +1084,13 @@ input, select, textarea,
     color: var(--text-main);
 }
 
+@media (max-width: 768px) {
+    #table-mensal {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+}
+
 
