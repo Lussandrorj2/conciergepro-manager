@@ -7,6 +7,7 @@
     <title>Hospedagem — {{ hotel.nome }}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -161,6 +162,49 @@
         .btn-ok{background:var(--gold);color:#0b0f19;border:none;padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
         .btn-ok:hover{filter:brightness(1.1)}
         .btn-cancel{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+
+        /* ── ESTATÍSTICAS ── */
+        .stats-top { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px; }
+        .stat-box { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;border-top:3px solid transparent;text-align:center; }
+        .stat-box.s-green{border-top-color:#15803d}.stat-box.s-blue{border-top-color:#2563eb}
+        .stat-box.s-purple{border-top-color:#7c3aed}.stat-box.s-gold{border-top-color:var(--gold)}
+        .stat-box-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:6px}
+        .stat-box-val{font-size:26px;font-weight:700;color:var(--text-main);line-height:1}
+        .stat-box-sub{font-size:10px;color:var(--text-soft);margin-top:4px}
+        .stat-box-trend{font-size:11px;font-weight:700;margin-top:4px}
+        .trend-up{color:#15803d}.trend-down{color:#dc2626}.trend-eq{color:var(--text-soft)}
+
+        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+        .chart-panel.full{grid-column:1/-1}
+        .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .chart-panel-title{font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
+        .chart-panel-body{padding:14px;position:relative}
+        .chart-canvas-wrap{position:relative;height:220px}
+        .chart-canvas-wrap.tall{height:280px}
+
+        .stats-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px}
+        .stats-filters label{font-size:11px;color:var(--text-soft);white-space:nowrap}
+        .stats-filters select,.stats-filters input{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none}
+        .stats-filters select:focus,.stats-filters input:focus{border-color:var(--gold)}
+        .stats-filters .sep{width:1px;height:20px;background:var(--border)}
+
+        .no-data-chart{display:flex;flex-direction:column;align-items:center;justify-content:center;height:180px;color:var(--text-soft);font-size:12px;gap:8px}
+        .no-data-chart span{font-size:28px;opacity:.3}
+
+        .table-stats{width:100%;border-collapse:collapse}
+        .table-stats th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .table-stats td{padding:9px 12px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border)}
+        .table-stats tr:last-child td{border-bottom:none}
+        .table-stats tr:hover td{background:var(--bg-hover)}
+        .table-stats .td-bold{font-weight:600;color:var(--text-main)}
+        .table-stats .td-num{font-family:monospace;font-weight:600}
+
+        .badge-comp{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700}
+        .bc-up{background:rgba(22,163,74,.1);color:#15803d}.bc-down{background:rgba(220,38,38,.1);color:#dc2626}.bc-eq{background:var(--bg-hover);color:var(--text-soft)}
+
+        @media(max-width:900px){.stats-top{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.chart-panel.full{grid-column:1}}
+        @media(max-width:768px){.stats-top{grid-template-columns:1fr 1fr}}
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
@@ -181,8 +225,8 @@
             <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
@@ -261,6 +305,7 @@
                 <button class="tab-btn"          data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
                 <button class="tab-btn"          data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
                 <button class="tab-btn"          data-tab="historico"  onclick="setTab('historico')">📋 Histórico</button>
+                <button class="tab-btn"          data-tab="stats"      onclick="setTab('stats');renderStats()">📊 Estatísticas</button>
             </div>
 
             <!-- ══ CHECK-OUTS ══ -->
@@ -436,6 +481,140 @@
         </div>
     </main>
 </div>
+
+
+            <!-- ══ ESTATÍSTICAS ══ -->
+            <div class="tab-pane" id="pane-stats">
+
+                <!-- Filtros -->
+                <div class="stats-filters">
+                    <label>Período:</label>
+                    <select id="sf-periodo" onchange="renderStats()">
+                        <option value="3">Últimos 3 meses</option>
+                        <option value="6" selected>Últimos 6 meses</option>
+                        <option value="12">Últimos 12 meses</option>
+                        <option value="all">Todo o histórico</option>
+                    </select>
+                    <div class="sep"></div>
+                    <label>Comparar com:</label>
+                    <select id="sf-comp" onchange="renderStats()">
+                        <option value="prev">Mês anterior</option>
+                        <option value="year">Mesmo período ano passado</option>
+                    </select>
+                    <button class="btn-a" style="margin-left:auto" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
+                </div>
+
+                <!-- KPIs topo -->
+                <div class="stats-top">
+                    <div class="stat-box s-green">
+                        <div class="stat-box-lbl">Ocupação Média</div>
+                        <div class="stat-box-val" id="st-ocup-med">—</div>
+                        <div class="stat-box-trend" id="st-ocup-trend"></div>
+                        <div class="stat-box-sub">no período</div>
+                    </div>
+                    <div class="stat-box s-gold">
+                        <div class="stat-box-lbl">Diária Média (DM)</div>
+                        <div class="stat-box-val" id="st-dm-med">—</div>
+                        <div class="stat-box-trend" id="st-dm-trend"></div>
+                        <div class="stat-box-sub">no período</div>
+                    </div>
+                    <div class="stat-box s-blue">
+                        <div class="stat-box-lbl">Total Check-outs</div>
+                        <div class="stat-box-val" id="st-co-total">—</div>
+                        <div class="stat-box-trend" id="st-co-trend"></div>
+                        <div class="stat-box-sub">auditorias registradas</div>
+                    </div>
+                    <div class="stat-box s-purple">
+                        <div class="stat-box-lbl">Auditorias Salvas</div>
+                        <div class="stat-box-val" id="st-audit-total">—</div>
+                        <div class="stat-box-sub">no histórico</div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="charts-grid">
+
+                    <!-- Ocupação por dia -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-head">
+                            <div class="chart-panel-title">📈 Ocupação por Auditoria</div>
+                            <span style="font-size:10px;color:var(--text-soft)">% por dia</span>
+                        </div>
+                        <div class="chart-panel-body">
+                            <div class="chart-canvas-wrap"><canvas id="chart-ocup"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Diária média por dia -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-head">
+                            <div class="chart-panel-title">💰 Diária Média (DM) por Auditoria</div>
+                            <span style="font-size:10px;color:var(--text-soft)">R$ por dia</span>
+                        </div>
+                        <div class="chart-panel-body">
+                            <div class="chart-canvas-wrap"><canvas id="chart-dm"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Check-outs por mês (barras) -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-head">
+                            <div class="chart-panel-title">🚪 Check-outs por Mês</div>
+                            <span style="font-size:10px;color:var(--text-soft)">total de saídas</span>
+                        </div>
+                        <div class="chart-panel-body">
+                            <div class="chart-canvas-wrap"><canvas id="chart-co-mes"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Ocupação média por mês -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-head">
+                            <div class="chart-panel-title">📊 Ocupação Média por Mês</div>
+                            <span style="font-size:10px;color:var(--text-soft)">comparativo mensal</span>
+                        </div>
+                        <div class="chart-panel-body">
+                            <div class="chart-canvas-wrap"><canvas id="chart-ocup-mes"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- DM média por mês (barras full) -->
+                    <div class="chart-panel full">
+                        <div class="chart-panel-head">
+                            <div class="chart-panel-title">💳 Evolução da Diária Média por Mês</div>
+                            <span style="font-size:10px;color:var(--text-soft)">comparativo de receita média</span>
+                        </div>
+                        <div class="chart-panel-body">
+                            <div class="chart-canvas-wrap tall"><canvas id="chart-dm-mes"></canvas></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tabela comparativa mensal -->
+                <div class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title"><div class="dot dot-gold"></div> Comparativo Mensal Detalhado</div>
+                        <span style="font-size:10px;color:var(--text-soft)">Dados extraídos das auditorias salvas</span>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="table-stats" id="table-mensal">
+                            <thead><tr>
+                                <th>Mês</th>
+                                <th>Auditorias</th>
+                                <th>Ocupação Média</th>
+                                <th>DM Média</th>
+                                <th>Check-outs Total</th>
+                                <th>Res. Especiais</th>
+                                <th>vs Mês Anterior</th>
+                            </tr></thead>
+                            <tbody id="tbody-mensal"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /pane-stats -->
+
 
 <!-- MODAL COLAR -->
 <div class="modal-ov" id="paste-modal">
@@ -1038,6 +1217,288 @@ function dataAmanha(iso){
 function toast(msg){
     const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
     document.body.appendChild(t); setTimeout(()=>t.remove(),3500);
+}
+
+
+// ══════════════════════════════════════════
+// ESTATÍSTICAS / RELATÓRIO FINANCEIRO
+// ══════════════════════════════════════════
+
+let chartInstances = {}; // guarda instâncias para destruir antes de recriar
+
+function destroyChart(id) {
+    if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+}
+
+function getHistFiltrado() {
+    let hist = []; try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+    const meses = g('sf-periodo')?.value || '6';
+    if (meses === 'all') return hist;
+    const limite = new Date();
+    limite.setMonth(limite.getMonth() - parseInt(meses));
+    return hist.filter(h => h.data && new Date(h.data + 'T12:00:00') >= limite);
+}
+
+function parsePct(s) {
+    if (!s) return null;
+    const n = parseFloat(String(s).replace(',', '.').replace('%', '').trim());
+    return isNaN(n) ? null : n;
+}
+function parseDM(s) {
+    if (!s) return null;
+    const n = parseFloat(String(s).replace(/[R$\s.]/g, '').replace(',', '.').trim());
+    return isNaN(n) ? null : n;
+}
+function nomeMes(iso) {
+    if (!iso) return '';
+    try {
+        return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+    } catch { return iso; }
+}
+function chavesMes(iso) {
+    if (!iso) return '';
+    return iso.slice(0, 7); // YYYY-MM
+}
+function labelMes(ym) {
+    const [y, m] = ym.split('-');
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return (meses[parseInt(m) - 1] || m) + '/' + y.slice(2);
+}
+
+function renderStats() {
+    const hist = getHistFiltrado();
+    if (!hist.length) { renderStatsVazio(); return; }
+
+    // ── Processa dados ──
+    const porData = hist.map(h => ({
+        data:   h.data || '',
+        ocup:   parsePct(h.ocupacao),
+        dm:     parseDM(h.dm),
+        coQtd:  (h.co || []).length,
+        espQtd: (h.esp || esp || []).length,
+        turno:  h.turno || '',
+    })).sort((a, b) => a.data.localeCompare(b.data));
+
+    // Agrupa por mês
+    const porMes = {};
+    porData.forEach(d => {
+        const km = chavesMes(d.data);
+        if (!km) return;
+        if (!porMes[km]) porMes[km] = { ocups:[], dms:[], co:0, esp:0, n:0 };
+        if (d.ocup !== null) porMes[km].ocups.push(d.ocup);
+        if (d.dm   !== null) porMes[km].dms.push(d.dm);
+        porMes[km].co  += d.coQtd;
+        porMes[km].esp += d.espQtd;
+        porMes[km].n++;
+    });
+    const meses = Object.keys(porMes).sort();
+
+    // ── KPIs topo ──
+    const todasOcup = porData.map(d => d.ocup).filter(v => v !== null);
+    const todasDM   = porData.map(d => d.dm  ).filter(v => v !== null);
+    const medOcup = todasOcup.length ? (todasOcup.reduce((a,b)=>a+b,0)/todasOcup.length).toFixed(1) : null;
+    const medDM   = todasDM.length   ? (todasDM.reduce((a,b)=>a+b,0)/todasDM.length)              : null;
+    const totalCO = porData.reduce((a,d)=>a+d.coQtd,0);
+
+    g('st-ocup-med').textContent    = medOcup !== null ? medOcup + '%' : '—';
+    g('st-dm-med').textContent      = medDM   !== null ? 'R$ ' + medDM.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    g('st-co-total').textContent    = totalCO;
+    g('st-audit-total').textContent = hist.length;
+
+    // Tendência (último mês vs penúltimo)
+    if (meses.length >= 2) {
+        const ult = porMes[meses[meses.length-1]];
+        const pen = porMes[meses[meses.length-2]];
+        const ocUlt = ult.ocups.length ? ult.ocups.reduce((a,b)=>a+b,0)/ult.ocups.length : null;
+        const ocPen = pen.ocups.length ? pen.ocups.reduce((a,b)=>a+b,0)/pen.ocups.length : null;
+        const dmUlt = ult.dms.length   ? ult.dms.reduce((a,b)=>a+b,0)/ult.dms.length   : null;
+        const dmPen = pen.dms.length   ? pen.dms.reduce((a,b)=>a+b,0)/pen.dms.length   : null;
+        g('st-ocup-trend').innerHTML = tendencia(ocUlt, ocPen, '%');
+        g('st-dm-trend').innerHTML   = tendencia(dmUlt, dmPen, 'R$', true);
+        g('st-co-trend').innerHTML   = tendencia(ult.co, pen.co, 'CO');
+    } else {
+        ['st-ocup-trend','st-dm-trend','st-co-trend'].forEach(id => g(id).textContent = '');
+    }
+
+    // ── Cores ──
+    const corVerde  = '#15803d'; const corVerdeA = 'rgba(21,128,61,.12)';
+    const corOuro   = '#b5843a'; const corOuroA  = 'rgba(181,132,58,.12)';
+    const corAzul   = '#2563eb'; const corAzulA  = 'rgba(37,99,235,.12)';
+    const corRoxo   = '#7c3aed'; const corRoxoA  = 'rgba(124,58,237,.12)';
+
+    const cfgBase = {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false }, tooltip:{ callbacks:{} } },
+        scales:{
+            x:{ grid:{ color:'rgba(0,0,0,.06)' }, ticks:{ font:{size:10}, color:'#94a3b8' } },
+            y:{ grid:{ color:'rgba(0,0,0,.06)' }, ticks:{ font:{size:10}, color:'#94a3b8' } }
+        }
+    };
+
+    // ── 1. Ocupação por dia (linha) ──
+    const labDia  = porData.map(d => fmtDateShort(d.data));
+    const valOcup = porData.map(d => d.ocup);
+    destroyChart('chart-ocup');
+    chartInstances['chart-ocup'] = new Chart(g('chart-ocup'), {
+        type:'line',
+        data:{ labels:labDia, datasets:[{
+            label:'Ocupação %', data:valOcup,
+            borderColor:corVerde, backgroundColor:corVerdeA,
+            borderWidth:2, pointRadius:3, pointBackgroundColor:corVerde, fill:true, tension:.35,
+            spanGaps:true
+        }]},
+        options:{...cfgBase,
+            plugins:{...cfgBase.plugins, tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(1)+'%' : '—'}`}}},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>v+'%'}, min:0, max:100}}
+        }
+    });
+
+    // ── 2. DM por dia (linha) ──
+    const valDM = porData.map(d => d.dm);
+    destroyChart('chart-dm');
+    chartInstances['chart-dm'] = new Chart(g('chart-dm'), {
+        type:'line',
+        data:{ labels:labDia, datasets:[{
+            label:'Diária Média R$', data:valDM,
+            borderColor:corOuro, backgroundColor:corOuroA,
+            borderWidth:2, pointRadius:3, pointBackgroundColor:corOuro, fill:true, tension:.35,
+            spanGaps:true
+        }]},
+        options:{...cfgBase,
+            plugins:{...cfgBase.plugins, tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}`}}},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$'+v.toLocaleString('pt-BR')}}}
+        }
+    });
+
+    // ── 3. Check-outs por mês (barras) ──
+    const labMes = meses.map(labelMes);
+    const valCO  = meses.map(m => porMes[m].co);
+    destroyChart('chart-co-mes');
+    chartInstances['chart-co-mes'] = new Chart(g('chart-co-mes'), {
+        type:'bar',
+        data:{ labels:labMes, datasets:[{
+            label:'Check-outs', data:valCO,
+            backgroundColor:corAzulA, borderColor:corAzul, borderWidth:1.5, borderRadius:4,
+        }]},
+        options:{...cfgBase, plugins:{...cfgBase.plugins, legend:{display:false}}}
+    });
+
+    // ── 4. Ocupação média por mês (barras) ──
+    const valOcupMes = meses.map(m => {
+        const arr = porMes[m].ocups;
+        return arr.length ? +(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : null;
+    });
+    destroyChart('chart-ocup-mes');
+    chartInstances['chart-ocup-mes'] = new Chart(g('chart-ocup-mes'), {
+        type:'bar',
+        data:{ labels:labMes, datasets:[{
+            label:'Ocupação %', data:valOcupMes,
+            backgroundColor:corVerdeA, borderColor:corVerde, borderWidth:1.5, borderRadius:4,
+        }]},
+        options:{...cfgBase,
+            plugins:{...cfgBase.plugins},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>v+'%'}, min:0, max:100}}
+        }
+    });
+
+    // ── 5. DM média por mês (linha + área) ──
+    const valDMMes = meses.map(m => {
+        const arr = porMes[m].dms;
+        return arr.length ? +(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2) : null;
+    });
+    destroyChart('chart-dm-mes');
+    chartInstances['chart-dm-mes'] = new Chart(g('chart-dm-mes'), {
+        type:'line',
+        data:{ labels:labMes, datasets:[{
+            label:'DM Média R$', data:valDMMes,
+            borderColor:corOuro, backgroundColor:corOuroA,
+            borderWidth:2.5, pointRadius:5, pointBackgroundColor:corOuro,
+            fill:true, tension:.3, spanGaps:true,
+        }]},
+        options:{...cfgBase,
+            plugins:{...cfgBase.plugins, legend:{display:true, labels:{color:'#94a3b8', font:{size:11}}},
+                tooltip:{callbacks:{label:ctx=>`R$ ${ctx.parsed.y !== null ? ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}`}}},
+            scales:{...cfgBase.scales, y:{...cfgBase.scales.y, ticks:{...cfgBase.scales.y.ticks, callback:v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0})}}}
+        }
+    });
+
+    // ── Tabela mensal ──
+    const tbody = g('tbody-mensal');
+    tbody.innerHTML = meses.slice().reverse().map((m, idx_rev) => {
+        const d  = porMes[m];
+        const oc = d.ocups.length ? (d.ocups.reduce((a,b)=>a+b,0)/d.ocups.length).toFixed(1) : null;
+        const dm = d.dms.length   ? (d.dms.reduce((a,b)=>a+b,0)/d.dms.length)               : null;
+        const mant = meses.slice().reverse();
+        const prev = idx_rev < mant.length-1 ? porMes[mant[idx_rev+1]] : null;
+        const prevOc = prev && prev.ocups.length ? prev.ocups.reduce((a,b)=>a+b,0)/prev.ocups.length : null;
+        return `<tr>
+            <td class="td-bold">${labelMes(m)}</td>
+            <td class="td-num">${d.n}</td>
+            <td class="td-num">${oc !== null ? oc+'%' : '—'}</td>
+            <td class="td-num">${dm !== null ? 'R$ '+dm.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</td>
+            <td class="td-num">${d.co}</td>
+            <td class="td-num">${d.esp}</td>
+            <td>${compBadge(oc, prevOc, '%')}</td>
+        </tr>`;
+    }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Dados insuficientes — salve mais auditorias para ver o comparativo</td></tr>`;
+}
+
+function renderStatsVazio() {
+    ['chart-ocup','chart-dm','chart-co-mes','chart-ocup-mes','chart-dm-mes'].forEach(id => {
+        destroyChart(id);
+        const ctx = g(id);
+        if(ctx) ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
+    });
+    ['st-ocup-med','st-dm-med','st-co-total','st-audit-total'].forEach(id => { const el=g(id); if(el) el.textContent='—'; });
+    g('tbody-mensal').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:24px;font-size:13px">
+        📊 Nenhuma auditoria salva ainda.<br><span style="font-size:11px;margin-top:4px;display:block">Salve auditorias diariamente para gerar estatísticas.</span>
+    </td></tr>`;
+}
+
+function tendencia(atual, anterior, sufixo='', moeda=false) {
+    if (atual === null || anterior === null) return '';
+    const diff = atual - anterior;
+    const pct  = anterior !== 0 ? ((diff/anterior)*100).toFixed(1) : '0';
+    const sinal = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+    const cls   = diff > 0 ? 'trend-up' : diff < 0 ? 'trend-down' : 'trend-eq';
+    const val   = moeda ? 'R$ '+Math.abs(diff).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : Math.abs(diff).toFixed(1)+sufixo;
+    return `<span class="${cls}">${sinal} ${val} (${Math.abs(pct)}%)</span>`;
+}
+
+function compBadge(atual, anterior, suf='') {
+    if (atual === null || anterior === null) return '<span style="color:var(--text-soft)">—</span>';
+    const diff = atual - anterior;
+    const cls  = diff > 0.5 ? 'bc-up' : diff < -0.5 ? 'bc-down' : 'bc-eq';
+    const sinal = diff > 0.5 ? '▲' : diff < -0.5 ? '▼' : '=';
+    return `<span class="badge-comp ${cls}">${sinal} ${Math.abs(diff).toFixed(1)}${suf}</span>`;
+}
+
+function fmtDateShort(iso) {
+    if (!iso) return '';
+    try { return new Date(iso+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); } catch { return iso; }
+}
+
+function exportarStatsCSV() {
+    let hist = []; try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+    if (!hist.length) { toast('⚠️ Nenhum dado para exportar'); return; }
+    let csv = 'Data,Turno,Ocupacao(%),DM(R$),UH_Bloq,Check-outs,Prev_Ocupacao,Prev_DM,Prev_Entradas,Prev_Saidas,Cafe\n';
+    hist.sort((a,b)=>a.data?.localeCompare(b.data||'')).forEach(h => {
+        csv += [
+            h.data||'', (h.turno||'').replace(/,/g,' '),
+            (h.ocupacao||'').replace('%','').replace(',','.'),
+            (h.dm||'').replace(/[R$\s.]/g,'').replace(',','.'),
+            h.uh_bloq||0,
+            (h.co||[]).length,
+            (h.prev_ocup||'').replace('%','').replace(',','.'),
+            (h.prev_diaria||'').replace(/[R$\s.]/g,'').replace(',','.'),
+            h.prev_ent||0, h.prev_sai||0, h.prev_cafe||0
+        ].join(',') + '\n';
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
+    a.download = `estatisticas_auditoria_${HOTEL_SLUG}.csv`;
+    a.click();
+    toast('📥 CSV exportado!');
 }
 
 // ══ INIT ══
