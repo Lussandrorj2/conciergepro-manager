@@ -758,11 +758,6 @@
                     <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
                 </div>
             </div>
-        </div>
-    </main>
-</div>
-
-
             <!-- ══ ESTATÍSTICAS ══ -->
             <div class="tab-pane" id="pane-stats">
 
@@ -896,6 +891,10 @@
 
             </div><!-- /pane-stats -->
 
+        </div><!-- /content -->
+    </main>
+</div><!-- /layout -->
+
 
 <!-- MODAL COLAR -->
 <div class="modal-ov" id="paste-modal">
@@ -907,8 +906,9 @@
         <div class="modal-body">
             <!-- Abas -->
             <div class="paste-tabs">
-                <button class="paste-tab active" id="ptab-texto" onclick="setPasteTab('texto')">📝 Colar do Oracle</button>
-                <button class="paste-tab" id="ptab-livre" onclick="setPasteTab('livre')">✏️ Digitar / colar livre</button>
+                <button class="paste-tab active" id="ptab-texto"    onclick="setPasteTab('texto')">📝 Colar do Oracle</button>
+                <button class="paste-tab"         id="ptab-colunas" onclick="setPasteTab('colunas')">📊 Por Colunas</button>
+                <button class="paste-tab"         id="ptab-livre"   onclick="setPasteTab('livre')">✏️ Digitar livre</button>
             </div>
 
             <!-- ABA TEXTO -->
@@ -918,6 +918,49 @@
                     placeholder="Cole aqui os dados copiados do Oracle ou planilha…"
                     oninput="previewColar()"></textarea>
                 <div class="paste-prev" id="paste-prev"></div>
+            </div>
+
+            <!-- ABA DIGITAR LIVRE -->
+            <!-- ABA POR COLUNAS -->
+            <div class="paste-tab-pane" id="ppane-colunas">
+                <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px">
+                    <strong style="color:var(--text-main)">Cole cada coluna separadamente</strong> — ideal para copiar colunas de PDF ou planilha.<br>
+                    Cole os nomes, UHs e categorias em campos separados. Pode preencher só o que tiver.
+                </div>
+                <div style="display:grid;grid-template-columns:80px 90px 1fr;gap:10px;margin-bottom:10px">
+                    <div>
+                        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">UH</label>
+                        <textarea id="col-uh" class="paste-ta" placeholder="21&#10;22&#10;27&#10;33&#10;…"
+                            style="min-height:180px;max-height:220px;font-family:monospace;font-size:13px"
+                            oninput="previewColunas()"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">CTG</label>
+                        <textarea id="col-ctg" class="paste-ta" placeholder="SUP&#10;SUP&#10;STD&#10;SUI&#10;…"
+                            style="min-height:180px;max-height:220px;font-family:monospace;font-size:13px"
+                            oninput="previewColunas()"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Nome do Hóspede</label>
+                        <textarea id="col-nome" class="paste-ta" placeholder="Manuel,Rui&#10;Scordo,Cecilia&#10;silva,raphael&#10;Ramos,Maria Luiza&#10;…"
+                            style="min-height:180px;max-height:220px;font-family:monospace;font-size:13px"
+                            oninput="previewColunas()"></textarea>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                    <div>
+                        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Observação <span style="font-weight:400;text-transform:none">(opcional)</span></label>
+                        <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada no SUP&#10;&#10;…"
+                            style="min-height:70px;max-height:100px;font-family:monospace;font-size:13px"
+                            oninput="previewColunas()"></textarea>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+                        <div style="font-size:11px;color:var(--text-soft);line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;width:100%">
+                            💡 <strong>Dica:</strong> Cole os nomes do PDF no campo Nome, cole as UHs no campo UH. Não precisa preencher tudo — linhas sem UH ficam em branco para preencher depois.
+                        </div>
+                    </div>
+                </div>
+                <div class="paste-prev" id="paste-prev-colunas"></div>
             </div>
 
             <!-- ABA DIGITAR LIVRE -->
@@ -1162,7 +1205,7 @@ function renderOcorr(){
 function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); }
 function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
 
-function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderCi(); renderOcorr(); }
+function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderEspCi(); renderCi(); renderOcorr(); }
 
 // ══ HELPERS ══
 function ctOpts(sel) {
@@ -1194,7 +1237,7 @@ function delRow(k,i){
     re(k);
 }
 function re(k){
-    ({co:renderCo,prev:renderPrev,esp:renderEsp,ci:renderCi}[k]||renderCi)();
+    ({co:renderCo,prev:renderPrev,esp:renderEsp,'esp-ci':renderEspCi,ci:renderCi}[k]||renderCi)();
 }
 
 // ══ TAG MENU ══
@@ -1244,8 +1287,10 @@ function abrirColar(k){
     g('paste-hint').innerHTML = HINTS[k] || '';
     g('paste-ta').value = '';
     g('paste-prev').classList.remove('show');
-    if (g('paste-ta-livre')) { g('paste-ta-livre').value = ''; }
-    if (g('paste-prev-livre')) g('paste-prev-livre').classList.remove('show');
+    if (g('paste-ta-livre'))     { g('paste-ta-livre').value = ''; }
+    if (g('paste-prev-livre'))   g('paste-prev-livre').classList.remove('show');
+    ['col-uh','col-ctg','col-nome','col-obs'].forEach(id => { const el = g(id); if(el) el.value = ''; });
+    if (g('paste-prev-colunas')) g('paste-prev-colunas').classList.remove('show');
     setPasteTab('texto');
     g('paste-modal').classList.add('open');
     setTimeout(() => g('paste-ta').focus(), 100);
@@ -2240,18 +2285,15 @@ function setPasteTab(tab) {
     pasteTabAtiva = tab;
     document.querySelectorAll('.paste-tab').forEach(b => b.classList.toggle('active', b.id === 'ptab-' + tab));
     document.querySelectorAll('.paste-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'ppane-' + tab));
-    if (tab === 'livre') { setTimeout(() => g('paste-ta-livre')?.focus(), 80); }
-    if (tab === 'img') {
-        // carrega chave salva
-        const k = localStorage.getItem('_gk');
-        const inp = g('gk-input-modal');
-        if (k && inp && !inp.value) { inp.value = k; inp.type = 'password'; }
-    }
+    if (tab === 'texto')   { setTimeout(() => g('paste-ta')?.focus(), 80); }
+    if (tab === 'livre')   { setTimeout(() => g('paste-ta-livre')?.focus(), 80); }
+    if (tab === 'colunas') { setTimeout(() => g('col-nome')?.focus(), 80); }
 }
 
 // Confirmar dependendo da aba ativa
 function confirmarColarAtivo() {
-    if (pasteTabAtiva === 'livre') confirmarColarLivre();
+    if (pasteTabAtiva === 'livre')   confirmarColarLivre();
+    else if (pasteTabAtiva === 'colunas') confirmarColarColunas();
     else confirmarColar();
 }
 
@@ -2576,6 +2618,86 @@ function confirmarColarLivre() {
     re(colarKey);
     fecharColar();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
+}
+
+
+// ══ COLAR POR COLUNAS (estilo Excel) ══
+function previewColunas() {
+    const uhs   = (g('col-uh')?.value   || '').split('\n').map(l => l.trim());
+    const ctgs  = (g('col-ctg')?.value  || '').split('\n').map(l => l.trim());
+    const nomes = (g('col-nome')?.value || '').split('\n').map(l => l.trim());
+    const obs   = (g('col-obs')?.value  || '').split('\n').map(l => l.trim());
+
+    const qtd = Math.max(
+        uhs.filter(v => v).length,
+        ctgs.filter(v => v).length,
+        nomes.filter(v => v).length
+    );
+
+    const pv = g('paste-prev-colunas');
+    if (!qtd) { pv.classList.remove('show'); return; }
+
+    const cats = getCats();
+    const linhas = [];
+    for (let i = 0; i < qtd; i++) {
+        linhas.push({
+            uh:   uhs[i]   || '',
+            ct:   ctgs[i]  || cats[0] || 'SUP',
+            nome: nomes[i] || '',
+            obs:  obs[i]   || '',
+        });
+    }
+
+    pv.classList.add('show');
+    pv.innerHTML = `<strong style="color:var(--gold)">${qtd} linha(s)</strong> — prévia:<br><br>` +
+        linhas.slice(0, 5).map(r =>
+            `• UH <strong>${r.uh || '—'}</strong> [${r.ct}] — ${r.nome || '<em style="opacity:.5">sem nome</em>'}${r.obs ? ' | ' + r.obs : ''}`
+        ).join('<br>') +
+        (qtd > 5 ? `<br><em>…e mais ${qtd - 5}</em>` : '');
+}
+
+function confirmarColarColunas() {
+    const uhs   = (g('col-uh')?.value   || '').split('\n').map(l => l.trim());
+    const ctgs  = (g('col-ctg')?.value  || '').split('\n').map(l => l.trim());
+    const nomes = (g('col-nome')?.value || '').split('\n').map(l => l.trim());
+    const obs   = (g('col-obs')?.value  || '').split('\n').map(l => l.trim());
+
+    const qtd = Math.max(
+        uhs.filter(v => v).length,
+        ctgs.filter(v => v).length,
+        nomes.filter(v => v).length
+    );
+
+    if (!qtd) { toast('⚠️ Preencha ao menos uma coluna'); return; }
+
+    const cats = getCats();
+    const arr  = getData(colarKey);
+
+    // Se só nomes foram colados e já há linhas → preenche nomes
+    const soNomes = nomes.filter(v=>v).length > 0 && uhs.filter(v=>v).length === 0 && ctgs.filter(v=>v).length === 0;
+    if (soNomes && arr.length > 0) {
+        nomes.filter(v=>v).forEach((nome, i) => {
+            if (i < arr.length) arr[i].nome = nome;
+            else arr.push({ uh:'', ct: cats[0]||'SUP', nome, obs: obs[i]||'', pre:false, trip:false, saiu:false });
+        });
+        re(colarKey); fecharColar();
+        toast(`✅ ${nomes.filter(v=>v).length} nome(s) preenchido(s)!`);
+        return;
+    }
+
+    for (let i = 0; i < qtd; i++) {
+        arr.push({
+            uh:   uhs[i]   || '',
+            ct:   (ctgs[i] || cats[0] || 'SUP').toUpperCase(),
+            nome: limpar(nomes[i] || ''),
+            obs:  obs[i]   || '',
+            pre: false, trip: false, saiu: false
+        });
+    }
+
+    re(colarKey);
+    fecharColar();
+    toast(`✅ ${qtd} linha(s) importada(s)!`);
 }
 
 // ══ INIT ══
