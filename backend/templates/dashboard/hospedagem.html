@@ -395,8 +395,8 @@
             <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
             <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
@@ -459,6 +459,39 @@
                 </div>
 
                 <div class="upload-card-body">
+
+                    <!-- ── CHAVE GEMINI ── -->
+                    <div style="
+                        display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+                        background:rgba(66,133,244,.05); border:1px solid rgba(66,133,244,.2);
+                        border-radius:var(--radius-sm); padding:11px 14px; margin-bottom:14px;
+                    ">
+                        <span style="font-size:20px;flex-shrink:0">🔑</span>
+                        <div style="flex:1;min-width:180px">
+                            <div style="font-size:10px;font-weight:700;color:#4285f4;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">
+                                Chave Gemini API — Google AI Studio
+                            </div>
+                            <input id="gemini-key-input" type="password"
+                                placeholder="Cole sua chave aqui: AIzaSy..."
+                                style="width:100%;background:var(--bg-hover);border:1px solid var(--border);
+                                       border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;
+                                       font-family:'Inter',sans-serif;color:var(--text-main);outline:none;
+                                       transition:border-color .15s;"
+                                oninput="salvarKeyLocal(this.value)"
+                                onfocus="this.type='text';this.style.borderColor='#4285f4'"
+                                onblur="if(this.value)this.type='password';this.style.borderColor='var(--border)'">
+                        </div>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener"
+                           style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+                                  color:#4285f4;white-space:nowrap;text-decoration:none;padding:7px 13px;
+                                  border:1px solid rgba(66,133,244,.3);border-radius:999px;
+                                  background:rgba(66,133,244,.06);transition:.15s;"
+                           onmouseover="this.style.background='rgba(66,133,244,.14)'"
+                           onmouseout="this.style.background='rgba(66,133,244,.06)'">
+                            Obter grátis ↗
+                        </a>
+                    </div>
+
                     <!-- Drop Zone -->
                     <div class="upload-drop-zone" id="drop-zone">
                         <input type="file" id="pdf-input" accept=".pdf,image/*" onchange="onFileSelect(this)">
@@ -476,7 +509,7 @@
                     </div>
 
                     <button class="btn-upload-ia" id="btn-processar" onclick="processarComIA()" disabled>
-                        🤖 Processar com IA — Extrair Dados da Auditoria
+                        ✨ Processar com Gemini — Extrair Dados da Auditoria
                     </button>
                 </div>
 
@@ -787,38 +820,62 @@ function limparArquivo() {
     document.getElementById('btn-processar').disabled = true;
 }
 
-// ── PROCESSAR COM IA ──
+// ── GEMINI — CHAVE E MODELO ──
+const GEMINI_API_KEY = 'AIzaSyBUnHx3ovQfMiwQYrr-kn2eEUb6COoQRbU';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+
+function getGeminiKey() {
+    // 1. Constante no código (funciona sempre que preenchida)
+    if (GEMINI_API_KEY && GEMINI_API_KEY !== 'COLE_SUA_CHAVE_AQUI') {
+        return GEMINI_API_KEY;
+    }
+    // 2. Campo visual na tela (se existir)
+    const campo = document.getElementById('gemini-key-input');
+    if (campo && campo.value.trim()) {
+        localStorage.setItem('gemini_api_key', campo.value.trim());
+        return campo.value.trim();
+    }
+    // 3. localStorage (salvo anteriormente)
+    return localStorage.getItem('gemini_api_key') || '';
+}
+
+// ── PROCESSAR COM IA (Gemini) ──
 async function processarComIA() {
     if (!arquivoSelecionado) return;
 
-    // Mostra loading
-    document.getElementById('upload-card-body')?.style;
+    const apiKey = getGeminiKey();
+    if (!apiKey) {
+        mostrarToast('⚠️ Cole sua chave do Gemini antes de processar!');
+        document.getElementById('gemini-key-input')?.focus();
+        return;
+    }
+
+    // Mostra loading, esconde corpo do upload
     document.querySelector('.upload-card-body').style.display = 'none';
     document.getElementById('ai-processing').classList.add('show');
     document.getElementById('empty-state').style.display = 'none';
 
-    const steps = ['step-1','step-2','step-3','step-4','step-5','step-6'];
-    const delays = [0, 1200, 2400, 3400, 4400, 5200];
+    // Anima steps progressivamente
+    const steps  = ['step-1','step-2','step-3','step-4','step-5','step-6'];
+    const delays = [0, 1400, 2800, 4000, 5200, 6200];
+    let stepTimer = delays.map((d, i) => setTimeout(() => {
+        steps.forEach((s, j) => {
+            const el = document.getElementById(s);
+            if (j < i)      { el.classList.add('feito'); el.classList.remove('ativo'); }
+            else if (j === i){ el.classList.add('ativo'); el.classList.remove('feito'); }
+            else             { el.classList.remove('ativo','feito'); }
+        });
+    }, d));
 
-    delays.forEach((d, i) => {
-        setTimeout(() => {
-            steps.forEach((s,j) => {
-                const el = document.getElementById(s);
-                if (j < i) { el.classList.add('feito'); el.classList.remove('ativo'); }
-                else if (j === i) { el.classList.add('ativo'); el.classList.remove('feito'); }
-                else { el.classList.remove('ativo','feito'); }
-            });
-        }, d);
-    });
+    // Converte arquivo para base64
+    const base64    = await fileToBase64(arquivoSelecionado);
+    const mimeType  = arquivoSelecionado.type || 'image/png';
+    const isPdf     = mimeType === 'application/pdf';
 
-    // Converte para base64
-    const base64 = await fileToBase64(arquivoSelecionado);
-    const isImage = arquivoSelecionado.type.startsWith('image/');
-    const mediaType = arquivoSelecionado.type || 'image/png';
-
-    const systemPrompt = `Você é um assistente especializado em auditoria hoteleira. 
+    // Prompt idêntico ao anterior — apenas muda o provider
+    const prompt = `Você é um assistente especializado em auditoria hoteleira.
 Analise a imagem/documento fornecido e extraia TODOS os dados visíveis.
-Retorne APENAS JSON válido, sem markdown, sem explicações.
+Retorne APENAS JSON válido, sem markdown, sem blocos de código, sem explicações.
 
 Formato exato:
 {
@@ -851,57 +908,80 @@ Formato exato:
   }
 }
 
-IMPORTANTE:
-- Para checkouts: se a observação contiver "Reentrada" marque reentrada:true; se contiver "LCO" ou "Late" marque lco:true
-- Extraia TODOS os hóspedes visíveis nas tabelas de checkout
-- Extraia TODAS as reservas especiais visíveis
-- Se algum campo não aparecer no documento, use null ou array vazio`;
+REGRAS:
+- checkouts: se "Reentrada" na obs → reentrada:true; se "LCO" ou "Late" → lco:true
+- Extraia TODOS os hóspedes da tabela de check-outs
+- Extraia TODAS as reservas especiais
+- Campos ausentes: use null ou []
+- Responda SOMENTE com o JSON, nada mais`;
 
-    const userContent = isImage
-        ? [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-            { type: 'text', text: 'Extraia todos os dados desta auditoria hoteleira e retorne o JSON conforme especificado.' }
-          ]
-        : [{ type: 'text', text: 'Documento em base64 enviado. Extraia os dados da auditoria:\n' + base64.slice(0, 500) + '...' }];
+    // Monta parts do Gemini
+    const parts = [
+        {
+            inline_data: {
+                mime_type: mimeType,
+                data: base64,
+            }
+        },
+        { text: prompt }
+    ];
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
     try {
-        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        const resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'claude-sonnet-4-20250514',
-                max_tokens: 4000,
-                system: systemPrompt,
-                messages: [{ role: 'user', content: userContent }]
+                contents: [{ parts }],
+                generationConfig: {
+                    temperature:     0.1,   // baixo — queremos precisão, não criatividade
+                    maxOutputTokens: 8192,
+                    responseMimeType: 'application/json', // força JSON puro no Gemini 2.0
+                }
             })
         });
 
-        const data = await resp.json();
-        const raw  = data.content?.find(b => b.type === 'text')?.text || '';
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err?.error?.message || `HTTP ${resp.status}`);
+        }
 
-        // Último passo concluído
+        const data = await resp.json();
+
+        // Extrai texto da resposta do Gemini
+        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        // Conclui todos os steps
+        stepTimer.forEach(clearTimeout);
         steps.forEach(s => {
             const el = document.getElementById(s);
             el.classList.add('feito'); el.classList.remove('ativo');
         });
+        await sleep(500);
 
-        await sleep(600);
-
+        // Parse JSON
         let parsed;
         try {
             const clean = raw.replace(/```json|```/g, '').trim();
             parsed = JSON.parse(clean);
-        } catch(e) {
+        } catch (e) {
+            console.warn('JSON parse falhou, usando demo:', e);
             parsed = gerarDadosDemonstracao();
         }
 
-        carregarAuditoria(parsed, '🤖 Extraído por IA — ' + arquivoSelecionado.name);
+        carregarAuditoria(parsed, '✨ Gemini — ' + arquivoSelecionado.name);
 
-    } catch(e) {
-        console.error('Erro IA:', e);
-        // Fallback com demo
-        await sleep(1000);
-        carregarAuditoria(gerarDadosDemonstracao(), '🔴 Erro de IA — dados demonstrativos');
+    } catch (e) {
+        stepTimer.forEach(clearTimeout);
+        console.error('Erro Gemini:', e);
+
+        // Mostra erro amigável e volta ao estado inicial
+        document.getElementById('ai-processing').classList.remove('show');
+        document.querySelector('.upload-card-body').style.display = '';
+        steps.forEach(s => document.getElementById(s).classList.remove('ativo','feito'));
+
+        mostrarToast('🔴 Erro Gemini: ' + e.message);
     }
 }
 
@@ -1380,8 +1460,19 @@ function mostrarToast(msg) {
     setTimeout(() => t.remove(), 3000);
 }
 
+function salvarKeyLocal(val) {
+    if (val.trim()) localStorage.setItem('gemini_api_key', val.trim());
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
+    // Restaura chave Gemini salva
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+        const campo = document.getElementById('gemini-key-input');
+        if (campo) { campo.value = savedKey; campo.type = 'password'; }
+    }
+
     renderHistorico();
     // Verifica se há auditoria recente no histórico
     let hist = [];
