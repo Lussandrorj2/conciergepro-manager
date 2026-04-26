@@ -1,1026 +1,887 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <title>Hospedagem — {{ hotel.nome }}</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* ── UPLOAD ── */
-        .up-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px; }
-        .up-header { display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg-hover);gap:12px;flex-wrap:wrap; }
-        .up-title { display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--text-main); }
-        .up-icon { width:30px;height:30px;border-radius:8px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);display:flex;align-items:center;justify-content:center;font-size:15px; }
-        .up-body { padding:14px 18px; }
-        .drop-zone { border:2px dashed var(--border-light);border-radius:var(--radius-md);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg-hover); }
-        .drop-zone:hover,.drop-zone.drag-over { border-color:var(--gold);background:var(--gold-dim); }
-        .drop-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2; }
-        .drop-icon { font-size:30px;display:block;margin-bottom:8px; }
-        .drop-text { font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:3px; }
-        .drop-hint { font-size:11px;color:var(--text-soft); }
-        .drop-hint span { color:var(--gold);font-weight:600; }
-        /* MULTI-ARQUIVO */
-        .files-list { display:none;flex-direction:column;gap:6px;margin-top:10px; }
-        .files-list.show { display:flex; }
-        .file-item { display:flex;align-items:center;gap:9px;background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:8px 12px; }
-        .file-item-icon { font-size:15px;flex-shrink:0; }
-        .file-item-info { flex:1;min-width:0; }
-        .file-item-name { font-size:12px;font-weight:600;color:#15803d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-        .file-item-size { font-size:10px;color:var(--text-soft);margin-top:1px; }
-        .file-item-tag { font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2);white-space:nowrap;cursor:pointer;transition:.15s; }
-        .file-item-tag:hover { background:rgba(181,132,58,.18); }
-        .file-item-del { background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0; }
-        .file-item-del:hover { color:#dc2626; }
-        .files-add-more { display:none;align-items:center;gap:8px;margin-top:8px;padding:8px 12px;border:1px dashed var(--border-light);border-radius:var(--radius-sm);cursor:pointer;background:none;font-size:12px;color:var(--text-soft);font-family:'Inter',sans-serif;width:100%;transition:.15s;position:relative; }
-        .files-add-more input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
-        .files-add-more:hover { border-color:var(--gold);color:var(--gold); }
-        .files-add-more.show { display:flex; }
-        .file-tipo-select { background:var(--bg-hover);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:11px;font-family:'Inter',sans-serif;color:var(--text-muted);cursor:pointer;outline:none; }
-        .file-tipo-select:focus { border-color:var(--gold); }
-        .btn-process { display:inline-flex;align-items:center;gap:8px;justify-content:center;background:var(--gold);color:#0b0f19;border:none;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:filter .15s;margin-top:12px;width:100%; }
-        .btn-process:hover { filter:brightness(1.1); }
-        .btn-process:disabled { opacity:.45;cursor:not-allowed; }
-        /* SPINNER */
-        .ai-load { display:none;padding:24px 18px;flex-direction:column;align-items:center;gap:10px; }
-        .ai-load.show { display:flex; }
-        .ai-spin { width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .85s linear infinite; }
-        .ai-load-label { font-size:13px;font-weight:600;color:var(--text-main); }
-        .ai-steps { display:flex;flex-direction:column;gap:5px;width:100%;max-width:340px; }
-        .ai-step { display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:var(--radius-sm);background:var(--bg-hover);border:1px solid var(--border);font-size:12px;color:var(--text-soft);transition:all .35s; }
-        .ai-step.ativo { border-color:var(--gold);color:var(--text-main);background:var(--gold-dim); }
-        .ai-step.feito { border-color:rgba(22,163,74,.3);color:#15803d;background:rgba(22,163,74,.06); }
-        .ai-dot { width:7px;height:7px;border-radius:50%;background:var(--border-light);flex-shrink:0;transition:.3s; }
-        .ai-step.ativo .ai-dot { background:var(--gold); }
-        .ai-step.feito .ai-dot { background:#15803d; }
-        /* TOPBAR AUDITORIA */
-        .audit-topbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap; }
-        .audit-meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
-        .badge-data { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);font-size:12px;font-weight:700;color:var(--gold); }
-        .badge-fonte { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);font-size:11px;font-weight:600;color:#15803d; }
-        .btn-a { display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-family:'Inter',sans-serif;transition:.15s; }
-        .btn-a:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
-        /* TURNO GRID */
-        .turno-grid { display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:10px;margin-bottom:14px; }
-        .turno-field { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px; }
-        .turno-field label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-soft);display:block;margin-bottom:5px; }
-        .turno-field input { background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 9px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);width:100%;outline:none; }
-        .turno-field input:focus { border-color:var(--gold); }
-        /* KPI */
-        .kpi-row { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px; }
-        .kpi-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;border-top:3px solid transparent; }
-        .kpi-card.k-green{border-top-color:#15803d}.kpi-card.k-blue{border-top-color:#2563eb}.kpi-card.k-amber{border-top-color:#d97706}.kpi-card.k-purple{border-top-color:#7c3aed}.kpi-card.k-gold{border-top-color:var(--gold)}
-        .kpi-label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:5px; }
-        .kpi-value { font-size:24px;font-weight:700;line-height:1;color:var(--text-main); }
-        .kpi-sub { font-size:10px;color:var(--text-soft);margin-top:3px; }
-        /* ABAS */
-        .tabs-nav { display:flex;gap:2px;padding:4px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;overflow-x:auto; }
-        .tab-btn { display:flex;align-items:center;gap:7px;padding:9px 16px;border:none;background:none;border-radius:calc(var(--radius-md) - 2px);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif; }
-        .tab-btn:hover { color:var(--text-main);background:rgba(255,255,255,.5); }
-        .tab-btn.active { background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 4px rgba(0,0,0,.08); }
-        .tbadge { font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--bg-hover);color:var(--text-soft);min-width:18px;text-align:center; }
-        .tab-btn.active .tbadge { background:var(--gold-dim);color:var(--gold); }
-        .tab-btn[data-tab="auditoria"].active { color:#d97706; }
-        .tab-btn[data-tab="auditoria"].active .tbadge { background:rgba(217,119,6,.1);color:#d97706; }
-        .tab-btn[data-tab="checkout"].active { color:#2563eb; }
-        .tab-btn[data-tab="checkout"].active .tbadge { background:rgba(37,99,235,.1);color:#2563eb; }
-        .tab-btn[data-tab="previsao"].active { color:#7c3aed; }
-        .tab-btn[data-tab="previsao"].active .tbadge { background:rgba(124,58,237,.1);color:#7c3aed; }
-        .tab-btn[data-tab="especiais"].active { color:var(--gold); }
-        .tab-btn[data-tab="especiais"].active .tbadge { background:var(--gold-dim);color:var(--gold); }
-        .tab-btn[data-tab="checkins"].active { color:#d97706; }
-        .tab-btn[data-tab="checkins"].active .tbadge { background:rgba(217,119,6,.1);color:#d97706; }
-        /* PANES */
-        .tab-pane { display:none; }
-        .tab-pane.active { display:block; }
-        /* PANEL */
-        .panel { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:14px; }
-        .panel-head { display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover); }
-        .panel-title { display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px; }
-        .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-        .dot-green{background:#15803d}.dot-amber{background:#d97706}.dot-blue{background:#2563eb}.dot-purple{background:#7c3aed}.dot-gold{background:var(--gold)}.dot-red{background:#dc2626}
-        .pbadge { font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px; }
-        .pb-green{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.2)}
-        .pb-amber{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
-        .pb-blue{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
-        .pb-purple{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
-        .pb-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
-        .pb-red{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
-        /* TABELA GENÉRICA */
-        .t-wrap { overflow-x:auto; }
-        .t{width:100%;border-collapse:collapse}
-        .t th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover);white-space:nowrap}
-        .t td{padding:10px 12px;font-size:12.5px;color:var(--text-muted);border-bottom:1px solid var(--border);vertical-align:middle}
-        .t tr:last-child td{border-bottom:none}
-        .t tr:hover td{background:var(--bg-hover)}
-        .td-b{font-weight:600;color:var(--text-main)}
-        .td-num{font-size:11px;font-weight:700;font-family:monospace;background:var(--bg-hover);border:1px solid var(--border);padding:2px 6px;border-radius:4px;color:var(--text-muted)}
-        .td-c{text-align:center}
-        /* TAGS */
-        .xtag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
-        .xt-lco{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25)}
-        .xt-reent{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
-        .xt-ls{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
-        .xt-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
-        /* TABELA CHECKOUT (header escuro) */
-        .co-wrap{overflow-x:auto}
-        .co-t{width:100%;border-collapse:collapse;min-width:660px}
-        .co-t thead tr{background:#0f172a}
-        .co-t thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;border-bottom:2px solid #1e293b;white-space:nowrap}
-        .co-t td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle}
-        .co-t tr:last-child td{border-bottom:none}
-        .co-t tr:hover td{background:var(--bg-hover)}
-        .co-t tr.r-lco td{background:rgba(124,58,237,.04)}
-        .co-t tr.r-reent td{background:rgba(37,99,235,.04)}
-        .co-t tr.r-lco:hover td{background:rgba(124,58,237,.09)}
-        .co-t tr.r-reent:hover td{background:rgba(37,99,235,.09)}
-        .co-t tr.r-blank td{background:var(--bg-hover);height:34px;opacity:.55}
-        .co-t tr.r-blank:nth-child(even) td{background:transparent}
-        .td-chk{width:40px;padding:9px 8px!important;text-align:center}
-        .td-chk input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
-        .td-obs-c{padding:0!important;min-width:150px}
-        .obs-inner{display:flex;align-items:center;gap:5px;padding:7px 9px;min-height:40px}
-        .obs-inp{background:transparent;border:none;outline:none;font-size:12px;color:var(--text-muted);width:100%;font-family:'Inter',sans-serif}
-        .obs-inp::placeholder{color:var(--border-light);font-style:italic}
-        .obs-inp:focus{color:var(--text-main)}
-        .td-uh{font-size:13px;font-weight:700;color:var(--text-main);padding:9px 12px!important}
-        .td-ct{padding:9px 10px!important}
-        .td-nome{font-size:12.5px;font-weight:600;color:var(--text-main);padding:9px 12px!important;white-space:nowrap}
-        .ct-b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
-        .ct-sup{background:rgba(37,99,235,.1);color:#2563eb}
-        .ct-std{background:rgba(22,163,74,.08);color:#15803d}
-        .ct-sui{background:var(--gold-dim);color:var(--gold)}
-        .ct-pho{background:rgba(245,158,11,.1);color:#d97706}
-        .itag{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
-        .btn-tp{background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.12s}
-        .btn-tp:hover{border-color:var(--gold);color:var(--gold)}
-        /* OCORRÊNCIAS */
-        .ocorr-list{display:flex;flex-direction:column;gap:6px;padding:12px 16px;min-height:40px}
-        .ocorr-item{display:flex;align-items:flex-start;gap:8px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text-muted)}
-        .ocorr-dot{width:6px;height:6px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-top:4px}
-        .ocorr-del{background:none;border:none;color:var(--text-soft);cursor:pointer;margin-left:auto;font-size:13px;line-height:1;padding:0 2px}
-        .ocorr-del:hover{color:#dc2626}
-        .ocorr-add{display:flex;gap:8px;padding:0 16px 14px}
-        .ocorr-ta{flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px}
-        .ocorr-ta:focus{border-color:var(--gold)}
-        .btn-ocorr{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:8px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap;align-self:flex-end}
-        .btn-ocorr:hover{background:rgba(220,38,38,.12)}
-        /* PREVISÃO NÚMEROS */
-        .prev-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-bottom:1px solid var(--border)}
-        .prev-item{text-align:center}
-        .prev-val{font-size:26px;font-weight:700;line-height:1}
-        .prev-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-top:4px}
-        .prev-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
-        .c-green{color:#15803d}.c-red{color:#dc2626}.c-amber{color:#d97706}.c-blue{color:#2563eb}.c-gold{color:var(--gold)}
-        /* 2 COLUNAS */
-        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        /* FOOTER TABELA */
-        .tfoot{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-        .tfoot .leg{font-size:11px;color:var(--text-soft)}
-        .btn-add-row{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-soft);padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
-        .btn-add-row:hover{border-color:var(--gold);color:var(--gold)}
-        /* HISTÓRICO */
-        .hist-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-        .hist-item:last-child{border-bottom:none}
-        .hist-item:hover{background:var(--bg-hover)}
-        .hist-nome{font-size:13px;font-weight:600;color:var(--text-main)}
-        .hist-data{font-size:11px;color:var(--text-soft);margin-top:1px}
-        .hist-ocup{font-size:13px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap}
-        /* EMPTY */
-        .empty-state{padding:52px 24px;text-align:center}
-        .empty-icon{font-size:48px;margin-bottom:14px;display:block;opacity:.3}
-        .empty-title{font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px}
-        .empty-desc{font-size:13px;color:var(--text-soft);max-width:360px;margin:0 auto;line-height:1.7}
-        /* RESPONSIVE */
-        @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}}
-        @media(max-width:900px){.two-col{grid-template-columns:1fr}}
-        @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}.turno-grid{grid-template-columns:1fr 1fr}.prev-nums{grid-template-columns:repeat(2,1fr)}.tab-btn{padding:7px 11px;font-size:11px}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditoria Hoteleira</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f6fa;
+  --bg2: #ffffff;
+  --bg3: #f8f9fc;
+  --border: #e2e6ef;
+  --border2: #d0d5e8;
+  --gold: #e6a817;
+  --gold-dim: rgba(230,168,23,0.10);
+  --gold-glow: rgba(230,168,23,0.18);
+  --green: #22863a;
+  --green-dim: rgba(34,134,58,0.10);
+  --blue: #0969da;
+  --blue-dim: rgba(9,105,218,0.09);
+  --purple: #8250df;
+  --purple-dim: rgba(130,80,223,0.09);
+  --amber: #bf8700;
+  --amber-dim: rgba(191,135,0,0.10);
+  --red: #cf222e;
+  --red-dim: rgba(207,34,46,0.09);
+  --text: #1c2332;
+  --text2: #57606a;
+  --text3: #8c959f;
+  --radius: 8px;
+  --radius2: 12px;
+  --shadow: 0 1px 4px rgba(28,35,50,0.07), 0 0 0 1px rgba(28,35,50,0.04);
+  --shadow2: 0 2px 8px rgba(28,35,50,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(28,35,50,0.06)}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:-.3px}
+.topbar-brand span{font-size:20px}
+.topbar-actions{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.15s;white-space:nowrap;box-shadow:var(--shadow)}
+.btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold);box-shadow:none}
+.btn-gold:hover{filter:brightness(1.08);color:#fff}
+.btn-green{background:var(--green-dim);color:var(--green);border-color:rgba(34,134,58,.25)}
+.btn-green:hover{background:rgba(34,134,58,.18)}
+.btn-red{background:var(--red-dim);color:var(--red);border-color:rgba(207,34,46,.25)}
+.btn-red:hover{background:rgba(207,34,46,.18)}
+
+/* ── LAYOUT ── */
+.app{max-width:1400px;margin:0 auto;padding:20px 20px 40px}
+
+/* ── SECTION TITLE ── */
+.sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── CABEÇALHO ── */
+.header-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.hfield{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow)}
+.hfield label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:5px}
+.hfield input,.hfield select{background:transparent;border:none;outline:none;color:var(--text);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;width:100%;padding:0}
+.hfield input::placeholder{color:var(--text3)}
+.hfield-highlight{border-color:#e6a817;border-width:1.5px;background:rgba(230,168,23,0.04)}
+.hfield-highlight label{color:var(--gold)}
+.hfield-highlight input{color:#b07d0a;font-size:15px}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;border-top:3px solid transparent;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.kpi::after{content:attr(data-icon);position:absolute;right:12px;top:10px;font-size:22px;opacity:.15}
+.kpi.k-gold{border-top-color:var(--gold)}.kpi.k-green{border-top-color:var(--green)}.kpi.k-blue{border-top-color:var(--blue)}.kpi.k-purple{border-top-color:var(--purple)}.kpi.k-amber{border-top-color:var(--amber)}
+.kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* ── ABAS ── */
+.tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:4px;margin-bottom:16px;overflow-x:auto;flex-wrap:nowrap;box-shadow:var(--shadow)}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border:none;background:none;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);white-space:nowrap;transition:.15s;font-family:'Sora',sans-serif}
+.tab:hover{color:var(--text);background:rgba(28,35,50,.04)}
+.tab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(28,35,50,.10);border:1px solid var(--border)}
+.tab-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--bg3);color:var(--text3)}
+.tab.active .tab-badge{background:var(--gold-dim);color:var(--gold)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* ── PAINEL ── */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.panel-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-gold{background:var(--gold)}.d-green{background:var(--green)}.d-blue{background:var(--blue)}.d-purple{background:var(--purple)}.d-amber{background:var(--amber)}.d-red{background:var(--red)}
+
+.pbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px}
+.pb-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(230,168,23,.3)}
+.pb-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,134,58,.25)}
+.pb-blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(9,105,218,.25)}
+.pb-purple{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(130,80,223,.25)}
+.pb-amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(191,135,0,.25)}
+.pb-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(207,34,46,.25)}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ══════════════════════════════════════
+   TABELA CHECK-OUTS
+══════════════════════════════════════ */
+.co-wrap{overflow-x:auto}
+.co-t{width:100%;border-collapse:collapse;min-width:700px;font-family:'JetBrains Mono',monospace}
+.co-t thead{background:var(--bg3)}
+.co-t thead th{padding:9px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap}
+.co-t thead th.tc{text-align:center}
+.co-t td{padding:0;border-bottom:1px solid rgba(226,230,239,.8);vertical-align:middle}
+.co-t tr:last-child td{border-bottom:none}
+.co-t tr:hover td{background:rgba(28,35,50,.02)}
+/* highlight rows */
+.co-t tr.row-reent td{background:rgba(9,105,218,.04)}
+.co-t tr.row-lco td{background:rgba(130,80,223,.04)}
+.co-t tr.row-reent:hover td{background:rgba(9,105,218,.08)}
+.co-t tr.row-lco:hover td{background:rgba(130,80,223,.08)}
+
+/* células editáveis */
+.td-chk{width:44px;padding:8px 6px!important;text-align:center}
+.td-chk input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
+.td-uh{padding:8px 10px!important;font-size:13px;font-weight:700;color:var(--text)}
+.td-ct{padding:8px 8px!important}
+.td-nome{padding:8px 10px!important;font-size:12px;font-weight:600;color:var(--text)}
+.td-obs{padding:0!important;min-width:180px}
+.obs-wrap{display:flex;align-items:center;gap:5px;padding:6px 8px}
+.obs-inp{background:transparent;border:none;outline:none;font-size:11px;color:var(--text2);width:100%;font-family:'Sora',sans-serif}
+.obs-inp::placeholder{color:var(--text3);font-style:italic}
+.obs-inp:focus{color:var(--text)}
+
+/* inputs editáveis inline */
+.inp-uh{background:rgba(28,35,50,.05);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text);width:46px;text-align:center;outline:none}
+.inp-uh:focus{border-color:var(--gold)}
+.sel-ct{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-family:'Sora',sans-serif;color:var(--text2);cursor:pointer;outline:none}
+.sel-ct:focus{border-color:var(--gold)}
+.inp-nome{background:transparent;border:none;outline:none;font-size:12px;color:var(--text);font-family:'Sora',sans-serif;width:100%;padding:0}
+.inp-nome::placeholder{color:var(--text3)}
+.inp-nome:focus{color:var(--text)}
+
+/* tags inline */
+.itag{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0;font-family:'Sora',sans-serif}
+.it-lco{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(130,80,223,.25)}
+.it-reent{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(9,105,218,.25)}
+.it-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(230,168,23,.25)}
+.it-ls{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(191,135,0,.25)}
+
+/* categorias */
+.ct-b{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.ct-sup{background:rgba(9,105,218,.12);color:var(--blue)}
+.ct-std{background:rgba(34,134,58,.10);color:var(--green)}
+.ct-sui{background:var(--gold-dim);color:var(--gold)}
+.ct-pho{background:var(--amber-dim);color:var(--amber)}
+
+/* btn ação linha */
+.btn-row-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px;line-height:1;flex-shrink:0;transition:.12s}
+.btn-row-del:hover{color:var(--red)}
+.btn-tag-add{background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.12s;flex-shrink:0}
+.btn-tag-add:hover{border-color:var(--gold);color:var(--gold)}
+
+/* tfoot */
+.tfoot{padding:9px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--bg3)}
+.tfoot .leg{font-size:10px;color:var(--text3)}
+.btn-add-row{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:var(--radius);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif;transition:.15s}
+.btn-add-row:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ══════════════════════════════════════
+   TABELA RESERVAS ESPECIAIS
+══════════════════════════════════════ */
+.esp-t{width:100%;border-collapse:collapse;font-size:12px}
+.esp-t th{padding:9px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap}
+.esp-t th.tc{text-align:center}
+.esp-t td{padding:0;border-bottom:1px solid rgba(226,230,239,.8);vertical-align:middle}
+.esp-t tr:last-child td{border-bottom:none}
+.esp-t tr:hover td{background:rgba(28,35,50,.02)}
+.esp-t td.p{padding:8px 12px!important}
+.esp-t td.tc{text-align:center;padding:8px 6px!important}
+.inp-esp{background:transparent;border:none;outline:none;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);width:100%;padding:0}
+.inp-esp::placeholder{color:var(--text3);font-style:italic}
+.inp-esp:focus{color:var(--text)}
+.inp-esp-sm{background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);width:100%;padding:0}
+.inp-esp-sm::placeholder{color:var(--text3)}
+.sel-tipo{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-family:'Sora',sans-serif;color:var(--text2);cursor:pointer;outline:none}
+.sel-tipo:focus{border-color:var(--gold)}
+
+/* ══════════════════════════════════════
+   CHECKINS PENDENTES
+══════════════════════════════════════ */
+.ci-t{width:100%;border-collapse:collapse;font-size:12px}
+.ci-t th{padding:9px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3)}
+.ci-t td{padding:0;border-bottom:1px solid rgba(226,230,239,.8);vertical-align:middle}
+.ci-t tr:last-child td{border-bottom:none}
+.ci-t tr:hover td{background:rgba(28,35,50,.02)}
+.ci-t td.p{padding:8px 12px!important}
+.inp-ci{background:transparent;border:none;outline:none;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);width:100%;padding:0}
+.inp-ci::placeholder{color:var(--text3);font-style:italic}
+
+/* ══════════════════════════════════════
+   OCORRÊNCIAS
+══════════════════════════════════════ */
+.ocorr-list{display:flex;flex-direction:column;gap:6px;padding:12px 16px;min-height:30px}
+.ocorr-item{display:flex;align-items:flex-start;gap:8px;background:rgba(207,34,46,.04);border:1px solid rgba(207,34,46,.18);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--text2)}
+.ocorr-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:3px}
+.ocorr-del{background:none;border:none;color:var(--text3);cursor:pointer;margin-left:auto;font-size:13px;line-height:1}
+.ocorr-del:hover{color:var(--red)}
+.ocorr-add{display:flex;gap:8px;padding:0 16px 14px}
+.ocorr-ta{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 11px;font-size:12px;font-family:'Sora',sans-serif;color:var(--text);resize:none;outline:none;min-height:52px}
+.ocorr-ta:focus{border-color:var(--red)}
+
+/* ══════════════════════════════════════
+   PREVISÃO
+══════════════════════════════════════ */
+.prev-nums{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:1px solid var(--border)}
+.prev-item{padding:16px;text-align:center;border-right:1px solid var(--border)}
+.prev-item:last-child{border-right:none}
+.prev-val{font-size:26px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}
+.prev-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-top:5px}
+.prev-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.prev-inp{background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:inherit;width:100%;text-align:center;padding:0}
+.prev-inp::placeholder{color:var(--border2);font-size:14px;font-weight:400}
+.c-green{color:var(--green)}.c-red{color:var(--red)}.c-amber{color:var(--amber)}.c-blue{color:var(--blue)}.c-gold{color:var(--gold)}.c-purple{color:var(--purple)}
+
+/* num reservas especiais */
+.sut-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.sut-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.sut-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3)}
+.sut-val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text)}
+.inp-sut{background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--text);width:50px;text-align:right}
+
+/* ══════════════════════════════════════
+   DROPDOWN TAG MENU
+══════════════════════════════════════ */
+#tag-menu{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius2);box-shadow:0 8px 32px rgba(28,35,50,.15);z-index:500;padding:6px;min-width:190px}
+.tag-opt{display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;color:var(--text2);transition:.12s}
+.tag-opt:hover{background:var(--bg3);color:var(--text)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:10px 18px;border-radius:var(--radius);font-size:12px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.15);animation:toastIn .2s ease}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.header-grid{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:repeat(3,1fr)}.two-col{grid-template-columns:1fr}.prev-nums{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.header-grid{grid-template-columns:1fr}.prev-nums{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head>
 <body>
-<div class="layout">
-    <aside class="sidebar">
-        <div class="sidebar-logo">🔔 Concierge</div>
-        <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
-            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
-            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
-            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
-            <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
-            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
-            <hr>
-            <a href="/logout/">↩ Sair</a>
-        </nav>
-    </aside>
 
-    <main class="main">
-        <div class="topbar">
-            <div class="topbar-left">
-                <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-                    </svg>
-                </button>
-                <span class="topbar-title">🏨 Hospedagem — Auditoria</span>
-            </div>
-            <div class="topbar-right">
-                <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
-                <button class="btn-novo desktop-only" onclick="novaAuditoria()" style="display:none">＋ Nova Auditoria</button>
-                <div class="topbar-actions-menu" id="actions-menu-wrap">
-                    <button class="topbar-actions-btn" onclick="toggleActionsMenu()" aria-label="Ações">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                            <circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/>
-                        </svg>
-                    </button>
-                    <div class="topbar-actions-dropdown" id="actions-dropdown">
-                        <button class="actions-item actions-item-destaque" onclick="novaAuditoria();toggleActionsMenu()">＋ Nova Auditoria</button>
-                        <button class="actions-item" onclick="salvarAuditoria();toggleActionsMenu()">💾 Salvar</button>
-                        <button class="actions-item" onclick="exportarAuditoria();toggleActionsMenu()">📄 Exportar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="content">
-
-            <!-- ═══ UPLOAD ═══ -->
-            <div class="up-card" id="upload-section">
-                <div class="up-header">
-                    <div class="up-title">
-                        <div class="up-icon">🤖</div>
-                        <div>
-                            <div>Importar Relatório via IA</div>
-                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">IA analisa a imagem/PDF e preenche tudo automaticamente</div>
-                        </div>
-                    </div>
-                    <button class="btn-a" onclick="novaAuditoria()">＋ Manual</button>
-                </div>
-                <div class="up-body">
-                    <div class="drop-zone" id="drop-zone">
-                        <input type="file" id="pdf-input" accept=".pdf,image/*" multiple onchange="onFileSelect(this)">
-                        <span class="drop-icon">📄</span>
-                        <div class="drop-text">Arraste os PDFs/imagens da auditoria aqui</div>
-                        <div class="drop-hint">ou <span>clique para selecionar</span> — vários arquivos aceitos (PDF, PNG, JPG)</div>
-                    </div>
-                    <div class="files-list" id="files-list"></div>
-                    <button class="files-add-more" id="btn-add-more">
-                        <input type="file" accept=".pdf,image/*" multiple onchange="adicionarMaisArquivos(this)">
-                        ＋ Adicionar mais arquivos
-                    </button>
-                    <button class="btn-process" id="btn-processar" onclick="processarComIA()" disabled>
-                        ✨ Processar com IA — Extrair Dados da Auditoria
-                    </button>
-                </div>
-                <div class="ai-load" id="ai-loading">
-                    <div class="ai-spin"></div>
-                    <div class="ai-load-label">IA analisando o relatório…</div>
-                    <div class="ai-steps">
-                        <div class="ai-step" id="s1"><div class="ai-dot"></div>Lendo documento</div>
-                        <div class="ai-step" id="s2"><div class="ai-dot"></div>Extraindo dados de ocupação</div>
-                        <div class="ai-step" id="s3"><div class="ai-dot"></div>Identificando check-outs do dia</div>
-                        <div class="ai-step" id="s4"><div class="ai-dot"></div>Mapeando reservas especiais</div>
-                        <div class="ai-step" id="s5"><div class="ai-dot"></div>Calculando previsão</div>
-                        <div class="ai-step" id="s6"><div class="ai-dot"></div>Montando auditoria completa</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ═══ AUDITORIA ═══ -->
-            <div id="audit-wrap" style="display:none">
-
-                <div class="audit-topbar">
-                    <div class="audit-meta">
-                        <div class="badge-data">📅 <span id="lbl-data">—</span></div>
-                        <div class="badge-fonte" id="lbl-fonte">🤖 IA</div>
-                    </div>
-                    <div style="display:flex;gap:6px">
-                        <button class="btn-a" onclick="salvarAuditoria()">💾 Salvar</button>
-                        <button class="btn-a" onclick="exportarAuditoria()">📄 Exportar</button>
-                        <button class="btn-a" onclick="novaAuditoria()">＋ Nova</button>
-                    </div>
-                </div>
-
-                <!-- Troca de turno -->
-                <div class="turno-grid">
-                    <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: nome recepcionista"></div>
-                    <div class="turno-field"><label>Data</label><input type="date" id="t-data"></div>
-                    <div class="turno-field"><label>Ocupação</label><input type="text" id="t-ocup" placeholder="%"></div>
-                    <div class="turno-field"><label>DM (Diária Média)</label><input type="text" id="t-dm" placeholder="R$"></div>
-                    <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
-                </div>
-
-                <!-- KPIs -->
-                <div class="kpi-row">
-                    <div class="kpi-card k-green"><div class="kpi-label">Ocupação Hoje</div><div class="kpi-value" id="kpi-ocup">—</div></div>
-                    <div class="kpi-card k-blue"><div class="kpi-label">Check-outs Hoje</div><div class="kpi-value" id="kpi-co">—</div><div class="kpi-sub">saídas previstas</div></div>
-                    <div class="kpi-card k-purple"><div class="kpi-label">Late Check-out</div><div class="kpi-value" id="kpi-lco">—</div><div class="kpi-sub">com LCO</div></div>
-                    <div class="kpi-card k-amber"><div class="kpi-label">Reentradas</div><div class="kpi-value" id="kpi-reent">—</div></div>
-                    <div class="kpi-card k-gold"><div class="kpi-label">Reservas Especiais</div><div class="kpi-value" id="kpi-esp">—</div></div>
-                </div>
-
-                <!-- ABAS -->
-                <div class="tabs-nav">
-                    <button class="tab-btn active" data-tab="auditoria" onclick="setTab('auditoria')">📋 Auditoria <span class="tbadge" id="tb-audit">—</span></button>
-                    <button class="tab-btn" data-tab="checkout"  onclick="setTab('checkout')">🚪 Check-outs do Dia <span class="tbadge" id="tb-co">0</span></button>
-                    <button class="tab-btn" data-tab="previsao"  onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
-                    <button class="tab-btn" data-tab="especiais" onclick="setTab('especiais')">⭐ Res. Especiais <span class="tbadge" id="tb-esp">0</span></button>
-                    <button class="tab-btn" data-tab="checkins"  onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
-                </div>
-
-                <!-- ABA: AUDITORIA -->
-                <div class="tab-pane active" id="pane-auditoria">
-                    <div class="two-col">
-                        <div class="panel">
-                            <div class="panel-head">
-                                <div class="panel-title"><div class="dot dot-amber"></div> Check-ins Pendentes</div>
-                                <span class="pbadge pb-amber" id="b-ci">0</span>
-                            </div>
-                            <div class="t-wrap"><table class="t"><thead><tr><th>Reserva</th><th>Nome do Hóspede</th></tr></thead><tbody id="tb-ci-a"></tbody></table></div>
-                        </div>
-                        <div class="panel">
-                            <div class="panel-head">
-                                <div class="panel-title"><div class="dot dot-red"></div> Ocorrências</div>
-                                <span class="pbadge pb-red" id="b-ocorr">0</span>
-                            </div>
-                            <div class="ocorr-list" id="ocorr-list"></div>
-                            <div class="ocorr-add">
-                                <textarea class="ocorr-ta" id="ocorr-input" placeholder="Descreva a ocorrência…" rows="2"></textarea>
-                                <button class="btn-ocorr" onclick="adicionarOcorrencia()">＋ Registrar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
-                            <button onclick="limparHistorico()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
-                        </div>
-                        <div id="historico-list"><div style="padding:20px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
-                    </div>
-                </div>
-
-                <!-- ABA: CHECK-OUTS DO DIA -->
-                <div class="tab-pane" id="pane-checkout">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-blue"></div> Check-outs do Dia <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">— marque PRE/TRIP e adicione observações</span></div>
-                            <span class="pbadge pb-blue" id="b-co">0</span>
-                        </div>
-                        <div class="co-wrap">
-                            <table class="co-t">
-                                <thead><tr><th class="td-c" style="width:44px">PRE</th><th class="td-c" style="width:44px">TRIP</th><th>Observação</th><th class="td-c" style="width:52px">UH</th><th style="width:60px">CT</th><th>Nome do Hóspede</th></tr></thead>
-                                <tbody id="tb-co-body"></tbody>
-                            </table>
-                        </div>
-                        <div class="tfoot">
-                            <span class="leg">Legenda:</span>
-                            <span class="xtag xt-lco">🕐 LCO</span>
-                            <span class="xtag xt-reent">🔄 Reentrada</span>
-                            <span class="xtag xt-esp">⭐ Especial</span>
-                            <button class="btn-add-row" onclick="addCoRow('checkoutsHoje','tb-co-body',renderCheckoutsHoje)">＋ Adicionar linha</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA: PREVISÃO -->
-                <div class="tab-pane" id="pane-previsao">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-purple"></div> Previsão — Amanhã</div>
-                            <span id="lbl-amanha" style="font-size:11px;color:var(--text-soft)">—</span>
-                        </div>
-                        <div class="prev-nums">
-                            <div class="prev-item"><div class="prev-val c-green" id="prev-ocup">—</div><div class="prev-lbl">Ocupação</div><div class="prev-sub" id="prev-diaria">—</div></div>
-                            <div class="prev-item"><div class="prev-val c-green" id="prev-ent">—</div><div class="prev-lbl">Entradas</div><div class="prev-sub">check-ins previstos</div></div>
-                            <div class="prev-item"><div class="prev-val c-red" id="prev-sai">—</div><div class="prev-lbl">Saídas</div><div class="prev-sub">check-outs previstos</div></div>
-                            <div class="prev-item"><div class="prev-val c-amber" id="prev-cafe">—</div><div class="prev-lbl">Café da Manhã</div><div class="prev-sub">hóspedes esperados</div></div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-purple"></div> Check-outs Previstos — Amanhã <span style="font-size:10px;font-weight:400;color:var(--text-soft);text-transform:none;letter-spacing:0;margin-left:4px">— marque e adicione observações</span></div>
-                            <span class="pbadge pb-purple" id="b-prev-co">0</span>
-                        </div>
-                        <div class="co-wrap">
-                            <table class="co-t">
-                                <thead><tr style="background:#1e1b4b"><th class="td-c" style="width:44px">PRE</th><th class="td-c" style="width:44px">TRIP</th><th>Observação</th><th class="td-c" style="width:52px">UH</th><th style="width:60px">CT</th><th>Nome do Hóspede</th></tr></thead>
-                                <tbody id="tb-prev-co-body"></tbody>
-                            </table>
-                        </div>
-                        <div class="tfoot">
-                            <span class="leg">Legenda:</span>
-                            <span class="xtag xt-lco">🕐 LCO</span>
-                            <span class="xtag xt-reent">🔄 Reentrada</span>
-                            <button class="btn-add-row" onclick="addCoRow('checkoutsPrev','tb-prev-co-body',renderCheckoutsPrev)">＋ Adicionar linha</button>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-purple"></div> Reservas Especiais — Amanhã</div>
-                            <span class="pbadge pb-purple" id="b-prev-esp">0</span>
-                        </div>
-                        <div class="t-wrap">
-                            <table class="t"><thead><tr><th>Cat.</th><th>Reserva</th><th>IN</th><th>OUT</th><th>Descrição</th><th>UH</th><th class="td-c">C</th><th class="td-c">M</th><th class="td-c">E</th></tr></thead>
-                            <tbody id="tb-prev-esp"></tbody></table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA: RESERVAS ESPECIAIS -->
-                <div class="tab-pane" id="pane-especiais">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-gold"></div> Reservas Especiais — Hoje</div>
-                            <span class="pbadge pb-gold" id="b-esp">0</span>
-                        </div>
-                        <div class="t-wrap">
-                            <table class="t"><thead><tr><th>UH</th><th>Reserva</th><th>Check-in</th><th>Check-out</th><th>Descrição</th><th>Tipo</th></tr></thead>
-                            <tbody id="tb-esp"></tbody></table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA: CHECK-INS PENDENTES -->
-                <div class="tab-pane" id="pane-checkins">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <div class="panel-title"><div class="dot dot-amber"></div> Check-ins Pendentes</div>
-                            <span class="pbadge pb-amber" id="b-ci2">0</span>
-                        </div>
-                        <div class="t-wrap">
-                            <table class="t"><thead><tr><th>Reserva</th><th>Nome do Hóspede</th></tr></thead>
-                            <tbody id="tb-ci-b"></tbody></table>
-                        </div>
-                    </div>
-                </div>
-
-            </div><!-- /audit-wrap -->
-
-            <!-- ESTADO VAZIO -->
-            <div id="empty-state">
-                <div class="panel">
-                    <div class="empty-state">
-                        <span class="empty-icon">📋</span>
-                        <div class="empty-title">Nenhuma auditoria aberta</div>
-                        <div class="empty-desc">Faça upload da imagem ou PDF para a IA extrair tudo automaticamente, ou clique em <strong>＋ Manual</strong>.</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand"><span>🏨</span> Auditoria Hoteleira</div>
+  <div class="topbar-actions">
+    <button class="btn btn-green" onclick="novaAuditoria()">＋ Nova</button>
+    <button class="btn" onclick="salvar()">💾 Salvar</button>
+    <button class="btn" onclick="exportar()">📄 Exportar</button>
+    <button class="btn" onclick="carregarUltima()">📋 Carregar última</button>
+  </div>
 </div>
 
+<div class="app">
+
+  <!-- CABEÇALHO -->
+  <div class="sec-title">Identificação do Turno</div>
+  <div class="header-grid">
+    <div class="hfield"><label>Troca de Turno</label><input id="h-turno" type="text" placeholder="Ex: Margiore / Lussandro"></div>
+    <div class="hfield"><label>Data</label><input id="h-data" type="date"></div>
+    <div class="hfield hfield-highlight"><label>Ocupação</label><input id="h-ocup" type="text" placeholder="Ex: 98,18%"></div>
+    <div class="hfield hfield-highlight"><label>DM (Diária Média)</label><input id="h-dm" type="text" placeholder="R$ 1.332,84"></div>
+    <div class="hfield"><label>QNT UH Bloq.</label><input id="h-bloq" type="number" value="0" min="0"></div>
+    <div class="hfield"><label>Observação Geral</label><input id="h-obs" type="text" placeholder=""></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi k-gold" data-icon="🏨"><div class="kpi-label">Ocupação</div><div class="kpi-val c-gold" id="kpi-ocup">—</div></div>
+    <div class="kpi k-green" data-icon="🚪"><div class="kpi-label">Check-outs Hoje</div><div class="kpi-val c-green" id="kpi-co">0</div><div class="kpi-sub">saídas previstas</div></div>
+    <div class="kpi k-purple" data-icon="🕐"><div class="kpi-label">Late Check-out</div><div class="kpi-val c-purple" id="kpi-lco">0</div></div>
+    <div class="kpi k-blue" data-icon="🔄"><div class="kpi-label">Reentradas</div><div class="kpi-val c-blue" id="kpi-reent">0</div></div>
+    <div class="kpi k-amber" data-icon="⭐"><div class="kpi-label">Res. Especiais</div><div class="kpi-val c-amber" id="kpi-esp">0</div></div>
+  </div>
+
+  <!-- ABAS -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="checkouts" onclick="setTab('checkouts')">🚪 Check-outs do Dia <span class="tab-badge" id="tb-co">0</span></button>
+    <button class="tab" data-tab="previsao" onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tab-badge" id="tb-prev">0</span></button>
+    <button class="tab" data-tab="especiais" onclick="setTab('especiais')">⭐ Res. Especiais <span class="tab-badge" id="tb-esp">0</span></button>
+    <button class="tab" data-tab="checkins" onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tab-badge" id="tb-ci">0</span></button>
+    <button class="tab" data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tab-badge" id="tb-ocorr">0</span></button>
+  </div>
+
+  <!-- ═══════════ ABA: CHECK-OUTS DO DIA ═══════════ -->
+  <div class="tab-pane active" id="pane-checkouts">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-blue"></div>Check-outs do Dia — marque PRE / TRIP e adicione observações</div>
+        <span class="pbadge pb-blue" id="b-co">0</span>
+      </div>
+      <div class="co-wrap">
+        <table class="co-t">
+          <thead><tr>
+            <th class="tc">PRE</th>
+            <th class="tc">TRIP</th>
+            <th style="min-width:200px">Observação</th>
+            <th class="tc">UH</th>
+            <th style="width:64px">CTG</th>
+            <th style="min-width:200px">Nome do Hóspede</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="tb-co"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <span class="leg">Tags:</span>
+        <span class="itag it-lco">🕐 LCO</span>
+        <span class="itag it-reent">🔄 Reentrada</span>
+        <span class="itag it-esp">⭐ Especial</span>
+        <button class="btn-add-row" onclick="addRow('co')">＋ Adicionar linha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ABA: PREVISÃO ═══════════ -->
+  <div class="tab-pane" id="pane-previsao">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-purple"></div>Previsão — Amanhã</div>
+        <span id="lbl-amanha" style="font-size:11px;color:var(--text3)">—</span>
+      </div>
+      <div class="prev-nums">
+        <div class="prev-item"><div class="prev-val c-gold"><input class="prev-inp c-gold" id="p-ocup" placeholder="%" oninput="updateKpis()"></div><div class="prev-lbl">Ocupação</div><div class="prev-sub"><input style="background:transparent;border:none;outline:none;text-align:center;width:100%;font-size:10px;color:var(--text3);font-family:'Sora',sans-serif" id="p-dm" placeholder="Diária"></div></div>
+        <div class="prev-item"><div class="prev-val c-green"><input class="prev-inp c-green" id="p-uhs" placeholder="UHs"></div><div class="prev-lbl">UHs Prev.</div></div>
+        <div class="prev-item"><div class="prev-val c-green"><input class="prev-inp c-green" id="p-ent" placeholder="0"></div><div class="prev-lbl">Entradas</div><div class="prev-sub">check-ins previstos</div></div>
+        <div class="prev-item"><div class="prev-val c-red"><input class="prev-inp c-red" id="p-sai" placeholder="0"></div><div class="prev-lbl">Saídas</div><div class="prev-sub">check-outs previstos</div></div>
+        <div class="prev-item"><div class="prev-val c-amber"><input class="prev-inp c-amber" id="p-cafe" placeholder="0"></div><div class="prev-lbl">Café da Manhã</div><div class="prev-sub">hóspedes esperados</div></div>
+      </div>
+      <div class="sut-grid">
+        <div class="sut-item"><span class="sut-label">SUT</span><input class="inp-sut" id="p-sut" placeholder="0"></div>
+        <div class="sut-item"><span class="sut-label">SUP</span><input class="inp-sut" id="p-sup" placeholder="0"></div>
+        <div class="sut-item"><span class="sut-label">STD</span><input class="inp-sut" id="p-std" placeholder="0"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-purple"></div>Check-outs Previstos — Amanhã</div>
+        <span class="pbadge pb-purple" id="b-prev">0</span>
+      </div>
+      <div class="co-wrap">
+        <table class="co-t">
+          <thead><tr>
+            <th class="tc">PRE</th>
+            <th class="tc">TRIP</th>
+            <th style="min-width:200px">Observação</th>
+            <th class="tc">UH</th>
+            <th style="width:64px">CTG</th>
+            <th style="min-width:200px">Nome do Hóspede</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="tb-prev"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <span class="leg">Tags:</span>
+        <span class="itag it-lco">🕐 LCO</span>
+        <span class="itag it-reent">🔄 Reentrada</span>
+        <button class="btn-add-row" onclick="addRow('prev')">＋ Adicionar linha</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-purple"></div>Reservas Especiais — Amanhã</div>
+        <span class="pbadge pb-purple" id="b-prev-esp">0</span>
+      </div>
+      <div class="co-wrap">
+        <table class="esp-t">
+          <thead><tr>
+            <th>Cat.</th><th>Reserva</th><th>IN</th><th>OUT</th><th>Descrição</th><th class="tc">UH</th>
+            <th class="tc" title="Check">C</th><th class="tc" title="Minibar">M</th><th class="tc" title="Extra">E</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="tb-prev-esp"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <button class="btn-add-row" onclick="addRow('prev-esp')">＋ Adicionar linha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ABA: RESERVAS ESPECIAIS ═══════════ -->
+  <div class="tab-pane" id="pane-especiais">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-gold"></div>Reservas Especiais — Hoje</div>
+        <span class="pbadge pb-gold" id="b-esp">0</span>
+      </div>
+      <div class="co-wrap">
+        <table class="esp-t">
+          <thead><tr>
+            <th>UH</th><th>Reserva</th><th>Check-in</th><th>Check-out</th><th style="min-width:220px">Descrição</th><th>Tipo</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="tb-esp"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <button class="btn-add-row" onclick="addRow('esp')">＋ Adicionar linha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ABA: CHECK-INS PENDENTES ═══════════ -->
+  <div class="tab-pane" id="pane-checkins">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-amber"></div>Check-ins Pendentes</div>
+        <span class="pbadge pb-amber" id="b-ci">0</span>
+      </div>
+      <div class="co-wrap">
+        <table class="ci-t">
+          <thead><tr><th>Reserva</th><th>Nome do Hóspede</th><th style="width:36px"></th></tr></thead>
+          <tbody id="tb-ci"></tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        <button class="btn-add-row" onclick="addRow('ci')">＋ Adicionar linha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ABA: OCORRÊNCIAS ═══════════ -->
+  <div class="tab-pane" id="pane-ocorrencias">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><div class="dot d-red"></div>Ocorrências</div>
+        <span class="pbadge pb-red" id="b-ocorr">0</span>
+      </div>
+      <div class="ocorr-list" id="ocorr-list"><div style="font-size:12px;color:var(--text3);padding:8px 0">Nenhuma ocorrência registrada.</div></div>
+      <div class="ocorr-add">
+        <textarea class="ocorr-ta" id="ocorr-inp" placeholder="Descreva a ocorrência…" rows="2"></textarea>
+        <button class="btn btn-red" onclick="addOcorr()">＋ Registrar</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- TAG MENU -->
+<div id="tag-menu" style="display:none"></div>
+
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}";
-const LS_KEY     = `hosp_audit_hist_${HOTEL_SLUG}`;
+// ════════════════════════════════
+// ESTADO
+// ════════════════════════════════
+const LS = 'hotel_auditoria_v2';
+let ocorrencias = [];
 
-// ════════════════════════════════════════════════════════
-// CONFIGURAÇÃO DA IA — Groq (gratuito e rápido)
-// Obtenha sua chave em: https://console.groq.com
-// IMPORTANTE: mova esta chave para o backend Django
-// para não ficar exposta no HTML público.
-// No Django: settings.py → GROQ_API_KEY = 'gsk_...'
-// Na view: passe via contexto → context['groq_key'] = settings.GROQ_API_KEY
-// No template: const GROQ_API_KEY = "{{ groq_key }}";
-// ════════════════════════════════════════════════════════
-const GROQ_API_KEY = "{{ groq_key|default:'' }}";
+// ════════════════════════════════
+// ABAS
+// ════════════════════════════════
+function setTab(tab) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + tab));
+}
 
-// Modelos com suporte a visão (imagem) no Groq — em ordem de fallback
-const GROQ_MODELS = [
-    'meta-llama/llama-4-scout-17b-16e-instruct',  // Llama 4 Scout — melhor para visão
-    'meta-llama/llama-4-maverick-17b-128e-instruct', // Llama 4 Maverick — fallback
+// ════════════════════════════════
+// ADD ROW
+// ════════════════════════════════
+function addRow(tipo) {
+  if (tipo === 'co')       addCoRow('tb-co',   updateKpis);
+  if (tipo === 'prev')     addCoRow('tb-prev',  updateBadges);
+  if (tipo === 'prev-esp') addEspRow('tb-prev-esp', 'b-prev-esp', true);
+  if (tipo === 'esp')      addEspRow('tb-esp',  'b-esp', false);
+  if (tipo === 'ci')       addCiRow();
+}
+
+function addCoRow(tbodyId, cb) {
+  const tbody = document.getElementById(tbodyId);
+  const idx = tbody.querySelectorAll('tr').length;
+  const tr = document.createElement('tr');
+  tr.dataset.idx = idx;
+  tr.dataset.tb = tbodyId;
+  tr.innerHTML = coRowHtml({uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,lco:false,reentrada:false}, idx, tbodyId);
+  tbody.appendChild(tr);
+  if (cb) cb();
+  updateBadges();
+}
+
+function coRowHtml(d, i, tbId) {
+  const tags = (d.lco ? '<span class="itag it-lco">🕐 LCO</span>' : '') +
+               (d.reentrada ? '<span class="itag it-reent">🔄 Reentrada</span>' : '');
+  return `
+    <td class="td-chk"><input type="checkbox" ${d.pre?'checked':''} onchange="setData('${tbId}',${i},'pre',this.checked)"></td>
+    <td class="td-chk"><input type="checkbox" ${d.trip?'checked':''} onchange="setData('${tbId}',${i},'trip',this.checked)"></td>
+    <td class="td-obs"><div class="obs-wrap" id="obs-wrap-${tbId}-${i}">
+      ${tags}
+      <input class="obs-inp" placeholder="observação…" value="${esc(d.obs||'')}"
+        oninput="setObs('${tbId}',${i},this.value)"
+        onchange="detectTags('${tbId}',${i},this.value)">
+      <button class="btn-tag-add" onclick="openTagMenu(event,'${tbId}',${i})">＋</button>
+    </div></td>
+    <td class="td-uh"><input class="inp-uh" placeholder="UH" value="${esc(d.uh||'')}"
+      oninput="setData('${tbId}',${i},'uh',this.value)"></td>
+    <td class="td-ct">
+      <select class="sel-ct" onchange="setData('${tbId}',${i},'ct',this.value)">
+        ${ctOptions(d.ct)}
+      </select>
+    </td>
+    <td class="td-nome"><input class="inp-nome" placeholder="Sobrenome, Nome" value="${esc(d.nome||'')}"
+      oninput="setData('${tbId}',${i},'nome',this.value)"></td>
+    <td style="padding:6px 8px;text-align:center"><button class="btn-row-del" onclick="delRow('${tbId}',this)" title="Remover">✕</button></td>
+  `;
+}
+
+function ctOptions(sel) {
+  return ['SUP','STD','SUI','PHO'].map(c => `<option value="${c}" ${c===sel?'selected':''}>${c}</option>`).join('');
+}
+function ctClass(ct) { return ct==='SUP'?'ct-sup':ct==='STD'?'ct-std':ct==='SUI'?'ct-sui':'ct-pho'; }
+function ctBadge(ct) { return `<span class="ct-b ${ctClass(ct)}">${ct}</span>`; }
+
+function addEspRow(tbodyId, badgeId, isAmanha) {
+  const tbody = document.getElementById(tbodyId);
+  const i = tbody.querySelectorAll('tr').length;
+  const tr = document.createElement('tr');
+  if (isAmanha) {
+    tr.innerHTML = `
+      <td class="p"><select class="sel-ct" style="font-size:11px">${ctOptions('SUP')}</select></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="N° reserva" style="width:90px"></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="DD/MM/AAAA" style="width:90px"></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="DD/MM/AAAA" style="width:90px"></td>
+      <td class="p"><input class="inp-esp" placeholder="Descrição / nome hóspede"></td>
+      <td class="tc"><input class="inp-uh" placeholder="UH" style="width:44px"></td>
+      <td class="tc"><input type="checkbox"></td>
+      <td class="tc"><input type="checkbox"></td>
+      <td class="tc"><input type="checkbox"></td>
+      <td style="padding:6px 8px;text-align:center"><button class="btn-row-del" onclick="delRow('${tbodyId}',this)">✕</button></td>
+    `;
+  } else {
+    tr.innerHTML = `
+      <td class="p"><input class="inp-uh" placeholder="UH" style="width:44px"></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="N° reserva" style="width:90px"></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="DD/MM/AAAA" style="width:90px"></td>
+      <td class="p"><input class="inp-esp-sm" placeholder="DD/MM/AAAA" style="width:90px"></td>
+      <td class="p"><input class="inp-esp" placeholder="Descrição (ex: Jazlyn Raggio - Long stay)"></td>
+      <td class="p">
+        <select class="sel-tipo">
+          <option value="long_stay">🏷️ Long Stay</option>
+          <option value="lua_de_mel">💍 Lua de Mel</option>
+          <option value="aniversario">🎂 Aniversário</option>
+          <option value="vip">⭐ VIP</option>
+          <option value="outro">Outro</option>
+        </select>
+      </td>
+      <td style="padding:6px 8px;text-align:center"><button class="btn-row-del" onclick="delRow('${tbodyId}',this)">✕</button></td>
+    `;
+  }
+  tbody.appendChild(tr);
+  updateBadges();
+}
+
+function addCiRow() {
+  const tbody = document.getElementById('tb-ci');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="p"><input class="inp-ci" placeholder="N° reserva" style="width:120px;font-family:'JetBrains Mono',monospace"></td>
+    <td class="p"><input class="inp-ci" placeholder="Nome do hóspede" style="width:100%"></td>
+    <td style="padding:6px 8px;text-align:center"><button class="btn-row-del" onclick="delRow('tb-ci',this)">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  updateBadges();
+}
+
+function delRow(tbodyId, btn) {
+  btn.closest('tr').remove();
+  updateKpis();
+  updateBadges();
+}
+
+const rowData = {};
+
+function ensureRow(tbId, i) {
+  if (!rowData[tbId]) rowData[tbId] = {};
+  if (!rowData[tbId][i]) rowData[tbId][i] = {pre:false,trip:false,obs:'',uh:'',ct:'SUP',nome:'',lco:false,reentrada:false};
+  return rowData[tbId][i];
+}
+function setData(tbId, i, key, val) { ensureRow(tbId,i)[key]=val; updateKpis(); }
+function setObs(tbId, i, val)       { ensureRow(tbId,i).obs=val; }
+
+function detectTags(tbId, i, val) {
+  const up = val.toUpperCase();
+  const d = ensureRow(tbId, i);
+  d.lco      = up.includes('LCO') || up.includes('LATE');
+  d.reentrada = up.includes('REENTRADA') || up.includes('REENT');
+  renderRowTags(tbId, i, d);
+  updateKpis();
+}
+
+function renderRowTags(tbId, i, d) {
+  const wrap = document.getElementById(`obs-wrap-${tbId}-${i}`);
+  if (!wrap) return;
+  const tags = (d.lco ? '<span class="itag it-lco">🕐 LCO</span>' : '') +
+               (d.reentrada ? '<span class="itag it-reent">🔄 Reentrada</span>' : '');
+  wrap.querySelectorAll('.itag').forEach(t => t.remove());
+  if (tags) { const tmp = document.createElement('div'); tmp.innerHTML = tags; [...tmp.children].forEach(c => wrap.insertBefore(c, wrap.firstChild)); }
+  const tr = wrap.closest('tr');
+  tr.className = d.reentrada ? 'row-reent' : d.lco ? 'row-lco' : '';
+}
+
+// ════════════════════════════════
+// TAG MENU
+// ════════════════════════════════
+const TAG_OPTS = [
+  {l:'🕐 Late Check-out',       v:'LCO'},
+  {l:'🔄 Reentrada no SUP',     v:'Reentrada no SUP'},
+  {l:'🔄 Reentrada no STD',     v:'Reentrada no STD'},
+  {l:'🔄 Reentrada no SUI',     v:'Reentrada no SUI'},
+  {l:'⭐ Reserva Especial',     v:'Reserva Especial'},
+  {l:'💳 CC virtual s/ autori.', v:'CC virtual não autorizado trf confidencial'},
 ];
 
-let arquivosSel   = [];
-let auditoriaAtual = null;
-let ocorrencias   = [];
-let checkoutsHoje = [];
-let checkoutsPrev = [];
-let especiais     = [];
-let prevEspeciais  = [];
-let checkins      = [];
+let _tagTarget = null;
 
-// ── DRAG & DROP ──
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('drag-over');
-    adicionarArquivos(Array.from(e.dataTransfer.files));
-});
-function onFileSelect(inp) { adicionarArquivos(Array.from(inp.files)); inp.value=''; }
-function adicionarMaisArquivos(inp) { adicionarArquivos(Array.from(inp.files)); inp.value=''; }
-
-const TIPOS = ['Ocupação','Check-outs','Check-ins','Reservas Especiais','Outro'];
-
-function adicionarArquivos(files) {
-    files.forEach(f => {
-        const nome = f.name.toLowerCase();
-        let tipo = 'Outro';
-        if (nome.includes('ocup') || nome.includes('occup')) tipo = 'Ocupação';
-        else if (nome.includes('check') && nome.includes('out')) tipo = 'Check-outs';
-        else if (nome.includes('check') && nome.includes('in'))  tipo = 'Check-ins';
-        else if (nome.includes('espec') || nome.includes('reserv')) tipo = 'Reservas Especiais';
-        arquivosSel.push({ file: f, tipo });
-    });
-    renderFilesList();
+function openTagMenu(e, tbId, i) {
+  e.stopPropagation();
+  const menu = document.getElementById('tag-menu');
+  _tagTarget = {tbId, i};
+  menu.innerHTML = TAG_OPTS.map(o =>
+    `<button class="tag-opt" onclick="applyTag('${esc(o.v)}')">${o.l}</button>`
+  ).join('');
+  const r = e.target.getBoundingClientRect();
+  menu.style.top  = (r.bottom + 4) + 'px';
+  menu.style.left = Math.min(r.left, window.innerWidth - 210) + 'px';
+  menu.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closeTagMenu, {once:true}), 50);
 }
 
-function removerArquivo(idx) {
-    arquivosSel.splice(idx, 1);
-    renderFilesList();
+function closeTagMenu() { document.getElementById('tag-menu').style.display='none'; }
+
+function applyTag(val) {
+  if (!_tagTarget) return;
+  const {tbId, i} = _tagTarget;
+  const d = ensureRow(tbId, i);
+  d.obs = val;
+  detectTags(tbId, i, val);
+  const wrap = document.getElementById(`obs-wrap-${tbId}-${i}`);
+  if (wrap) { const inp = wrap.querySelector('.obs-inp'); if(inp) inp.value = val; }
+  closeTagMenu();
 }
 
-function renderFilesList() {
-    const list = g('files-list');
-    const addMore = g('btn-add-more');
-    if (!arquivosSel.length) {
-        list.innerHTML = '';
-        list.classList.remove('show');
-        addMore.classList.remove('show');
-        g('btn-processar').disabled = true;
-        return;
-    }
-    list.classList.add('show');
-    addMore.classList.add('show');
-    g('btn-processar').disabled = false;
-
-    const icones = {'Ocupação':'📊','Check-outs':'🚪','Check-ins':'🟡','Reservas Especiais':'⭐','Outro':'📄'};
-    list.innerHTML = arquivosSel.map((a,i) => `
-        <div class="file-item">
-            <span class="file-item-icon">${icones[a.tipo]||'📄'}</span>
-            <div class="file-item-info">
-                <div class="file-item-name">${esc(a.file.name)}</div>
-                <div class="file-item-size">${(a.file.size/1024).toFixed(0)} KB</div>
-            </div>
-            <select class="file-tipo-select" onchange="arquivosSel[${i}].tipo=this.value;renderFilesList()">
-                ${TIPOS.map(t=>`<option value="${t}" ${t===a.tipo?'selected':''}>${t}</option>`).join('')}
-            </select>
-            <button class="file-item-del" onclick="removerArquivo(${i})" title="Remover">✕</button>
-        </div>`).join('');
+// ════════════════════════════════
+// KPIs & BADGES
+// ════════════════════════════════
+function countCoRows(tbId) {
+  return document.querySelectorAll(`#${tbId} tr`).length;
+}
+function countLCO(tbId) {
+  let n=0;
+  for (const k in (rowData[tbId]||{})) { if(rowData[tbId][k].lco) n++; }
+  return n;
+}
+function countReent(tbId) {
+  let n=0;
+  for (const k in (rowData[tbId]||{})) { if(rowData[tbId][k].reentrada) n++; }
+  return n;
 }
 
-// ── PROCESSAR COM IA (Groq) ──
-async function processarComIA() {
-    if (!arquivosSel.length) return;
-
-    if (!GROQ_API_KEY || GROQ_API_KEY.trim() === '') {
-        toast('⚠️ Chave do Groq não configurada. Adicione GROQ_API_KEY no settings.py do Django.');
-        return;
-    }
-
-    g('upload-section').querySelector('.up-body').style.display = 'none';
-    g('ai-loading').classList.add('show');
-    g('empty-state').style.display = 'none';
-
-    const ss = ['s1','s2','s3','s4','s5','s6'];
-    const dd = [0,1400,2800,4000,5200,6200];
-    const tt = dd.map((d,i) => setTimeout(() => {
-        ss.forEach((s,j) => {
-            const el = g(s);
-            if (j<i){el.classList.add('feito');el.classList.remove('ativo');}
-            else if(j===i){el.classList.add('ativo');el.classList.remove('feito');}
-            else{el.classList.remove('ativo','feito');}
-        });
-    }, d));
-
-    // Converte arquivos para base64
-    const partsArquivos = [];
-    for (const a of arquivosSel) {
-        const b64  = await toB64(a.file);
-        const mime = a.file.type || 'image/png';
-        partsArquivos.push({ tipo: a.tipo, b64, mime, nome: a.file.name });
-    }
-
-    const prompt = `Você é especialista em auditoria hoteleira. Analise a imagem/documento e extraia TODOS os dados.
-Retorne APENAS JSON válido sem markdown, sem texto antes ou depois.
-
-{
-  "data":"DD/MM/AAAA","turno":"Nome/Nome","ocupacao":"XX,XX%","dm":"R$ X.XXX,XX","uh_bloq":0,
-  "checkouts":[{"uh":21,"ct":"SUP","nome":"Sobrenome,Nome","obs":"","lco":false,"reentrada":false,"pre":false,"trip":false}],
-  "checkins_pendentes":[{"reserva":"XXXXXX","nome":"Nome"}],
-  "ocorrencias":[],
-  "reservas_especiais":[{"uh":31,"reserva":"335778852","checkin":"19/04/2026","checkout":"27/04/2026","descricao":"Jazlyn Raggio - Long stay","tipo":"long_stay"}],
-  "previsao":{
-    "ocupacao":"XX,XX%","diaria":"R$ X.XXX,XX","uhs":50,"entradas":19,"saidas":23,"cafe":90,
-    "checkouts_amanha":[{"uh":34,"ct":"SUP","nome":"Nome,Sobrenome","obs":"Reentrada no STD","lco":false,"reentrada":true,"pre":false,"trip":false}],
-    "especiais":[{"categoria":"SUP","reserva":"XXXXX","in":"DD/MM/AAAA","out":"DD/MM/AAAA","descricao":"Desc","uh":34}]
+function updateKpis() {
+  const ocup = document.getElementById('h-ocup').value || '—';
+  document.getElementById('kpi-ocup').textContent = ocup;
+  const co = countCoRows('tb-co');
+  document.getElementById('kpi-co').textContent = co;
+  document.getElementById('kpi-lco').textContent = countLCO('tb-co');
+  document.getElementById('kpi-reent').textContent = countReent('tb-co');
+  document.getElementById('kpi-esp').textContent = countCoRows('tb-esp');
+  updateBadges();
+  const data = document.getElementById('h-data').value;
+  if (data) {
+    const dt = new Date(data + 'T12:00:00');
+    dt.setDate(dt.getDate()+1);
+    document.getElementById('lbl-amanha').textContent = 'Amanhã — ' + dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
   }
 }
-REGRAS: obs com "Reentrada"→reentrada:true; "LCO"/"Late"→lco:true. Extraia TODOS os hóspedes visíveis.`;
 
-    // Monta mensagem no formato OpenAI com imagens
-    const contentParts = [];
-    partsArquivos.forEach(a => {
-        contentParts.push({ type: 'text', text: `--- ARQUIVO: ${a.nome} | TIPO: ${a.tipo} ---` });
-        contentParts.push({
-            type: 'image_url',
-            image_url: { url: `data:${a.mime};base64,${a.b64}` }
-        });
-    });
-    contentParts.push({ type: 'text', text: prompt });
-
-    // Tenta modelos em sequência (fallback automático)
-    let raw = '';
-    let modelUsado = '';
-    let lastError = null;
-
-    for (const model of GROQ_MODELS) {
-        try {
-            const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${GROQ_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: model,
-                    messages: [{ role: 'user', content: contentParts }],
-                    temperature: 0.1,
-                    max_tokens: 8192,
-                    response_format: { type: 'json_object' }
-                })
-            });
-
-            if (!r.ok) {
-                const e = await r.json().catch(() => {});
-                const msg = e?.error?.message || `HTTP ${r.status}`;
-                // Se for quota, tenta próximo modelo
-                if (r.status === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
-                    lastError = `${model}: quota atingida`;
-                    continue;
-                }
-                throw new Error(msg);
-            }
-
-            const data = await r.json();
-            raw = data?.choices?.[0]?.message?.content || '';
-            modelUsado = model.split('/').pop(); // nome curto do modelo
-            break; // sucesso — sai do loop
-
-        } catch(e) {
-            lastError = e.message;
-            // Se não for erro de quota, não tenta próximo
-            if (!e.message.toLowerCase().includes('quota') && !e.message.toLowerCase().includes('rate')) {
-                throw e;
-            }
-        }
-    }
-
-    tt.forEach(clearTimeout);
-
-    if (!raw) {
-        ss.forEach(s => g(s).classList.remove('ativo','feito'));
-        g('ai-loading').classList.remove('show');
-        g('upload-section').querySelector('.up-body').style.display = '';
-        renderFilesList();
-        toast('🔴 Todos os modelos atingiram o limite. Tente novamente em alguns minutos.');
-        return;
-    }
-
-    ss.forEach(s => { const el=g(s); el.classList.add('feito'); el.classList.remove('ativo'); });
-    await sleep(500);
-
-    let parsed;
-    try {
-        parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    } catch {
-        parsed = demo();
-    }
-
-    carregarAuditoria(parsed, `✨ Groq — ${modelUsado}`);
+function updateBadges() {
+  const set = (id, n) => { const el=document.getElementById(id); if(el) el.textContent=n; };
+  set('tb-co',    countCoRows('tb-co'));   set('b-co',    countCoRows('tb-co'));
+  set('tb-prev',  countCoRows('tb-prev')); set('b-prev',  countCoRows('tb-prev'));
+  set('tb-esp',   countCoRows('tb-esp'));  set('b-esp',   countCoRows('tb-esp'));
+  set('tb-ci',    countCoRows('tb-ci'));   set('b-ci',    countCoRows('tb-ci'));
+  set('b-prev-esp', countCoRows('tb-prev-esp'));
+  set('tb-ocorr', ocorrencias.length);    set('b-ocorr', ocorrencias.length);
 }
 
-function toB64(f){return new Promise((r,j)=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.onerror=()=>j(new Error('Falhou'));fr.readAsDataURL(f);});}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-// ── DEMO ──
-function demo(){
-    return {
-        data:'25/04/2026',turno:'Margiore / Lussandro',ocupacao:'98,18%',dm:'R$ 1.332,84',uh_bloq:1,
-        checkins_pendentes:[],ocorrencias:[],
-        reservas_especiais:[
-            {uh:31,reserva:'335778852',checkin:'19/04/2026',checkout:'27/04/2026',descricao:'Jazlyn Raggio - Long stay',tipo:'long_stay'},
-            {uh:51,reserva:'336154889',checkin:'21/04/2026',checkout:'28/04/2026',descricao:'Jason Mancuso - Long stay',tipo:'long_stay'},
-            {uh:64,reserva:'336139503',checkin:'21/04/2026',checkout:'28/04/2026',descricao:'Will Hu - Long stay',tipo:'long_stay'},
-            {uh:85,reserva:'336079102',checkin:'21/04/2026',checkout:'29/04/2026',descricao:'Monishee Matin - Long stay',tipo:'long_stay'},
-            {uh:87,reserva:'335076706',checkin:'22/04/2026',checkout:'26/04/2026',descricao:'Eduardo Vidal e Maria Angelica - Lua de mel',tipo:'especial'},
-        ],
-        checkouts:[
-            {uh:21,ct:'SUP',nome:'Manuel,Rui',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:22,ct:'SUP',nome:'Scordo,Cecilia Claudia',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:34,ct:'SUP',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
-            {uh:92,ct:'SUI',nome:'Reid,Naomi',obs:'Reentrada no SUP',lco:false,reentrada:true,pre:false,trip:false},
-        ],
-        previsao:{
-            ocupacao:'92,59%',diaria:'R$ 1.286,97',uhs:50,entradas:19,saidas:23,cafe:90,
-            checkouts_amanha:[
-                {uh:34,ct:'STD',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
-            ],
-            especiais:[
-                {categoria:'STD',reserva:'336271347',in:'26/04/2026',out:'27/04/2026',descricao:'Ramos,Maria Luiza - Reentrada no STD',uh:34},
-            ]
-        }
-    };
+// ════════════════════════════════
+// OCORRÊNCIAS
+// ════════════════════════════════
+function addOcorr() {
+  const t = document.getElementById('ocorr-inp').value.trim();
+  if (!t) return;
+  ocorrencias.push(t);
+  document.getElementById('ocorr-inp').value = '';
+  renderOcorr();
+}
+function remOcorr(i) { ocorrencias.splice(i,1); renderOcorr(); }
+function renderOcorr() {
+  const list = document.getElementById('ocorr-list');
+  list.innerHTML = ocorrencias.length
+    ? ocorrencias.map((o,i) => `<div class="ocorr-item"><div class="ocorr-dot"></div><span style="flex:1">${esc(o)}</span><button class="ocorr-del" onclick="remOcorr(${i})">✕</button></div>`).join('')
+    : '<div style="font-size:12px;color:var(--text3);padding:8px 0">Nenhuma ocorrência registrada.</div>';
+  updateBadges();
 }
 
-// ── CARREGAR ──
-function carregarAuditoria(d, fonte) {
-    auditoriaAtual = d;
-    ocorrencias   = d.ocorrencias||[];
-    checkoutsHoje = d.checkouts||[];
-    checkoutsPrev = d.previsao?.checkouts_amanha||[];
-    especiais     = d.reservas_especiais||[];
-    prevEspeciais  = d.previsao?.especiais||[];
-    checkins      = d.checkins_pendentes||[];
-
-    g('upload-section').querySelector('.up-body').style.display='';
-    g('ai-loading').classList.remove('show');
-    g('empty-state').style.display='none';
-    g('audit-wrap').style.display='block';
-
-    g('lbl-data').textContent  = d.data||'—';
-    g('lbl-fonte').textContent = fonte||'🤖 IA';
-    g('t-turno').value   = d.turno||'';
-    g('t-data').value    = isoDate(d.data);
-    g('t-ocup').value    = d.ocupacao||'';
-    g('t-dm').value      = d.dm||'';
-    g('t-uh-bloq').value = d.uh_bloq||0;
-
-    const lcos  = checkoutsHoje.filter(c=>c.lco).length;
-    const reent = checkoutsHoje.filter(c=>c.reentrada).length;
-    g('kpi-ocup').textContent  = d.ocupacao||'—';
-    g('kpi-co').textContent    = checkoutsHoje.length;
-    g('kpi-lco').textContent   = lcos;
-    g('kpi-reent').textContent = reent;
-    g('kpi-esp').textContent   = especiais.length;
-
-    g('tb-audit').textContent = d.turno?d.turno.split('/')[0].trim():'—';
-    g('tb-co').textContent    = checkoutsHoje.length;
-    g('tb-prev').textContent  = checkoutsPrev.length;
-    g('tb-esp').textContent   = especiais.length;
-    g('tb-ci').textContent    = checkins.length;
-
-    const pv = d.previsao||{};
-    g('prev-ocup').textContent  = pv.ocupacao||'—';
-    g('prev-diaria').textContent= pv.diaria||'—';
-    g('prev-ent').textContent   = pv.entradas!==undefined?pv.entradas:'—';
-    g('prev-sai').textContent   = pv.saidas!==undefined?pv.saidas:'—';
-    g('prev-cafe').textContent  = pv.cafe!==undefined?pv.cafe:'—';
-    g('lbl-amanha').textContent = dataAmanha(d.data);
-
-    renderTudo();
-    setTab('auditoria');
+// ════════════════════════════════
+// ESTADO DOM
+// ════════════════════════════════
+function getState() {
+  return {
+    turno:   document.getElementById('h-turno').value,
+    data:    document.getElementById('h-data').value,
+    ocup:    document.getElementById('h-ocup').value,
+    dm:      document.getElementById('h-dm').value,
+    bloq:    document.getElementById('h-bloq').value,
+    obs:     document.getElementById('h-obs').value,
+    pOcup:   document.getElementById('p-ocup').value,
+    pDm:     document.getElementById('p-dm').value,
+    pUhs:    document.getElementById('p-uhs').value,
+    pEnt:    document.getElementById('p-ent').value,
+    pSai:    document.getElementById('p-sai').value,
+    pCafe:   document.getElementById('p-cafe').value,
+    pSut:    document.getElementById('p-sut').value,
+    pSup:    document.getElementById('p-sup').value,
+    pStd:    document.getElementById('p-std').value,
+    ocorrencias,
+    coHtml:      document.getElementById('tb-co').innerHTML,
+    prevHtml:    document.getElementById('tb-prev').innerHTML,
+    espHtml:     document.getElementById('tb-esp').innerHTML,
+    prevEspHtml: document.getElementById('tb-prev-esp').innerHTML,
+    ciHtml:      document.getElementById('tb-ci').innerHTML,
+    rowData,
+  };
 }
 
-function renderTudo(){renderCheckins();renderOcorrencias();renderEspeciais();renderCheckoutsHoje();renderCheckoutsPrev();renderPrevEsp();}
-
-// ── ABAS ──
-function setTab(tab){
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+tab));
+function setState(s) {
+  if (!s) return;
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.value=v||''; };
+  set('h-turno', s.turno); set('h-data', s.data); set('h-ocup', s.ocup);
+  set('h-dm', s.dm); set('h-bloq', s.bloq); set('h-obs', s.obs);
+  set('p-ocup', s.pOcup); set('p-dm', s.pDm); set('p-uhs', s.pUhs);
+  set('p-ent', s.pEnt); set('p-sai', s.pSai); set('p-cafe', s.pCafe);
+  set('p-sut', s.pSut); set('p-sup', s.pSup); set('p-std', s.pStd);
+  ocorrencias = s.ocorrencias || [];
+  if (s.coHtml)      document.getElementById('tb-co').innerHTML      = s.coHtml;
+  if (s.prevHtml)    document.getElementById('tb-prev').innerHTML    = s.prevHtml;
+  if (s.espHtml)     document.getElementById('tb-esp').innerHTML     = s.espHtml;
+  if (s.prevEspHtml) document.getElementById('tb-prev-esp').innerHTML= s.prevEspHtml;
+  if (s.ciHtml)      document.getElementById('tb-ci').innerHTML      = s.ciHtml;
+  if (s.rowData) { Object.assign(rowData, s.rowData); }
+  renderOcorr();
+  updateKpis();
 }
 
-// ── CHECKINS ──
-function renderCheckins(){
-    const html = checkins.length
-        ? checkins.map(c=>`<tr><td><span class="td-num">${esc(c.reserva)}</span></td><td class="td-b">${esc(c.nome)}</td></tr>`).join('')
-        : '<tr><td colspan="2" style="text-align:center;color:var(--text-soft);padding:18px;font-size:12px">Sem check-ins pendentes</td></tr>';
-    ['tb-ci-a','tb-ci-b'].forEach(id=>{const el=g(id);if(el)el.innerHTML=html;});
-    ['b-ci','b-ci2','tb-ci'].forEach(id=>{const el=g(id);if(el)el.textContent=checkins.length;});
+// ════════════════════════════════
+// SALVAR / CARREGAR
+// ════════════════════════════════
+function salvar() {
+  const state = getState();
+  state._ts = Date.now();
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(LS)) || []; } catch{}
+  hist.unshift(state);
+  if (hist.length > 30) hist = hist.slice(0, 30);
+  localStorage.setItem(LS, JSON.stringify(hist));
+  toast('✅ Auditoria salva!');
 }
 
-// ── OCORRÊNCIAS ──
-function renderOcorrencias(){
-    const list=g('ocorr-list');
-    list.innerHTML=ocorrencias.map((o,i)=>
-        `<div class="ocorr-item"><div class="ocorr-dot"></div><span style="flex:1">${esc(o)}</span><button class="ocorr-del" onclick="remOcorr(${i})">✕</button></div>`
-    ).join('')||'<div style="padding:8px 0;font-size:12px;color:var(--text-soft)">Nenhuma ocorrência.</div>';
-    g('b-ocorr').textContent=ocorrencias.length;
-}
-function adicionarOcorrencia(){const t=g('ocorr-input').value.trim();if(!t)return;ocorrencias.push(t);g('ocorr-input').value='';renderOcorrencias();}
-function remOcorr(i){ocorrencias.splice(i,1);renderOcorrencias();}
-
-// ── ESPECIAIS ──
-function renderEspeciais(){
-    const tbody=g('tb-esp');
-    tbody.innerHTML=especiais.length
-        ? especiais.map(e=>`<tr>
-            <td><span class="td-num">${esc(e.uh||'')}</span></td>
-            <td class="td-b">${esc(e.reserva||'')}</td>
-            <td style="font-size:12px;white-space:nowrap">${esc(e.checkin||'')}</td>
-            <td style="font-size:12px;white-space:nowrap">${esc(e.checkout||'')}</td>
-            <td>${esc(e.descricao||'')}</td>
-            <td>${e.tipo==='long_stay'?'<span class="xtag xt-ls">🏷️ Long Stay</span>':'<span class="xtag xt-esp">⭐ Especial</span>'}</td>
-          </tr>`).join('')
-        : '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial</td></tr>';
-    const el=g('b-esp');if(el)el.textContent=especiais.length;
+function carregarUltima() {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(LS)) || []; } catch{}
+  if (!hist.length) { toast('⚠️ Nenhuma auditoria salva.'); return; }
+  setState(hist[0]);
+  toast('📋 Última auditoria carregada!');
 }
 
-// ── CHECKOUTS ──
-function renderCheckoutsHoje(){
-    const tbody=g('tb-co-body');
-    let rows=checkoutsHoje.map((c,i)=>coRow(c,i,'checkoutsHoje')).join('');
-    for(let b=0;b<Math.max(5,28-checkoutsHoje.length);b++) rows+=blankRow(b);
-    tbody.innerHTML=rows;
-    ['b-co','tb-co'].forEach(id=>{const el=g(id);if(el)el.textContent=checkoutsHoje.length;});
-    g('kpi-co').textContent    = checkoutsHoje.length;
-    g('kpi-lco').textContent   = checkoutsHoje.filter(c=>c.lco).length;
-    g('kpi-reent').textContent = checkoutsHoje.filter(c=>c.reentrada).length;
+function novaAuditoria() {
+  if (!confirm('Criar nova auditoria? Os dados atuais não serão salvos automaticamente.')) return;
+  ['tb-co','tb-prev','tb-esp','tb-prev-esp','tb-ci'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+  ['h-turno','h-ocup','h-dm','h-obs','p-ocup','p-dm','p-uhs','p-ent','p-sai','p-cafe','p-sut','p-sup','p-std'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('h-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('h-bloq').value = '0';
+  ocorrencias = [];
+  for (const k in rowData) delete rowData[k];
+  renderOcorr();
+  updateKpis();
+  toast('✨ Nova auditoria criada!');
 }
 
-function renderCheckoutsPrev(){
-    const tbody=g('tb-prev-co-body');
-    let rows=checkoutsPrev.map((c,i)=>coRow(c,i,'checkoutsPrev')).join('');
-    for(let b=0;b<Math.max(5,28-checkoutsPrev.length);b++) rows+=blankRow(b);
-    tbody.innerHTML=rows;
-    ['b-prev-co','tb-prev'].forEach(id=>{const el=g(id);if(el)el.textContent=checkoutsPrev.length;});
+// ════════════════════════════════
+// EXPORTAR
+// ════════════════════════════════
+function exportar() {
+  const v = id => document.getElementById(id)?.value || '';
+  let txt = '═══════════════════════════════════\n';
+  txt += '         AUDITORIA HOTELEIRA\n';
+  txt += '═══════════════════════════════════\n';
+  txt += `Turno: ${v('h-turno')}\nData: ${v('h-data')}\nOcupação: ${v('h-ocup')} | DM: ${v('h-dm')}\nUH Bloq.: ${v('h-bloq')}\n\n`;
+  txt += '── CHECK-OUTS DO DIA ──\n';
+  document.querySelectorAll('#tb-co tr').forEach(tr => {
+    const inps = tr.querySelectorAll('input:not([type=checkbox])');
+    const chks = tr.querySelectorAll('input[type=checkbox]');
+    const sel  = tr.querySelector('select');
+    const uh   = inps[0]?.value || '';
+    const ct   = sel?.value || '';
+    const nome = inps[2]?.value || '';
+    const obs  = inps[1]?.value || '';
+    const pre  = chks[0]?.checked ? '[PRE]' : '';
+    const trip = chks[1]?.checked ? '[TRIP]' : '';
+    txt += `UH ${uh} [${ct}] ${nome}${obs?' — '+obs:''}${pre?' '+pre:''}${trip?' '+trip:''}\n`;
+  });
+  txt += '\n── CHECK-OUTS PREVISTOS (AMANHÃ) ──\n';
+  document.querySelectorAll('#tb-prev tr').forEach(tr => {
+    const inps = tr.querySelectorAll('input:not([type=checkbox])');
+    const sel  = tr.querySelector('select');
+    txt += `UH ${inps[0]?.value||''} [${sel?.value||''}] ${inps[2]?.value||''}${inps[1]?.value?' — '+inps[1].value:''}\n`;
+  });
+  txt += '\n── RESERVAS ESPECIAIS ──\n';
+  document.querySelectorAll('#tb-esp tr').forEach(tr => {
+    const inps = tr.querySelectorAll('input');
+    const sel  = tr.querySelector('select');
+    txt += `UH ${inps[0]?.value||''} | ${inps[1]?.value||''} | ${inps[2]?.value||''}→${inps[3]?.value||''} | ${inps[4]?.value||''} | ${sel?.value||''}\n`;
+  });
+  txt += '\n── CHECK-INS PENDENTES ──\n';
+  document.querySelectorAll('#tb-ci tr').forEach(tr => {
+    const inps = tr.querySelectorAll('input');
+    txt += `${inps[0]?.value||''} — ${inps[1]?.value||''}\n`;
+  });
+  txt += '\n── OCORRÊNCIAS ──\n';
+  ocorrencias.forEach(o => txt += `• ${o}\n`);
+  txt += `\n── PREVISÃO AMANHÃ ──\nOcupação: ${v('p-ocup')} | Diária: ${v('p-dm')}\nEntradas: ${v('p-ent')} | Saídas: ${v('p-sai')} | Café: ${v('p-cafe')}\nSUT: ${v('p-sut')} | SUP: ${v('p-sup')} | STD: ${v('p-std')}\n`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = `auditoria_${v('h-data')||'hoje'}.txt`;
+  a.click();
 }
 
-function coRow(c,i,arr){
-    const cls   = c.reentrada?'r-reent':c.lco?'r-lco':'';
-    const ctCls = c.ct==='SUP'?'ct-sup':c.ct==='STD'?'ct-std':c.ct==='SUI'?'ct-sui':'ct-pho';
-    let tags='';
-    if(c.lco)       tags+='<span class="itag xt-lco">🕐 LCO</span>';
-    if(c.reentrada) tags+='<span class="itag xt-reent">🔄 Reentrada</span>';
-    return `<tr class="${cls}" data-arr="${arr}" data-i="${i}">
-        <td class="td-chk"><input type="checkbox" ${c.pre?'checked':''} onchange="${arr}[${i}].pre=this.checked"></td>
-        <td class="td-chk"><input type="checkbox" ${c.trip?'checked':''} onchange="${arr}[${i}].trip=this.checked"></td>
-        <td class="td-obs-c"><div class="obs-inner">${tags}
-            <input class="obs-inp" value="${esc(c.obs||'')}" placeholder="observação…"
-                oninput="${arr}[${i}].obs=this.value"
-                onchange="detectTag('${arr}',${i},this.value)">
-            <button class="btn-tp" onclick="tagMenu('${arr}',${i},this)">＋</button>
-        </div></td>
-        <td class="td-uh">${c.uh}</td>
-        <td class="td-ct"><span class="ct-b ${ctCls}">${esc(c.ct||'')}</span></td>
-        <td class="td-nome">${esc(c.nome||'')}</td>
-    </tr>`;
+// ════════════════════════════════
+// UTILS
+// ════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function blankRow(b){
-    return `<tr class="r-blank" style="${b%2===0?'background:var(--bg-hover)':''}">
-        <td class="td-chk"><input type="checkbox" disabled style="opacity:.25"></td>
-        <td class="td-chk"><input type="checkbox" disabled style="opacity:.25"></td>
-        <td class="td-obs-c"><div class="obs-inner"></div></td>
-        <td></td><td></td><td></td>
-    </tr>`;
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-function detectTag(arr,i,val){
-    const up=val.toUpperCase();
-    window[arr][i].lco       = up.includes('LCO')||up.includes('LATE');
-    window[arr][i].reentrada = up.includes('REENTRADA')||up.includes('REENT');
-    if(arr==='checkoutsHoje') renderCheckoutsHoje(); else renderCheckoutsPrev();
-}
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('h-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('h-ocup').addEventListener('input', updateKpis);
+  document.getElementById('h-data').addEventListener('input', updateKpis);
 
-function addCoRow(arr,tbodyId,renderFn){
-    window[arr].push({uh:'',ct:'STD',nome:'',obs:'',lco:false,reentrada:false,pre:false,trip:false});
-    renderFn();
-}
+  for (let i=0; i<5; i++) addCoRow('tb-co', null);
+  for (let i=0; i<3; i++) addCoRow('tb-prev', null);
+  addEspRow('tb-esp', 'b-esp', false);
+  addEspRow('tb-prev-esp', 'b-prev-esp', true);
+  addCiRow();
 
-function tagMenu(arr,i,btn){
-    document.getElementById('__tm')?.remove();
-    const opts=[
-        {l:'🕐 Late Check-out',v:'LCO'},
-        {l:'🔄 Reentrada no SUP',v:'Reentrada no SUP'},
-        {l:'🔄 Reentrada no STD',v:'Reentrada no STD'},
-        {l:'⭐ Reserva Especial',v:'Reserva Especial'},
-    ];
-    const m=document.createElement('div');
-    m.id='__tm';
-    m.style.cssText='position:fixed;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:600;padding:5px;min-width:180px;';
-    opts.forEach(o=>{
-        const b=document.createElement('button');
-        b.textContent=o.l;
-        b.style.cssText='display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:Inter,sans-serif;color:var(--text-main);';
-        b.onmouseover=()=>b.style.background='var(--bg-hover)';
-        b.onmouseout=()=>b.style.background='none';
-        b.onclick=()=>{window[arr][i].obs=o.v;detectTag(arr,i,o.v);m.remove();};
-        m.appendChild(b);
-    });
-    const r=btn.getBoundingClientRect();
-    m.style.top=(r.bottom+4)+'px';
-    m.style.left=Math.min(r.left,window.innerWidth-200)+'px';
-    document.body.appendChild(m);
-    setTimeout(()=>document.addEventListener('click',()=>m.remove(),{once:true}),50);
-}
-
-// ── PREV ESPECIAIS ──
-function renderPrevEsp(){
-    const tbody=g('tb-prev-esp');
-    const ctCls=ct=>ct==='SUP'?'ct-sup':ct==='STD'?'ct-std':ct==='SUI'?'ct-sui':'ct-pho';
-    tbody.innerHTML=prevEspeciais.length
-        ? prevEspeciais.map(e=>`<tr>
-            <td><span class="ct-b ${ctCls(e.categoria||'')}">${esc(e.categoria||'')}</span></td>
-            <td class="td-b" style="font-size:12px">${esc(e.reserva||'')}</td>
-            <td style="font-size:12px;white-space:nowrap">${esc(e.in||'')}</td>
-            <td style="font-size:12px;white-space:nowrap">${esc(e.out||'')}</td>
-            <td style="font-size:12px">${esc(e.descricao||'')}</td>
-            <td><span class="td-num">${esc(e.uh||'')}</span></td>
-            <td class="td-chk"><input type="checkbox"></td>
-            <td class="td-chk"><input type="checkbox"></td>
-            <td class="td-chk"><input type="checkbox"></td>
-          </tr>`).join('')
-        : '<tr><td colspan="9" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px">Nenhuma reserva especial para amanhã</td></tr>';
-    const el=g('b-prev-esp');if(el)el.textContent=prevEspeciais.length;
-}
-
-// ── MANUAL ──
-function novaAuditoria(){
-    carregarAuditoria({
-        data:new Date().toLocaleDateString('pt-BR'),turno:'',ocupacao:'',dm:'',uh_bloq:0,
-        checkins_pendentes:[],ocorrencias:[],reservas_especiais:[],checkouts:[],
-        previsao:{ocupacao:'',diaria:'',uhs:0,entradas:0,saidas:0,cafe:0,checkouts_amanha:[],especiais:[]}
-    },'✏️ Manual');
-}
-
-// ── SALVAR ──
-function salvarAuditoria(){
-    const snap={id:Date.now(),
-        data:g('t-data').value||auditoriaAtual?.data,
-        turno:g('t-turno').value,ocupacao:g('t-ocup').value,dm:g('t-dm').value,
-        fonte:g('lbl-fonte').textContent,
-        ocorrencias,checkoutsHoje,checkoutsPrev,especiais,prevEspeciais,checkins,
-        previsao:auditoriaAtual?.previsao||{},
-    };
-    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
-    h.unshift(snap);if(h.length>30)h=h.slice(0,30);
-    localStorage.setItem(LS_KEY,JSON.stringify(h));
-    renderHistorico();
-    toast('✅ Auditoria salva!');
-}
-
-// ── EXPORTAR ──
-function exportarAuditoria(){
-    let txt='═══════════════════════════\n   AUDITORIA HOTELEIRA\n═══════════════════════════\n';
-    txt+=`Data: ${g('t-data').value}\nTurno: ${g('t-turno').value}\nOcupação: ${g('t-ocup').value} | DM: ${g('t-dm').value}\n\n`;
-    txt+='── CHECK-OUTS DO DIA ──\n';
-    checkoutsHoje.forEach(c=>{const f=[c.lco?'LCO':'',c.reentrada?'REENTRADA':'',c.pre?'PRE':'',c.trip?'TRIP':''].filter(Boolean).join('|');txt+=`UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}${f?' ('+f+')':''}\n`;});
-    txt+='\n── CHECK-OUTS PREVISTOS (AMANHÃ) ──\n';
-    checkoutsPrev.forEach(c=>txt+=`UH ${c.uh} [${c.ct}] ${c.nome}${c.obs?' — '+c.obs:''}\n`);
-    txt+='\n── RESERVAS ESPECIAIS ──\n';
-    especiais.forEach(e=>txt+=`UH ${e.uh} | ${e.reserva} | ${e.checkin}→${e.checkout} | ${e.descricao}\n`);
-    txt+='\n── OCORRÊNCIAS ──\n';
-    ocorrencias.forEach(o=>txt+=`• ${o}\n`);
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
-    a.download=`auditoria_${g('t-data').value||'hoje'}.txt`;a.click();
-}
-
-// ── HISTÓRICO ──
-function renderHistorico(){
-    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
-    const el=g('historico-list');
-    if(!h.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';return;}
-    el.innerHTML=h.map((x,i)=>`<div class="hist-item" onclick="carregarHist(${i})">
-        <span style="font-size:18px">📋</span>
-        <div><div class="hist-nome">${x.turno||'Auditoria'}</div><div class="hist-data">${fmtData(x.data)} — ${x.fonte||''}</div></div>
-        <span class="hist-ocup">${x.ocupacao||'—'}</span>
-    </div>`).join('');
-}
-
-function carregarHist(i){
-    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
-    const x=h[i];if(!x)return;
-    auditoriaAtual=x;
-    ocorrencias   =x.ocorrencias||[];
-    checkoutsHoje =x.checkoutsHoje||[];
-    checkoutsPrev =x.checkoutsPrev||[];
-    especiais     =x.especiais||[];
-    prevEspeciais  =x.prevEspeciais||[];
-    checkins      =x.checkins||[];
-    carregarAuditoria({...x,checkouts:checkoutsHoje,reservas_especiais:especiais,checkins_pendentes:checkins},x.fonte||'📋 Histórico');
-}
-
-function limparHistorico(){if(!confirm('Limpar todo o histórico?'))return;localStorage.removeItem(LS_KEY);renderHistorico();}
-
-// ── UTILS ──
-function g(id){return document.getElementById(id);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function isoDate(br){if(!br)return'';if(br.includes('-'))return br;const[d,m,y]=br.split('/');return`${y}-${m}-${d}`;}
-function dataAmanha(br){if(!br)return'';const[d,m,y]=br.includes('/')?br.split('/'):br.split('-').reverse();const dt=new Date(+y,+m-1,+d+1);return'Amanhã — '+dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});}
-function fmtData(d){if(!d)return'—';if(d.includes('-'))return new Date(d+'T12:00:00').toLocaleDateString('pt-BR');return d;}
-function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
-
-// ── INIT ──
-document.addEventListener('DOMContentLoaded',()=>{
-    renderHistorico();
-    let h=[];try{h=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
-    if(h.length){
-        const btn=document.createElement('button');
-        btn.textContent='📋 Carregar última auditoria';
-        btn.style.cssText='margin-top:14px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);color:var(--gold);padding:8px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;display:block;margin-left:auto;margin-right:auto;';
-        btn.onclick=()=>carregarHist(0);
-        g('empty-state')?.querySelector('.empty-state')?.appendChild(btn);
-    }
+  updateKpis();
 });
 </script>
-<script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
 </html>
