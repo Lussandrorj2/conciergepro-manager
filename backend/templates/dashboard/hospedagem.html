@@ -174,15 +174,15 @@
         .stat-box-trend{font-size:11px;font-weight:700;margin-top:4px}
         .trend-up{color:#15803d}.trend-down{color:#dc2626}.trend-eq{color:var(--text-soft)}
 
-        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-        .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
-        .chart-panel.full{grid-column:1/-1}
-        .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        /* charts-grid moved below */
+
+
+        .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
         .chart-panel-title{font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
-        .chart-panel-body{padding:14px;position:relative}
-        .chart-canvas-wrap{position:relative;height:220px;min-height:180px}
-        .chart-panel-body{padding:14px;position:relative;overflow:hidden}
-        .chart-canvas-wrap.tall{height:280px}
+
+
+
+.chart-canvas-wrap.tall{height:260px}
 
         .stats-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px}
         .stats-filters label{font-size:11px;color:var(--text-soft);white-space:nowrap}
@@ -363,6 +363,70 @@
         }
         .cat-dyn-inp:focus { background: var(--gold-dim); }
         .cat-dyn-inp::placeholder { color: var(--border-light); font-size: 16px; }
+
+        /* ── MODAL COLAR — imagem ── */
+        .paste-tabs { display:flex;gap:2px;padding:3px;background:var(--bg-hover);border-radius:var(--radius-sm);margin-bottom:12px; }
+        .paste-tab  { flex:1;padding:7px 10px;border:none;background:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;transition:.15s; }
+        .paste-tab.active { background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 3px rgba(0,0,0,.08); }
+        .paste-tab-pane { display:none; }
+        .paste-tab-pane.active { display:block; }
+
+        .img-drop-zone {
+            border:2px dashed var(--border-light);border-radius:var(--radius-md);
+            padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;
+            position:relative;background:var(--bg-hover);
+        }
+        .img-drop-zone:hover,.img-drop-zone.drag-over { border-color:var(--gold);background:var(--gold-dim); }
+        .img-drop-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2; }
+        .img-preview-wrap { margin-top:10px;display:none;position:relative; }
+        .img-preview-wrap.show { display:block; }
+        .img-preview-wrap img { max-width:100%;max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--border);object-fit:contain; }
+        .img-preview-del { position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center; }
+        .img-preview-del:hover { background:#dc2626; }
+
+        .ai-inline-load { display:none;align-items:center;gap:10px;padding:12px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);border-radius:var(--radius-sm);margin-top:10px; }
+        .ai-inline-load.show { display:flex; }
+        .ai-mini-spin { width:18px;height:18px;border:2px solid rgba(181,132,58,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0; }
+        .ai-inline-label { font-size:12px;font-weight:600;color:var(--gold); }
+
+        .paste-ctrl-v-hint {
+            display:flex;align-items:center;gap:8px;padding:8px 12px;
+            background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.15);
+            border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;color:#2563eb;
+        }
+        .paste-ctrl-v-hint kbd { background:#e8f0fe;border:1px solid #bfdbfe;border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace; }
+
+        /* ── STATS FIX — altura garantida e overflow hidden ── */
+        .charts-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start; }
+        .chart-panel { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;min-width:0; }
+        .chart-panel.full { grid-column:1/-1; }
+        .chart-panel-body { padding:14px;overflow:hidden; }
+        .chart-canvas-wrap { position:relative;height:200px;width:100%; }
+        .chart-canvas-wrap canvas { display:block;max-width:100%; }
+
+        /* ── TIPOS DE RESERVA ESPECIAL ── */
+        .tipo-sel {
+            background:transparent;border:none;outline:none;
+            font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+            cursor:pointer;padding:3px 6px;border-radius:4px;width:100%;
+            transition:background .12s;
+        }
+        .tipo-sel:focus { background:var(--gold-dim); }
+        .t-ls    { color:#d97706 } .t-esp { color:var(--gold) }
+        .t-lm    { color:#db2777 } .t-vip { color:#7c3aed }
+        .t-aniv  { color:#15803d } .t-ret { color:#2563eb }
+        .t-hab   { color:#0891b2 } .t-grp { color:#64748b }
+        .t-reent { color:#2563eb } .t-twin { color:#475569 }
+
+        /* ── CHECKBOXES C/M/E ── */
+        .td-cme { width:28px;text-align:center;padding:4px 2px!important; }
+        .td-cme input { width:14px;height:14px;cursor:pointer;accent-color:var(--gold); }
+        .cme-head { font-size:10px;font-weight:700;color:var(--text-soft);text-align:center;padding:6px 2px!important; }
+
+        /* ── BADGE TIPO COMPACTO ── */
+        .tipo-badge { display:inline-block;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap; }
+
+        @media(max-width:900px){ .charts-grid{grid-template-columns:1fr} .chart-panel.full{grid-column:1} }
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
@@ -439,10 +503,10 @@
 
             <!-- TROCA DE TURNO -->
             <div class="turno-grid">
-                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Nome passagem de turno" oninput="syncUI()"></div>
+                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncUI()"></div>
                 <div class="turno-field"><label>Data</label><input type="date" id="t-data" oninput="syncUI();purgeEsp()"></div>
-                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="" oninput="syncUI()" onblur="fmtPctInput(this)"></div>
-                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="" oninput="syncUI()" onblur="fmtDMInput(this)"></div>
+                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="98,18" oninput="syncUI()" onblur="fmtPctInput(this)"></div>
+                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="1.332,84" oninput="syncUI()" onblur="fmtDMInput(this)"></div>
                 <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
             </div>
 
@@ -580,6 +644,39 @@
                         <button class="btn-add" onclick="addRow('prev')">＋ Linha</button>
                     </div>
                 </div>
+
+                <!-- ══ RESERVAS ESPECIAIS — CHECK-INS PREVISTOS ══ -->
+                <div class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title"><div class="dot dot-purple"></div> Reservas Especiais — Check-ins Previstos</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span style="font-size:10px;color:var(--text-soft)">VIPs, Long Stay, Reentradas, Grupos, configuração de camas</span>
+                            <span class="pbadge pb-purple" id="b-esp-ci">0</span>
+                        </div>
+                    </div>
+                    <div class="ed-wrap"><table class="ed-t" style="min-width:780px">
+                        <thead><tr style="background:#1e1b4b">
+                            <th class="td-del" style="background:#1e1b4b"></th>
+                            <th style="width:64px;color:#a5b4fc">CTG</th>
+                            <th style="width:96px;color:#a5b4fc">Reserva</th>
+                            <th style="width:96px;color:#a5b4fc">IN</th>
+                            <th style="width:96px;color:#a5b4fc">OUT</th>
+                            <th style="color:#a5b4fc">Descrição / Nome — Tipo — Configuração</th>
+                            <th style="width:52px;color:#a5b4fc">UH</th>
+                            <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">C</th>
+                            <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">M</th>
+                            <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">E</th>
+                        </tr></thead>
+                        <tbody id="tbody-esp-ci"></tbody>
+                    </table></div>
+                    <div class="tfoot" style="flex-wrap:wrap;gap:6px">
+                        <span style="font-size:10px;color:var(--text-soft)"><strong>C</strong>=Cama config. &nbsp;<strong>M</strong>=Mesa/berço &nbsp;<strong>E</strong>=Extra/solicitação</span>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto">
+                            <button class="btn-paste" onclick="abrirColar('esp-ci')">📋 Colar lista</button>
+                            <button class="btn-add" onclick="addRow('esp-ci')">＋ Adicionar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- ══ ESPECIAIS NA CASA ══ -->
@@ -684,7 +781,8 @@
                         <option value="prev">Mês anterior</option>
                         <option value="year">Mesmo período ano passado</option>
                     </select>
-                    <button class="btn-a" style="margin-left:auto" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
+                    <button class="btn-a" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
+                    <button class="btn-a pdf" onclick="gerarPDFStats()">📄 PDF Estatísticas</button>
                 </div>
 
                 <!-- KPIs topo -->
@@ -807,13 +905,58 @@
             <button onclick="fecharColar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-soft)">✕</button>
         </div>
         <div class="modal-body">
-            <div class="paste-hint" id="paste-hint"></div>
-            <textarea class="paste-ta" id="paste-ta" placeholder="Cole aqui os dados copiados do Oracle ou planilha…" oninput="previewColar()"></textarea>
-            <div class="paste-prev" id="paste-prev"></div>
+            <!-- Abas -->
+            <div class="paste-tabs">
+                <button class="paste-tab active" id="ptab-texto" onclick="setPasteTab('texto')">📝 Colar texto</button>
+                <button class="paste-tab" id="ptab-img" onclick="setPasteTab('img')">🖼️ Colar imagem (print)</button>
+            </div>
+
+            <!-- ABA TEXTO -->
+            <div class="paste-tab-pane active" id="ppane-texto">
+                <div class="paste-hint" id="paste-hint"></div>
+                <textarea class="paste-ta" id="paste-ta"
+                    placeholder="Cole aqui os dados copiados do Oracle ou planilha…"
+                    oninput="previewColar()"></textarea>
+                <div class="paste-prev" id="paste-prev"></div>
+            </div>
+
+            <!-- ABA IMAGEM -->
+            <div class="paste-tab-pane" id="ppane-img">
+                <div class="paste-ctrl-v-hint">
+                    <kbd>Ctrl</kbd>+<kbd>V</kbd> para colar print direto, ou arraste/selecione a imagem abaixo
+                </div>
+                <div class="img-drop-zone" id="img-drop-zone">
+                    <input type="file" id="img-file-input" accept="image/*" onchange="onImgSelect(this)">
+                    <span style="font-size:32px;display:block;margin-bottom:8px">🖼️</span>
+                    <div style="font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:4px">Arraste o print aqui</div>
+                    <div style="font-size:11px;color:var(--text-soft)">ou <span style="color:var(--gold);font-weight:600">clique para selecionar</span> — PNG, JPG aceitos</div>
+                </div>
+                <div class="img-preview-wrap" id="img-preview-wrap">
+                    <img id="img-preview" src="" alt="preview">
+                    <button class="img-preview-del" onclick="limparImg()">✕</button>
+                </div>
+                <div class="ai-inline-load" id="ai-inline-load">
+                    <div class="ai-mini-spin"></div>
+                    <div class="ai-inline-label">Gemini lendo o print e extraindo dados…</div>
+                </div>
+                <div class="paste-prev" id="paste-prev-img"></div>
+                <!-- Chave Gemini compacta -->
+                <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="font-size:11px;color:var(--text-soft);white-space:nowrap">🔑 Chave Gemini:</span>
+                    <input id="gk-input-modal" type="password"
+                        style="flex:1;min-width:140px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;"
+                        placeholder="AIzaSy…"
+                        onfocus="this.type='text'"
+                        onblur="if(this.value)this.type='password';saveGK(this.value)"
+                        oninput="saveGK(this.value)">
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                        style="font-size:11px;color:#4285f4;white-space:nowrap;text-decoration:none">Obter grátis ↗</a>
+                </div>
+            </div>
         </div>
         <div class="modal-foot">
             <button class="btn-cancel" onclick="fecharColar()">Cancelar</button>
-            <button class="btn-ok" onclick="confirmarColar()">✅ Importar linhas</button>
+            <button class="btn-ok" id="btn-confirmar-colar" onclick="confirmarColarAtivo()">✅ Importar linhas</button>
         </div>
     </div>
 </div>
@@ -826,6 +969,7 @@ const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 let co      = [];
 let prev    = [];
 let esp     = [];   // especiais na casa (persistem entre auditorias)
+let espCi   = [];   // especiais de check-ins previstos
 let ci      = [];
 let ocorr   = [];
 const LS_ESP = `audit_esp_${HOTEL_SLUG}`; // chave separada para especiais
@@ -1054,7 +1198,8 @@ function addRow(k){
         co:   {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
         prev: {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
         esp:  {uh:'',ct:'SUP',reserva:'',checkin:'',checkout:'',descricao:'',tipo:'long_stay'},
-        ci:   {reserva:'',nome:'',uh:'',ct:'SUP',obs:''},
+        ci:     {reserva:'',nome:'',uh:'',ct:'SUP',obs:''},
+        'esp-ci': {ct:'SUP',reserva:'',in:'',out:'',descricao:'',uh:'',tipo:'long_stay',c:false,m:false,e:false},
     }[k];
     getData(k).push({...def});
     re(k);
@@ -1109,18 +1254,26 @@ let colarKey='co';
 const HINTS={
     co:   '<strong>Check-outs do dia.</strong> Cole do Oracle ou planilha.<br>Exemplos aceitos:<br>• <code>21  SUP  Manuel,Rui</code><br>• <code>Manuel,Rui</code><br>• <code>21  SUP  Manuel,Rui  LCO</code>',
     prev: '<strong>Check-outs previstos amanhã.</strong> Mesmo formato dos check-outs.<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code>',
+    'esp-ci': '<strong>Reservas Especiais — Check-ins Previstos.</strong> Cole da planilha ou Oracle.<br>Exemplo: <code>SUP  334532990  26/04/2026  27/04/2026  Almeida,Luis - 1 de 3</code>',
     ci:   '<strong>Check-ins pendentes.</strong> Cole do Oracle ou planilha.<br>• <code>336271347  Ramos,Maria Luiza</code><br>• <code>Ramos,Maria Luiza</code>',
 };
 const TITULOS={co:'📋 Colar — Check-outs do Dia',prev:'📋 Colar — Check-outs Amanhã',ci:'📋 Colar — Check-ins Pendentes'};
 
 function abrirColar(k){
-    colarKey=k;
-    g('paste-titulo').textContent=TITULOS[k]||'📋 Colar lista';
-    g('paste-hint').innerHTML=HINTS[k]||'';
-    g('paste-ta').value='';
+    colarKey = k;
+    g('paste-titulo').textContent = TITULOS[k] || '📋 Colar lista';
+    g('paste-hint').innerHTML = HINTS[k] || '';
+    g('paste-ta').value = '';
     g('paste-prev').classList.remove('show');
+    // reset aba imagem
+    limparImg();
+    setPasteTab('texto');
     g('paste-modal').classList.add('open');
-    setTimeout(()=>g('paste-ta').focus(),100);
+    // carrega chave salva no campo
+    const k2 = localStorage.getItem('_gk');
+    const inp = g('gk-input-modal');
+    if (k2 && inp && !inp.value) { inp.value = k2; inp.type = 'password'; }
+    setTimeout(() => g('paste-ta').focus(), 100);
 }
 function fecharColar(){ g('paste-modal').classList.remove('open'); }
 
@@ -1140,6 +1293,18 @@ function parseLinha(linha,key){
             else { nome=cols[0]; uh=isNum(cols[1]||'')?cols[1]:''; ct=isCT(cols[2]||'')?cols[2]:'SUP'; obs=cols[3]||''; }
         } else { nome=raw; }
         return{reserva,nome:limpar(nome),uh,ct:ct||'SUP',obs};
+    }
+    if(key==='esp-ci'){
+        // CTG  Reserva  IN  OUT  Descrição  [UH]
+        let ct='SUP',reserva='',din='',dout='',descricao='',uh='';
+        if(isCT(cols[0])){ct=cols[0];cols=cols.slice(1);}
+        if(isNum(cols[0])&&!isCT(cols[0])&&cols[0].length>5){reserva=cols[0];cols=cols.slice(1);}
+        // detecta datas dd/mm/aaaa
+        const isDate=s=>/^\d{2}[\/-]\d{2}[\/-]\d{4}$/.test(s?.trim());
+        if(isDate(cols[0])){din=cols[0];cols=cols.slice(1);}
+        if(isDate(cols[0])){dout=cols[0];cols=cols.slice(1);}
+        descricao=cols.join(' ');
+        return{ct:ct||'SUP',reserva,in:din,out:dout,descricao:limpar(descricao),uh,tipo:'long_stay',c:false,m:false,e:false};
     }
     // co / prev
     let uh='',ct='SUP',nome='',obs='';
@@ -1191,7 +1356,7 @@ function novaAuditoria(){
     if(co.length+prev.length+ci.length>0){
         if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
     }
-    co=[]; prev=[]; ci=[]; ocorr=[];
+    co=[]; prev=[]; espCi=[]; ci=[]; ocorr=[];
     ['t-turno','t-ocup','t-dm','prev-ocup','prev-diaria','prev-uh','prev-ent','prev-sai','prev-cafe'].forEach(id=>{const el=g(id);if(el)el.value='';});
     limparValoresCats();
     g('t-data').value=new Date().toISOString().split('T')[0];
@@ -1212,6 +1377,7 @@ function salvar(){
         cats_vals: lerValoresCats(),
         co:JSON.parse(JSON.stringify(co)),
         prev:JSON.parse(JSON.stringify(prev)),
+        espCi:JSON.parse(JSON.stringify(espCi)),
         ci:JSON.parse(JSON.stringify(ci)),
         ocorr:[...ocorr],
     };
@@ -1236,7 +1402,7 @@ function gerarPDF(){
     doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('AUDITORIA', 14, 12);
+    doc.text('AUDITORIA HOTELEIRA', 14, 12);
     doc.setFontSize(9); doc.setFont('helvetica','normal');
     doc.text(hotNome, 14, 18);
     doc.setTextColor(181,132,58);
@@ -1414,10 +1580,11 @@ function renderHist(){
 function carregarHist(i){
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
     const h=hist[i]; if(!h)return;
-    co    = h.co   ?JSON.parse(JSON.stringify(h.co))  :[];
-    prev  = h.prev ?JSON.parse(JSON.stringify(h.prev)):[];
-    ci    = h.ci   ?JSON.parse(JSON.stringify(h.ci))  :[];
-    ocorr = h.ocorr?[...h.ocorr]:[];
+    co    = h.co    ?JSON.parse(JSON.stringify(h.co))    :[];
+    prev  = h.prev  ?JSON.parse(JSON.stringify(h.prev))  :[];
+    espCi = h.espCi ?JSON.parse(JSON.stringify(h.espCi)) :[];
+    ci    = h.ci    ?JSON.parse(JSON.stringify(h.ci))    :[];
+    ocorr = h.ocorr ?[...h.ocorr]:[];
     ['turno','data','ocup','dm','uh_bloq'].forEach(k=>{ const el=g('t-'+k.replace('_bloq','-bloq')); if(el)el.value=h[k]||''; });
     g('t-turno').value=h.turno||''; g('t-data').value=h.data||''; g('t-ocup').value=h.ocupacao||'';
     g('t-dm').value=h.dm||''; g('t-uh-bloq').value=h.uh_bloq||'0';
@@ -2015,6 +2182,336 @@ function imprimirCheckouts() {
     const w = window.open('', '_blank', 'width=800,height=700');
     w.document.write(html);
     w.document.close();
+}
+
+
+// ══ MODAL COLAR — ABA IMAGEM ══
+const GEMINI_MODEL = 'gemini-2.0-flash';
+// Cole sua chave aqui ou use o campo no modal:
+const GEMINI_API_KEY_HARD = 'COLE_SUA_CHAVE_AQUI';
+
+function getGK() {
+    if (GEMINI_API_KEY_HARD && GEMINI_API_KEY_HARD !== 'COLE_SUA_CHAVE_AQUI') return GEMINI_API_KEY_HARD;
+    return localStorage.getItem('_gk') || g('gk-input-modal')?.value.trim() || '';
+}
+function saveGK(v) { if (v && v.trim()) localStorage.setItem('_gk', v.trim()); }
+
+let imgBase64 = null;
+let imgParsed = []; // linhas extraídas pela IA da imagem
+let pasteTabAtiva = 'texto';
+
+function setPasteTab(tab) {
+    pasteTabAtiva = tab;
+    document.querySelectorAll('.paste-tab').forEach(b => b.classList.toggle('active', b.id === 'ptab-' + tab));
+    document.querySelectorAll('.paste-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'ppane-' + tab));
+    if (tab === 'img') {
+        // carrega chave salva
+        const k = localStorage.getItem('_gk');
+        const inp = g('gk-input-modal');
+        if (k && inp && !inp.value) { inp.value = k; inp.type = 'password'; }
+    }
+}
+
+// Confirmar dependendo da aba ativa
+function confirmarColarAtivo() {
+    if (pasteTabAtiva === 'img') confirmarColarImg();
+    else confirmarColar();
+}
+
+// ── Drop zone da imagem ──
+const imgDz = document.getElementById('img-drop-zone');
+if (imgDz) {
+    imgDz.addEventListener('dragover', e => { e.preventDefault(); imgDz.classList.add('drag-over'); });
+    imgDz.addEventListener('dragleave', () => imgDz.classList.remove('drag-over'));
+    imgDz.addEventListener('drop', e => {
+        e.preventDefault(); imgDz.classList.remove('drag-over');
+        const f = e.dataTransfer.files[0];
+        if (f && f.type.startsWith('image/')) processarImgFile(f);
+    });
+}
+
+// Ctrl+V global — intercepta quando modal está aberto na aba imagem
+document.addEventListener('paste', e => {
+    if (!g('paste-modal').classList.contains('open')) return;
+    if (pasteTabAtiva !== 'img') return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            e.preventDefault();
+            processarImgFile(item.getAsFile());
+            break;
+        }
+    }
+});
+
+function onImgSelect(inp) {
+    const f = inp.files[0];
+    if (f) processarImgFile(f);
+    inp.value = '';
+}
+
+function limparImg() {
+    imgBase64 = null; imgParsed = [];
+    g('img-preview-wrap').classList.remove('show');
+    g('img-preview').src = '';
+    g('paste-prev-img').classList.remove('show');
+    g('paste-prev-img').innerHTML = '';
+    g('ai-inline-load').classList.remove('show');
+}
+
+async function processarImgFile(file) {
+    // Mostra preview
+    const reader = new FileReader();
+    reader.onload = async e2 => {
+        const dataUrl = e2.target.result;
+        g('img-preview').src = dataUrl;
+        g('img-preview-wrap').classList.add('show');
+        imgBase64 = dataUrl.split(',')[1];
+        const mime = file.type || 'image/png';
+        await extrairComGemini(imgBase64, mime);
+    };
+    reader.readAsDataURL(file);
+}
+
+async function extrairComGemini(b64, mime) {
+    const apiKey = getGK();
+    if (!apiKey) {
+        g('paste-prev-img').classList.add('show');
+        g('paste-prev-img').innerHTML = '<span style="color:#dc2626">⚠️ Cole sua chave do Gemini no campo abaixo para usar essa função.</span>';
+        return;
+    }
+
+    g('ai-inline-load').classList.add('show');
+    g('paste-prev-img').classList.remove('show');
+    g('btn-confirmar-colar').disabled = true;
+
+    const prompt = `Analise esta imagem de lista de hóspedes/check-outs de hotel.
+Extraia CADA LINHA visível com os dados: UH (número do apartamento), CTG (categoria: SUP/STD/SUI/DLX etc) e NOME do hóspede.
+Retorne APENAS JSON válido, sem markdown:
+{
+  "linhas": [
+    {"uh": "21", "ct": "SUP", "nome": "Manuel,Rui", "obs": ""},
+    {"uh": "22", "ct": "SUP", "nome": "Scordo,Cecilia Claudia", "obs": ""}
+  ]
+}
+REGRAS:
+- Extraia TODAS as linhas visíveis, na ordem em que aparecem
+- Se houver observação (LCO, Reentrada, etc), coloque em "obs"
+- Se não encontrar UH ou CTG, deixe string vazia ""
+- Retorne SOMENTE o JSON, nada mais`;
+
+    try {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [
+                    { inline_data: { mime_type: mime, data: b64 } },
+                    { text: prompt }
+                ]}],
+                generationConfig: { temperature: 0.1, maxOutputTokens: 4096, responseMimeType: 'application/json' }
+            })
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err?.error?.message || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        let parsed;
+        try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+        catch { throw new Error('Resposta da IA inválida'); }
+
+        imgParsed = (parsed.linhas || []).filter(l => l.nome);
+
+        g('ai-inline-load').classList.remove('show');
+        g('btn-confirmar-colar').disabled = false;
+
+        const prev = g('paste-prev-img');
+        prev.classList.add('show');
+
+        if (!imgParsed.length) {
+            prev.innerHTML = '<span style="color:#dc2626">⚠️ Nenhuma linha detectada. Tente uma imagem mais nítida.</span>';
+            return;
+        }
+
+        prev.innerHTML = `<strong style="color:var(--gold)">${imgParsed.length} hóspede(s) detectado(s)</strong> — prévia:<br><br>` +
+            imgParsed.slice(0, 5).map(r =>
+                `• UH <strong>${r.uh||'?'}</strong> [${r.ct||'?'}] — ${r.nome}${r.obs ? ' | ' + r.obs : ''}`
+            ).join('<br>') +
+            (imgParsed.length > 5 ? `<br><em>…e mais ${imgParsed.length - 5}</em>` : '');
+
+    } catch (e) {
+        g('ai-inline-load').classList.remove('show');
+        g('btn-confirmar-colar').disabled = false;
+        g('paste-prev-img').classList.add('show');
+        g('paste-prev-img').innerHTML = `<span style="color:#dc2626">🔴 Erro: ${e.message}</span>`;
+    }
+}
+
+function confirmarColarImg() {
+    if (!imgParsed.length) {
+        toast('⚠️ Nenhuma linha extraída — processe uma imagem primeiro');
+        return;
+    }
+    const arr = getData(colarKey);
+    imgParsed.forEach(r => {
+        arr.push({
+            uh:   r.uh  || '',
+            ct:   r.ct  || (getCats()[0] || 'SUP'),
+            nome: r.nome || '',
+            obs:  r.obs  || '',
+            pre: false, trip: false, saiu: false
+        });
+    });
+    re(colarKey);
+    fecharColar();
+    toast(`✅ ${imgParsed.length} hóspede(s) importado(s) da imagem!`);
+}
+
+
+// ══ RENDER ESPECIAIS CHECK-INS PREVISTOS ══
+const TIPOS_ESP = {
+    'long_stay':      {l:'🏷️ Long Stay',      cls:'t-ls'},
+    'vip':            {l:'👑 VIP',              cls:'t-vip'},
+    'lua_de_mel':     {l:'💑 Lua de Mel',       cls:'t-lm'},
+    'aniversario':    {l:'🎂 Aniversário',      cls:'t-aniv'},
+    'returning':      {l:'🔄 Returning Guest',  cls:'t-ret'},
+    'habitue':        {l:'⭐ Habitué',          cls:'t-hab'},
+    'grupo':          {l:'👥 Grupo',            cls:'t-grp'},
+    'reentrada':      {l:'↩️ Reentrada',        cls:'t-reent'},
+    'twin':           {l:'🛏️🛏️ Twin',           cls:'t-twin'},
+    'cama_adicional': {l:'➕ Cama Adicional',   cls:'t-grp'},
+    'especial':       {l:'⭐ Especial',         cls:'t-esp'},
+};
+
+function tipoOpts(sel) {
+    return Object.entries(TIPOS_ESP).map(([v,t]) =>
+        `<option value="${v}" ${(sel||'long_stay')===v?'selected':''}>${t.l}</option>`
+    ).join('');
+}
+
+function renderEspCi() {
+    const tbody = g('tbody-esp-ci');
+    if (!tbody) return;
+    if (!espCi.length) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">
+            Nenhuma reserva especial prevista — clique em ＋ para adicionar<br>
+            <span style="font-size:11px">VIPs, Long Stays, Reentradas, Grupos, configuração de camas</span>
+        </td></tr>`;
+    } else {
+        tbody.innerHTML = espCi.map((r,i) => `<tr>
+            <td class="td-del"><button class="btn-del" onclick="delRow('esp-ci',${i})">✕</button></td>
+            <td><select class="es" onchange="setF('esp-ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+            <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setF('esp-ci',${i},'reserva',this.value)"></td>
+            <td><input class="ei" style="width:88px" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'in',this.value)"></td>
+            <td><input class="ei" style="width:88px" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'out',this.value)"></td>
+            <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - ex: Maxwell,Josh - 1 de 5 - Cama twin" oninput="setF('esp-ci',${i},'descricao',this.value)" style="min-width:220px"></td>
+            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('esp-ci',${i},'uh',this.value)"></td>
+            <td class="td-cme"><input type="checkbox" ${r.c?'checked':''} onchange="setF('esp-ci',${i},'c',this.checked)" title="Configuração de cama confirmada"></td>
+            <td class="td-cme"><input type="checkbox" ${r.m?'checked':''} onchange="setF('esp-ci',${i},'m',this.checked)" title="Mesa/berço/extra confirmado"></td>
+            <td class="td-cme"><input type="checkbox" ${r.e?'checked':''} onchange="setF('esp-ci',${i},'e',this.checked)" title="Solicitação extra confirmada"></td>
+        </tr>`).join('');
+    }
+    const badge = g('b-esp-ci');
+    if (badge) badge.textContent = espCi.length;
+}
+
+// ══ HINTS para colar lista esp-ci ══
+// Já adicionado no HINTS object — faremos abaixo
+
+// ══ PDF ESTATÍSTICAS ══
+function gerarPDFStats() {
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const hotel = document.querySelector('.hotel-badge span')?.textContent || '';
+    const azul=[37,99,235], roxo=[124,58,237], dourado=[181,132,58], escuro=[15,23,42];
+
+    // Header
+    doc.setFillColor(...escuro); doc.rect(0,0,297,22,'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text('ESTATÍSTICAS & RELATÓRIO FINANCEIRO', 14, 10);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text(hotel, 14, 17);
+    doc.setTextColor(181,132,58);
+    doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR')}`, 240, 17);
+
+    let y = 28;
+
+    // KPIs
+    const kpis = [
+        {l:'Ocupação Média', v: g('st-ocup-med')?.textContent||'—'},
+        {l:'Diária Média',   v: g('st-dm-med')?.textContent||'—'},
+        {l:'Total Check-outs', v: g('st-co-total')?.textContent||'—'},
+        {l:'Auditorias Salvas', v: g('st-audit-total')?.textContent||'—'},
+    ];
+    const kpiW = (297-28)/4;
+    kpis.forEach((k,i) => {
+        const x = 14 + i*kpiW;
+        doc.setFillColor(248,250,252); doc.roundedRect(x, y, kpiW-4, 18, 2, 2, 'F');
+        doc.setDrawColor(200,200,200); doc.roundedRect(x, y, kpiW-4, 18, 2, 2, 'S');
+        doc.setTextColor(100,100,100); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+        doc.text(k.l.toUpperCase(), x+4, y+6);
+        doc.setTextColor(...escuro); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+        doc.text(k.v, x+4, y+15);
+    });
+    y += 24;
+
+    // Tabela mensal
+    const tbody = g('tbody-mensal');
+    if (tbody) {
+        const rows = [];
+        tbody.querySelectorAll('tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 6) {
+                rows.push([
+                    cells[0]?.textContent?.trim()||'',
+                    cells[1]?.textContent?.trim()||'',
+                    cells[2]?.textContent?.trim()||'',
+                    cells[3]?.textContent?.trim()||'',
+                    cells[4]?.textContent?.trim()||'',
+                    cells[5]?.textContent?.trim()||'',
+                    cells[6]?.querySelector('.badge-comp')?.textContent?.trim()||'—',
+                ]);
+            }
+        });
+
+        if (rows.length) {
+            doc.setFillColor(...dourado); doc.rect(14, y, 269, 7, 'F');
+            doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+            doc.text('COMPARATIVO MENSAL DETALHADO', 16, y+5); y += 9;
+
+            doc.autoTable({
+                startY: y, margin:{left:14,right:14},
+                head:[['Mês','Auditorias','Ocupação Média','DM Média','Check-outs','Res. Especiais','vs Anterior']],
+                body: rows,
+                styles:{fontSize:8, cellPadding:2},
+                headStyles:{fillColor:escuro, textColor:255, fontStyle:'bold'},
+                alternateRowStyles:{fillColor:[250,250,250]},
+                columnStyles:{
+                    0:{cellWidth:28,fontStyle:'bold'},1:{cellWidth:22,halign:'center'},
+                    2:{cellWidth:30,halign:'center'},3:{cellWidth:35,halign:'center'},
+                    4:{cellWidth:28,halign:'center'},5:{cellWidth:28,halign:'center'},
+                    6:{cellWidth:32,halign:'center'},
+                },
+            });
+            y = doc.lastAutoTable.finalY + 8;
+        }
+    }
+
+    // Rodapé
+    doc.setPage(doc.getNumberOfPages());
+    doc.setDrawColor(200,200,200); doc.line(14,200,283,200);
+    doc.setTextColor(150,150,150); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text(`${hotel} — Estatísticas — ${new Date().toLocaleDateString('pt-BR')}`, 14, 204);
+    doc.text(`Concierge Dashboard`, 240, 204);
+
+    doc.save(`Estatisticas_${hotel.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+    toast('📄 PDF de estatísticas gerado!');
 }
 
 // ══ INIT ══
