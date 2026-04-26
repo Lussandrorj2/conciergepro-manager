@@ -749,153 +749,140 @@
                 </div>
             </div>
 
-            <!-- ══ HISTÓRICO ══ -->
-            <div class="tab-pane" id="pane-historico">
-                <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
-                        <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
-                    </div>
-                    <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
+            ```
+        <!-- ══ HISTÓRICO ══ -->
+        <div class="tab-pane" id="pane-historico">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
+                    <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
                 </div>
+                <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
             </div>
         </div>
-    </main>
-</div>
 
+        <!-- ══ ESTATÍSTICAS ══ -->
+        <div class="tab-pane" id="pane-stats">
 
-            <!-- ══ ESTATÍSTICAS ══ -->
-            <div class="tab-pane" id="pane-stats">
+            <div class="stats-filters">
+                <label>Período:</label>
+                <select id="sf-periodo" onchange="renderStats()">
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6" selected>Últimos 6 meses</option>
+                    <option value="12">Últimos 12 meses</option>
+                    <option value="all">Todo o histórico</option>
+                </select>
+                <div class="sep"></div>
+                <label>Comparar com:</label>
+                <select id="sf-comp" onchange="renderStats()">
+                    <option value="prev">Mês anterior</option>
+                    <option value="year">Mesmo período ano passado</option>
+                </select>
+                <button class="btn-a" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
+                <button class="btn-a pdf" onclick="gerarPDFStats()">📄 PDF Estatísticas</button>
+            </div>
 
-                <!-- Filtros -->
-                <div class="stats-filters">
-                    <label>Período:</label>
-                    <select id="sf-periodo" onchange="renderStats()">
-                        <option value="3">Últimos 3 meses</option>
-                        <option value="6" selected>Últimos 6 meses</option>
-                        <option value="12">Últimos 12 meses</option>
-                        <option value="all">Todo o histórico</option>
-                    </select>
-                    <div class="sep"></div>
-                    <label>Comparar com:</label>
-                    <select id="sf-comp" onchange="renderStats()">
-                        <option value="prev">Mês anterior</option>
-                        <option value="year">Mesmo período ano passado</option>
-                    </select>
-                    <button class="btn-a" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
-                    <button class="btn-a pdf" onclick="gerarPDFStats()">📄 PDF Estatísticas</button>
+            <div class="stats-top">
+                <div class="stat-box s-green">
+                    <div class="stat-box-lbl">Ocupação Média</div>
+                    <div class="stat-box-val" id="st-ocup-med">—</div>
+                    <div class="stat-box-trend" id="st-ocup-trend"></div>
+                    <div class="stat-box-sub">no período</div>
                 </div>
-
-                <!-- KPIs topo -->
-                <div class="stats-top">
-                    <div class="stat-box s-green">
-                        <div class="stat-box-lbl">Ocupação Média</div>
-                        <div class="stat-box-val" id="st-ocup-med">—</div>
-                        <div class="stat-box-trend" id="st-ocup-trend"></div>
-                        <div class="stat-box-sub">no período</div>
-                    </div>
-                    <div class="stat-box s-gold">
-                        <div class="stat-box-lbl">Diária Média (DM)</div>
-                        <div class="stat-box-val" id="st-dm-med">—</div>
-                        <div class="stat-box-trend" id="st-dm-trend"></div>
-                        <div class="stat-box-sub">no período</div>
-                    </div>
-                    <div class="stat-box s-blue">
-                        <div class="stat-box-lbl">Total Check-outs</div>
-                        <div class="stat-box-val" id="st-co-total">—</div>
-                        <div class="stat-box-trend" id="st-co-trend"></div>
-                        <div class="stat-box-sub">auditorias registradas</div>
-                    </div>
-                    <div class="stat-box s-purple">
-                        <div class="stat-box-lbl">Auditorias Salvas</div>
-                        <div class="stat-box-val" id="st-audit-total">—</div>
-                        <div class="stat-box-sub">no histórico</div>
-                    </div>
+                <div class="stat-box s-gold">
+                    <div class="stat-box-lbl">Diária Média (DM)</div>
+                    <div class="stat-box-val" id="st-dm-med">—</div>
+                    <div class="stat-box-trend" id="st-dm-trend"></div>
+                    <div class="stat-box-sub">no período</div>
                 </div>
-
-                <!-- Gráficos -->
-                <div class="charts-grid">
-
-                    <!-- Ocupação por dia -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">📈 Ocupação por Auditoria</div>
-                            <span style="font-size:10px;color:var(--text-soft)">% por dia</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-ocup"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Diária média por dia -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">💰 Diária Média (DM) por Auditoria</div>
-                            <span style="font-size:10px;color:var(--text-soft)">R$ por dia</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-dm"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Check-outs por mês (barras) -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">🚪 Check-outs por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">total de saídas</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-co-mes"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Ocupação média por mês -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">📊 Ocupação Média por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">comparativo mensal</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-ocup-mes"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- DM média por mês (barras full) -->
-                    <div class="chart-panel full">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">💳 Evolução da Diária Média por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">comparativo de receita média</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap tall"><canvas id="chart-dm-mes"></canvas></div>
-                        </div>
-                    </div>
-
+                <div class="stat-box s-blue">
+                    <div class="stat-box-lbl">Total Check-outs</div>
+                    <div class="stat-box-val" id="st-co-total">—</div>
+                    <div class="stat-box-trend" id="st-co-trend"></div>
+                    <div class="stat-box-sub">auditorias registradas</div>
                 </div>
+                <div class="stat-box s-purple">
+                    <div class="stat-box-lbl">Auditorias Salvas</div>
+                    <div class="stat-box-val" id="st-audit-total">—</div>
+                    <div class="stat-box-sub">no histórico</div>
+                </div>
+            </div>
 
-                <!-- Tabela comparativa mensal -->
-                <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-gold"></div> Comparativo Mensal Detalhado</div>
-                        <span style="font-size:10px;color:var(--text-soft)">Dados extraídos das auditorias salvas</span>
+            <div class="charts-grid">
+                <div class="chart-panel">
+                    <div class="chart-panel-head">
+                        <div class="chart-panel-title">📈 Ocupação por Auditoria</div>
+                        <span style="font-size:10px;color:var(--text-soft)">% por dia</span>
                     </div>
-                    <div style="overflow-x:auto">
-                        <table class="table-stats" id="table-mensal">
-                            <thead><tr>
-                                <th>Mês</th>
-                                <th>Auditorias</th>
-                                <th>Ocupação Média</th>
-                                <th>DM Média</th>
-                                <th>Check-outs Total</th>
-                                <th>Res. Especiais</th>
-                                <th>vs Mês Anterior</th>
-                            </tr></thead>
-                            <tbody id="tbody-mensal"></tbody>
-                        </table>
+                    <div class="chart-panel-body">
+                        <div class="chart-canvas-wrap"><canvas id="chart-ocup"></canvas></div>
                     </div>
                 </div>
+                <div class="chart-panel">
+                    <div class="chart-panel-head">
+                        <div class="chart-panel-title">💰 Diária Média (DM) por Auditoria</div>
+                        <span style="font-size:10px;color:var(--text-soft)">R$ por dia</span>
+                    </div>
+                    <div class="chart-panel-body">
+                        <div class="chart-canvas-wrap"><canvas id="chart-dm"></canvas></div>
+                    </div>
+                </div>
+                <div class="chart-panel">
+                    <div class="chart-panel-head">
+                        <div class="chart-panel-title">🚪 Check-outs por Mês</div>
+                        <span style="font-size:10px;color:var(--text-soft)">total de saídas</span>
+                    </div>
+                    <div class="chart-panel-body">
+                        <div class="chart-canvas-wrap"><canvas id="chart-co-mes"></canvas></div>
+                    </div>
+                </div>
+                <div class="chart-panel">
+                    <div class="chart-panel-head">
+                        <div class="chart-panel-title">📊 Ocupação Média por Mês</div>
+                        <span style="font-size:10px;color:var(--text-soft)">comparativo mensal</span>
+                    </div>
+                    <div class="chart-panel-body">
+                        <div class="chart-canvas-wrap"><canvas id="chart-ocup-mes"></canvas></div>
+                    </div>
+                </div>
+                <div class="chart-panel full">
+                    <div class="chart-panel-head">
+                        <div class="chart-panel-title">💳 Evolução da Diária Média por Mês</div>
+                        <span style="font-size:10px;color:var(--text-soft)">comparativo de receita média</span>
+                    </div>
+                    <div class="chart-panel-body">
+                        <div class="chart-canvas-wrap tall"><canvas id="chart-dm-mes"></canvas></div>
+                    </div>
+                </div>
+            </div>
 
-            </div><!-- /pane-stats -->
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title"><div class="dot dot-gold"></div> Comparativo Mensal Detalhado</div>
+                    <span style="font-size:10px;color:var(--text-soft)">Dados extraídos das auditorias salvas</span>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="table-stats" id="table-mensal">
+                        <thead><tr>
+                            <th>Mês</th>
+                            <th>Auditorias</th>
+                            <th>Ocupação Média</th>
+                            <th>DM Média</th>
+                            <th>Check-outs Total</th>
+                            <th>Res. Especiais</th>
+                            <th>vs Mês Anterior</th>
+                        </tr></thead>
+                        <tbody id="tbody-mensal"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /pane-stats -->
+
+    </div><!-- /content -->
+</main>
+
+</div><!-- /layout -->
 
 
 <!-- MODAL COLAR -->
