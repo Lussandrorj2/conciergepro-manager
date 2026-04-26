@@ -255,7 +255,7 @@
                         <div class="up-icon">🤖</div>
                         <div>
                             <div>Importar Relatório via IA</div>
-                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">Gemini analisa a imagem/PDF e preenche tudo automaticamente</div>
+                            <div style="font-size:11px;font-weight:400;color:var(--text-soft);margin-top:1px">IA analisa a imagem/PDF e preenche tudo automaticamente</div>
                         </div>
                     </div>
                     <button class="btn-a" onclick="novaAuditoria()">＋ Manual</button>
@@ -267,20 +267,18 @@
                         <div class="drop-text">Arraste os PDFs/imagens da auditoria aqui</div>
                         <div class="drop-hint">ou <span>clique para selecionar</span> — vários arquivos aceitos (PDF, PNG, JPG)</div>
                     </div>
-                    <!-- Lista de arquivos selecionados -->
                     <div class="files-list" id="files-list"></div>
-                    <!-- Botão adicionar mais -->
                     <button class="files-add-more" id="btn-add-more">
                         <input type="file" accept=".pdf,image/*" multiple onchange="adicionarMaisArquivos(this)">
                         ＋ Adicionar mais arquivos
                     </button>
                     <button class="btn-process" id="btn-processar" onclick="processarComIA()" disabled>
-                        ✨ Processar com Gemini — Extrair Dados da Auditoria
+                        ✨ Processar com IA — Extrair Dados da Auditoria
                     </button>
                 </div>
                 <div class="ai-load" id="ai-loading">
                     <div class="ai-spin"></div>
-                    <div class="ai-load-label">Gemini analisando o relatório…</div>
+                    <div class="ai-load-label">IA analisando o relatório…</div>
                     <div class="ai-steps">
                         <div class="ai-step" id="s1"><div class="ai-dot"></div>Lendo documento</div>
                         <div class="ai-step" id="s2"><div class="ai-dot"></div>Extraindo dados de ocupação</div>
@@ -298,7 +296,7 @@
                 <div class="audit-topbar">
                     <div class="audit-meta">
                         <div class="badge-data">📅 <span id="lbl-data">—</span></div>
-                        <div class="badge-fonte" id="lbl-fonte">🤖 Gemini</div>
+                        <div class="badge-fonte" id="lbl-fonte">🤖 IA</div>
                     </div>
                     <div style="display:flex;gap:6px">
                         <button class="btn-a" onclick="salvarAuditoria()">💾 Salvar</button>
@@ -478,14 +476,27 @@
 </div>
 
 <script>
-const HOTEL_SLUG  = "{{ hotel.slug }}";
-const LS_KEY      = `hosp_audit_hist_${HOTEL_SLUG}`;
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const HOTEL_SLUG = "{{ hotel.slug }}";
+const LS_KEY     = `hosp_audit_hist_${HOTEL_SLUG}`;
 
+// ════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DA IA — Groq (gratuito e rápido)
+// Obtenha sua chave em: https://console.groq.com
+// IMPORTANTE: mova esta chave para o backend Django
+// para não ficar exposta no HTML público.
+// No Django: settings.py → GROQ_API_KEY = 'gsk_...'
+// Na view: passe via contexto → context['groq_key'] = settings.GROQ_API_KEY
+// No template: const GROQ_API_KEY = "{{ groq_key }}";
+// ════════════════════════════════════════════════════════
+const GROQ_API_KEY = "{{ groq_key|default:'' }}";
 
-const GEMINI_API_KEY = 'AIzaSyAZnWFAmAlPx3PcbjzgE3UwRX2wmISuQtg';
+// Modelos com suporte a visão (imagem) no Groq — em ordem de fallback
+const GROQ_MODELS = [
+    'meta-llama/llama-4-scout-17b-16e-instruct',  // Llama 4 Scout — melhor para visão
+    'meta-llama/llama-4-maverick-17b-128e-instruct', // Llama 4 Maverick — fallback
+];
 
-let arquivosSel   = []; // array de {file, tipo}
+let arquivosSel   = [];
 let auditoriaAtual = null;
 let ocorrencias   = [];
 let checkoutsHoje = [];
@@ -493,11 +504,6 @@ let checkoutsPrev = [];
 let especiais     = [];
 let prevEspeciais  = [];
 let checkins      = [];
-
-// ── GEMINI KEY ──
-function getGeminiKey() {
-    return GEMINI_API_KEY;
-}
 
 // ── DRAG & DROP ──
 const dz = document.getElementById('drop-zone');
@@ -514,7 +520,6 @@ const TIPOS = ['Ocupação','Check-outs','Check-ins','Reservas Especiais','Outro
 
 function adicionarArquivos(files) {
     files.forEach(f => {
-        // detecta tipo pelo nome do arquivo
         const nome = f.name.toLowerCase();
         let tipo = 'Outro';
         if (nome.includes('ocup') || nome.includes('occup')) tipo = 'Ocupação';
@@ -560,11 +565,14 @@ function renderFilesList() {
         </div>`).join('');
 }
 
-// ── PROCESSAR COM IA ──
+// ── PROCESSAR COM IA (Groq) ──
 async function processarComIA() {
     if (!arquivosSel.length) return;
-    const apiKey = getGeminiKey();
-    if (!apiKey) { toast('⚠️ Configure a chave do Gemini no código!'); return; }
+
+    if (!GROQ_API_KEY || GROQ_API_KEY.trim() === '') {
+        toast('⚠️ Chave do Groq não configurada. Adicione GROQ_API_KEY no settings.py do Django.');
+        return;
+    }
 
     g('upload-section').querySelector('.up-body').style.display = 'none';
     g('ai-loading').classList.add('show');
@@ -581,7 +589,7 @@ async function processarComIA() {
         });
     }, d));
 
-    // Converte todos os arquivos para base64
+    // Converte arquivos para base64
     const partsArquivos = [];
     for (const a of arquivosSel) {
         const b64  = await toB64(a.file);
@@ -589,15 +597,8 @@ async function processarComIA() {
         partsArquivos.push({ tipo: a.tipo, b64, mime, nome: a.file.name });
     }
 
-    // Monta parts do Gemini — um bloco por arquivo com label do tipo
-    const parts = [];
-    partsArquivos.forEach(a => {
-        parts.push({ text: `--- ARQUIVO: ${a.nome} | TIPO: ${a.tipo} ---` });
-        parts.push({ inline_data: { mime_type: a.mime, data: a.b64 } });
-    });
-
     const prompt = `Você é especialista em auditoria hoteleira. Analise a imagem/documento e extraia TODOS os dados.
-Retorne APENAS JSON válido sem markdown.
+Retorne APENAS JSON válido sem markdown, sem texto antes ou depois.
 
 {
   "data":"DD/MM/AAAA","turno":"Nome/Nome","ocupacao":"XX,XX%","dm":"R$ X.XXX,XX","uh_bloq":0,
@@ -613,32 +614,86 @@ Retorne APENAS JSON válido sem markdown.
 }
 REGRAS: obs com "Reentrada"→reentrada:true; "LCO"/"Late"→lco:true. Extraia TODOS os hóspedes visíveis.`;
 
-    try {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,{
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                contents:[{parts:[...parts, {text:prompt}]}],
-                generationConfig:{temperature:0.1,maxOutputTokens:8192,responseMimeType:'application/json'}
-            })
+    // Monta mensagem no formato OpenAI com imagens
+    const contentParts = [];
+    partsArquivos.forEach(a => {
+        contentParts.push({ type: 'text', text: `--- ARQUIVO: ${a.nome} | TIPO: ${a.tipo} ---` });
+        contentParts.push({
+            type: 'image_url',
+            image_url: { url: `data:${a.mime};base64,${a.b64}` }
         });
-        if (!r.ok){const e=await r.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${r.status}`);}
-        const data = await r.json();
-        const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-        tt.forEach(clearTimeout);
-        ss.forEach(s=>{const el=g(s);el.classList.add('feito');el.classList.remove('ativo');});
-        await sleep(500);
-        let parsed;
-        try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{parsed=demo();}
-        const nomes = arquivosSel.map(a=>a.file.name).join(', ');
-        carregarAuditoria(parsed,'✨ Gemini — '+arquivosSel.length+' arquivo(s)');
-    } catch(e) {
-        tt.forEach(clearTimeout);
-        ss.forEach(s=>g(s).classList.remove('ativo','feito'));
-        g('ai-loading').classList.remove('show');
-        renderFilesList();
-        g('upload-section').querySelector('.up-body').style.display='';
-        toast('🔴 Erro: '+e.message);
+    });
+    contentParts.push({ type: 'text', text: prompt });
+
+    // Tenta modelos em sequência (fallback automático)
+    let raw = '';
+    let modelUsado = '';
+    let lastError = null;
+
+    for (const model of GROQ_MODELS) {
+        try {
+            const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{ role: 'user', content: contentParts }],
+                    temperature: 0.1,
+                    max_tokens: 8192,
+                    response_format: { type: 'json_object' }
+                })
+            });
+
+            if (!r.ok) {
+                const e = await r.json().catch(() => {});
+                const msg = e?.error?.message || `HTTP ${r.status}`;
+                // Se for quota, tenta próximo modelo
+                if (r.status === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
+                    lastError = `${model}: quota atingida`;
+                    continue;
+                }
+                throw new Error(msg);
+            }
+
+            const data = await r.json();
+            raw = data?.choices?.[0]?.message?.content || '';
+            modelUsado = model.split('/').pop(); // nome curto do modelo
+            break; // sucesso — sai do loop
+
+        } catch(e) {
+            lastError = e.message;
+            // Se não for erro de quota, não tenta próximo
+            if (!e.message.toLowerCase().includes('quota') && !e.message.toLowerCase().includes('rate')) {
+                throw e;
+            }
+        }
     }
+
+    tt.forEach(clearTimeout);
+
+    if (!raw) {
+        ss.forEach(s => g(s).classList.remove('ativo','feito'));
+        g('ai-loading').classList.remove('show');
+        g('upload-section').querySelector('.up-body').style.display = '';
+        renderFilesList();
+        toast('🔴 Todos os modelos atingiram o limite. Tente novamente em alguns minutos.');
+        return;
+    }
+
+    ss.forEach(s => { const el=g(s); el.classList.add('feito'); el.classList.remove('ativo'); });
+    await sleep(500);
+
+    let parsed;
+    try {
+        parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    } catch {
+        parsed = demo();
+    }
+
+    carregarAuditoria(parsed, `✨ Groq — ${modelUsado}`);
 }
 
 function toB64(f){return new Promise((r,j)=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.onerror=()=>j(new Error('Falhou'));fr.readAsDataURL(f);});}
@@ -659,38 +714,16 @@ function demo(){
         checkouts:[
             {uh:21,ct:'SUP',nome:'Manuel,Rui',obs:'',lco:false,reentrada:false,pre:false,trip:false},
             {uh:22,ct:'SUP',nome:'Scordo,Cecilia Claudia',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:27,ct:'STD',nome:'silva,raphael',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:33,ct:'SUP',nome:'Fabbri Ratcliff,Katia',obs:'',lco:false,reentrada:false,pre:false,trip:false},
             {uh:34,ct:'SUP',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
-            {uh:37,ct:'STD',nome:'Pereira,Diego',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:42,ct:'SUP',nome:'Workman,Greta',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:43,ct:'SUP',nome:'MARTINEZ,RAFAEL',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:45,ct:'STD',nome:'Kurniawan,Grace Jasmine',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:46,ct:'STD',nome:'Lemaitre,Cecilia Gurgel',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:53,ct:'SUP',nome:'Scipioni,Mercedes',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:54,ct:'SUP',nome:'De Laurentis,Carlos',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:57,ct:'STD',nome:'Berger,Sandra',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:61,ct:'SUP',nome:'Vignart,Juan Pablo',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:62,ct:'SUP',nome:'Vignart,Oscar',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:63,ct:'SUP',nome:'Mauler Da Cruz,Bruno',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:65,ct:'STD',nome:'Cardum,Matheus',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:67,ct:'STD',nome:'Xavier,Beatriz',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:76,ct:'STD',nome:'Gottardi,Ana Maria',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:77,ct:'STD',nome:'Gottardi,Luciana',obs:'',lco:false,reentrada:false,pre:false,trip:false},
-            {uh:87,ct:'STD',nome:'Vidal,Eduardo',obs:'',lco:false,reentrada:false,pre:false,trip:false},
             {uh:92,ct:'SUI',nome:'Reid,Naomi',obs:'Reentrada no SUP',lco:false,reentrada:true,pre:false,trip:false},
-            {uh:96,ct:'STD',nome:'Carmona dos Santos,Guermann',obs:'',lco:false,reentrada:false,pre:false,trip:false},
         ],
         previsao:{
             ocupacao:'92,59%',diaria:'R$ 1.286,97',uhs:50,entradas:19,saidas:23,cafe:90,
             checkouts_amanha:[
                 {uh:34,ct:'STD',nome:'Ramos,Maria Luiza',obs:'Reentrada no STD',lco:false,reentrada:true,pre:false,trip:false},
-                {uh:92,ct:'SUP',nome:'Reid,Naomi',obs:'Reentrada no SUP',lco:false,reentrada:true,pre:false,trip:false},
             ],
             especiais:[
                 {categoria:'STD',reserva:'336271347',in:'26/04/2026',out:'27/04/2026',descricao:'Ramos,Maria Luiza - Reentrada no STD',uh:34},
-                {categoria:'SUP',reserva:'334532990',in:'26/04/2026',out:'27/04/2026',descricao:'Almeida,Luis - 1 de 3',uh:''},
-                {categoria:'STD',reserva:'335710091',in:'26/04/2026',out:'05/05/2026',descricao:'Silva Reis,Pedro - Long stay',uh:''},
             ]
         }
     };
@@ -712,7 +745,7 @@ function carregarAuditoria(d, fonte) {
     g('audit-wrap').style.display='block';
 
     g('lbl-data').textContent  = d.data||'—';
-    g('lbl-fonte').textContent = fonte||'🤖 Gemini';
+    g('lbl-fonte').textContent = fonte||'🤖 IA';
     g('t-turno').value   = d.turno||'';
     g('t-data').value    = isoDate(d.data);
     g('t-ocup').value    = d.ocupacao||'';
@@ -727,14 +760,12 @@ function carregarAuditoria(d, fonte) {
     g('kpi-reent').textContent = reent;
     g('kpi-esp').textContent   = especiais.length;
 
-    // tab badges
     g('tb-audit').textContent = d.turno?d.turno.split('/')[0].trim():'—';
     g('tb-co').textContent    = checkoutsHoje.length;
     g('tb-prev').textContent  = checkoutsPrev.length;
     g('tb-esp').textContent   = especiais.length;
     g('tb-ci').textContent    = checkins.length;
 
-    // previsão
     const pv = d.previsao||{};
     g('prev-ocup').textContent  = pv.ocupacao||'—';
     g('prev-diaria').textContent= pv.diaria||'—';
@@ -788,8 +819,7 @@ function renderEspeciais(){
             <td>${e.tipo==='long_stay'?'<span class="xtag xt-ls">🏷️ Long Stay</span>':'<span class="xtag xt-esp">⭐ Especial</span>'}</td>
           </tr>`).join('')
         : '<tr><td colspan="6" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial</td></tr>';
-    ['b-esp','tb-esp-badge'].forEach(id=>{const el=g(id);if(el)el.textContent=especiais.length;});
-    g('tb-esp-badge')&&(g('tb-esp-badge').textContent=especiais.length);
+    const el=g('b-esp');if(el)el.textContent=especiais.length;
 }
 
 // ── CHECKOUTS ──
@@ -799,8 +829,8 @@ function renderCheckoutsHoje(){
     for(let b=0;b<Math.max(5,28-checkoutsHoje.length);b++) rows+=blankRow(b);
     tbody.innerHTML=rows;
     ['b-co','tb-co'].forEach(id=>{const el=g(id);if(el)el.textContent=checkoutsHoje.length;});
-    g('kpi-co').textContent   = checkoutsHoje.length;
-    g('kpi-lco').textContent  = checkoutsHoje.filter(c=>c.lco).length;
+    g('kpi-co').textContent    = checkoutsHoje.length;
+    g('kpi-lco').textContent   = checkoutsHoje.filter(c=>c.lco).length;
     g('kpi-reent').textContent = checkoutsHoje.filter(c=>c.reentrada).length;
 }
 
