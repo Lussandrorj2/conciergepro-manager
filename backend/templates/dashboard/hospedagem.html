@@ -429,6 +429,22 @@
         .tipo-badge { display:inline-block;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap; }
 
 
+
+        /* ── INPUT DATA AUTOMÁTICO ── */
+        .ei-date-auto {
+            width: 106px; font-family: monospace; letter-spacing: .5px;
+        }
+
+        /* ── DRAG & DROP ── */
+        .ed-t tr[draggable="true"] { cursor: grab; }
+        .ed-t tr[draggable="true"]:active { cursor: grabbing; }
+        .ed-t tr.drag-over td { background: var(--gold-dim) !important; border-top: 2px solid var(--gold); }
+        .ed-t tr.dragging { opacity: .4; }
+        .drag-handle {
+            color: var(--border-light); cursor: grab; font-size: 14px;
+            padding: 0 4px; user-select: none; flex-shrink: 0;
+        }
+        .drag-handle:hover { color: var(--text-soft); }
         /* ── RESPONSIVE ── */
         @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
@@ -515,10 +531,10 @@
             <!-- KPIs -->
             <div class="kpi-row">
                 <div class="kpi-card k-green"><div class="kpi-lbl">Ocupação</div><div class="kpi-val" id="kpi-ocup">—</div></div>
-                <div class="kpi-card k-blue"><div class="kpi-lbl">Check-outs Hoje</div><div class="kpi-val" id="kpi-co">0</div><div class="kpi-sub">saídas</div></div>
-                <div class="kpi-card k-purple"><div class="kpi-lbl">Late Check-out</div><div class="kpi-val" id="kpi-lco">0</div></div>
-                <div class="kpi-card k-amber"><div class="kpi-lbl">Reentradas</div><div class="kpi-val" id="kpi-reent">0</div></div>
-                <div class="kpi-card k-gold"><div class="kpi-lbl">Res. Especiais na Casa</div><div class="kpi-val" id="kpi-esp">0</div></div>
+                <div class="kpi-card k-blue"><div class="kpi-lbl">Check-outs Previstos</div><div class="kpi-val" id="kpi-co">0</div><div class="kpi-sub">saídas do dia</div></div>
+                <div class="kpi-card k-purple"><div class="kpi-lbl">Late Check-out</div><div class="kpi-val" id="kpi-lco">0</div><div class="kpi-sub">na lista do dia</div></div>
+                <div class="kpi-card k-amber"><div class="kpi-lbl">Reentradas</div><div class="kpi-val" id="kpi-reent">0</div><div class="kpi-sub">na lista do dia</div></div>
+                <div class="kpi-card k-gold"><div class="kpi-lbl">Especiais na Casa</div><div class="kpi-val" id="kpi-esp">0</div><div class="kpi-sub">long stays e VIPs</div></div>
             </div>
 
             <!-- ABAS -->
@@ -539,8 +555,9 @@
                         <div class="panel-title"><div class="dot dot-blue"></div> Check-outs do Dia</div>
                         <span class="pbadge pb-blue" id="b-co">0</span>
                     </div>
-                    <div class="ed-wrap"><table class="ed-t">
+                    <div class="ed-wrap"><table class="ed-t" id="table-co">
                         <thead><tr class="head-dark">
+                            <th style="width:22px"></th>
                             <th class="td-del"></th>
                             <th class="td-saiu" title="Marcar como saiu">✓ Saiu</th>
                             <th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
@@ -931,7 +948,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
                     <div>
                         <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Observação <span style="font-weight:400;text-transform:none">(opcional)</span></label>
-                        <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada no SUP&#10;&#10;…"
+                        <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada&#10;&#10;…"
                             style="min-height:70px;max-height:100px;font-family:monospace;font-size:13px"
                             oninput="previewColunas()"></textarea>
                     </div>
@@ -1038,7 +1055,7 @@ function renderCo(){
 function renderCoTable(arr,tbodyId,key){
     const tbody=g(tbodyId);
     const isCo = (key==='co'); // só checkout de hoje tem coluna "Saiu"
-    const cols  = isCo ? 8 : 5;
+    const cols  = isCo ? 9 : 5;
     if(!arr.length){
         tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhum registro — clique em 📋 Colar lista ou ＋ Linha</td></tr>`;
         return;
@@ -1052,13 +1069,21 @@ function renderCoTable(arr,tbodyId,key){
         if(/reentrada|reent/i.test(r.obs)) tags+='<span class="itag xt-reent">🔄</span> ';
 
         if(isCo){
-            // CHECK-OUTS DO DIA — com Saiu, PRE, TRIP
+            // CHECK-OUTS DO DIA — com drag, Saiu, PRE, TRIP
             const saiuCol = `<td class="td-saiu">
                 <button class="btn-saiu ${r.saiu?'saiu':''}"
                     onclick="toggleSaiu('${key}',${i})"
                     title="${r.saiu?'Desmarcar saída':'Marcar como saiu'}">✓</button>
             </td>`;
-            return `<tr class="${cls}" data-key="${key}" data-i="${i}">
+            return `<tr class="${cls}" data-key="${key}" data-i="${i}" draggable="true"
+                ondragstart="dragStart(event,${i})"
+                ondragover="dragOver(event)"
+                ondragleave="dragLeave(event)"
+                ondrop="dragDrop(event,${i})"
+                ondragend="dragEnd(event)">
+                <td style="padding:4px 2px!important;width:22px;text-align:center">
+                    <span class="drag-handle" title="Arrastar para reordenar">⠿</span>
+                </td>
                 <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
                 ${saiuCol}
                 <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
@@ -1073,7 +1098,7 @@ function renderCoTable(arr,tbodyId,key){
                         ${tags}
                         <input class="obs-input-field"
                             value="${esc(r.obs)}"
-                            placeholder="LCO / Reentrada no SUP / observação…"
+                            placeholder="LCO / Reentrada / observação…"
                             data-key="${key}" data-i="${i}"
                             onblur="commitObs(this)"
                             onkeydown="if(event.key==='Enter'){this.blur();}">
@@ -1095,7 +1120,7 @@ function renderCoTable(arr,tbodyId,key){
                         ${tags}
                         <input class="obs-input-field"
                             value="${esc(r.obs)}"
-                            placeholder="LCO / Reentrada no SUP / observação…"
+                            placeholder="LCO / Reentrada / observação…"
                             data-key="${key}" data-i="${i}"
                             onblur="commitObs(this)"
                             onkeydown="if(event.key==='Enter'){this.blur();}">
@@ -1168,8 +1193,8 @@ function renderEsp(){
                 <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="esp[${i}].uh=this.value;salvarEsp()"></td>
                 <td><select class="es" onchange="esp[${i}].ct=this.value;salvarEsp()">${ctOpts(r.ct)}</select></td>
                 <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="esp[${i}].reserva=this.value;salvarEsp()"></td>
-                <td><input class="ei ei-date" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkin=this.value;salvarEsp()"></td>
-                <td><input class="ei ei-date" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkout=this.value;salvarEsp()">${diasRestantes}</td>
+                <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkin=this.value;salvarEsp()" maxlength="10" inputmode="numeric"></td>
+                <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkout=this.value;salvarEsp()" maxlength="10" inputmode="numeric">${diasRestantes}</td>
                 <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - Long stay / motivo" oninput="esp[${i}].descricao=this.value;salvarEsp()" style="min-width:160px"></td>
                 <td><select class="es" onchange="esp[${i}].tipo=this.value;salvarEsp();renderEsp()">
                     ${[['long_stay','🏷️ Long Stay'],['returning','🔄 Returning Guest'],['habitue','⭐ Habitué'],['vip','👑 VIP'],['lua_de_mel','💑 Lua de Mel'],['aniversario','🎂 Aniversário'],['grupo','👥 Grupo'],['reentrada','↩️ Reentrada'],['twin','🛏️🛏️ Cama Twin'],['cama_adicional','➕ Cama Adicional'],['bercinho','🍼 Berço/Cama Bebê']].map(([v,l])=>`<option value="${v}" ${(r.tipo||'long_stay')===v?'selected':''}>${l}</option>`).join('')}
@@ -1246,13 +1271,8 @@ function re(k){
 function tagMenu(k,i,btn){
     document.getElementById('__tm')?.remove();
     const opts=[
-        {l:'🕐 Late Check-out',v:'LCO'},
-        {l:'🔄 Reentrada no SUP',v:'Reentrada no SUP'},
-        {l:'🔄 Reentrada no STD',v:'Reentrada no STD'},
-        {l:'🔄 Reentrada no SUI',v:'Reentrada no SUI'},
-        {l:'⭐ Reserva Especial',v:'Reserva Especial'},
-        {l:'💑 Lua de Mel',v:'Lua de Mel'},
-        {l:'🎂 Aniversário',v:'Aniversário'},
+        {l:'🕐 Late Check-out (LCO)',v:'LCO'},
+        {l:'🔄 Reentrada',v:'Reentrada'},
     ];
     const m=document.createElement('div');
     m.id='__tm';
@@ -2472,8 +2492,8 @@ function renderEspCi() {
             <td class="td-del"><button class="btn-del" onclick="delRow('esp-ci',${i})">✕</button></td>
             <td><select class="es" onchange="setF('esp-ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
             <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setF('esp-ci',${i},'reserva',this.value)"></td>
-            <td><input class="ei" style="width:88px" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'in',this.value)"></td>
-            <td><input class="ei" style="width:88px" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'out',this.value)"></td>
+            <td><input class="ei ei-date-auto" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);setF('esp-ci',${i},'in',this.value)" maxlength="10" inputmode="numeric"></td>
+            <td><input class="ei ei-date-auto" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);setF('esp-ci',${i},'out',this.value)" maxlength="10" inputmode="numeric"></td>
             <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - ex: Maxwell,Josh - 1 de 5 - Cama twin" oninput="setF('esp-ci',${i},'descricao',this.value)" style="min-width:220px"></td>
             <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('esp-ci',${i},'uh',this.value)"></td>
             <td class="td-cme"><input type="checkbox" ${r.c?'checked':''} onchange="setF('esp-ci',${i},'c',this.checked)" title="Configuração de cama confirmada"></td>
@@ -2682,6 +2702,46 @@ function confirmarColarColunas() {
     re(colarKey);
     fecharColar();
     toast(`✅ ${qtd} linha(s) importada(s)!`);
+}
+
+
+// ══ MÁSCARA DE DATA AUTOMÁTICA ══
+function maskDate(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length >= 5)      v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+    else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    input.value = v;
+}
+
+
+// ══ DRAG & DROP — check-outs do dia ══
+let dragIdx = null;
+
+function dragStart(e, i) {
+    dragIdx = i;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
+function dragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+function dragDrop(e, toIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (dragIdx === null || dragIdx === toIdx) return;
+    const item = co.splice(dragIdx, 1)[0];
+    co.splice(toIdx, 0, item);
+    dragIdx = null;
+    renderCo();
+}
+function dragEnd(e) {
+    e.currentTarget.classList.remove('dragging', 'drag-over');
+    dragIdx = null;
 }
 
 // ══ INIT ══
