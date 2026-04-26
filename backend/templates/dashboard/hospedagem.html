@@ -1170,7 +1170,7 @@ function ctOpts(sel) {
     const padrao = sel || cats[0] || 'SUP';
     return cats.map(o => `<option ${padrao === o ? 'selected' : ''}>${o}</option>`).join('');
 }
-function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:ci; }
+function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
 function setF(k,i,f,v){ getData(k)[i][f]=v; }
 function addRow(k){
     const def = {
@@ -1244,14 +1244,10 @@ function abrirColar(k){
     g('paste-hint').innerHTML = HINTS[k] || '';
     g('paste-ta').value = '';
     g('paste-prev').classList.remove('show');
-    // reset aba imagem
-    limparImg();
+    if (g('paste-ta-livre')) { g('paste-ta-livre').value = ''; }
+    if (g('paste-prev-livre')) g('paste-prev-livre').classList.remove('show');
     setPasteTab('texto');
     g('paste-modal').classList.add('open');
-    // carrega chave salva no campo
-    const k2 = localStorage.getItem('_gk');
-    const inp = g('gk-input-modal');
-    if (k2 && inp && !inp.value) { inp.value = k2; inp.type = 'password'; }
     setTimeout(() => g('paste-ta').focus(), 100);
 }
 function fecharColar(){ g('paste-modal').classList.remove('open'); }
@@ -2272,19 +2268,8 @@ if (imgDz) {
 }
 
 // Ctrl+V global — intercepta quando modal está aberto na aba imagem
-document.addEventListener('paste', e => {
-    if (!g('paste-modal').classList.contains('open')) return;
-    if (pasteTabAtiva !== 'img') return;
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (const item of items) {
-        if (item.type.startsWith('image/')) {
-            e.preventDefault();
-            processarImgFile(item.getAsFile());
-            break;
-        }
-    }
-});
+// paste handler de imagem removido (aba IA removida)
+
 
 function onImgSelect(inp) {
     const f = inp.files[0];
@@ -2294,11 +2279,10 @@ function onImgSelect(inp) {
 
 function limparImg() {
     imgBase64 = null; imgParsed = [];
-    g('img-preview-wrap').classList.remove('show');
-    g('img-preview').src = '';
-    g('paste-prev-img').classList.remove('show');
-    g('paste-prev-img').innerHTML = '';
-    g('ai-inline-load').classList.remove('show');
+    const pw = g('img-preview-wrap'); if(pw) pw.classList.remove('show');
+    const pi = g('img-preview'); if(pi) pi.src = '';
+    const pp = g('paste-prev-img'); if(pp){pp.classList.remove('show');pp.innerHTML='';}
+    const al = g('ai-inline-load'); if(al) al.classList.remove('show');
 }
 
 async function processarImgFile(file) {
