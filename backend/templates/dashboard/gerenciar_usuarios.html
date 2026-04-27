@@ -245,15 +245,12 @@
         </div>
     </div>
 </div>
-
+{{ modulos|json_script:"modulos-data" }}
 <script>
 const HOTEL_SLUG = "{{ hotel.slug }}";
 
-const MODULOS = [
-    {% for key, label in modulos %}
-    { key: "{{ key }}", label: "{{ label }}" }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-];
+const MODULOS_RAW = JSON.parse(document.getElementById('modulos-data').textContent);
+const MODULOS = MODULOS_RAW.map(([key, label]) => ({ key, label }));
 
 let todosUsuarios = [];
 let modoEdicao   = false;
