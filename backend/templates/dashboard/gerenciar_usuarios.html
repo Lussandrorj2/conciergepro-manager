@@ -250,9 +250,9 @@
 const HOTEL_SLUG = "{{ hotel.slug }}";
 
 const MODULOS = [
-    '{% for key, label in modulos %}',
-    '{ key: "{{ key }}", label: "{{ label }}" }',
-    '{% endfor %}'
+    {% for key, label in modulos %}
+    { key: "{{ key }}", label: "{{ label }}" }{% if not forloop.last %},{% endif %}
+    {% endfor %}
 ];
 
 let todosUsuarios = [];
