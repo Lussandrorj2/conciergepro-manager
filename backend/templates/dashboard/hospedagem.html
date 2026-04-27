@@ -1340,400 +1340,299 @@ function gerarPDF(){
         ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})
         : '-';
 
-    // == PALETA OFF-WHITE PROFISSIONAL ==
-    const NAVY    = [15, 35, 75];
-    const BLUE    = [30, 80, 160];
-    const BLUE2   = [50, 100, 190];
-    const GOLD    = [160, 120, 40];
-    const GOLDBG  = [250, 245, 225];
-    const WHITE   = [255, 255, 255];
-    const OFFWHITE= [250, 249, 246];
-    const CARD    = [245, 246, 250];
-    const CARD2   = [238, 241, 248];
-    const BORDER  = [200, 208, 225];
-    const BORDER2 = [180, 190, 215];
-    const TEXT    = [25, 35, 65];
-    const SOFT    = [100, 115, 145];
-    const GREEN   = [20, 140, 80];
-    const RED     = [190, 40, 40];
-    const PURPLE  = [100, 60, 170];
-    const TEAL    = [0, 140, 120];
+    // == PALETA PRINT-FRIENDLY ==
+    // Regra: fundo sempre branco, cor só em textos e bordas finas
+    const NAVY   = [15, 35, 75];
+    const BLUE   = [30, 80, 160];
+    const GOLD   = [150, 110, 30];
+    const WHITE  = [255, 255, 255];
+    const LGRAY  = [248, 248, 248];   // fundo alternado linhas — quase branco
+    const MGRAY  = [210, 215, 225];   // bordas
+    const DGRAY  = [130, 140, 160];   // labels
+    const TEXT   = [25, 35, 65];
+    const GREEN  = [20, 130, 70];
+    const RED    = [180, 40, 40];
+    const PURPLE = [90, 50, 160];
+    const TEAL   = [0, 120, 105];
 
     const sf = (sz, st='normal', col=TEXT) => {
         doc.setFontSize(sz); doc.setFont('helvetica', st); doc.setTextColor(...col);
     };
     const fr = (x,y,w,h,col) => { doc.setFillColor(...col); doc.rect(x,y,w,h,'F'); };
-    const rr = (x,y,w,h,r,col) => { doc.setFillColor(...col); doc.roundedRect(x,y,w,h,r,r,'F'); };
-    const stroke = (x,y,w,h,r,col,lw=0.3) => {
-        doc.setDrawColor(...col); doc.setLineWidth(lw);
-        r > 0 ? doc.roundedRect(x,y,w,h,r,r,'S') : doc.rect(x,y,w,h,'S');
-    };
-    const ln = (x1,y1,x2,y2,col=BORDER,lw=0.3) => {
+    const ln = (x1,y1,x2,y2,col=MGRAY,lw=0.3) => {
         doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,y1,x2,y2);
     };
-    const badge = (x,y,txt,bg,tc=WHITE) => {
-        const tw = doc.getTextWidth(txt);
-        rr(x, y-3.8, tw+6, 5.5, 1.5, bg);
-        sf(6, 'bold', tc); doc.text(txt, x+3, y);
+    const box = (x,y,w,h,col=MGRAY,lw=0.3) => {
+        doc.setDrawColor(...col); doc.setLineWidth(lw); doc.rect(x,y,w,h,'S');
     };
 
-    // == FUNDO OFF-WHITE ==
-    fr(0, 0, W, 297, OFFWHITE);
+    // == CABECALHO — faixa navy fina no topo, resto branco ==
+    fr(0, 0, W, 18, NAVY);
+    fr(0, 16, W, 2, GOLD);  // faixa dourada embaixo do header
 
-    // == CABECALHO ==
-    fr(0, 0, W, 34, NAVY);
-    // faixa dourada no topo
-    fr(0, 0, W, 1.5, GOLD);
+    sf(11, 'bold', WHITE);
+    doc.text('RELATORIO DE AUDITORIA', W/2, 8, {align:'center'});
+    sf(7.5, 'normal', [190, 205, 230]);
+    doc.text(hotNome + '   |   Auditoria: ' + dataFmt + '   |   Turno: ' + turno, W/2, 14, {align:'center'});
 
-    sf(13, 'bold', WHITE);
-    doc.text('RELATORIO DE AUDITORIA', W/2, 11, {align:'center'});
-    sf(8, 'normal', [180, 195, 220]);
-    doc.text(hotNome, W/2, 18, {align:'center'});
+    let y = 23;
 
-    // badges data e turno
-    const mkBadge = (text, x, col, tc) => {
-        const tw = doc.getTextWidth(text) + 8;
-        rr(x - tw/2, 22, tw, 6.5, 1.5, col);
-        sf(6.5, 'bold', tc); doc.text(text, x, 26.5, {align:'center'});
-    };
-    mkBadge('Auditoria: ' + dataFmt, W/2 - 28, [40,60,110], GOLD);
-    mkBadge('Turno: ' + turno, W/2 + 38, [30,50,100], [200,215,240]);
-
-    // faixa dourada embaixo do header
-    fr(0, 32, W, 2, GOLD);
-
-    let y = 39;
-
-    // == HELPER SECAO ==
-    function secao(titulo, dotCol=BLUE) {
-        if(y > 258){ doc.addPage(); fr(0,0,W,297,OFFWHITE); y = 10; }
-        // barra lateral colorida + fundo suave
-        rr(ML, y, CW, 7.5, 1, CARD2);
-        fr(ML, y, 2.5, 7.5, dotCol);
-        sf(7, 'bold', NAVY);
-        doc.text(titulo, ML+6, y+5.2);
-        y += 11;
-    }
-
-    // == HELPER CARD STAT ==
-    function statCard(x, y, w, h, label, val, valCol=NAVY) {
-        rr(x, y, w, h, 2, CARD);
-        stroke(x, y, w, h, 2, BORDER);
-        sf(6.5, 'bold', SOFT);
-        doc.text(label, x + w/2, y + 6, {align:'center'});
-        sf(13, 'bold', valCol);
-        doc.text(String(val), x + w/2, y + h - 4, {align:'center'});
+    // == HELPER SECAO — apenas texto colorido + linha, sem fundo ==
+    function secao(titulo, col=BLUE) {
+        if(y > 260){ doc.addPage(); y = 10; }
+        sf(7.5, 'bold', col);
+        doc.text(titulo, ML, y+4);
+        ln(ML, y+6, W-MR, y+6, col, 0.5);
+        y += 10;
     }
 
     // =====================
     // 1. SITUACAO ATUAL
     // =====================
-    secao('SITUACAO ATUAL', BLUE);
+    secao('1. SITUACAO ATUAL', NAVY);
 
-    rr(ML, y, CW, 22, 2, WHITE);
-    stroke(ML, y, CW, 22, 2, BORDER);
-    // linha divisoria
-    ln(ML + CW/2, y+3, ML + CW/2, y+19, BORDER);
-    // ocupacao
-    sf(20, 'bold', GREEN);
-    doc.text(ocupacao, ML + CW*0.25, y+14, {align:'center'});
-    sf(6.5, 'normal', SOFT);
-    doc.text('Ocupacao atual  |  UH Bloq: '+uhBloq, ML + CW*0.25, y+19, {align:'center'});
-    // DM
-    sf(20, 'bold', GOLD);
-    doc.text(dm, ML + CW*0.75, y+14, {align:'center'});
-    sf(6.5, 'normal', SOFT);
-    doc.text('Diaria Media (DM)', ML + CW*0.75, y+19, {align:'center'});
-    y += 26;
+    // 3 colunas com apenas borda fina
+    const c3w = CW/3 - 2;
+    [[ocupacao,'Ocupacao Atual',GREEN],[dm,'Diaria Media (DM)',GOLD],['UH Bloq: '+uhBloq,'UHs Bloqueadas',NAVY]].forEach(([val,lbl,vc],i) => {
+        const cx = ML + i*(c3w+3);
+        box(cx, y, c3w, 16, MGRAY);
+        sf(6.5, 'normal', DGRAY); doc.text(lbl, cx+c3w/2, y+5.5, {align:'center'});
+        sf(13, 'bold', vc);       doc.text(String(val), cx+c3w/2, y+13, {align:'center'});
+    });
+    y += 20;
 
     // =====================
-    // 2. RESERVAS ESPECIAIS NA CASA
+    // 2. RESERVAS ESPECIAIS
     // =====================
-    secao('RESERVAS ESPECIAIS NA CASA' + (esp.length ? ' (' + esp.length + ')' : ''), GOLD);
+    secao('2. RESERVAS ESPECIAIS NA CASA' + (esp.length?' ('+esp.length+')':''), GOLD);
 
     if(!esp.length){
-        rr(ML, y, CW, 10, 2, CARD);
-        stroke(ML, y, CW, 10, 2, BORDER);
-        sf(7.5, 'normal', SOFT);
-        doc.text('Nenhuma reserva especial na casa', W/2, y+6.5, {align:'center'});
-        y += 14;
+        sf(7.5, 'normal', DGRAY);
+        doc.text('Nenhuma reserva especial na casa', ML, y+4);
+        y += 8;
     } else {
-        // cabecalho
-        rr(ML, y, CW, 7, 2, CARD2);
-        fr(ML, y, 2.5, 7, GOLD);
-        sf(6, 'bold', SOFT);
-        ['RESERVA','UH','NOME / DESCRICAO','CHECK-IN','CHECK-OUT'].forEach((h,i) => {
-            const xs = [ML+6, ML+32, ML+52, ML+130, ML+155];
-            doc.text(h, xs[i], y+4.8);
-        });
-        y += 7;
-
-        const tipoMap = {
-            'long_stay':'Long Stay','returning':'Ret.Guest','habitue':'Habitue',
-            'vip':'VIP','lua_de_mel':'Lua Mel','aniversario':'Aniversario'
-        };
-        const tipoColMap = {
-            'vip':[100,60,170],'long_stay':[30,80,160],'returning':[0,130,110],
-            'habitue':[150,110,30],'lua_de_mel':[180,40,80],'aniversario':[20,130,70]
-        };
+        // cabecalho tabela
+        fr(ML, y, CW, 6.5, LGRAY);
+        ln(ML, y, W-MR, y, MGRAY, 0.3);
+        ln(ML, y+6.5, W-MR, y+6.5, MGRAY, 0.3);
+        sf(6, 'bold', DGRAY);
+        [[ML+3,'RESERVA'],[ML+30,'UH'],[ML+45,'NOME / DESCRICAO'],[ML+125,'CHECK-IN'],[ML+148,'CHECK-OUT'],[ML+170,'CTG']].forEach(([x,h]) => doc.text(h,x,y+4.5));
+        y += 6.5;
 
         esp.forEach((r,i) => {
-            if(y > 272){ doc.addPage(); fr(0,0,W,297,OFFWHITE); y = 10; }
-            if(i%2===0){ rr(ML, y, CW, 7.5, 0, CARD); }
-            ln(ML, y+7.5, ML+CW, y+7.5, BORDER, 0.2);
+            if(y > 272){ doc.addPage(); y = 10; }
+            if(i%2===0) fr(ML, y, CW, 7, LGRAY);
+            ln(ML, y+7, W-MR, y+7, MGRAY, 0.2);
             sf(7.5, 'normal', TEXT);
-            doc.text(String(r.reserva||'-'), ML+6, y+5.2);
-            doc.text(String(r.uh||'-'), ML+32, y+5.2);
-            doc.text((r.descricao||'-').slice(0,35), ML+52, y+5.2);
-            doc.text(r.checkin||'-', ML+130, y+5.2);
-            doc.text(r.checkout||'-', ML+155, y+5.2);
-            // badge tipo
-            const tipo = r.tipo || 'long_stay';
-            const bCol = tipoColMap[tipo] || BLUE;
-            // badge CTG
-            badge(ML+168, y+5.2, r.ct||'-', bCol);
-            y += 7.5;
+            doc.text(String(r.reserva||'-'), ML+3, y+5);
+            doc.text(String(r.uh||'-'), ML+30, y+5);
+            doc.text((r.descricao||'-').slice(0,36), ML+45, y+5);
+            doc.text(r.checkin||'-', ML+125, y+5);
+            doc.text(r.checkout||'-', ML+148, y+5);
+            sf(7.5, 'bold', BLUE); doc.text(r.ct||'-', ML+170, y+5);
+            y += 7;
         });
-        y += 5;
+        y += 4;
     }
 
     // =====================
-    // 3. PREVISAO DE AMANHA — 2 colunas
+    // 3. PREVISAO DE AMANHA
     // =====================
-    secao('PREVISAO DE AMANHA', BLUE);
+    secao('3. PREVISAO DE AMANHA', BLUE);
 
-    rr(ML, y, CW, 42, 2, WHITE);
-    stroke(ML, y, CW, 42, 2, BORDER);
-    ln(ML + CW/2, y+3, ML + CW/2, y+39, BORDER);
-
-    const col1Data = [
-        {l:'Ocupacao prevista', v: g('prev-ocup')?.value||'-', c:GREEN},
-        {l:'Diaria Media (DM)', v: g('prev-diaria')?.value||'-', c:GOLD},
-        {l:'UHs Ocupadas',      v: g('prev-uh')?.value||'-', c:BLUE},
+    // 2 grupos de 3 colunas
+    const grupos = [
+        [{l:'Ocupacao',v:g('prev-ocup')?.value||'-',c:GREEN},{l:'DM',v:g('prev-diaria')?.value||'-',c:GOLD},{l:'UHs Ocup.',v:g('prev-uh')?.value||'-',c:BLUE}],
+        [{l:'Entradas',v:g('prev-ent')?.value||'-',c:GREEN},{l:'Saidas',v:g('prev-sai')?.value||'-',c:RED},{l:'Total Hosp.',v:g('prev-cafe')?.value||'-',c:PURPLE}],
     ];
-    const col2Data = [
-        {l:'Entradas previstas', v: g('prev-ent')?.value||'-', c:GREEN},
-        {l:'Saidas previstas',   v: g('prev-sai')?.value||'-', c:RED},
-        {l:'Total hosp. na casa',v: g('prev-cafe')?.value||'-', c:PURPLE},
-    ];
-
-    col1Data.forEach((item, i) => {
-        const iy = y + 7 + i*12;
-        sf(13, 'bold', item.c);
-        doc.text(String(item.v), ML + CW*0.25, iy, {align:'center'});
-        sf(6, 'normal', SOFT);
-        doc.text(item.l, ML + CW*0.25, iy+5, {align:'center'});
+    const gw = CW/2 - 4;
+    grupos.forEach((grp, gi) => {
+        const gx = ML + gi*(gw+8);
+        const iw = gw/3 - 1;
+        grp.forEach((item, ii) => {
+            const cx = gx + ii*(iw+1.5);
+            box(cx, y, iw, 15, MGRAY);
+            sf(6, 'normal', DGRAY); doc.text(item.l, cx+iw/2, y+5.5, {align:'center'});
+            sf(11, 'bold', item.c); doc.text(String(item.v), cx+iw/2, y+13, {align:'center'});
+        });
     });
-    col2Data.forEach((item, i) => {
-        const iy = y + 7 + i*12;
-        sf(13, 'bold', item.c);
-        doc.text(String(item.v), ML + CW*0.75, iy, {align:'center'});
-        sf(6, 'normal', SOFT);
-        doc.text(item.l, ML + CW*0.75, iy+5, {align:'center'});
-    });
-    y += 46;
+    // linha divisoria entre grupos
+    ln(ML+gw+4, y+1, ML+gw+4, y+14, MGRAY, 0.4);
+    y += 19;
 
     // =====================
     // 4. ENTRADAS POR CATEGORIA
     // =====================
-    const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '' && parseInt(cv.val) > 0);
+    const catVals = lerValoresCats().filter(cv=>cv.val&&cv.val!==''&&parseInt(cv.val)>0);
     if(catVals.length){
-        secao('ENTRADAS POR CATEGORIA', PURPLE);
-        rr(ML, y, CW, catVals.length*9+8, 2, WHITE);
-        stroke(ML, y, CW, catVals.length*9+8, 2, BORDER);
+        secao('4. ENTRADAS POR CATEGORIA', PURPLE);
+        const barColors = [BLUE,GREEN,PURPLE,TEAL,GOLD,RED];
+        const maxVal = Math.max(...catVals.map(cv=>parseInt(cv.val)||0),1);
+        const barMaxW = CW - 40;
 
-        const maxVal = Math.max(...catVals.map(cv=>parseInt(cv.val)||0), 1);
-        const barMaxW = CW - 55;
-        const barColors = [BLUE, GREEN, PURPLE, TEAL, GOLD, RED];
-
-        catVals.forEach((cv, i) => {
-            const iy = y + 5 + i*9;
+        catVals.forEach((cv,i) => {
+            if(y > 272){ doc.addPage(); y = 10; }
             const bw = Math.max((parseInt(cv.val)/maxVal)*barMaxW, 2);
             const bc = barColors[i % barColors.length];
-            sf(7, 'bold', TEXT); doc.text(cv.cat, ML+6, iy+5);
-            // trilha da barra
-            rr(ML+24, iy+1, barMaxW, 5.5, 1, CARD2);
-            // barra preenchida
-            rr(ML+24, iy+1, bw, 5.5, 1, bc);
-            // valor
-            sf(7, 'bold', bc);
-            doc.text(String(cv.val)+' apts', ML+24+bw+4, iy+5.5);
+            sf(7, 'bold', TEXT); doc.text(cv.cat, ML+3, y+5);
+            // trilha (só borda)
+            box(ML+22, y+1, barMaxW, 5, MGRAY, 0.2);
+            // barra preenchida — só 40% opacidade simulada com cor mais clara
+            const bcLight = bc.map(v=>Math.min(255, v+140));
+            fr(ML+22, y+1, bw, 5, bcLight);
+            // borda da barra na cor original
+            doc.setDrawColor(...bc); doc.setLineWidth(0.4); doc.rect(ML+22, y+1, bw, 5, 'S');
+            sf(7, 'bold', bc); doc.text(String(cv.val)+' apts', ML+22+bw+4, y+5.5);
+            y += 8;
         });
-        y += catVals.length*9 + 12;
+        y += 4;
     }
 
     // =====================
     // 5. EVOLUCAO DO MES
     // =====================
-    secao('EVOLUCAO DO MES - OCUPACAO', TEAL);
+    secao('5. EVOLUCAO DO MES - OCUPACAO', TEAL);
 
     let hist = [];
     try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
 
     if(hist.length < 2){
-        rr(ML, y, CW, 14, 2, CARD);
-        stroke(ML, y, CW, 14, 2, BORDER);
-        sf(7.5, 'normal', SOFT);
-        doc.text('Dados insuficientes - salve mais auditorias para ver a evolucao', W/2, y+8.5, {align:'center'});
-        y += 18;
+        sf(7.5,'normal',DGRAY);
+        doc.text('Dados insuficientes - salve mais auditorias para ver a evolucao', ML, y+4);
+        y += 8;
     } else {
         const porMes = {};
-        hist.forEach(h => {
-            if(!h.data || !h.ocupacao) return;
-            const mes = h.data.slice(0,7);
-            const dia = parseInt(h.data.slice(8,10));
-            const oc  = parseFloat(String(h.ocupacao).replace('%','').replace(',','.')) || 0;
-            if(!porMes[mes]) porMes[mes] = [];
-            porMes[mes].push({dia, oc});
+        hist.forEach(h=>{
+            if(!h.data||!h.ocupacao) return;
+            const mes=h.data.slice(0,7), dia=parseInt(h.data.slice(8,10));
+            const oc=parseFloat(String(h.ocupacao).replace('%','').replace(',','.'))||0;
+            if(!porMes[mes]) porMes[mes]=[];
+            porMes[mes].push({dia,oc});
         });
-
         const meses = Object.keys(porMes).sort().slice(-3);
-        const chartH = 38, chartW = CW - 14;
-        const chartX = ML + 10, chartY = y + 4;
+        const chartH=32, chartW=CW-12;
+        const chartX=ML+8, chartY=y+2;
 
-        rr(ML, y, CW, chartH + 22, 2, WHITE);
-        stroke(ML, y, CW, chartH + 22, 2, BORDER);
+        box(ML, y, CW, chartH+18, MGRAY, 0.3);
 
-        const yScale = (oc) => chartY + chartH - (oc/100)*chartH;
+        const yScale = oc => chartY + chartH - (oc/100)*chartH;
 
-        // grade horizontal
-        [25, 50, 75, 100].forEach(pct => {
-            const gy = yScale(pct);
-            ln(chartX, gy, chartX+chartW, gy, BORDER, 0.2);
-            sf(5, 'normal', SOFT);
-            doc.text(pct+'%', chartX-2, gy+1.5, {align:'right'});
+        // grade
+        [25,50,75,100].forEach(pct=>{
+            const gy=yScale(pct);
+            ln(chartX,gy,chartX+chartW,gy,[230,232,238],0.2);
+            sf(5,'normal',DGRAY); doc.text(pct+'%',chartX-2,gy+1.5,{align:'right'});
         });
 
-        // linhas por mes
-        const mesColors = [BORDER2, TEAL, BLUE];
+        const mesColors = [[180,190,210],TEAL,NAVY];
         const mesLabels = [];
 
-        meses.forEach((mes, mi) => {
-            const dados = porMes[mes].sort((a,b)=>a.dia-b.dia);
+        meses.forEach((mes,mi)=>{
+            const dados=porMes[mes].sort((a,b)=>a.dia-b.dia);
             if(!dados.length) return;
-            const col2 = mesColors[mi];
-            const isLast = mi === meses.length-1;
-
-            doc.setDrawColor(...col2);
-            doc.setLineWidth(isLast ? 1.2 : 0.6);
-
-            for(let i=0; i<dados.length-1; i++){
-                const x1 = chartX + (dados[i].dia/31)*chartW;
-                const y1 = yScale(dados[i].oc);
-                const x2 = chartX + (dados[i+1].dia/31)*chartW;
-                const y2 = yScale(dados[i+1].oc);
-                doc.line(x1,y1,x2,y2);
+            const col2=mesColors[mi], isLast=mi===meses.length-1;
+            doc.setDrawColor(...col2); doc.setLineWidth(isLast?1:0.5);
+            if(isLast){ // linha tracejada para os outros, solida para o atual
+                for(let i=0;i<dados.length-1;i++){
+                    const x1=chartX+(dados[i].dia/31)*chartW, y1=yScale(dados[i].oc);
+                    const x2=chartX+(dados[i+1].dia/31)*chartW, y2=yScale(dados[i+1].oc);
+                    doc.line(x1,y1,x2,y2);
+                }
+            } else {
+                doc.setLineDashPattern([1,1.5],0);
+                for(let i=0;i<dados.length-1;i++){
+                    const x1=chartX+(dados[i].dia/31)*chartW, y1=yScale(dados[i].oc);
+                    const x2=chartX+(dados[i+1].dia/31)*chartW, y2=yScale(dados[i+1].oc);
+                    doc.line(x1,y1,x2,y2);
+                }
+                doc.setLineDashPattern([],0);
             }
-            // ponto no ultimo
             if(dados.length){
-                const last = dados[dados.length-1];
-                const px = chartX + (last.dia/31)*chartW;
-                const py = yScale(last.oc);
-                doc.setFillColor(...col2);
-                doc.circle(px, py, isLast ? 1.5 : 1, 'F');
-                // valor no ponto
-                sf(5.5, 'bold', col2);
-                doc.text(last.oc.toFixed(1)+'%', px+2, py-1);
+                const last=dados[dados.length-1];
+                const px=chartX+(last.dia/31)*chartW, py=yScale(last.oc);
+                doc.setFillColor(...col2); doc.circle(px,py,isLast?1.5:1,'F');
+                sf(5.5,isLast?'bold':'normal',col2);
+                doc.text(last.oc.toFixed(1)+'%',px+2,py-1);
             }
-
-            const [ano, m] = mes.split('-');
-            const mNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-            mesLabels.push({label: mNomes[parseInt(m)-1]+'/'+ano.slice(2), col: col2, bold: isLast});
+            const [ano,m]=mes.split('-');
+            const mNomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            mesLabels.push({label:mNomes[parseInt(m)-1]+'/'+ano.slice(2),col:col2,bold:isLast});
         });
 
         // eixo X
-        [1,5,10,15,20,25,31].forEach(d => {
-            const gx = chartX + (d/31)*chartW;
-            ln(gx, chartY+chartH, gx, chartY+chartH+2, BORDER, 0.3);
-            sf(5, 'normal', SOFT);
-            doc.text(String(d), gx, chartY+chartH+5, {align:'center'});
+        [1,5,10,15,20,25,31].forEach(d=>{
+            const gx=chartX+(d/31)*chartW;
+            ln(gx,chartY+chartH,gx,chartY+chartH+2,MGRAY,0.3);
+            sf(5,'normal',DGRAY); doc.text(String(d),gx,chartY+chartH+5,{align:'center'});
         });
 
         // legenda
-        const legY = chartY + chartH + 12;
-        let legX = chartX;
-        mesLabels.forEach(ml => {
-            doc.setFillColor(...ml.col);
-            doc.rect(legX, legY-2.5, 8, 3, 'F');
-            sf(6, ml.bold?'bold':'normal', ml.col);
-            doc.text(ml.label, legX+10, legY);
-            legX += 32;
+        let legX=chartX;
+        mesLabels.forEach(ml=>{
+            doc.setDrawColor(...ml.col); doc.setLineWidth(ml.bold?1:0.5);
+            if(!ml.bold) doc.setLineDashPattern([1,1.5],0);
+            doc.line(legX,chartY+chartH+12,legX+8,chartY+chartH+12);
+            doc.setLineDashPattern([],0);
+            sf(6,ml.bold?'bold':'normal',ml.col);
+            doc.text(ml.label+(ml.bold?' (atual)':''),legX+10,chartY+chartH+13);
+            legX+=38;
         });
 
-        y += chartH + 26;
+        y += chartH+22;
     }
 
     // =====================
-    // 6. CHECK-INS ESPECIAIS PREVISTOS
+    // 6. CHECK-INS ESPECIAIS
     // =====================
     if(espCi.length){
-        if(y > 220){ doc.addPage(); fr(0,0,W,297,OFFWHITE); y = 10; }
-        secao('CHECK-INS PREVISTOS - ENTRADAS ESPECIAIS (' + espCi.length + ')', GOLD);
+        if(y>220){ doc.addPage(); y=10; }
+        secao('6. CHECK-INS PREVISTOS - ENTRADAS ESPECIAIS ('+espCi.length+')', GOLD);
 
-        // cabecalho
-        rr(ML, y, CW, 7, 2, CARD2);
-        fr(ML, y, 2.5, 7, GOLD);
-        sf(6, 'bold', SOFT);
-        ['CTG','RESERVA','IN / OUT','NOME E OBS','UH','C','M','E'].forEach((h,i) => {
-            const xs = [ML+6, ML+22, ML+46, ML+80, ML+142, ML+155, ML+163, ML+171];
-            doc.text(h, xs[i], y+4.8);
-        });
-        y += 7;
+        fr(ML,y,CW,6.5,LGRAY);
+        ln(ML,y,W-MR,y,MGRAY,0.3); ln(ML,y+6.5,W-MR,y+6.5,MGRAY,0.3);
+        sf(6,'bold',DGRAY);
+        [[ML+3,'CTG'],[ML+18,'RESERVA'],[ML+42,'IN > OUT'],[ML+76,'NOME E OBS'],[ML+138,'UH'],[ML+148,'C'],[ML+156,'M'],[ML+164,'E']].forEach(([x,h])=>doc.text(h,x,y+4.5));
+        y+=6.5;
 
-        const tipoMapCI = {
-            'long_stay':'Long Stay','returning':'Ret.','habitue':'Hab.',
-            'vip':'VIP','lua_de_mel':'L.Mel','aniversario':'Aniv.'
-        };
-        const tipoColCI = {
-            'vip':[100,60,170],'long_stay':[30,80,160],'returning':[0,130,110],
-            'habitue':[150,110,30],'lua_de_mel':[180,40,80],'aniversario':[20,130,70]
-        };
-
-        espCi.forEach((r,i) => {
-            if(y > 270){ doc.addPage(); fr(0,0,W,297,OFFWHITE); y = 10; }
-            if(i%2===0){ rr(ML, y, CW, 8, 0, CARD); }
-            ln(ML, y+8, ML+CW, y+8, BORDER, 0.2);
-
-            const bCol = tipoColCI[r.tipo||'long_stay'] || BLUE;
-            badge(ML+6, y+5.5, r.ct||'-', bCol);
-            sf(7, 'normal', TEXT);
-            doc.text(String(r.reserva||'-'), ML+22, y+5.5);
-            doc.text((r.in||'-')+' > '+(r.out||'-'), ML+46, y+5.5);
-            const tipoLabel = tipoMapCI[r.tipo||'long_stay']||'-';
-            doc.text(((r.descricao||'-').slice(0,28)+' - '+tipoLabel).slice(0,38), ML+80, y+5.5);
-            doc.text(String(r.uh||'-'), ML+142, y+5.5);
-
-            // checkboxes
-            [ML+153, ML+161, ML+169].forEach((cx, ci) => {
-                stroke(cx, y+1.5, 5, 5, 0, BORDER, 0.4);
-                const checked = [r.c, r.m, r.e][ci];
-                if(checked){ rr(cx+0.5, y+2, 4, 4, 0, GREEN); }
+        const tipoMapCI={'long_stay':'Long Stay','returning':'Ret.','habitue':'Hab.','vip':'VIP','lua_de_mel':'L.Mel','aniversario':'Aniv.'};
+        espCi.forEach((r,i)=>{
+            if(y>272){ doc.addPage(); y=10; }
+            if(i%2===0) fr(ML,y,CW,8,LGRAY);
+            ln(ML,y+8,W-MR,y+8,MGRAY,0.2);
+            sf(7,'bold',BLUE); doc.text(r.ct||'-',ML+3,y+5.5);
+            sf(7,'normal',TEXT);
+            doc.text(String(r.reserva||'-'),ML+18,y+5.5);
+            doc.text((r.in||'-')+' > '+(r.out||'-'),ML+42,y+5.5);
+            const tl=tipoMapCI[r.tipo||'long_stay']||'-';
+            doc.text(((r.descricao||'-').slice(0,28)+' - '+tl).slice(0,40),ML+76,y+5.5);
+            doc.text(String(r.uh||'-'),ML+138,y+5.5);
+            // checkboxes simples
+            [ML+146,ML+154,ML+162].forEach((cx,ci)=>{
+                box(cx,y+2,5,5,MGRAY,0.4);
+                if([r.c,r.m,r.e][ci]){
+                    sf(7,'bold',GREEN); doc.text('v',cx+1,y+6);
+                }
             });
-            y += 8;
+            y+=8;
         });
-
-        sf(7, 'bold', SOFT);
-        doc.text('Total: ' + espCi.length + ' hospede(s) especial(is)', ML+4, y+5);
-        y += 9;
+        sf(7,'normal',DGRAY);
+        doc.text('Total: '+espCi.length+' hospede(s) especial(is)',ML,y+5);
+        y+=8;
     }
 
     // == RODAPE ==
-    const pTotal = doc.getNumberOfPages();
-    for(let p=1; p<=pTotal; p++){
+    const pTotal=doc.getNumberOfPages();
+    for(let p=1;p<=pTotal;p++){
         doc.setPage(p);
-        fr(0, 284, W, 13, NAVY);
-        fr(0, 284, W, 1, GOLD);
-        sf(6.5, 'normal', [170,185,215]);
-        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), ML, 291);
-        sf(6.5, 'bold', GOLD);
-        doc.text('AUDITORIA OPERACIONAL', W-MR, 291, {align:'right'});
-        if(pTotal > 1){
-            sf(6.5, 'normal', [170,185,215]);
-            doc.text(p+'/'+pTotal, W/2, 291, {align:'center'});
-        }
+        ln(ML,286,W-MR,286,MGRAY,0.4);
+        sf(6.5,'normal',DGRAY);
+        doc.text('Relatorio gerado em '+new Date().toLocaleString('pt-BR'),ML,290);
+        sf(6.5,'bold',NAVY);
+        doc.text('AUDITORIA OPERACIONAL',W-MR,290,{align:'right'});
+        if(pTotal>1){ sf(6.5,'normal',DGRAY); doc.text(p+'/'+pTotal,W/2,290,{align:'center'}); }
     }
 
-    doc.save('Auditoria_' + (dataVal||'hoje') + '.pdf');
+    doc.save('Auditoria_'+(dataVal||'hoje')+'.pdf');
     toast('PDF gerado!');
 }
 
