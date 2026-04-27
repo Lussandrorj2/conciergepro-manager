@@ -12,7 +12,8 @@ from django.http import JsonResponse
 from django.db import transaction
 
 from .models import Hotel, Perfil, MODULOS
-from .permissions import requer_gerente, requer_gerente_api
+from .permissions import requer_gerente, requer_gerente_api, get_contexto_usuario
+
 
 
 # ──────────────────────────────────────────
