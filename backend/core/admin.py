@@ -9,3 +9,5 @@ class PerfilAdmin(admin.ModelAdmin):
 admin.site.register(Hotel)
 admin.site.register(Passeio)
 admin.site.register(ImagemPasseio)
+
+#teste
