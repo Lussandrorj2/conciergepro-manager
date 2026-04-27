@@ -301,6 +301,22 @@
         .btn-hist-load:hover { background: rgba(37,99,235,.08); }
         .btn-hist-del  { color: #dc2626; border-color: rgba(220,38,38,.25); }
         .btn-hist-del:hover  { background: rgba(220,38,38,.08); }
+
+        /* ── AUTOSAVE INDICATOR ── */
+        .autosave-dot {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:10px; color:var(--text-soft); font-weight:500;
+        }
+        .autosave-dot::before {
+            content:''; width:6px; height:6px; border-radius:50%;
+            background:#059669; flex-shrink:0;
+            animation: pulse-save 2s ease-in-out infinite;
+        }
+        .autosave-dot.saving::before { background:#f59e0b; animation:none; }
+        .autosave-dot.error::before  { background:#dc2626; animation:none; }
+        @keyframes pulse-save {
+            0%,100%{ opacity:1; } 50%{ opacity:.3; }
+        }
         /* ══ RESPONSIVE ══ */
         @media(max-width:1100px){.turno-bar{grid-template-columns:1fr 1fr 1fr}.stat-strip{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.stat-strip{grid-template-columns:repeat(3,1fr)}.prev-strip{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr!important}.chart-panel.full{grid-column:1!important}.stats-top{grid-template-columns:repeat(2,1fr)}}
@@ -358,9 +374,10 @@
 
             <!-- BARRA DE AÇÕES -->
             <div class="aud-bar">
-                <div class="aud-bar-left">
+                <div class="aud-bar-left" style="gap:12px">
                     <div class="aud-date-badge">📅 <span id="lbl-data">—</span></div>
                     <span class="aud-amanha" id="lbl-amanha"></span>
+                    <span class="autosave-dot" id="autosave-ind" title="Salvo automaticamente">salvo</span>
                 </div>
                 <div class="aud-bar-right">
                     <button class="btn-a prim" onclick="novaAuditoria()">＋ Nova Auditoria</button>
@@ -787,7 +804,7 @@
 
 
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}";
+const HOTEL_SLUG = "{{ hotel.slug }}" || window.location.pathname.split('/')[1] || 'hotel';
 const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 const LS_DRAFT   = `audit_draft_${HOTEL_SLUG}`; // rascunho atual — persiste entre navegações
 
@@ -2613,6 +2630,8 @@ function syncStats() {
 let _autoSaveTimer = null;
 
 function salvarRascunho() {
+    const ind = document.getElementById('autosave-ind');
+    if(ind){ ind.className='autosave-dot saving'; ind.textContent='salvando…'; }
     try {
         const draft = {
             turno:    g('t-turno')?.value    || '',
@@ -2634,12 +2653,16 @@ function salvarRascunho() {
             _ts: Date.now(),
         };
         localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
-    } catch(e) { console.warn('autosave falhou:', e); }
+        if(ind){ ind.className='autosave-dot'; ind.textContent='salvo'; }
+    } catch(e) {
+        console.warn('autosave falhou:', e);
+        if(ind){ ind.className='autosave-dot error'; ind.textContent='erro ao salvar'; }
+    }
 }
 
 function autoSave() {
     clearTimeout(_autoSaveTimer);
-    _autoSaveTimer = setTimeout(salvarRascunho, 600);
+    _autoSaveTimer = setTimeout(salvarRascunho, 400);
 }
 
 function carregarRascunho() {
@@ -2708,10 +2731,15 @@ document.addEventListener('DOMContentLoaded',()=>{
         g('t-data').value = new Date().toISOString().split('T')[0];
     }
     syncUI(); renderTudo(); renderHist();
-    // Autosave nos campos de texto via input
-    ['t-turno','t-data','t-ocup','t-dm','t-uh-bloq'].forEach(id => {
-        const el = g(id);
-        if (el) el.addEventListener('input', autoSave);
+
+    // Salva imediatamente ao sair da página
+    window.addEventListener('beforeunload', () => {
+        salvarRascunho();
+    });
+
+    // Salva ao trocar de aba/visibilidade
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') salvarRascunho();
     });
 });
 </script>
