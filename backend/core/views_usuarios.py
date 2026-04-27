@@ -23,10 +23,13 @@ from .permissions import requer_gerente, requer_gerente_api, get_contexto_usuari
 @requer_gerente
 def gerenciar_usuarios(request, hotel_slug):
     hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    ctx = get_contexto_usuario(request, hotel)
     return render(request, 'dashboard/gerenciar_usuarios.html', {
         'hotel':   hotel,
         'modulos': MODULOS,
+        **ctx,
     })
+
 
 
 # ──────────────────────────────────────────
