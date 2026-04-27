@@ -1291,7 +1291,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharColar();});
 
 // ══ NOVA AUDITORIA ══
 function novaAuditoria(){
-    if(co.length+prev.length+ci.length>0){
+    if(co.length+ci.length+espCi.length+ocorr.length>0){
         if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
     }
     co=[]; espCi=[]; ci=[]; ocorr=[];
