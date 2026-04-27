@@ -804,7 +804,10 @@
 
 
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}" || window.location.pathname.split('/')[1] || 'hotel';
+const _SLUG_TEMPLATE = "{{ hotel.slug }}";
+const HOTEL_SLUG = _SLUG_TEMPLATE && _SLUG_TEMPLATE !== '' && _SLUG_TEMPLATE !== '{{ hotel.slug }}'
+    ? _SLUG_TEMPLATE
+    : (window.location.pathname.split('/').filter(Boolean)[0] || 'hotel');
 const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 const LS_DRAFT   = `audit_draft_${HOTEL_SLUG}`; // rascunho atual — persiste entre navegações
 
@@ -1327,136 +1330,259 @@ function _salvarLegado(){
 // ══ GERAR PDF ══
 function gerarPDF(){
     const {jsPDF} = window.jspdf;
-    const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const hotNome = "{{ hotel.nome|striptags }}";
-    const data    = fmtDate(g('t-data').value)||'—';
-    const turno   = g('t-turno').value||'—';
-    const azul=[37,99,235], roxo=[124,58,237], amber=[180,90,0], dourado=[181,132,58], verm=[200,40,40];
-    const cinza=[100,100,100], escuro=[15,23,42];
+    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    const W = 210, ML = 12, MR = 12, CW = W - ML - MR;
 
-    // ── CABEÇALHO ──
-    doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('AUDITORIA', 14, 12);
-    doc.setFontSize(9); doc.setFont('helvetica','normal');
-    doc.text(hotNome, 14, 18);
-    doc.setTextColor(181,132,58);
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text(data, 14, 24);
-    doc.setTextColor(255,255,255); doc.setFontSize(9);
-    doc.text(`Turno: ${turno}`, 80, 18);
-    doc.text(`Ocupação: ${g('t-ocup').value||'—'}`, 80, 23);
-    doc.text(`DM: ${g('t-dm').value||'—'}`, 140, 18);
-    doc.text(`UH Bloq: ${g('t-uh-bloq').value||'0'}`, 140, 23);
+    const hotNome  = "{{ hotel.nome|striptags }}";
+    const dataVal  = g('t-data')?.value || '';
+    const turno    = g('t-turno')?.value || '—';
+    const ocupacao = g('t-ocup')?.value  || '—';
+    const dm       = g('t-dm')?.value    || '—';
+    const uhBloq   = g('t-uh-bloq')?.value || '0';
 
-    let y = 34;
+    // cores
+    const NAVY   = [13, 27, 64];
+    const BLUE   = [20, 50, 120];
+    const GOLD   = [181, 140, 50];
+    const WHITE  = [255, 255, 255];
+    const LGRAY  = [245, 247, 250];
+    const MGRAY  = [210, 215, 225];
+    const DGRAY  = [90, 100, 120];
+    const TEXT   = [30, 40, 65];
 
-    // ── FUNÇÃO SEÇÃO ──
-    function secao(titulo, cor){
-        doc.setFillColor(...cor); doc.rect(0,y,210,7,'F');
-        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-        doc.text(titulo, 14, y+5); y+=10;
-    }
+    // helpers
+    const setFont = (size, style='normal', color=TEXT) => {
+        doc.setFontSize(size);
+        doc.setFont('helvetica', style);
+        doc.setTextColor(...color);
+    };
+    const fillRect = (x,y,w,h,color) => {
+        doc.setFillColor(...color);
+        doc.rect(x,y,w,h,'F');
+    };
+    const roundRect = (x,y,w,h,r,color) => {
+        doc.setFillColor(...color);
+        doc.roundedRect(x,y,w,h,r,r,'F');
+    };
+    const hline = (y, color=MGRAY) => {
+        doc.setDrawColor(...color);
+        doc.setLineWidth(0.3);
+        doc.line(ML, y, W-MR, y);
+    };
 
-    // ── CHECK-OUTS DO DIA ──
-    if(co.length){
-        secao(`CHECK-OUTS DO DIA (${co.length})`, azul);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Nome do Hóspede','Observação','PRE','TRIP']],
-            body:co.map(r=>[r.uh,r.ct,r.nome,r.obs,r.pre?'✓':'',r.trip?'✓':'']),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:azul,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[245,248,255]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:55},3:{cellWidth:70},4:{cellWidth:10,halign:'center'},5:{cellWidth:10,halign:'center'}},
-        });
-        y = doc.lastAutoTable.finalY + 6;
-    }
+    // ════════════════════════════════════
+    // CABEÇALHO — fundo navy escuro
+    // ════════════════════════════════════
+    fillRect(0, 0, W, 42, NAVY);
 
-    // ── PREVISÃO ──
-    secao('PREVISÃO — AMANHÃ', roxo);
-    const prevRows=[
-        ['Ocupação',g('prev-ocup').value||'—','Diária Média',g('prev-diaria').value||'—'],
-        ['UHs Ocupadas',g('prev-uh').value||'—','Café da Manhã',g('prev-cafe').value||'—'],
-        ['Entradas',g('prev-ent').value||'—','Saídas',g('prev-sai').value||'—'],
-        ...lerValoresCats().map(cv => [cv.cat, cv.val||'—', '', '']),
+    // título AUDITORIA
+    setFont(20, 'bold', WHITE);
+    doc.text('AUDITORIA', ML, 14);
+
+    // hotel nome
+    setFont(9, 'normal', [180, 190, 210]);
+    doc.text(hotNome, ML, 20);
+
+    // data formatada em destaque dourado
+    const dataFmt = dataVal
+        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).toUpperCase()
+        : '—';
+    setFont(8, 'bold', GOLD);
+    doc.text('📅  ' + dataFmt, ML, 27);
+
+    // mini info cards no cabeçalho: Turno | Ocupação | UH Bloq
+    const headerCards = [
+        {icon:'👤', label:'TURNO',    val: turno},
+        {icon:'🛏️', label:'OCUPAÇÃO', val: ocupacao},
+        {icon:'🔒', label:'UH BLOQ.', val: uhBloq},
     ];
-    doc.autoTable({
-        startY:y, margin:{left:10,right:10},
-        head:[['Indicador','Valor','Indicador','Valor']],
-        body:prevRows,
-        styles:{fontSize:8,cellPadding:2},
-        headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
-        alternateRowStyles:{fillColor:[248,245,255]},
-        columnStyles:{0:{cellWidth:40,fontStyle:'bold'},1:{cellWidth:40},2:{cellWidth:40,fontStyle:'bold'},3:{cellWidth:40}},
+    let hx = 100;
+    headerCards.forEach(hc => {
+        // linha separadora
+        doc.setDrawColor(60,80,130);
+        doc.setLineWidth(0.4);
+        doc.line(hx-3, 10, hx-3, 36);
+        setFont(7, 'bold', [150,165,200]);
+        doc.text(hc.label, hx+1, 18);
+        setFont(10, 'bold', WHITE);
+        doc.text(String(hc.val), hx+1, 27);
+        hx += 36;
     });
-    y = doc.lastAutoTable.finalY + 6;
 
+    // linha dourada embaixo do header
+    fillRect(0, 40, W, 1.5, GOLD);
 
+    let y = 48;
 
-    // ── RESERVAS ESPECIAIS ──
-    if(esp.length){
-        if(y>220){ doc.addPage(); y=14; }
-        secao(`RESERVAS ESPECIAIS NA CASA (${esp.length})`, dourado);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Reserva','Check-in','Check-out','Nome / Descrição','Tipo']],
-            body:esp.map(r=>[r.uh,r.ct,r.reserva,r.checkin,r.checkout,r.descricao,r.tipo?.replace('_',' ')||'']),
-            styles:{fontSize:7.5,cellPadding:2},
-            headStyles:{fillColor:dourado,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,252,245]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:12},2:{cellWidth:22},3:{cellWidth:20},4:{cellWidth:20},5:{cellWidth:65},6:{cellWidth:19}},
-        });
-        y = doc.lastAutoTable.finalY + 6;
+    // ════════════════════════════════════
+    // SEÇÃO helper — título com fundo azul
+    // ════════════════════════════════════
+    function secTitulo(icon, titulo, count='') {
+        if (y > 265) { doc.addPage(); y = 16; fillRect(0,0,W,3,NAVY); }
+        fillRect(ML, y, CW, 8, BLUE);
+        // borda esquerda dourada
+        fillRect(ML, y, 2, 8, GOLD);
+        setFont(8, 'bold', WHITE);
+        doc.text(`${icon}  ${titulo}${count?' ('+count+')':''}`, ML+5, y+5.5);
+        y += 11;
     }
 
-    // ── CHECK-INS PENDENTES ──
-    if(ci.length){
-        if(y>230){ doc.addPage(); y=14; }
-        secao(`CHECK-INS PENDENTES (${ci.length})`, amber);
+    // ════════════════════════════════════
+    // 1. DADOS ATUAIS DE OCUPAÇÃO
+    // ════════════════════════════════════
+    secTitulo('🏨', 'DADOS ATUAIS DE OCUPAÇÃO');
+
+    // 3 cards lado a lado
+    const oc1Cards = [
+        {label:'Ocupação Atual', val: ocupacao},
+        {label:'Diária Média (DM)', val: dm},
+        {label:'UHs Bloqueadas', val: uhBloq},
+    ];
+    const cardW = CW/3 - 2;
+    oc1Cards.forEach((card, idx) => {
+        const cx = ML + idx * (cardW + 3);
+        roundRect(cx, y, cardW, 18, 2, LGRAY);
+        doc.setDrawColor(...MGRAY); doc.setLineWidth(0.3);
+        doc.roundedRect(cx, y, cardW, 18, 2, 2, 'S');
+        setFont(7, 'bold', DGRAY);
+        doc.text(card.label, cx + cardW/2, y+6, {align:'center'});
+        setFont(13, 'bold', NAVY);
+        doc.text(String(card.val||'—'), cx + cardW/2, y+14, {align:'center'});
+    });
+    y += 22;
+
+    // ════════════════════════════════════
+    // 2. RESERVAS ESPECIAIS NA CASA
+    // ════════════════════════════════════
+    if (esp.length) {
+        secTitulo('⭐', 'RESERVAS ESPECIAIS NA CASA', esp.length);
         doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['Reserva','Nome do Hóspede','UH','CTG','Observação']],
-            body:ci.map(r=>[r.reserva,r.nome,r.uh,r.ct,r.obs]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:amber,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,252,235]},
-            columnStyles:{0:{cellWidth:24},1:{cellWidth:60},2:{cellWidth:12},3:{cellWidth:14},4:{cellWidth:56}},
+            startY: y,
+            margin: {left: ML, right: MR},
+            head: [['UH','CTG','Reserva','Check-in','Check-out','Nome / Descrição']],
+            body: esp.map(r=>[r.uh||'—', r.ct||'—', r.reserva||'—', r.checkin||'—', r.checkout||'—', r.descricao||'—']),
+            styles: {fontSize:8, cellPadding:2.5, font:'helvetica', textColor:TEXT},
+            headStyles: {fillColor:BLUE, textColor:WHITE, fontStyle:'bold', fontSize:7.5},
+            alternateRowStyles: {fillColor:LGRAY},
+            columnStyles: {
+                0:{cellWidth:12, halign:'center'},
+                1:{cellWidth:14, halign:'center'},
+                2:{cellWidth:22},
+                3:{cellWidth:20, halign:'center'},
+                4:{cellWidth:20, halign:'center'},
+                5:{cellWidth:CW-88},
+            },
+            tableLineColor: MGRAY, tableLineWidth: 0.2,
         });
-        y = doc.lastAutoTable.finalY + 6;
+        y = doc.lastAutoTable.finalY + 8;
     }
 
-    // ── OCORRÊNCIAS ──
-    if(ocorr.length){
-        if(y>240){ doc.addPage(); y=14; }
-        secao(`OCORRÊNCIAS (${ocorr.length})`, verm);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['#','Descrição']],
-            body:ocorr.map((o,i)=>[i+1,o]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:verm,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,245,245]},
-            columnStyles:{0:{cellWidth:10},1:{cellWidth:160}},
+    // ════════════════════════════════════
+    // 3. PREVISÃO AMANHÃ
+    // ════════════════════════════════════
+    if (y > 210) { doc.addPage(); y = 16; }
+    secTitulo('🔮', 'PREVISÃO — AMANHÃ');
+
+    // 5 cards: Ocupação, DM, UHs, Entradas, Total Hóspedes
+    const prevCards = [
+        {label:'Ocupação', val: g('prev-ocup')?.value||'—'},
+        {label:'Diária Média', val: g('prev-diaria')?.value||'—'},
+        {label:'UHs Ocupadas', val: g('prev-uh')?.value||'—'},
+        {label:'Entradas', val: g('prev-ent')?.value||'—'},
+        {label:'Total Hóspedes', val: g('prev-cafe')?.value||'—'},
+    ];
+    const pc5W = CW/5 - 1.6;
+    prevCards.forEach((card, idx) => {
+        const cx = ML + idx * (pc5W + 2);
+        roundRect(cx, y, pc5W, 18, 2, [235,240,252]);
+        doc.setDrawColor(...[190,200,225]); doc.setLineWidth(0.3);
+        doc.roundedRect(cx, y, pc5W, 18, 2, 2, 'S');
+        // topo azul
+        fillRect(cx, y, pc5W, 3, BLUE);
+        setFont(6.5, 'bold', DGRAY);
+        doc.text(card.label, cx + pc5W/2, y+9, {align:'center'});
+        setFont(11, 'bold', NAVY);
+        doc.text(String(card.val), cx + pc5W/2, y+15.5, {align:'center'});
+    });
+    y += 22;
+
+    // Entradas por categoria
+    const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '');
+    if (catVals.length) {
+        setFont(7.5, 'bold', DGRAY);
+        doc.text('Entradas por Categoria:', ML, y+4);
+        y += 7;
+        const catW = Math.min(CW / catVals.length - 2, 36);
+        catVals.forEach((cv, idx) => {
+            const cx = ML + idx*(catW+2);
+            roundRect(cx, y, catW, 14, 2, LGRAY);
+            doc.setDrawColor(...MGRAY); doc.roundedRect(cx, y, catW, 14, 2, 2, 'S');
+            setFont(6.5, 'bold', DGRAY);
+            doc.text(cv.cat, cx+catW/2, y+5.5, {align:'center'});
+            setFont(10, 'bold', NAVY);
+            doc.text(String(cv.val||'—'), cx+catW/2, y+11.5, {align:'center'});
         });
-        y = doc.lastAutoTable.finalY + 6;
+        y += 18;
+    } else {
+        y += 2;
     }
 
-    // ── RODAPÉ ──
-    const pTotal=doc.getNumberOfPages();
-    for(let p=1;p<=pTotal;p++){
+    // ════════════════════════════════════
+    // 4. CHECK-INS ESPECIAIS PREVISTOS
+    // ════════════════════════════════════
+    if (espCi.length) {
+        if (y > 220) { doc.addPage(); y = 16; }
+        secTitulo('🟡', 'CHECK-INS ESPECIAIS PREVISTOS', espCi.length);
+        doc.autoTable({
+            startY: y,
+            margin: {left: ML, right: MR},
+            head: [['CTG','Reserva','IN','OUT','Descrição / Nome','UH','C','M','E']],
+            body: espCi.map(r=>[
+                r.ct||'—', r.reserva||'—', r.in||'—', r.out||'—',
+                r.descricao||'—', r.uh||'—',
+                r.c?'✓':'', r.m?'✓':'', r.e?'✓':''
+            ]),
+            styles: {fontSize:7.5, cellPadding:2.2, textColor:TEXT},
+            headStyles: {fillColor:[40,60,140], textColor:WHITE, fontStyle:'bold', fontSize:7},
+            alternateRowStyles: {fillColor:LGRAY},
+            columnStyles: {
+                0:{cellWidth:14, halign:'center'},
+                1:{cellWidth:22},
+                2:{cellWidth:20, halign:'center'},
+                3:{cellWidth:20, halign:'center'},
+                4:{cellWidth:CW-118},
+                5:{cellWidth:14, halign:'center'},
+                6:{cellWidth:9,  halign:'center'},
+                7:{cellWidth:9,  halign:'center'},
+                8:{cellWidth:9,  halign:'center'},
+            },
+            tableLineColor: MGRAY, tableLineWidth: 0.2,
+        });
+        y = doc.lastAutoTable.finalY + 8;
+    }
+
+    // ════════════════════════════════════
+    // RODAPÉ em todas as páginas
+    // ════════════════════════════════════
+    const pTotal = doc.getNumberOfPages();
+    for (let p = 1; p <= pTotal; p++) {
         doc.setPage(p);
-        doc.setDrawColor(200,200,200); doc.line(10,285,200,285);
-        doc.setTextColor(150,150,150); doc.setFontSize(7); doc.setFont('helvetica','normal');
-        doc.text(`${hotNome} — Auditoria ${data} — Turno: ${turno}`, 10, 289);
-        doc.text(`Página ${p} de ${pTotal}`, 190, 289, {align:'right'});
+        // faixa navy no rodapé
+        fillRect(0, 285, W, 12, NAVY);
+        setFont(7, 'normal', [160,175,210]);
+        doc.text(`🛡  Relatório gerado em ${new Date().toLocaleString('pt-BR')}`, ML+2, 291.5);
+        setFont(7, 'bold', GOLD);
+        doc.text('AUDITORIA OPERACIONAL', W-MR, 291.5, {align:'right'});
+        // número de páginas (só se > 1)
+        if (pTotal > 1) {
+            setFont(7, 'normal', [160,175,210]);
+            doc.text(`${p}/${pTotal}`, W/2, 291.5, {align:'center'});
+        }
     }
 
-    // Download + abrir para email
-    const filename=`Auditoria_${g('t-data').value||'hoje'}.pdf`;
+    const filename = `Auditoria_${dataVal||'hoje'}.pdf`;
     doc.save(filename);
-    toast('📄 PDF gerado! Abra o arquivo para enviar por email.');
+    toast('📄 PDF gerado!');
 }
 
 // ══ EXPORTAR TXT ══
@@ -1489,7 +1615,7 @@ function renderHist(){
         <div class="hist-item">
             <span style="font-size:18px;flex-shrink:0">📋</span>
             <div style="flex:1;min-width:0">
-                <div class="hist-nome">${h.turno||'Auditoria'}</div>
+                <div class="hist-nome">${h.turno||'Auditoria'}${h._autoSaved?'<span style="font-size:9px;background:var(--bg-hover);color:var(--text-soft);padding:1px 5px;border-radius:4px;margin-left:6px;font-weight:400">auto</span>':''}</div>
                 <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
             <div style="text-align:right;flex-shrink:0;margin-right:10px">
@@ -2348,6 +2474,8 @@ function renderEspCi() {
     }
     const badge = g('b-esp-ci');
     if (badge) badge.textContent = espCi.length;
+    syncStats();
+    autoSave();
 }
 
 // ══ HINTS para colar lista esp-ci ══
@@ -2630,47 +2758,152 @@ function syncStats() {
 let _autoSaveTimer = null;
 
 function salvarRascunho() {
+    // Não salva se não há dados (evita sobrescrever com estado vazio)
+    if (!co.length && !ci.length && !espCi.length && !ocorr.length
+        && !g('t-turno')?.value && !g('t-ocup')?.value) {
+        return;
+    }
     const ind = document.getElementById('autosave-ind');
     if(ind){ ind.className='autosave-dot saving'; ind.textContent='salvando…'; }
     try {
+        let catsVals = [];
+        try { catsVals = lerValoresCats(); } catch(e) {}
         const draft = {
-            turno:    g('t-turno')?.value    || '',
-            data:     g('t-data')?.value     || '',
-            ocupacao: g('t-ocup')?.value     || '',
-            dm:       g('t-dm')?.value       || '',
-            uh_bloq:  g('t-uh-bloq')?.value  || '0',
-            prev_ocup:    g('prev-ocup')?.value    || '',
-            prev_diaria:  g('prev-diaria')?.value  || '',
-            prev_uh:      g('prev-uh')?.value      || '',
-            prev_ent:     g('prev-ent')?.value     || '',
-            prev_sai:     g('prev-sai')?.value     || '',
-            prev_cafe:    g('prev-cafe')?.value     || '',
+            turno:       g('t-turno')?.value    || '',
+            data:        g('t-data')?.value     || '',
+            ocupacao:    g('t-ocup')?.value     || '',
+            dm:          g('t-dm')?.value       || '',
+            uh_bloq:     g('t-uh-bloq')?.value  || '0',
+            prev_ocup:   g('prev-ocup')?.value   || '',
+            prev_diaria: g('prev-diaria')?.value || '',
+            prev_uh:     g('prev-uh')?.value     || '',
+            prev_ent:    g('prev-ent')?.value    || '',
+            prev_sai:    g('prev-sai')?.value    || '',
+            prev_cafe:   g('prev-cafe')?.value   || '',
+            cats_vals: catsVals,
+            co:    JSON.parse(JSON.stringify(co    || [])),
+            espCi: JSON.parse(JSON.stringify(espCi || [])),
+            ci:    JSON.parse(JSON.stringify(ci    || [])),
+            ocorr: [...(ocorr || [])],
+            _ts:   Date.now(),
+            _slug: HOTEL_SLUG,
+        };
+        const json = JSON.stringify(draft);
+        localStorage.setItem(LS_DRAFT, json);
+        // double-check: lê de volta para confirmar
+        const check = localStorage.getItem(LS_DRAFT);
+        if (!check) throw new Error('localStorage não gravou');
+        if(ind){ ind.className='autosave-dot'; ind.textContent='salvo'; }
+        console.log('[autosave] OK — slug:', HOTEL_SLUG, '— co:', co.length, 'linhas');
+    } catch(e) {
+        console.error('[autosave] ERRO:', e);
+        if(ind){ ind.className='autosave-dot error'; ind.textContent='erro ao salvar'; }
+    }
+}
+
+let _histTimer = null;
+
+function autoSave() {
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(salvarRascunho, 400);
+    // Salva no histórico automaticamente se tem dados suficientes
+    clearTimeout(_histTimer);
+    _histTimer = setTimeout(autoSalvarHistorico, 5000);
+}
+
+function autoSalvarHistorico() {
+    // Só salva se tiver turno + data preenchidos e pelo menos 1 checkout
+    const turno = g('t-turno')?.value?.trim();
+    const data  = g('t-data')?.value?.trim();
+    if (!turno || !data || co.length === 0) return;
+
+    try {
+        let hist = []; 
+        try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+        
+        // Verifica se já existe entrada para esse turno+data nos últimos 10 min
+        const agora = Date.now();
+        const jaExiste = hist.some(h => 
+            h.data === data && 
+            h.turno === turno && 
+            (agora - (h.id || 0)) < 600000 // 10 minutos
+        );
+        if (jaExiste) {
+            // Atualiza a entrada existente em vez de criar nova
+            const idx = hist.findIndex(h => h.data === data && h.turno === turno);
+            if (idx >= 0) {
+                hist[idx] = {
+                    ...hist[idx],
+                    ocupacao: g('t-ocup')?.value || hist[idx].ocupacao,
+                    dm:       g('t-dm')?.value   || hist[idx].dm,
+                    uh_bloq:  g('t-uh-bloq')?.value || hist[idx].uh_bloq,
+                    prev_ocup:   g('prev-ocup')?.value   || '',
+                    prev_diaria: g('prev-diaria')?.value || '',
+                    prev_uh:     g('prev-uh')?.value     || '',
+                    prev_ent:    g('prev-ent')?.value    || '',
+                    prev_sai:    g('prev-sai')?.value    || '',
+                    prev_cafe:   g('prev-cafe')?.value   || '',
+                    cats_vals: lerValoresCats(),
+                    co:    JSON.parse(JSON.stringify(co)),
+                    espCi: JSON.parse(JSON.stringify(espCi)),
+                    ci:    JSON.parse(JSON.stringify(ci)),
+                    ocorr: [...ocorr],
+                    _autoSaved: true,
+                };
+                localStorage.setItem(LS_KEY, JSON.stringify(hist));
+                renderHist();
+            }
+            return;
+        }
+
+        // Cria nova entrada
+        const snap = {
+            id:       Date.now(),
+            turno, data,
+            ocupacao: g('t-ocup')?.value   || '',
+            dm:       g('t-dm')?.value     || '',
+            uh_bloq:  g('t-uh-bloq')?.value || '0',
+            prev_ocup:   g('prev-ocup')?.value   || '',
+            prev_diaria: g('prev-diaria')?.value || '',
+            prev_uh:     g('prev-uh')?.value     || '',
+            prev_ent:    g('prev-ent')?.value    || '',
+            prev_sai:    g('prev-sai')?.value    || '',
+            prev_cafe:   g('prev-cafe')?.value   || '',
             cats_vals: lerValoresCats(),
             co:    JSON.parse(JSON.stringify(co)),
             espCi: JSON.parse(JSON.stringify(espCi)),
             ci:    JSON.parse(JSON.stringify(ci)),
             ocorr: [...ocorr],
-            _ts: Date.now(),
+            _autoSaved: true,
         };
-        localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
-        if(ind){ ind.className='autosave-dot'; ind.textContent='salvo'; }
+        hist.unshift(snap);
+        if (hist.length > 30) hist = hist.slice(0, 30);
+        localStorage.setItem(LS_KEY, JSON.stringify(hist));
+        salvarEsp();
+        renderHist();
+        // Mostra indicador discreto
+        const ind = document.getElementById('autosave-ind');
+        if(ind){ 
+            ind.textContent = '📌 histórico salvo';
+            setTimeout(() => { ind.textContent = 'salvo'; }, 2000);
+        }
     } catch(e) {
-        console.warn('autosave falhou:', e);
-        if(ind){ ind.className='autosave-dot error'; ind.textContent='erro ao salvar'; }
+        console.warn('[autoSalvarHistorico] erro:', e);
     }
-}
-
-function autoSave() {
-    clearTimeout(_autoSaveTimer);
-    _autoSaveTimer = setTimeout(salvarRascunho, 400);
 }
 
 function carregarRascunho() {
     try {
         const raw = localStorage.getItem(LS_DRAFT);
-        if (!raw) return false;
+        if (!raw) { console.log('[rascunho] nenhum draft encontrado para', LS_DRAFT); return false; }
         const d = JSON.parse(raw);
         if (!d) return false;
+        // verifica se o draft é do mesmo hotel
+        if (d._slug && d._slug !== HOTEL_SLUG) {
+            console.warn('[rascunho] draft de outro hotel, ignorando');
+            return false;
+        }
+        console.log('[rascunho] restaurando —', (d.co||[]).length, 'checkouts, turno:', d.turno);
         // restaura campos de texto
         if(g('t-turno'))   g('t-turno').value   = d.turno   || '';
         if(g('t-data'))    g('t-data').value     = d.data    || new Date().toISOString().split('T')[0];
@@ -2724,6 +2957,7 @@ function salvarNoHistorico(){
 
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
+    console.log('[hospedagem] HOTEL_SLUG =', HOTEL_SLUG, '| LS_DRAFT =', LS_DRAFT);
     carregarEsp();
     renderCats();
     const restaurou = carregarRascunho();
