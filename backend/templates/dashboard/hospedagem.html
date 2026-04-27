@@ -283,6 +283,24 @@
         /* ══ DATE INPUT ══ */
         .ei-date-auto{width:106px;font-family:monospace;letter-spacing:.5px}
 
+
+        /* ── HISTÓRICO AÇÕES ── */
+        .hist-item { position: relative; }
+        .hist-actions {
+            display: flex; gap: 4px; opacity: 0;
+            transition: opacity .15s; flex-shrink: 0;
+        }
+        .hist-item:hover .hist-actions { opacity: 1; }
+        .btn-hist {
+            background: none; border: 1px solid var(--border);
+            border-radius: 6px; cursor: pointer; font-size: 11px;
+            font-weight: 600; padding: 4px 8px; font-family: 'Inter', sans-serif;
+            transition: all .15s; white-space: nowrap;
+        }
+        .btn-hist-load { color: #2563eb; border-color: rgba(37,99,235,.25); }
+        .btn-hist-load:hover { background: rgba(37,99,235,.08); }
+        .btn-hist-del  { color: #dc2626; border-color: rgba(220,38,38,.25); }
+        .btn-hist-del:hover  { background: rgba(220,38,38,.08); }
         /* ══ RESPONSIVE ══ */
         @media(max-width:1100px){.turno-bar{grid-template-columns:1fr 1fr 1fr}.stat-strip{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:900px){.stat-strip{grid-template-columns:repeat(3,1fr)}.prev-strip{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr!important}.chart-panel.full{grid-column:1!important}.stats-top{grid-template-columns:repeat(2,1fr)}}
@@ -357,7 +375,7 @@
             <div class="turno-bar">
                 <div class="tf">
                     <label>Troca de Turno</label>
-                    <input type="text" id="t-turno" placeholder="Ex: Lussandro / Margiore" oninput="syncUI()">
+                    <input type="text" id="t-turno" oninput="syncUI()">
                 </div>
                 <div class="tf">
                     <label>Data</label>
@@ -365,11 +383,11 @@
                 </div>
                 <div class="tf">
                     <label>Ocupação (%)</label>
-                    <input type="text" id="t-ocup" placeholder="98,18" oninput="syncUI()" onblur="fmtPctInput(this)">
+                    <input type="text" id="t-ocup" oninput="syncUI()" onblur="fmtPctInput(this)">
                 </div>
                 <div class="tf">
                     <label>DM — Diária Média</label>
-                    <input type="text" id="t-dm" placeholder="1.332,84" oninput="syncUI()" onblur="fmtDMInput(this)">
+                    <input type="text" id="t-dm" oninput="syncUI()" onblur="fmtDMInput(this)">
                 </div>
                 <div class="tf">
                     <label>UH Bloq.</label>
@@ -824,12 +842,23 @@ function toBr(iso){
 
 // ══ SYNC UI ══
 function syncUI(){
+    const di   = g('t-data')?.value || '';
+    const ocup = g('t-ocup')?.value || '';
+    const dm   = g('t-dm')?.value   || '';
+    if(g('lbl-data'))      g('lbl-data').textContent      = fmtDate(di)||'—';
+    if(g('lbl-amanha'))    g('lbl-amanha').textContent    = dataAmanha(di);
+    if(g('lbl-prev-data')) g('lbl-prev-data').textContent = dataAmanha(di);
+    // stat strip
+    if(g('ss-ocup')) g('ss-ocup').textContent = ocup||'—';
+    if(g('ss-dm'))   g('ss-dm').textContent   = 'DM: '+(dm||'—');
+    // preview strip — previsão
+    if(g('ps-ocup')) g('ps-ocup').textContent = g('prev-ocup')?.value||'—';
+    if(g('ps-ent'))  g('ps-ent').textContent  = g('prev-ent')?.value||'—';
+    if(g('ps-sai'))  g('ps-sai').textContent  = g('prev-sai')?.value||'—';
+    if(g('ps-dm'))   g('ps-dm').textContent   = g('prev-diaria')?.value||'—';
+    if(g('ps-cafe')) g('ps-cafe').textContent = g('prev-cafe')?.value||'—';
+    if(g('ps-uh'))   g('ps-uh').textContent   = g('prev-uh')?.value||'—';
     syncStats();
-    const ocup = g('t-ocup').value;
-    const di = g('t-data').value;
-    g('lbl-data').textContent     = fmtDate(di)||'—';
-    g('lbl-amanha').textContent   = dataAmanha(di);
-    g('lbl-prev-data').textContent = dataAmanha(di);
 }
 
 // ══ RENDER ══
@@ -1433,17 +1462,32 @@ function renderHist(){
     const el=g('hist-list');
     if(!hist.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';return;}
     el.innerHTML=hist.map((h,i)=>`
-        <div class="hist-item" onclick="carregarHist(${i})">
-            <span style="font-size:18px">📋</span>
-            <div>
+        <div class="hist-item">
+            <span style="font-size:18px;flex-shrink:0">📋</span>
+            <div style="flex:1;min-width:0">
                 <div class="hist-nome">${h.turno||'Auditoria'}</div>
                 <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
-            <div style="text-align:right">
+            <div style="text-align:right;flex-shrink:0;margin-right:10px">
                 <div class="hist-ocup">${h.ocupacao||'—'}</div>
                 <div style="font-size:10px;color:var(--text-soft);margin-top:2px">DM: ${h.dm||'—'}</div>
             </div>
+            <div class="hist-actions">
+                <button class="btn-hist btn-hist-load" onclick="carregarHist(${i})" title="Carregar auditoria">✏️ Editar</button>
+                <button class="btn-hist btn-hist-del"  onclick="apagarHist(${i})"  title="Apagar esta auditoria">🗑️ Apagar</button>
+            </div>
         </div>`).join('');
+}
+
+function apagarHist(i){
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const h = hist[i];
+    const nome = h?.turno || fmtDate(h?.data) || 'esta auditoria';
+    if(!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`))return;
+    hist.splice(i,1);
+    localStorage.setItem(LS_KEY, JSON.stringify(hist));
+    renderHist();
+    toast('🗑️ Auditoria apagada');
 }
 function carregarHist(i){
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
