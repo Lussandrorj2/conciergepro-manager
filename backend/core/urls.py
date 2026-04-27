@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import views_usuarios
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -32,6 +33,17 @@ urlpatterns = [
     path('<slug:hotel_slug>/dashboard/quadro/', views.dashboard_quadro, name='dashboard_quadro'),
     path('<slug:hotel_slug>/dashboard/hospedagem/', views.dashboard_hospedagem, name='dashboard_hospedagem'),
     path('<slug:hotel_slug>/dashboard/reservas-hotel/', views.dashboard_reservas_hotel, name='dashboard_reservas_hotel'),
+    path('<slug:hotel_slug>/dashboard/lugares/', views.dashboard_lugares, name='dashboard_lugares'),
+
+    # =========================
+    # GESTÃO DE USUÁRIOS (GERENTE)
+    # =========================
+    path('<slug:hotel_slug>/dashboard/usuarios/', views_usuarios.gerenciar_usuarios, name='gerenciar_usuarios'),
+    path('api/admin/<slug:hotel_slug>/usuarios/', views_usuarios.api_usuarios_lista, name='api_usuarios_lista'),
+    path('api/admin/<slug:hotel_slug>/usuarios/criar/', views_usuarios.api_usuario_criar, name='api_usuario_criar'),
+    path('api/admin/<slug:hotel_slug>/usuarios/<int:user_id>/', views_usuarios.api_usuario_editar, name='api_usuario_editar'),
+    path('api/admin/<slug:hotel_slug>/usuarios/<int:user_id>/deletar/', views_usuarios.api_usuario_deletar, name='api_usuario_deletar'),
+    path('api/admin/<slug:hotel_slug>/usuarios/<int:user_id>/toggle/', views_usuarios.api_usuario_toggle_ativo, name='api_usuario_toggle'),
 
     # =========================
     # API PÚBLICA
@@ -80,13 +92,15 @@ urlpatterns = [
     path('api/<slug:hotel_slug>/relatorios/comissoes/', views.relatorio_comissoes, name='relatorio_comissoes'),
     path('api/admin/<slug:hotel_slug>/divisao/', views.api_divisao, name='api_divisao'),
 
-    path('<slug:hotel_slug>/dashboard/lugares/', views.dashboard_lugares, name='dashboard_lugares'),
+    # =========================
+    # LUGARES
+    # =========================
     path('api/admin/<slug:hotel_slug>/lugares/', views.api_lugares, name='api_lugares'),
     path('api/admin/<slug:hotel_slug>/lugares/<int:lugar_id>/', views.api_lugares, name='api_lugares_detail'),
     path('api/public/<slug:hotel_slug>/lugares/', views.api_lugares_publico, name='api_lugares_publico'),
 
     # =========================
-    # ADIANTAMENTOS  ← ESTAVA FALTANDO
+    # ADIANTAMENTOS
     # =========================
     path('api/admin/<slug:hotel_slug>/adiantamentos/', views.api_adiantamentos, name='api_adiantamentos'),
 
@@ -95,4 +109,5 @@ urlpatterns = [
     # =========================
     path('api/admin/imagem/<int:id>/', views.deletar_imagem, name='deletar_imagem'),
 ]
+
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

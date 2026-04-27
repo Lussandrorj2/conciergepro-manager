@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 from deep_translator import GoogleTranslator
+from .permissions import requer_permissao, requer_gerente, get_contexto_usuario
 
 def to_float(valor):
     try:
@@ -181,49 +182,65 @@ def logout_view(request):
 
 # =========================
 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+# Função auxiliar para evitar repetição de código
+def render_com_contexto(request, hotel_slug, template, extra_context=None):
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    # Pega o is_gerente e outras permissões
+    ctx = get_contexto_usuario(request, hotel)
+    
+    contexto = {'hotel': hotel, **ctx}
+    if extra_context:
+        contexto.update(extra_context)
+        
+    return render(request, template, contexto)
+
 @login_required
 def dashboard_home(request, hotel_slug):
-    return render(request, 'dashboard/dashboard_home.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/dashboard_home.html')
 
 @login_required
 def dashboard_criar(request, hotel_slug):
-    return render(request, "dashboard/criar_passeios.html", {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, "dashboard/criar_passeios.html")
 
 @login_required
 def dashboard_listar(request, hotel_slug):
-    return render(request, 'dashboard/gerenciar_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/gerenciar_passeios.html')
 
 @login_required
 def dashboard_relatorios(request, hotel_slug):
-    return render(request, 'dashboard/relatorios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/relatorios.html')
 
 @login_required
 def dashboard_config(request, hotel_slug):
-    return render(request, 'dashboard/configuracoes.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/configuracoes.html')
 
 @login_required
 def dashboard_agenda(request, hotel_slug):
-    return render(request, 'dashboard/agenda_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/agenda_passeios.html')
 
 @login_required
 def dashboard_reservas(request, hotel_slug):
-    return render(request, 'dashboard/reservas.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/reservas.html')
 
 @login_required
 def dashboard_cambio(request, hotel_slug):
-    return render(request, 'dashboard/cambio.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/cambio.html')
 
 @login_required
 def dashboard_quadro(request, hotel_slug):
-    return render(request, 'dashboard/quadro.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/quadro.html')
 
 @login_required
+@requer_permissao('hospedagem')
 def dashboard_hospedagem(request, hotel_slug):
-   return render(request, 'dashboard/hospedagem.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/hospedagem.html')
 
 @login_required
 def dashboard_reservas_hotel(request, hotel_slug):
-    return render(request, 'dashboard/reservas-hotel.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/reservas-hotel.html')
 
 # =========================
 

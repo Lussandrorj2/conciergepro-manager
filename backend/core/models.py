@@ -127,7 +127,7 @@ class Perfil(models.Model):
     nome_completo = models.CharField(max_length=150, blank=True)
     telefone      = models.CharField(max_length=20, blank=True)
     ativo         = models.BooleanField(default=True)
-    criado_em     = models.DateTimeField(auto_now_add=True)
+    criado_em     = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['cargo', 'user__username']
@@ -227,7 +227,8 @@ class PasseioAgenda(models.Model):
         return max(self.vagas - reservadas, 0)
 
     def __str__(self):
-        return f"{self.passeio.nome} - {self.data} {self.horario}"
+        data_str = self.data.strftime('%d/%m/%Y') if self.data else "Sem data"
+        return f"{self.passeio.nome if self.passeio else 'Passeio'} - {data_str}"
 
 
 # ==========================================
@@ -411,4 +412,5 @@ class LugarSugerido(models.Model):
         ordering = ['ordem', 'nome']
 
     def __str__(self):
-        return f"{self.nome} ({self.hotel.nome})"
+        hotel_nome = self.hotel.nome if self.hotel else "Sem Hotel"
+        return f"{self.nome} ({hotel_nome})"

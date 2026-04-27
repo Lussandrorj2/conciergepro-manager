@@ -1,0 +1,518 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Usuários — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ── LAYOUT ── */
+        .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+        .page-title{font-size:18px;font-weight:700;color:var(--text-main)}
+        .page-sub{font-size:12px;color:var(--text-soft);margin-top:2px}
+
+        /* ── STATS BAR ── */
+        .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+        .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+        .stat-card-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:4px}
+        .stat-card-val{font-size:24px;font-weight:800;color:var(--text-main)}
+
+        /* ── TABELA ── */
+        .usuarios-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+        .panel-top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+        .panel-top h2{font-size:13px;font-weight:700;color:var(--text-main)}
+        .search-input{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;width:220px}
+        .search-input:focus{border-color:var(--gold)}
+
+        table.ut{width:100%;border-collapse:collapse}
+        table.ut th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);background:var(--bg-hover);border-bottom:1px solid var(--border)}
+        table.ut td{padding:10px 14px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border);vertical-align:middle}
+        table.ut tr:last-child td{border-bottom:none}
+        table.ut tr:hover td{background:var(--bg-hover)}
+
+        .badge-cargo{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700}
+        .bc-gerente{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
+        .bc-recep{background:rgba(37,99,235,.08);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+        .badge-ativo{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+        .ba-on{background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .ba-off{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+
+        .btn-act{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;color:var(--text-soft)}
+        .btn-act:hover{border-color:var(--gold);color:var(--gold)}
+        .btn-act.danger:hover{border-color:#dc2626;color:#dc2626}
+        .btn-act.success:hover{border-color:#059669;color:#059669}
+
+        /* ── PERMISSÕES CHIPS ── */
+        .perm-chips{display:flex;flex-wrap:wrap;gap:4px}
+        .pchip{padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600;background:var(--bg-hover);border:1px solid var(--border);color:var(--text-soft)}
+        .pchip.on{background:rgba(37,99,235,.08);color:#2563eb;border-color:rgba(37,99,235,.2)}
+
+        /* ── MODAL ── */
+        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:16px}
+        .modal-ov.open{display:flex}
+        .modal-box{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;width:100%;max-width:560px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
+        .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .modal-head h3{font-size:14px;font-weight:700;color:var(--text-main)}
+        .modal-body{padding:20px;overflow-y:auto;flex:1}
+        .modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--bg-card)}
+
+        .form-row{margin-bottom:14px}
+        .form-row label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:5px}
+        .form-input{width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;transition:border-color .15s;box-sizing:border-box}
+        .form-input:focus{border-color:var(--gold)}
+        .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+        /* Permissões checkboxes */
+        .perms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+        .perm-item{display:flex;align-items:center;gap:8px;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;transition:.12s}
+        .perm-item:hover{border-color:var(--gold)}
+        .perm-item input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;cursor:pointer}
+        .perm-item-lbl{font-size:12px;font-weight:500;color:var(--text-muted)}
+
+        .btn-primary{background:#0f172a;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+        .btn-primary:hover{background:#1e293b}
+        .btn-secondary{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+        .btn-danger{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+        .btn-danger:hover{background:rgba(220,38,38,.15)}
+
+        .alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;display:none}
+        .alert.show{display:block}
+        .alert-err{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);color:#dc2626}
+        .alert-ok{background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.2);color:#059669}
+
+        .cargo-toggle{display:flex;gap:6px;margin-bottom:12px}
+        .cargo-opt{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-soft);transition:.15s}
+        .cargo-opt.selected{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+        .cargo-opt:hover{border-color:var(--gold)}
+
+        @media(max-width:600px){.stats-bar{grid-template-columns:1fr}.form-row-2{grid-template-columns:1fr}.perms-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
+            <a href="/{{ hotel.slug }}/dashboard/usuarios/" class="active">👥 Usuários</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger-btn" id="hamburger-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <span class="topbar-title">👥 Gestão de Usuários</span>
+            </div>
+            <div class="topbar-right">
+                <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page-head">
+                <div>
+                    <div class="page-title">Usuários do Hotel</div>
+                    <div class="page-sub">Gerencie gerentes e recepcionistas — defina acessos e permissões</div>
+                </div>
+                <button class="btn-primary" onclick="abrirModalCriar()">＋ Novo Usuário</button>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-card-lbl">Total de Usuários</div>
+                    <div class="stat-card-val" id="stat-total">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-lbl">Gerentes</div>
+                    <div class="stat-card-val" id="stat-gerentes">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-lbl">Recepcionistas</div>
+                    <div class="stat-card-val" id="stat-recep">—</div>
+                </div>
+            </div>
+
+            <!-- TABELA -->
+            <div class="usuarios-panel">
+                <div class="panel-top">
+                    <h2>Lista de Usuários</h2>
+                    <input class="search-input" type="text" placeholder="Buscar usuário…" oninput="filtrarTabela(this.value)">
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="ut" id="tabela-usuarios">
+                        <thead>
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Nome</th>
+                                <th>Cargo</th>
+                                <th>Status</th>
+                                <th>Permissões</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-usuarios">
+                            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-soft)">Carregando…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL CRIAR/EDITAR -->
+<div class="modal-ov" id="modal-usuario">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 id="modal-titulo">Novo Usuário</h3>
+            <button onclick="fecharModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-soft)">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-err" id="modal-erro"></div>
+            <div class="alert alert-ok"  id="modal-ok"></div>
+
+            <input type="hidden" id="edit-user-id">
+
+            <!-- Cargo -->
+            <div class="form-row">
+                <label>Cargo</label>
+                <div class="cargo-toggle">
+                    <div class="cargo-opt selected" id="opt-recep" onclick="selecionarCargo('recepcionista')">👤 Recepcionista</div>
+                    <div class="cargo-opt"           id="opt-ger"  onclick="selecionarCargo('gerente')">⭐ Gerente</div>
+                </div>
+                <input type="hidden" id="f-cargo" value="recepcionista">
+            </div>
+
+            <div class="form-row-2">
+                <div class="form-row">
+                    <label>Username *</label>
+                    <input class="form-input" id="f-username" placeholder="Ex: maria.silva" autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <label>Senha * <span id="lbl-senha-edit" style="display:none;font-weight:400;text-transform:none">(deixe vazio p/ manter)</span></label>
+                    <input class="form-input" id="f-password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Nome Completo</label>
+                <input class="form-input" id="f-nome" placeholder="Ex: Maria da Silva">
+            </div>
+
+            <div class="form-row-2">
+                <div class="form-row">
+                    <label>Email</label>
+                    <input class="form-input" id="f-email" type="email" placeholder="email@hotel.com">
+                </div>
+                <div class="form-row">
+                    <label>Telefone</label>
+                    <input class="form-input" id="f-telefone" placeholder="(21) 99999-9999">
+                </div>
+            </div>
+
+            <!-- Permissões (só para recepcionistas) -->
+            <div id="perms-section">
+                <div class="form-row" style="margin-bottom:6px">
+                    <label>Permissões de Acesso</label>
+                    <div style="font-size:11px;color:var(--text-soft);margin-top:2px">Selecione os módulos que este recepcionista pode acessar</div>
+                </div>
+                <div class="perms-grid" id="perms-grid"></div>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-danger"    id="btn-deletar" style="display:none" onclick="confirmarDeletar()">🗑️ Deletar</button>
+            <button class="btn-primary"   id="btn-salvar"  onclick="salvarUsuario()">✅ Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const HOTEL_SLUG = "{{ hotel.slug }}";
+
+const MODULOS = [
+    '{% for key, label in modulos %}',
+    '{ key: "{{ key }}", label: "{{ label }}" }',
+    '{% endfor %}'
+];
+
+let todosUsuarios = [];
+let modoEdicao   = false;
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+    renderPermsGrid();
+    carregarUsuarios();
+});
+
+// ── PERMISSÕES GRID ──
+function renderPermsGrid(selecionadas=[]) {
+    const grid = document.getElementById('perms-grid');
+    grid.innerHTML = MODULOS.map(m => `
+        <label class="perm-item">
+            <input type="checkbox" value="${m.key}" ${selecionadas.includes(m.key)?'checked':''}>
+            <span class="perm-item-lbl">${m.label}</span>
+        </label>
+    `).join('');
+}
+
+function getPermselecionadas() {
+    return [...document.querySelectorAll('#perms-grid input:checked')].map(el => el.value);
+}
+
+// ── CARGO TOGGLE ──
+function selecionarCargo(cargo) {
+    document.getElementById('f-cargo').value = cargo;
+    document.getElementById('opt-recep').classList.toggle('selected', cargo === 'recepcionista');
+    document.getElementById('opt-ger').classList.toggle('selected',   cargo === 'gerente');
+    document.getElementById('perms-section').style.display = cargo === 'recepcionista' ? 'block' : 'none';
+}
+
+// ── CARREGAR USUÁRIOS ──
+async function carregarUsuarios() {
+    try {
+        const resp = await fetch(`/api/admin/${HOTEL_SLUG}/usuarios/`);
+        todosUsuarios = await resp.json();
+        renderTabela(todosUsuarios);
+        atualizarStats(todosUsuarios);
+    } catch(e) {
+        document.getElementById('tbody-usuarios').innerHTML =
+            `<tr><td colspan="6" style="text-align:center;padding:20px;color:#dc2626">Erro ao carregar usuários</td></tr>`;
+    }
+}
+
+function atualizarStats(lista) {
+    document.getElementById('stat-total').textContent    = lista.length;
+    document.getElementById('stat-gerentes').textContent = lista.filter(u => u.cargo === 'gerente').length;
+    document.getElementById('stat-recep').textContent    = lista.filter(u => u.cargo === 'recepcionista').length;
+}
+
+function renderTabela(lista) {
+    const tbody = document.getElementById('tbody-usuarios');
+    if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-soft)">Nenhum usuário cadastrado</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = lista.map(u => {
+        const cargoBadge = u.cargo === 'gerente'
+            ? `<span class="badge-cargo bc-gerente">⭐ Gerente</span>`
+            : `<span class="badge-cargo bc-recep">👤 Recepcionista</span>`;
+
+        const atv = u.ativo
+            ? `<span class="badge-ativo ba-on">Ativo</span>`
+            : `<span class="badge-ativo ba-off">Inativo</span>`;
+
+        let permsHtml = '';
+        if (u.cargo === 'gerente') {
+            permsHtml = `<span style="font-size:11px;color:var(--text-soft);font-style:italic">Acesso total</span>`;
+        } else {
+            permsHtml = `<div class="perm-chips">${
+                MODULOS.map(m =>
+                    `<span class="pchip ${u.permissoes.includes(m.key)?'on':''}">${m.label.split('/')[0].trim()}</span>`
+                ).join('')
+            }</div>`;
+        }
+
+        return `<tr>
+            <td><strong style="color:var(--text-main)">${u.username}</strong></td>
+            <td>${u.nome_completo || '—'}</td>
+            <td>${cargoBadge}</td>
+            <td>${atv}</td>
+            <td>${permsHtml}</td>
+            <td style="white-space:nowrap">
+                <button class="btn-act" onclick='abrirModalEditar(${JSON.stringify(u)})'>✏️ Editar</button>
+                <button class="btn-act ${u.ativo?'danger':'success'}" onclick="toggleAtivo(${u.id}, '${u.username}', ${u.ativo})">
+                    ${u.ativo ? '🔒 Desativar' : '🔓 Ativar'}
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function filtrarTabela(q) {
+    const lower = q.toLowerCase();
+    const filtrado = todosUsuarios.filter(u =>
+        u.username.toLowerCase().includes(lower) ||
+        (u.nome_completo||'').toLowerCase().includes(lower) ||
+        u.cargo.toLowerCase().includes(lower)
+    );
+    renderTabela(filtrado);
+}
+
+// ── MODAL CRIAR ──
+function abrirModalCriar() {
+    modoEdicao = false;
+    document.getElementById('modal-titulo').textContent = 'Novo Usuário';
+    document.getElementById('edit-user-id').value = '';
+    document.getElementById('f-username').value   = '';
+    document.getElementById('f-password').value   = '';
+    document.getElementById('f-nome').value       = '';
+    document.getElementById('f-email').value      = '';
+    document.getElementById('f-telefone').value   = '';
+    document.getElementById('f-username').disabled = false;
+    document.getElementById('lbl-senha-edit').style.display = 'none';
+    document.getElementById('btn-deletar').style.display    = 'none';
+    document.getElementById('modal-erro').classList.remove('show');
+    document.getElementById('modal-ok').classList.remove('show');
+    selecionarCargo('recepcionista');
+    renderPermsGrid([]);
+    document.getElementById('modal-usuario').classList.add('open');
+}
+
+// ── MODAL EDITAR ──
+function abrirModalEditar(u) {
+    modoEdicao = true;
+    document.getElementById('modal-titulo').textContent = `Editar — ${u.username}`;
+    document.getElementById('edit-user-id').value  = u.id;
+    document.getElementById('f-username').value    = u.username;
+    document.getElementById('f-username').disabled = true;
+    document.getElementById('f-password').value    = '';
+    document.getElementById('f-nome').value        = u.nome_completo || '';
+    document.getElementById('f-email').value       = u.email || '';
+    document.getElementById('f-telefone').value    = u.telefone || '';
+    document.getElementById('lbl-senha-edit').style.display = 'inline';
+    document.getElementById('btn-deletar').style.display    = 'inline-flex';
+    document.getElementById('modal-erro').classList.remove('show');
+    document.getElementById('modal-ok').classList.remove('show');
+    selecionarCargo(u.cargo);
+    renderPermsGrid(u.permissoes || []);
+    document.getElementById('modal-usuario').classList.add('open');
+}
+
+function fecharModal() {
+    document.getElementById('modal-usuario').classList.remove('open');
+}
+document.getElementById('modal-usuario').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-usuario')) fecharModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+// ── SALVAR ──
+async function salvarUsuario() {
+    const btn  = document.getElementById('btn-salvar');
+    const erro = document.getElementById('modal-erro');
+    const ok   = document.getElementById('modal-ok');
+    erro.classList.remove('show');
+    ok.classList.remove('show');
+    btn.disabled = true;
+    btn.textContent = 'Salvando…';
+
+    const userId = document.getElementById('edit-user-id').value;
+    const cargo  = document.getElementById('f-cargo').value;
+    const body   = {
+        username:      document.getElementById('f-username').value.trim(),
+        password:      document.getElementById('f-password').value,
+        nome_completo: document.getElementById('f-nome').value.trim(),
+        email:         document.getElementById('f-email').value.trim(),
+        telefone:      document.getElementById('f-telefone').value.trim(),
+        cargo,
+        permissoes: cargo === 'recepcionista' ? getPermselecionadas() : [],
+    };
+
+    try {
+        let url, method;
+        if (modoEdicao) {
+            url    = `/api/admin/${HOTEL_SLUG}/usuarios/${userId}/`;
+            method = 'PUT';
+        } else {
+            url    = `/api/admin/${HOTEL_SLUG}/usuarios/criar/`;
+            method = 'POST';
+        }
+
+        const resp = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
+            body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+
+        if (data.erro) {
+            erro.textContent = data.erro;
+            erro.classList.add('show');
+        } else {
+            ok.textContent = data.msg || 'Salvo com sucesso!';
+            ok.classList.add('show');
+            await carregarUsuarios();
+            setTimeout(fecharModal, 1200);
+        }
+    } catch(e) {
+        erro.textContent = 'Erro de conexão';
+        erro.classList.add('show');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '✅ Salvar';
+}
+
+// ── DELETAR ──
+async function confirmarDeletar() {
+    const userId = document.getElementById('edit-user-id').value;
+    const uname  = document.getElementById('f-username').value;
+    if (!confirm(`Deletar o usuário "${uname}" permanentemente? Esta ação não pode ser desfeita.`)) return;
+
+    try {
+        const resp = await fetch(`/api/admin/${HOTEL_SLUG}/usuarios/${userId}/deletar/`, {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCsrf() },
+        });
+        const data = await resp.json();
+        if (data.erro) { alert(data.erro); return; }
+        fecharModal();
+        await carregarUsuarios();
+        toast(`🗑️ ${uname} removido`);
+    } catch(e) {
+        alert('Erro ao deletar');
+    }
+}
+
+// ── TOGGLE ATIVO ──
+async function toggleAtivo(userId, username, ativo) {
+    const acao = ativo ? 'desativar' : 'ativar';
+    if (!confirm(`${acao.charAt(0).toUpperCase()+acao.slice(1)} o usuário "${username}"?`)) return;
+    try {
+        const resp = await fetch(`/api/admin/${HOTEL_SLUG}/usuarios/${userId}/toggle/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrf() },
+        });
+        const data = await resp.json();
+        if (data.erro) { alert(data.erro); return; }
+        await carregarUsuarios();
+        toast(data.msg);
+    } catch(e) {
+        alert('Erro');
+    }
+}
+
+// ── UTILS ──
+function getCsrf() {
+    return document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+}
+
+function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+</script>
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+</body>
+</html>
