@@ -234,7 +234,7 @@ def dashboard_quadro(request, hotel_slug):
     return render_com_contexto(request, hotel_slug, 'dashboard/quadro.html')
 
 @login_required
-@requer_permissao('hospedagem')
+#@requer_permissao('hospedagem')
 def dashboard_hospedagem(request, hotel_slug):
     return render_com_contexto(request, hotel_slug, 'dashboard/hospedagem.html')
 
