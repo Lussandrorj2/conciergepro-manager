@@ -1331,7 +1331,7 @@ function _salvarLegado(){
 function gerarPDF(){
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-    const W = 210, ML = 12, MR = 12, CW = W - ML - MR;
+    const W = 210, ML = 14, MR = 14, CW = W - ML - MR;
 
     const hotNome  = "{{ hotel.nome|striptags }}";
     const dataVal  = g('t-data')?.value || '';
@@ -1339,230 +1339,248 @@ function gerarPDF(){
     const ocupacao = g('t-ocup')?.value  || '-';
     const dm       = g('t-dm')?.value    || '-';
     const uhBloq   = g('t-uh-bloq')?.value || '0';
+    const dataFmt  = dataVal
+        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})
+        : '-';
 
+    // cores
     const NAVY  = [13, 27, 64];
     const BLUE  = [20, 50, 120];
     const GOLD  = [181, 140, 50];
-    const WHITE = [255, 255, 255];
-    const LGRAY = [245, 247, 250];
-    const MGRAY = [210, 215, 225];
-    const DGRAY = [90, 100, 120];
+    const WHITE = [255,255,255];
+    const LGRAY = [245,247,250];
+    const MGRAY = [200,208,220];
     const TEXT  = [30, 40, 65];
+    const SOFT  = [100,115,140];
 
     const sf = (size, style='normal', color=TEXT) => {
-        doc.setFontSize(size);
-        doc.setFont('helvetica', style);
-        doc.setTextColor(...color);
+        doc.setFontSize(size); doc.setFont('helvetica', style); doc.setTextColor(...color);
     };
-    const fillRect = (x,y,w,h,color) => {
-        doc.setFillColor(...color);
-        doc.rect(x,y,w,h,'F');
-    };
-    const roundRect = (x,y,w,h,r,color) => {
-        doc.setFillColor(...color);
+    const fr = (x,y,w,h,col) => { doc.setFillColor(...col); doc.rect(x,y,w,h,'F'); };
+    const rr = (x,y,w,h,r,col,stroke) => {
+        doc.setFillColor(...col);
         doc.roundedRect(x,y,w,h,r,r,'F');
+        if(stroke){ doc.setDrawColor(...stroke); doc.setLineWidth(0.3); doc.roundedRect(x,y,w,h,r,r,'S'); }
+    };
+    const line = (x1,y1,x2,y2,col=[200,208,220],lw=0.3) => {
+        doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,y1,x2,y2);
     };
 
-    // ── CABECALHO ──
-    fillRect(0, 0, W, 44, NAVY);
+    // == CABECALHO ==
+    fr(0, 0, W, 36, NAVY);
+    // titulo
+    sf(7, 'bold', GOLD);
+    doc.text('RELATORIO DE AUDITORIA OPERACIONAL', W/2, 12, {align:'center'});
+    sf(16, 'bold', WHITE);
+    doc.text('AUDITORIA', W/2, 22, {align:'center'});
+    sf(9, 'normal', [180,190,210]);
+    doc.text(hotNome, W/2, 29, {align:'center'});
+    // linha dourada
+    fr(0, 34, W, 2, GOLD);
 
-    sf(22, 'bold', WHITE);
-    doc.text('AUDITORIA', ML, 14);
+    let y = 42;
 
-    sf(9, 'normal', [180, 190, 210]);
-    doc.text(hotNome, ML, 21);
+    // == 2 CARDS TOPO: Ocupacao + DM ==
+    const c2w = CW/2 - 3;
+    // card ocupacao
+    rr(ML, y, c2w, 18, 3, LGRAY, MGRAY);
+    sf(7, 'bold', SOFT);
+    doc.text('Ocupacao Atual', ML + c2w/2, y+6, {align:'center'});
+    sf(13, 'bold', NAVY);
+    doc.text('(' + ocupacao + ')', ML + c2w/2, y+14, {align:'center'});
+    // card DM
+    rr(ML+c2w+6, y, c2w, 18, 3, LGRAY, MGRAY);
+    sf(7, 'bold', SOFT);
+    doc.text('Diaria Media', ML+c2w+6 + c2w/2, y+6, {align:'center'});
+    sf(13, 'bold', NAVY);
+    doc.text('(' + dm + ')', ML+c2w+6 + c2w/2, y+14, {align:'center'});
+    y += 23;
 
-    const dataFmt = dataVal
-        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{
-            weekday:'long', day:'2-digit', month:'long', year:'numeric'
-          }).toUpperCase()
-        : '-';
+    // == LINHA: Turno | Data | UH Bloq ==
+    sf(7.5, 'bold', SOFT);
+    doc.text('Turno: ', ML, y+4);
+    sf(7.5, 'bold', TEXT);
+    doc.text(turno, ML+16, y+4);
+    sf(7.5, 'bold', SOFT);
+    doc.text('Data: ', ML+60, y+4);
+    sf(7.5, 'bold', TEXT);
+    doc.text(dataFmt, ML+74, y+4);
+    sf(7.5, 'bold', SOFT);
+    doc.text('UH Bloq: ', ML+110, y+4);
+    sf(7.5, 'bold', TEXT);
+    doc.text(uhBloq, ML+128, y+4);
+    y += 9;
+    line(ML, y, W-MR, y);
+    y += 5;
 
-    sf(7.5, 'bold', GOLD);
-    doc.text(dataFmt, ML, 28);
-
-    // separadores verticais + mini cards
-    const hCards = [
-        {label:'TURNO',    val: turno},
-        {label:'OCUPACAO', val: ocupacao},
-        {label:'UH BLOQ.', val: uhBloq},
-    ];
-    let hx = 100;
-    hCards.forEach(hc => {
-        doc.setDrawColor(60, 80, 130);
-        doc.setLineWidth(0.4);
-        doc.line(hx-3, 10, hx-3, 38);
-        sf(7, 'bold', [150,165,200]);
-        doc.text(hc.label, hx+1, 19);
-        sf(10, 'bold', WHITE);
-        doc.text(String(hc.val), hx+1, 28);
-        hx += 36;
-    });
-
-    // faixa dourada
-    fillRect(0, 42, W, 2, GOLD);
-
-    let y = 50;
-
-    // ── SECAO helper — sem emoji, usa simbolo latin ──
-    function secTitulo(simbolo, titulo, count='') {
-        if (y > 265) { doc.addPage(); y = 16; fillRect(0,0,W,2,NAVY); }
-        fillRect(ML, y, CW, 8, BLUE);
-        fillRect(ML, y, 2.5, 8, GOLD);
-        sf(8, 'bold', WHITE);
-        doc.text(simbolo + '  ' + titulo + (count ? ' (' + count + ')' : ''), ML+6, y+5.5);
-        y += 12;
+    // == HELPER TITULO DE SECAO ==
+    function secBar(titulo, cor=BLUE) {
+        if(y > 255){ doc.addPage(); y = 16; fr(0,0,W,2,NAVY); }
+        fr(ML, y, CW, 7, cor);
+        line(ML, y, ML, y+7, GOLD, 2.5);
+        sf(7.5, 'bold', WHITE);
+        doc.text(titulo, ML+6, y+5);
+        y += 10;
     }
 
-    // ════════════════════════════
-    // 1. DADOS ATUAIS DE OCUPACAO
-    // ════════════════════════════
-    secTitulo('►', 'DADOS ATUAIS DE OCUPACAO');
+    // == 2 COLUNAS: RESERVAS ESPECIAIS + PREVISAO ==
+    const col1x = ML, col1w = CW*0.52;
+    const col2x = ML + col1w + 5, col2w = CW - col1w - 5;
+    const ySnap = y;
 
-    const oc1Cards = [
-        {label:'Ocupacao Atual',   val: ocupacao},
-        {label:'Diaria Media (DM)',val: dm},
-        {label:'UHs Bloqueadas',   val: uhBloq},
-    ];
-    const cardW = CW/3 - 2;
-    oc1Cards.forEach((card, idx) => {
-        const cx = ML + idx * (cardW + 3);
-        roundRect(cx, y, cardW, 20, 2, LGRAY);
-        doc.setDrawColor(...MGRAY); doc.setLineWidth(0.3);
-        doc.roundedRect(cx, y, cardW, 20, 2, 2, 'S');
-        sf(7, 'bold', DGRAY);
-        doc.text(card.label, cx + cardW/2, y+7, {align:'center'});
-        sf(13, 'bold', NAVY);
-        doc.text(String(card.val||'-'), cx + cardW/2, y+16, {align:'center'});
-    });
-    y += 25;
+    // --- COLUNA 1: RESERVAS ESPECIAIS NA CASA ---
+    fr(col1x, y, col1w, 7, BLUE);
+    line(col1x, y, col1x, y+7, GOLD, 2.5);
+    sf(7, 'bold', WHITE);
+    doc.text('RESERVAS ESPECIAIS NA CASA' + (esp.length?' ('+esp.length+')':''), col1x+6, y+5);
+    let y1 = y + 10;
 
-    // ════════════════════════════
-    // 2. RESERVAS ESPECIAIS NA CASA
-    // ════════════════════════════
-    if (esp.length) {
-        secTitulo('★', 'RESERVAS ESPECIAIS NA CASA', esp.length);
-        doc.autoTable({
-            startY: y,
-            margin: {left: ML, right: MR},
-            head: [['UH','CTG','Reserva','Check-in','Check-out','Nome / Descricao']],
-            body: esp.map(r=>[
-                r.uh||'-', r.ct||'-', r.reserva||'-',
-                r.checkin||'-', r.checkout||'-', r.descricao||'-'
-            ]),
-            styles: {fontSize:8, cellPadding:2.5, textColor:TEXT},
-            headStyles: {fillColor:BLUE, textColor:WHITE, fontStyle:'bold', fontSize:7.5},
-            alternateRowStyles: {fillColor:LGRAY},
-            columnStyles: {
-                0:{cellWidth:12, halign:'center'},
-                1:{cellWidth:14, halign:'center'},
-                2:{cellWidth:22},
-                3:{cellWidth:22, halign:'center'},
-                4:{cellWidth:22, halign:'center'},
-                5:{cellWidth:CW-92},
-            },
-            tableLineColor: MGRAY, tableLineWidth: 0.2,
+    if(!esp.length){
+        sf(7.5, 'normal', SOFT);
+        doc.text('Nenhuma reserva especial', col1x+4, y1+5);
+        y1 += 12;
+    } else {
+        // cabecalho tabela
+        fr(col1x, y1, col1w, 6, [40,60,130]);
+        sf(6.5, 'bold', WHITE);
+        doc.text('Nome', col1x+4, y1+4.2);
+        doc.text('Diaria', col1x+col1w-22, y1+4.2);
+        y1 += 6;
+        esp.forEach((r,i) => {
+            if(i%2===0) fr(col1x, y1, col1w, 7, LGRAY);
+            sf(7.5, 'normal', TEXT);
+            const nome = (r.descricao||r.reserva||'-').slice(0,28);
+            doc.text(nome, col1x+4, y1+5);
+            doc.text(r.checkin||'-', col1x+col1w-22, y1+5);
+            y1 += 7;
         });
-        y = doc.lastAutoTable.finalY + 10;
     }
 
-    // ════════════════════════════
-    // 3. PREVISAO AMANHA
-    // ════════════════════════════
-    if (y > 210) { doc.addPage(); y = 16; }
-    secTitulo('●', 'PREVISAO - AMANHA');
+    // --- COLUNA 2: PREVISAO AMANHA ---
+    fr(col2x, ySnap, col2w, 7, BLUE);
+    line(col2x, ySnap, col2x, ySnap+7, GOLD, 2.5);
+    sf(7, 'bold', WHITE);
+    doc.text('PREVISAO AMANHA', col2x+6, ySnap+5);
+    let y2 = ySnap + 10;
 
-    const prevCards = [
-        {label:'Ocupacao',     val: g('prev-ocup')?.value||'-'},
-        {label:'Diaria Media', val: g('prev-diaria')?.value||'-'},
-        {label:'UHs Ocupadas', val: g('prev-uh')?.value||'-'},
-        {label:'Entradas',     val: g('prev-ent')?.value||'-'},
-        {label:'Total Hosp.',  val: g('prev-cafe')?.value||'-'},
+    // 2 mini cards: ocupacao + DM
+    const mc = col2w/2 - 2;
+    rr(col2x, y2, mc, 14, 2, LGRAY, MGRAY);
+    sf(6.5, 'bold', SOFT); doc.text('Ocupacao', col2x+mc/2, y2+5.5, {align:'center'});
+    sf(10, 'bold', NAVY); doc.text(g('prev-ocup')?.value||'-', col2x+mc/2, y2+12, {align:'center'});
+    rr(col2x+mc+4, y2, mc, 14, 2, LGRAY, MGRAY);
+    sf(6.5, 'bold', SOFT); doc.text('DM', col2x+mc+4+mc/2, y2+5.5, {align:'center'});
+    sf(10, 'bold', NAVY); doc.text(g('prev-diaria')?.value||'-', col2x+mc+4+mc/2, y2+12, {align:'center'});
+    y2 += 17;
+
+    // stats: entradas, diaria, saidas
+    const stats = [
+        {l:'Entradas', v: g('prev-ent')?.value||'-'},
+        {l:'Diaria',   v: g('prev-diaria')?.value||'-'},
+        {l:'Saidas',   v: g('prev-sai')?.value||'-'},
     ];
-    const pc5W = CW/5 - 1.6;
-    prevCards.forEach((card, idx) => {
-        const cx = ML + idx * (pc5W + 2);
-        roundRect(cx, y, pc5W, 20, 2, [235,240,252]);
-        doc.setDrawColor(...[190,200,225]); doc.setLineWidth(0.3);
-        doc.roundedRect(cx, y, pc5W, 20, 2, 2, 'S');
-        fillRect(cx, y, pc5W, 3, BLUE);
-        sf(6.5, 'bold', DGRAY);
-        doc.text(card.label, cx + pc5W/2, y+10, {align:'center'});
-        sf(11, 'bold', NAVY);
-        doc.text(String(card.val), cx + pc5W/2, y+17, {align:'center'});
+    const sw = col2w/3 - 1;
+    stats.forEach((s,i) => {
+        const sx = col2x + i*(sw+1.5);
+        sf(6, 'bold', SOFT); doc.text(s.l, sx+sw/2, y2+4, {align:'center'});
+        sf(9, 'bold', NAVY); doc.text(String(s.v), sx+sw/2, y2+9.5, {align:'center'});
     });
-    y += 25;
+    y2 += 13;
 
-    // Entradas por categoria
+    // Entradas por categoria — mini grafico de barras
     const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '');
-    if (catVals.length) {
-        sf(7.5, 'bold', DGRAY);
-        doc.text('Entradas por Categoria:', ML, y+4);
-        y += 8;
-        const catW = Math.min(CW / catVals.length - 2, 36);
-        catVals.forEach((cv, idx) => {
-            const cx = ML + idx*(catW+2);
-            roundRect(cx, y, catW, 15, 2, LGRAY);
-            doc.setDrawColor(...MGRAY); doc.roundedRect(cx, y, catW, 15, 2, 2, 'S');
-            sf(6.5, 'bold', DGRAY);
-            doc.text(cv.cat, cx+catW/2, y+6, {align:'center'});
-            sf(10, 'bold', NAVY);
-            doc.text(String(cv.val||'-'), cx+catW/2, y+12, {align:'center'});
+    if(catVals.length){
+        sf(6, 'bold', SOFT);
+        doc.text('Entradas por Categoria', col2x, y2+4);
+        y2 += 7;
+        const maxVal = Math.max(...catVals.map(cv => parseInt(cv.val)||0), 1);
+        const barMaxH = 18, barW = Math.min((col2w - (catVals.length-1)*2) / catVals.length, 16);
+        catVals.forEach((cv,i) => {
+            const bx = col2x + i*(barW+2);
+            const bh = Math.max(((parseInt(cv.val)||0)/maxVal)*barMaxH, 1);
+            // barra
+            fr(bx, y2 + barMaxH - bh, barW, bh, BLUE);
+            // label categoria
+            sf(5.5, 'bold', SOFT);
+            doc.text(cv.cat.slice(0,4), bx+barW/2, y2+barMaxH+4, {align:'center'});
+            // valor
+            sf(6, 'bold', NAVY);
+            doc.text(String(cv.val), bx+barW/2, y2+barMaxH-bh-1, {align:'center'});
         });
-        y += 20;
+        y2 += barMaxH + 7;
     }
 
-    // ════════════════════════════
-    // 4. CHECK-INS ESPECIAIS PREVISTOS
-    // ════════════════════════════
-    if (espCi.length) {
-        if (y > 220) { doc.addPage(); y = 16; }
-        secTitulo('◆', 'CHECK-INS ESPECIAIS PREVISTOS', espCi.length);
-        doc.autoTable({
-            startY: y,
-            margin: {left: ML, right: MR},
-            head: [['CTG','Reserva','IN','OUT','Descricao / Nome','UH','C','M','E']],
-            body: espCi.map(r=>[
-                r.ct||'-', r.reserva||'-', r.in||'-', r.out||'-',
-                r.descricao||'-', r.uh||'-',
-                r.c?'v':'', r.m?'v':'', r.e?'v':''
-            ]),
-            styles: {fontSize:7.5, cellPadding:2.2, textColor:TEXT},
-            headStyles: {fillColor:[40,60,140], textColor:WHITE, fontStyle:'bold', fontSize:7},
-            alternateRowStyles: {fillColor:LGRAY},
-            columnStyles: {
-                0:{cellWidth:14, halign:'center'},
-                1:{cellWidth:22},
-                2:{cellWidth:20, halign:'center'},
-                3:{cellWidth:20, halign:'center'},
-                4:{cellWidth:CW-118},
-                5:{cellWidth:14, halign:'center'},
-                6:{cellWidth:9,  halign:'center'},
-                7:{cellWidth:9,  halign:'center'},
-                8:{cellWidth:9,  halign:'center'},
-            },
-            tableLineColor: MGRAY, tableLineWidth: 0.2,
+    // avanca y para o maior dos dois lados
+    y = Math.max(y1, y2) + 6;
+    line(ML, y-3, W-MR, y-3);
+
+    // == TOTAL HOSPEDES + INFO ==
+    const totalHosp = g('prev-cafe')?.value || '-';
+    rr(ML, y, CW, 10, 2, [235,240,252], MGRAY);
+    sf(7.5, 'bold', SOFT);
+    doc.text('Total de Hospedes:', ML+6, y+6.5);
+    sf(9, 'bold', NAVY);
+    doc.text(totalHosp + ' hospedes', ML+46, y+6.5);
+    sf(7, 'normal', SOFT);
+    doc.text('Resumo gerado em ' + dataFmt, W-MR, y+6.5, {align:'right'});
+    y += 15;
+
+    // == CHECK-INS ESPECIAIS PREVISTOS ==
+    if(espCi.length){
+        if(y > 220){ doc.addPage(); y = 16; }
+        secBar('CHECK-INS ESPECIAIS PREVISTOS (' + espCi.length + ')');
+
+        // cabecalho
+        fr(ML, y, CW, 6.5, [40,60,130]);
+        sf(6.5, 'bold', WHITE);
+        const cols2 = [
+            {t:'CTG',  x:ML+3,    w:16},
+            {t:'Reserva', x:ML+19, w:24},
+            {t:'IN',   x:ML+43,   w:20},
+            {t:'OUT',  x:ML+63,   w:20},
+            {t:'Nome / Descricao', x:ML+83, w:70},
+            {t:'UH',   x:ML+153,  w:12},
+            {t:'C',    x:ML+165,  w:8},
+            {t:'M',    x:ML+173,  w:8},
+            {t:'E',    x:ML+181,  w:8},
+        ];
+        cols2.forEach(col => doc.text(col.t, col.x, y+4.8));
+        y += 7;
+
+        espCi.forEach((r,i) => {
+            if(y > 270){ doc.addPage(); y = 16; }
+            if(i%2===0) fr(ML, y, CW, 7, LGRAY);
+            sf(7.5, 'normal', TEXT);
+            doc.text(r.ct||'-',        ML+3,   y+5);
+            doc.text(r.reserva||'-',   ML+19,  y+5);
+            doc.text(r.in||'-',        ML+43,  y+5);
+            doc.text(r.out||'-',       ML+63,  y+5);
+            const desc = (r.descricao||'-').slice(0,38);
+            doc.text(desc,             ML+83,  y+5);
+            doc.text(r.uh||'-',        ML+153, y+5);
+            sf(7.5, 'bold', BLUE);
+            doc.text(r.c?'v':'-',      ML+165, y+5);
+            doc.text(r.m?'v':'-',      ML+173, y+5);
+            doc.text(r.e?'v':'-',      ML+181, y+5);
+            y += 7;
         });
-        y = doc.lastAutoTable.finalY + 8;
+        y += 4;
     }
 
-    // ── RODAPE ──
+    // == RODAPE ==
     const pTotal = doc.getNumberOfPages();
-    for (let p = 1; p <= pTotal; p++) {
+    for(let p=1; p<=pTotal; p++){
         doc.setPage(p);
-        fillRect(0, 285, W, 12, NAVY);
+        fr(0, 283, W, 14, NAVY);
+        line(0, 283, W, 283, GOLD, 1);
         sf(7, 'normal', [160,175,210]);
-        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), ML+2, 291.5);
+        doc.text(turno + ' (Auditor)', ML, 291);
+        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), W/2, 291, {align:'center'});
         sf(7, 'bold', GOLD);
-        doc.text('AUDITORIA OPERACIONAL', W-MR, 291.5, {align:'right'});
-        if (pTotal > 1) {
-            sf(7, 'normal', [160,175,210]);
-            doc.text(p + '/' + pTotal, W/2, 291.5, {align:'center'});
-        }
+        doc.text('AUDITORIA OPERACIONAL', W-MR, 291, {align:'right'});
     }
 
-    const filename = 'Auditoria_' + (dataVal||'hoje') + '.pdf';
-    doc.save(filename);
+    doc.save('Auditoria_' + (dataVal||'hoje') + '.pdf');
     toast('PDF gerado!');
 }
 
