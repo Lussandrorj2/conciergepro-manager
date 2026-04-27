@@ -804,10 +804,7 @@
 
 
 <script>
-const _SLUG_TEMPLATE = "{{ hotel.slug }}";
-const HOTEL_SLUG = _SLUG_TEMPLATE && _SLUG_TEMPLATE !== '' && _SLUG_TEMPLATE !== '{{ hotel.slug }}'
-    ? _SLUG_TEMPLATE
-    : (window.location.pathname.split('/').filter(Boolean)[0] || 'hotel');
+const HOTEL_SLUG = "{{ hotel.slug }}" || window.location.pathname.split('/').filter(Boolean)[0] || 'hotel';
 const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
 const LS_DRAFT   = `audit_draft_${HOTEL_SLUG}`; // rascunho atual — persiste entre navegações
 
@@ -1438,7 +1435,7 @@ function gerarPDF(){
         y += 14;
     } else {
         // cabecalho tabela
-        rr(ML, y, CW, 7, CARD2);
+        rr(ML, y, CW, 7, 2, CARD2);
         sf(6, 'bold', SOFT);
         const tc = [ML+4, ML+30, ML+70, ML+115, ML+155];
         ['RESERVA','UH','NOME','OBS','CTG'].forEach((h,i) => doc.text(h, tc[i], y+4.8));
