@@ -1306,6 +1306,7 @@ function salvar(){ salvarNoHistorico(); }
 function _salvarLegado(){
     const snap={
         id:Date.now(),
+        _hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
         turno:g('t-turno').value, data:g('t-data').value,
         ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
         prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
@@ -1666,7 +1667,7 @@ function renderHist(){
             <span style="font-size:18px;flex-shrink:0">📋</span>
             <div style="flex:1;min-width:0">
                 <div class="hist-nome">${h.turno||'Auditoria'}${h._autoSaved?'<span style="font-size:9px;background:var(--bg-hover);color:var(--text-soft);padding:1px 5px;border-radius:4px;margin-left:6px;font-weight:400">auto</span>':''}</div>
-                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
+                <div class="hist-info">${fmtDate(h.data)}${h._hora ? ' <span style="color:var(--gold);font-weight:600">' + h._hora + '</span>' : ''} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
             <div style="text-align:right;flex-shrink:0;margin-right:10px">
                 <div class="hist-ocup">${h.ocupacao||'—'}</div>
@@ -2909,6 +2910,7 @@ function autoSalvarHistorico() {
         // Cria nova entrada
         const snap = {
             id:       Date.now(),
+            _hora:    new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
             turno, data,
             ocupacao: g('t-ocup')?.value   || '',
             dm:       g('t-dm')?.value     || '',
@@ -2984,6 +2986,7 @@ function limparRascunho() {
 function salvarNoHistorico(){
     const snap={
         id:Date.now(),
+        _hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
         turno:g('t-turno').value, data:g('t-data').value,
         ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
         prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
