@@ -19,7 +19,8 @@ from rest_framework.response import Response
 from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 from deep_translator import GoogleTranslator
-from .permissions import requer_permissao, requer_gerente, get_contexto_usuario
+from .permissions import requer_gerente, requer_gerente_api, get_contexto_usuario
+
 
 def to_float(valor):
     try:
