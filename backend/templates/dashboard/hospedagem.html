@@ -1335,23 +1335,21 @@ function gerarPDF(){
 
     const hotNome  = "{{ hotel.nome|striptags }}";
     const dataVal  = g('t-data')?.value || '';
-    const turno    = g('t-turno')?.value || '—';
-    const ocupacao = g('t-ocup')?.value  || '—';
-    const dm       = g('t-dm')?.value    || '—';
+    const turno    = g('t-turno')?.value || '-';
+    const ocupacao = g('t-ocup')?.value  || '-';
+    const dm       = g('t-dm')?.value    || '-';
     const uhBloq   = g('t-uh-bloq')?.value || '0';
 
-    // cores
-    const NAVY   = [13, 27, 64];
-    const BLUE   = [20, 50, 120];
-    const GOLD   = [181, 140, 50];
-    const WHITE  = [255, 255, 255];
-    const LGRAY  = [245, 247, 250];
-    const MGRAY  = [210, 215, 225];
-    const DGRAY  = [90, 100, 120];
-    const TEXT   = [30, 40, 65];
+    const NAVY  = [13, 27, 64];
+    const BLUE  = [20, 50, 120];
+    const GOLD  = [181, 140, 50];
+    const WHITE = [255, 255, 255];
+    const LGRAY = [245, 247, 250];
+    const MGRAY = [210, 215, 225];
+    const DGRAY = [90, 100, 120];
+    const TEXT  = [30, 40, 65];
 
-    // helpers
-    const setFont = (size, style='normal', color=TEXT) => {
+    const sf = (size, style='normal', color=TEXT) => {
         doc.setFontSize(size);
         doc.setFont('helvetica', style);
         doc.setTextColor(...color);
@@ -1364,183 +1362,170 @@ function gerarPDF(){
         doc.setFillColor(...color);
         doc.roundedRect(x,y,w,h,r,r,'F');
     };
-    const hline = (y, color=MGRAY) => {
-        doc.setDrawColor(...color);
-        doc.setLineWidth(0.3);
-        doc.line(ML, y, W-MR, y);
-    };
 
-    // ════════════════════════════════════
-    // CABEÇALHO — fundo navy escuro
-    // ════════════════════════════════════
-    fillRect(0, 0, W, 42, NAVY);
+    // ── CABECALHO ──
+    fillRect(0, 0, W, 44, NAVY);
 
-    // título AUDITORIA
-    setFont(20, 'bold', WHITE);
+    sf(22, 'bold', WHITE);
     doc.text('AUDITORIA', ML, 14);
 
-    // hotel nome
-    setFont(9, 'normal', [180, 190, 210]);
-    doc.text(hotNome, ML, 20);
+    sf(9, 'normal', [180, 190, 210]);
+    doc.text(hotNome, ML, 21);
 
-    // data formatada em destaque dourado
     const dataFmt = dataVal
-        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).toUpperCase()
-        : '—';
-    setFont(8, 'bold', GOLD);
-    doc.text('📅  ' + dataFmt, ML, 27);
+        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{
+            weekday:'long', day:'2-digit', month:'long', year:'numeric'
+          }).toUpperCase()
+        : '-';
 
-    // mini info cards no cabeçalho: Turno | Ocupação | UH Bloq
-    const headerCards = [
-        {icon:'👤', label:'TURNO',    val: turno},
-        {icon:'🛏️', label:'OCUPAÇÃO', val: ocupacao},
-        {icon:'🔒', label:'UH BLOQ.', val: uhBloq},
+    sf(7.5, 'bold', GOLD);
+    doc.text(dataFmt, ML, 28);
+
+    // separadores verticais + mini cards
+    const hCards = [
+        {label:'TURNO',    val: turno},
+        {label:'OCUPACAO', val: ocupacao},
+        {label:'UH BLOQ.', val: uhBloq},
     ];
     let hx = 100;
-    headerCards.forEach(hc => {
-        // linha separadora
-        doc.setDrawColor(60,80,130);
+    hCards.forEach(hc => {
+        doc.setDrawColor(60, 80, 130);
         doc.setLineWidth(0.4);
-        doc.line(hx-3, 10, hx-3, 36);
-        setFont(7, 'bold', [150,165,200]);
-        doc.text(hc.label, hx+1, 18);
-        setFont(10, 'bold', WHITE);
-        doc.text(String(hc.val), hx+1, 27);
+        doc.line(hx-3, 10, hx-3, 38);
+        sf(7, 'bold', [150,165,200]);
+        doc.text(hc.label, hx+1, 19);
+        sf(10, 'bold', WHITE);
+        doc.text(String(hc.val), hx+1, 28);
         hx += 36;
     });
 
-    // linha dourada embaixo do header
-    fillRect(0, 40, W, 1.5, GOLD);
+    // faixa dourada
+    fillRect(0, 42, W, 2, GOLD);
 
-    let y = 48;
+    let y = 50;
 
-    // ════════════════════════════════════
-    // SEÇÃO helper — título com fundo azul
-    // ════════════════════════════════════
-    function secTitulo(icon, titulo, count='') {
-        if (y > 265) { doc.addPage(); y = 16; fillRect(0,0,W,3,NAVY); }
+    // ── SECAO helper — sem emoji, usa simbolo latin ──
+    function secTitulo(simbolo, titulo, count='') {
+        if (y > 265) { doc.addPage(); y = 16; fillRect(0,0,W,2,NAVY); }
         fillRect(ML, y, CW, 8, BLUE);
-        // borda esquerda dourada
-        fillRect(ML, y, 2, 8, GOLD);
-        setFont(8, 'bold', WHITE);
-        doc.text(`${icon}  ${titulo}${count?' ('+count+')':''}`, ML+5, y+5.5);
-        y += 11;
+        fillRect(ML, y, 2.5, 8, GOLD);
+        sf(8, 'bold', WHITE);
+        doc.text(simbolo + '  ' + titulo + (count ? ' (' + count + ')' : ''), ML+6, y+5.5);
+        y += 12;
     }
 
-    // ════════════════════════════════════
-    // 1. DADOS ATUAIS DE OCUPAÇÃO
-    // ════════════════════════════════════
-    secTitulo('🏨', 'DADOS ATUAIS DE OCUPAÇÃO');
+    // ════════════════════════════
+    // 1. DADOS ATUAIS DE OCUPACAO
+    // ════════════════════════════
+    secTitulo('►', 'DADOS ATUAIS DE OCUPACAO');
 
-    // 3 cards lado a lado
     const oc1Cards = [
-        {label:'Ocupação Atual', val: ocupacao},
-        {label:'Diária Média (DM)', val: dm},
-        {label:'UHs Bloqueadas', val: uhBloq},
+        {label:'Ocupacao Atual',   val: ocupacao},
+        {label:'Diaria Media (DM)',val: dm},
+        {label:'UHs Bloqueadas',   val: uhBloq},
     ];
     const cardW = CW/3 - 2;
     oc1Cards.forEach((card, idx) => {
         const cx = ML + idx * (cardW + 3);
-        roundRect(cx, y, cardW, 18, 2, LGRAY);
+        roundRect(cx, y, cardW, 20, 2, LGRAY);
         doc.setDrawColor(...MGRAY); doc.setLineWidth(0.3);
-        doc.roundedRect(cx, y, cardW, 18, 2, 2, 'S');
-        setFont(7, 'bold', DGRAY);
-        doc.text(card.label, cx + cardW/2, y+6, {align:'center'});
-        setFont(13, 'bold', NAVY);
-        doc.text(String(card.val||'—'), cx + cardW/2, y+14, {align:'center'});
+        doc.roundedRect(cx, y, cardW, 20, 2, 2, 'S');
+        sf(7, 'bold', DGRAY);
+        doc.text(card.label, cx + cardW/2, y+7, {align:'center'});
+        sf(13, 'bold', NAVY);
+        doc.text(String(card.val||'-'), cx + cardW/2, y+16, {align:'center'});
     });
-    y += 22;
+    y += 25;
 
-    // ════════════════════════════════════
+    // ════════════════════════════
     // 2. RESERVAS ESPECIAIS NA CASA
-    // ════════════════════════════════════
+    // ════════════════════════════
     if (esp.length) {
-        secTitulo('⭐', 'RESERVAS ESPECIAIS NA CASA', esp.length);
+        secTitulo('★', 'RESERVAS ESPECIAIS NA CASA', esp.length);
         doc.autoTable({
             startY: y,
             margin: {left: ML, right: MR},
-            head: [['UH','CTG','Reserva','Check-in','Check-out','Nome / Descrição']],
-            body: esp.map(r=>[r.uh||'—', r.ct||'—', r.reserva||'—', r.checkin||'—', r.checkout||'—', r.descricao||'—']),
-            styles: {fontSize:8, cellPadding:2.5, font:'helvetica', textColor:TEXT},
+            head: [['UH','CTG','Reserva','Check-in','Check-out','Nome / Descricao']],
+            body: esp.map(r=>[
+                r.uh||'-', r.ct||'-', r.reserva||'-',
+                r.checkin||'-', r.checkout||'-', r.descricao||'-'
+            ]),
+            styles: {fontSize:8, cellPadding:2.5, textColor:TEXT},
             headStyles: {fillColor:BLUE, textColor:WHITE, fontStyle:'bold', fontSize:7.5},
             alternateRowStyles: {fillColor:LGRAY},
             columnStyles: {
                 0:{cellWidth:12, halign:'center'},
                 1:{cellWidth:14, halign:'center'},
                 2:{cellWidth:22},
-                3:{cellWidth:20, halign:'center'},
-                4:{cellWidth:20, halign:'center'},
-                5:{cellWidth:CW-88},
+                3:{cellWidth:22, halign:'center'},
+                4:{cellWidth:22, halign:'center'},
+                5:{cellWidth:CW-92},
             },
             tableLineColor: MGRAY, tableLineWidth: 0.2,
         });
-        y = doc.lastAutoTable.finalY + 8;
+        y = doc.lastAutoTable.finalY + 10;
     }
 
-    // ════════════════════════════════════
-    // 3. PREVISÃO AMANHÃ
-    // ════════════════════════════════════
+    // ════════════════════════════
+    // 3. PREVISAO AMANHA
+    // ════════════════════════════
     if (y > 210) { doc.addPage(); y = 16; }
-    secTitulo('🔮', 'PREVISÃO — AMANHÃ');
+    secTitulo('●', 'PREVISAO - AMANHA');
 
-    // 5 cards: Ocupação, DM, UHs, Entradas, Total Hóspedes
     const prevCards = [
-        {label:'Ocupação', val: g('prev-ocup')?.value||'—'},
-        {label:'Diária Média', val: g('prev-diaria')?.value||'—'},
-        {label:'UHs Ocupadas', val: g('prev-uh')?.value||'—'},
-        {label:'Entradas', val: g('prev-ent')?.value||'—'},
-        {label:'Total Hóspedes', val: g('prev-cafe')?.value||'—'},
+        {label:'Ocupacao',     val: g('prev-ocup')?.value||'-'},
+        {label:'Diaria Media', val: g('prev-diaria')?.value||'-'},
+        {label:'UHs Ocupadas', val: g('prev-uh')?.value||'-'},
+        {label:'Entradas',     val: g('prev-ent')?.value||'-'},
+        {label:'Total Hosp.',  val: g('prev-cafe')?.value||'-'},
     ];
     const pc5W = CW/5 - 1.6;
     prevCards.forEach((card, idx) => {
         const cx = ML + idx * (pc5W + 2);
-        roundRect(cx, y, pc5W, 18, 2, [235,240,252]);
+        roundRect(cx, y, pc5W, 20, 2, [235,240,252]);
         doc.setDrawColor(...[190,200,225]); doc.setLineWidth(0.3);
-        doc.roundedRect(cx, y, pc5W, 18, 2, 2, 'S');
-        // topo azul
+        doc.roundedRect(cx, y, pc5W, 20, 2, 2, 'S');
         fillRect(cx, y, pc5W, 3, BLUE);
-        setFont(6.5, 'bold', DGRAY);
-        doc.text(card.label, cx + pc5W/2, y+9, {align:'center'});
-        setFont(11, 'bold', NAVY);
-        doc.text(String(card.val), cx + pc5W/2, y+15.5, {align:'center'});
+        sf(6.5, 'bold', DGRAY);
+        doc.text(card.label, cx + pc5W/2, y+10, {align:'center'});
+        sf(11, 'bold', NAVY);
+        doc.text(String(card.val), cx + pc5W/2, y+17, {align:'center'});
     });
-    y += 22;
+    y += 25;
 
     // Entradas por categoria
     const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '');
     if (catVals.length) {
-        setFont(7.5, 'bold', DGRAY);
+        sf(7.5, 'bold', DGRAY);
         doc.text('Entradas por Categoria:', ML, y+4);
-        y += 7;
+        y += 8;
         const catW = Math.min(CW / catVals.length - 2, 36);
         catVals.forEach((cv, idx) => {
             const cx = ML + idx*(catW+2);
-            roundRect(cx, y, catW, 14, 2, LGRAY);
-            doc.setDrawColor(...MGRAY); doc.roundedRect(cx, y, catW, 14, 2, 2, 'S');
-            setFont(6.5, 'bold', DGRAY);
-            doc.text(cv.cat, cx+catW/2, y+5.5, {align:'center'});
-            setFont(10, 'bold', NAVY);
-            doc.text(String(cv.val||'—'), cx+catW/2, y+11.5, {align:'center'});
+            roundRect(cx, y, catW, 15, 2, LGRAY);
+            doc.setDrawColor(...MGRAY); doc.roundedRect(cx, y, catW, 15, 2, 2, 'S');
+            sf(6.5, 'bold', DGRAY);
+            doc.text(cv.cat, cx+catW/2, y+6, {align:'center'});
+            sf(10, 'bold', NAVY);
+            doc.text(String(cv.val||'-'), cx+catW/2, y+12, {align:'center'});
         });
-        y += 18;
-    } else {
-        y += 2;
+        y += 20;
     }
 
-    // ════════════════════════════════════
+    // ════════════════════════════
     // 4. CHECK-INS ESPECIAIS PREVISTOS
-    // ════════════════════════════════════
+    // ════════════════════════════
     if (espCi.length) {
         if (y > 220) { doc.addPage(); y = 16; }
-        secTitulo('🟡', 'CHECK-INS ESPECIAIS PREVISTOS', espCi.length);
+        secTitulo('◆', 'CHECK-INS ESPECIAIS PREVISTOS', espCi.length);
         doc.autoTable({
             startY: y,
             margin: {left: ML, right: MR},
-            head: [['CTG','Reserva','IN','OUT','Descrição / Nome','UH','C','M','E']],
+            head: [['CTG','Reserva','IN','OUT','Descricao / Nome','UH','C','M','E']],
             body: espCi.map(r=>[
-                r.ct||'—', r.reserva||'—', r.in||'—', r.out||'—',
-                r.descricao||'—', r.uh||'—',
-                r.c?'✓':'', r.m?'✓':'', r.e?'✓':''
+                r.ct||'-', r.reserva||'-', r.in||'-', r.out||'-',
+                r.descricao||'-', r.uh||'-',
+                r.c?'v':'', r.m?'v':'', r.e?'v':''
             ]),
             styles: {fontSize:7.5, cellPadding:2.2, textColor:TEXT},
             headStyles: {fillColor:[40,60,140], textColor:WHITE, fontStyle:'bold', fontSize:7},
@@ -1561,28 +1546,24 @@ function gerarPDF(){
         y = doc.lastAutoTable.finalY + 8;
     }
 
-    // ════════════════════════════════════
-    // RODAPÉ em todas as páginas
-    // ════════════════════════════════════
+    // ── RODAPE ──
     const pTotal = doc.getNumberOfPages();
     for (let p = 1; p <= pTotal; p++) {
         doc.setPage(p);
-        // faixa navy no rodapé
         fillRect(0, 285, W, 12, NAVY);
-        setFont(7, 'normal', [160,175,210]);
-        doc.text(`🛡  Relatório gerado em ${new Date().toLocaleString('pt-BR')}`, ML+2, 291.5);
-        setFont(7, 'bold', GOLD);
+        sf(7, 'normal', [160,175,210]);
+        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), ML+2, 291.5);
+        sf(7, 'bold', GOLD);
         doc.text('AUDITORIA OPERACIONAL', W-MR, 291.5, {align:'right'});
-        // número de páginas (só se > 1)
         if (pTotal > 1) {
-            setFont(7, 'normal', [160,175,210]);
-            doc.text(`${p}/${pTotal}`, W/2, 291.5, {align:'center'});
+            sf(7, 'normal', [160,175,210]);
+            doc.text(p + '/' + pTotal, W/2, 291.5, {align:'center'});
         }
     }
 
-    const filename = `Auditoria_${dataVal||'hoje'}.pdf`;
+    const filename = 'Auditoria_' + (dataVal||'hoje') + '.pdf';
     doc.save(filename);
-    toast('📄 PDF gerado!');
+    toast('PDF gerado!');
 }
 
 // ══ EXPORTAR TXT ══
