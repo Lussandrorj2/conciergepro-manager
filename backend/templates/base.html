@@ -16,7 +16,6 @@
 <body>
 <div class="layout">
 
-```
 <!-- SIDEBAR -->
 <aside class="sidebar">
     <div class="sidebar-logo">🔔 Concierge</div>
@@ -96,7 +95,7 @@
     window.HOTEL = {
         slug: "{{ hotel.slug }}",
         nome: "{{ hotel.nome }}",
-        id:   {{ hotel.id|default:"null" }},
+        id:   '{{ hotel.id|default:"null" }}',
     };
 
     // Atalho conveniente para o slug (retrocompatibilidade)
