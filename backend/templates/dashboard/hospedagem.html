@@ -347,7 +347,6 @@
                     </button>
                     <div class="topbar-actions-dropdown" id="actions-dropdown">
                         <button class="actions-item actions-item-destaque" onclick="novaAuditoria();toggleActionsMenu()">＋ Nova Auditoria</button>
-                        <button class="actions-item" onclick="salvar();toggleActionsMenu()">💾 Salvar</button>
                         <button class="actions-item" onclick="gerarPDF();toggleActionsMenu()">📄 Gerar PDF</button>
                         <button class="actions-item" onclick="exportarTxt();toggleActionsMenu()">📋 Exportar .txt</button>
                     </div>
@@ -365,7 +364,6 @@
                 </div>
                 <div class="aud-bar-right">
                     <button class="btn-a prim" onclick="novaAuditoria()">＋ Nova Auditoria</button>
-                    <button class="btn-a" onclick="salvar()">💾 Salvar</button>
                     <button class="btn-a pdf-btn" onclick="gerarPDF()">📄 PDF</button>
                     <button class="btn-a" onclick="exportarTxt()">📋 .txt</button>
                 </div>
@@ -649,7 +647,10 @@
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
-                        <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <button onclick="salvarNoHistorico()" style="background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);color:var(--gold);padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">📌 Salvar no histórico</button>
+                            <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
+                        </div>
                     </div>
                     <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
                 </div>
@@ -788,6 +789,7 @@
 <script>
 const HOTEL_SLUG = "{{ hotel.slug }}";
 const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
+const LS_DRAFT   = `audit_draft_${HOTEL_SLUG}`; // rascunho atual — persiste entre navegações
 
 // ══ ESTADO ══
 let co      = [];
@@ -859,6 +861,7 @@ function syncUI(){
     if(g('ps-cafe')) g('ps-cafe').textContent = g('prev-cafe')?.value||'—';
     if(g('ps-uh'))   g('ps-uh').textContent   = g('prev-uh')?.value||'—';
     syncStats();
+    autoSave();
 }
 
 // ══ RENDER ══
@@ -968,6 +971,7 @@ function commitObs(input) {
     arr[i]._prevObs = val;
     if (precisaRender) re(key);
     else syncKpisCo();
+    autoSave();
 }
 
 function syncKpisCo(){ syncStats(); }
@@ -975,7 +979,7 @@ function syncKpisCo(){ syncStats(); }
 function toggleSaiu(key, i) {
     const arr = getData(key);
     arr[i].saiu = !arr[i].saiu;
-    re(key);
+    re(key); autoSave();
 }
 
 function renderEsp(){
@@ -1041,8 +1045,8 @@ function renderOcorr(){
         : '<div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência.</div>';
     g('b-oc').textContent = g('tb-oc').textContent = ocorr.length;
 }
-function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); }
-function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
+function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); autoSave(); }
+function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); autoSave(); }
 
 function renderTudo(){ renderCo(); renderEsp(); renderEspCi(); renderCi(); renderOcorr(); syncStats(); }
 
@@ -1053,7 +1057,7 @@ function ctOpts(sel) {
     return cats.map(o => `<option ${padrao === o ? 'selected' : ''}>${o}</option>`).join('');
 }
 function getData(k){ return k==='co'?co:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
-function setF(k,i,f,v){ getData(k)[i][f]=v; }
+function setF(k,i,f,v){ getData(k)[i][f]=v; autoSave(); }
 function addRow(k){
     const def = {
         co:   {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
@@ -1062,7 +1066,7 @@ function addRow(k){
         'esp-ci': {ct:'SUP',reserva:'',in:'',out:'',descricao:'',uh:'',tipo:'long_stay',c:false,m:false,e:false},
     }[k];
     getData(k).push({...def});
-    re(k);
+    re(k); autoSave();
     setTimeout(()=>{
         const id = k==='esp'?'tbody-esp':k==='ci'?'tbody-ci':`tbody-${k}`;
         const rows=g(id)?.querySelectorAll('tr'); if(!rows?.length)return;
@@ -1072,7 +1076,7 @@ function addRow(k){
 function delRow(k,i){
     getData(k).splice(i,1);
     if(k==='esp') salvarEsp();
-    re(k);
+    re(k); autoSave();
 }
 function re(k){
     ({co:renderCo,esp:renderEsp,'esp-ci':renderEspCi,ci:renderCi}[k]||renderCi)();
@@ -1259,6 +1263,7 @@ function confirmarColar(){
     parsed.forEach(r=>arr.push(r));
     re(colarKey);
     fecharColar();
+    autoSave();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
 }
 g('paste-modal').addEventListener('click',e=>{if(e.target===g('paste-modal'))fecharColar();});
@@ -1274,12 +1279,14 @@ function novaAuditoria(){
     limparValoresCats();
     g('t-data').value=new Date().toISOString().split('T')[0];
     g('t-uh-bloq').value='0';
+    limparRascunho();
     renderTudo(); syncUI(); setTab('checkout'); g('t-turno').focus();
-    purgeEsp(); // purge com nova data
+    purgeEsp();
 }
 
 // ══ SALVAR ══
-function salvar(){
+function salvar(){ salvarNoHistorico(); }
+function _salvarLegado(){
     const snap={
         id:Date.now(),
         turno:g('t-turno').value, data:g('t-data').value,
@@ -2442,6 +2449,7 @@ function confirmarColarLivre() {
     parsed.forEach(r => getData(colarKey).push(r));
     re(colarKey);
     fecharColar();
+    autoSave();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
 }
 
@@ -2569,7 +2577,7 @@ function dragEnd(e) {
 function clearObs(key, i) {
     getData(key)[i].obs = '';
     getData(key)[i]._prevObs = '';
-    re(key);
+    re(key); autoSave();
 }
 
 
@@ -2600,12 +2608,111 @@ function syncStats() {
     if(g('tb-esp'))  g('tb-esp').textContent  = esp.length;
 }
 
+
+// ══ AUTOSAVE — RASCUNHO ══
+let _autoSaveTimer = null;
+
+function salvarRascunho() {
+    try {
+        const draft = {
+            turno:    g('t-turno')?.value    || '',
+            data:     g('t-data')?.value     || '',
+            ocupacao: g('t-ocup')?.value     || '',
+            dm:       g('t-dm')?.value       || '',
+            uh_bloq:  g('t-uh-bloq')?.value  || '0',
+            prev_ocup:    g('prev-ocup')?.value    || '',
+            prev_diaria:  g('prev-diaria')?.value  || '',
+            prev_uh:      g('prev-uh')?.value      || '',
+            prev_ent:     g('prev-ent')?.value     || '',
+            prev_sai:     g('prev-sai')?.value     || '',
+            prev_cafe:    g('prev-cafe')?.value     || '',
+            cats_vals: lerValoresCats(),
+            co:    JSON.parse(JSON.stringify(co)),
+            espCi: JSON.parse(JSON.stringify(espCi)),
+            ci:    JSON.parse(JSON.stringify(ci)),
+            ocorr: [...ocorr],
+            _ts: Date.now(),
+        };
+        localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
+    } catch(e) { console.warn('autosave falhou:', e); }
+}
+
+function autoSave() {
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(salvarRascunho, 600);
+}
+
+function carregarRascunho() {
+    try {
+        const raw = localStorage.getItem(LS_DRAFT);
+        if (!raw) return false;
+        const d = JSON.parse(raw);
+        if (!d) return false;
+        // restaura campos de texto
+        if(g('t-turno'))   g('t-turno').value   = d.turno   || '';
+        if(g('t-data'))    g('t-data').value     = d.data    || new Date().toISOString().split('T')[0];
+        if(g('t-ocup'))    g('t-ocup').value     = d.ocupacao|| '';
+        if(g('t-dm'))      g('t-dm').value       = d.dm      || '';
+        if(g('t-uh-bloq')) g('t-uh-bloq').value  = d.uh_bloq || '0';
+        if(g('prev-ocup'))   g('prev-ocup').value   = d.prev_ocup   || '';
+        if(g('prev-diaria')) g('prev-diaria').value = d.prev_diaria || '';
+        if(g('prev-uh'))     g('prev-uh').value     = d.prev_uh     || '';
+        if(g('prev-ent'))    g('prev-ent').value    = d.prev_ent    || '';
+        if(g('prev-sai'))    g('prev-sai').value    = d.prev_sai    || '';
+        if(g('prev-cafe'))   g('prev-cafe').value   = d.prev_cafe   || '';
+        // restaura arrays
+        co    = d.co    ? JSON.parse(JSON.stringify(d.co))    : [];
+        espCi = d.espCi ? JSON.parse(JSON.stringify(d.espCi)) : [];
+        ci    = d.ci    ? JSON.parse(JSON.stringify(d.ci))    : [];
+        ocorr = d.ocorr ? [...d.ocorr] : [];
+        if (d.cats_vals) carregarValoresCats(d.cats_vals);
+        return true;
+    } catch(e) { console.warn('carregarRascunho falhou:', e); return false; }
+}
+
+function limparRascunho() {
+    localStorage.removeItem(LS_DRAFT);
+}
+
+
+function salvarNoHistorico(){
+    const snap={
+        id:Date.now(),
+        turno:g('t-turno').value, data:g('t-data').value,
+        ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
+        prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
+        prev_uh:g('prev-uh').value, prev_ent:g('prev-ent').value,
+        prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
+        cats_vals: lerValoresCats(),
+        co:JSON.parse(JSON.stringify(co)),
+        espCi:JSON.parse(JSON.stringify(espCi)),
+        ci:JSON.parse(JSON.stringify(ci)),
+        ocorr:[...ocorr],
+    };
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    // evita duplicata da mesma data/turno em menos de 1 minuto
+    hist = hist.filter(h => !(h.data===snap.data && h.turno===snap.turno && snap.id-h.id<60000));
+    hist.unshift(snap); if(hist.length>30)hist=hist.slice(0,30);
+    localStorage.setItem(LS_KEY,JSON.stringify(hist));
+    salvarEsp();
+    renderHist();
+    toast('📌 Salvo no histórico!');
+}
+
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
-    g('t-data').value=new Date().toISOString().split('T')[0];
     carregarEsp();
     renderCats();
+    const restaurou = carregarRascunho();
+    if (!restaurou) {
+        g('t-data').value = new Date().toISOString().split('T')[0];
+    }
     syncUI(); renderTudo(); renderHist();
+    // Autosave nos campos de texto via input
+    ['t-turno','t-data','t-ocup','t-dm','t-uh-bloq'].forEach(id => {
+        const el = g(id);
+        if (el) el.addEventListener('input', autoSave);
+    });
 });
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
