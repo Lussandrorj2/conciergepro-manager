@@ -40,11 +40,11 @@
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
             <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
-            <hr>
-            <a href="/logout/">↩ Sair</a>
             {% if is_gerente %}
             <a href="/{{ hotel.slug }}/dashboard/usuarios/">👥 Usuários</a>
             {% endif %}
+            <hr>
+            <a href="/logout/">↩ Sair</a>
         </nav>
     </aside>
 
