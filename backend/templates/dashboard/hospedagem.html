@@ -1331,7 +1331,7 @@ function _salvarLegado(){
 function gerarPDF(){
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-    const W = 210, ML = 14, MR = 14, CW = W - ML - MR;
+    const W = 210, ML = 10, MR = 10, CW = W - ML - MR;
 
     const hotNome  = "{{ hotel.nome|striptags }}";
     const dataVal  = g('t-data')?.value || '';
@@ -1343,248 +1343,382 @@ function gerarPDF(){
         ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})
         : '-';
 
-    // cores
-    const NAVY  = [13, 27, 64];
-    const BLUE  = [20, 50, 120];
-    const GOLD  = [181, 140, 50];
-    const WHITE = [255,255,255];
-    const LGRAY = [245,247,250];
-    const MGRAY = [200,208,220];
-    const TEXT  = [30, 40, 65];
-    const SOFT  = [100,115,140];
+    // == PALETA DARK ==
+    const BG      = [18, 22, 36];
+    const CARD    = [26, 32, 50];
+    const CARD2   = [32, 40, 62];
+    const BORDER  = [45, 55, 80];
+    const NAVY    = [13, 27, 64];
+    const TEAL    = [0, 188, 156];
+    const GOLD    = [255, 193, 68];
+    const BLUE    = [66, 135, 245];
+    const PURPLE  = [147, 112, 219];
+    const GREEN   = [52, 199, 89];
+    const RED     = [255, 80, 80];
+    const WHITE   = [255, 255, 255];
+    const SOFT    = [140, 155, 185];
+    const TEXT    = [220, 228, 245];
 
-    const sf = (size, style='normal', color=TEXT) => {
-        doc.setFontSize(size); doc.setFont('helvetica', style); doc.setTextColor(...color);
+    const sf = (sz, st='normal', col=TEXT) => {
+        doc.setFontSize(sz); doc.setFont('helvetica', st); doc.setTextColor(...col);
     };
     const fr = (x,y,w,h,col) => { doc.setFillColor(...col); doc.rect(x,y,w,h,'F'); };
-    const rr = (x,y,w,h,r,col,stroke) => {
-        doc.setFillColor(...col);
-        doc.roundedRect(x,y,w,h,r,r,'F');
-        if(stroke){ doc.setDrawColor(...stroke); doc.setLineWidth(0.3); doc.roundedRect(x,y,w,h,r,r,'S'); }
-    };
-    const line = (x1,y1,x2,y2,col=[200,208,220],lw=0.3) => {
+    const rr = (x,y,w,h,r,col) => { doc.setFillColor(...col); doc.roundedRect(x,y,w,h,r,r,'F'); };
+    const ln = (x1,y1,x2,y2,col=BORDER,lw=0.3) => {
         doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,y1,x2,y2);
     };
+    const badge = (x,y,txt,bg,tc=WHITE) => {
+        const tw = doc.getTextWidth(txt);
+        rr(x, y-3.5, tw+6, 5.5, 1.5, bg);
+        sf(6, 'bold', tc); doc.text(txt, x+3, y);
+    };
+
+    // == FUNDO COMPLETO ==
+    fr(0, 0, W, 297, BG);
 
     // == CABECALHO ==
-    fr(0, 0, W, 36, NAVY);
-    // titulo
-    sf(7, 'bold', GOLD);
-    doc.text('RELATORIO DE AUDITORIA OPERACIONAL', W/2, 12, {align:'center'});
-    sf(16, 'bold', WHITE);
-    doc.text('AUDITORIA', W/2, 22, {align:'center'});
-    sf(9, 'normal', [180,190,210]);
-    doc.text(hotNome, W/2, 29, {align:'center'});
-    // linha dourada
-    fr(0, 34, W, 2, GOLD);
+    fr(0, 0, W, 30, CARD);
+    ln(0, 30, W, 30, BORDER, 0.5);
 
-    let y = 42;
+    sf(13, 'bold', WHITE);
+    doc.text('RELATORIO DE AUDITORIA', W/2, 10, {align:'center'});
+    sf(8.5, 'normal', SOFT);
+    doc.text(hotNome, W/2, 17, {align:'center'});
 
-    // == 2 CARDS TOPO: Ocupacao + DM ==
-    const c2w = CW/2 - 3;
-    // card ocupacao
-    rr(ML, y, c2w, 18, 3, LGRAY, MGRAY);
-    sf(7, 'bold', SOFT);
-    doc.text('Ocupacao Atual', ML + c2w/2, y+6, {align:'center'});
-    sf(13, 'bold', NAVY);
-    doc.text('(' + ocupacao + ')', ML + c2w/2, y+14, {align:'center'});
-    // card DM
-    rr(ML+c2w+6, y, c2w, 18, 3, LGRAY, MGRAY);
-    sf(7, 'bold', SOFT);
-    doc.text('Diaria Media', ML+c2w+6 + c2w/2, y+6, {align:'center'});
-    sf(13, 'bold', NAVY);
-    doc.text('(' + dm + ')', ML+c2w+6 + c2w/2, y+14, {align:'center'});
-    y += 23;
+    // badges data e turno
+    const bdw1 = doc.getTextWidth('Auditoria: '+dataFmt) + 8;
+    const bdw2 = doc.getTextWidth('Turno: '+turno) + 8;
+    const bdy  = 23;
+    rr(W/2 - bdw1 - bdw2/2 - 4, bdy-4, bdw1, 6.5, 1.5, CARD2);
+    sf(6.5, 'bold', GOLD); doc.text('Auditoria: '+dataFmt, W/2 - bdw1 - bdw2/2 - 1, bdy);
+    rr(W/2 - bdw2/2 + 4, bdy-4, bdw2, 6.5, 1.5, CARD2);
+    sf(6.5, 'bold', SOFT); doc.text('Turno: '+turno, W/2 - bdw2/2 + 7, bdy);
 
-    // == LINHA: Turno | Data | UH Bloq ==
-    sf(7.5, 'bold', SOFT);
-    doc.text('Turno: ', ML, y+4);
-    sf(7.5, 'bold', TEXT);
-    doc.text(turno, ML+16, y+4);
-    sf(7.5, 'bold', SOFT);
-    doc.text('Data: ', ML+60, y+4);
-    sf(7.5, 'bold', TEXT);
-    doc.text(dataFmt, ML+74, y+4);
-    sf(7.5, 'bold', SOFT);
-    doc.text('UH Bloq: ', ML+110, y+4);
-    sf(7.5, 'bold', TEXT);
-    doc.text(uhBloq, ML+128, y+4);
-    y += 9;
-    line(ML, y, W-MR, y);
-    y += 5;
+    let y = 35;
 
-    // == HELPER TITULO DE SECAO ==
-    function secBar(titulo, cor=BLUE) {
-        if(y > 255){ doc.addPage(); y = 16; fr(0,0,W,2,NAVY); }
-        fr(ML, y, CW, 7, cor);
-        line(ML, y, ML, y+7, GOLD, 2.5);
-        sf(7.5, 'bold', WHITE);
-        doc.text(titulo, ML+6, y+5);
-        y += 10;
+    // == HELPER SECAO ==
+    function secao(titulo, dotCol=TEAL) {
+        if(y > 258){ doc.addPage(); fr(0,0,W,297,BG); y = 8; }
+        // dot colorido
+        doc.setFillColor(...dotCol);
+        doc.circle(ML+2, y+2, 1.2, 'F');
+        sf(7, 'bold', SOFT);
+        doc.text(titulo, ML+6, y+3.5);
+        ln(ML, y+6, W-MR, y+6, BORDER, 0.3);
+        y += 9;
     }
 
-    // == 2 COLUNAS: RESERVAS ESPECIAIS + PREVISAO ==
-    const col1x = ML, col1w = CW*0.52;
-    const col2x = ML + col1w + 5, col2w = CW - col1w - 5;
-    const ySnap = y;
+    // =====================
+    // 1. SITUACAO ATUAL
+    // =====================
+    secao('SITUACAO ATUAL', TEAL);
+    rr(ML, y, CW, 20, 2, CARD);
+    // ocupacao
+    sf(18, 'bold', GREEN);
+    doc.text(ocupacao, ML+CW*0.25, y+12, {align:'center'});
+    sf(6.5, 'normal', SOFT);
+    doc.text('Ocupacao atual - UH Bloq: '+uhBloq, ML+CW*0.25, y+17, {align:'center'});
+    // linha divisoria vertical
+    ln(ML+CW*0.5, y+3, ML+CW*0.5, y+17, BORDER, 0.4);
+    // DM
+    sf(18, 'bold', GOLD);
+    doc.text(dm, ML+CW*0.75, y+12, {align:'center'});
+    sf(6.5, 'normal', SOFT);
+    doc.text('Diaria media (DM)', ML+CW*0.75, y+17, {align:'center'});
+    y += 24;
 
-    // --- COLUNA 1: RESERVAS ESPECIAIS NA CASA ---
-    fr(col1x, y, col1w, 7, BLUE);
-    line(col1x, y, col1x, y+7, GOLD, 2.5);
-    sf(7, 'bold', WHITE);
-    doc.text('RESERVAS ESPECIAIS NA CASA' + (esp.length?' ('+esp.length+')':''), col1x+6, y+5);
-    let y1 = y + 10;
-
+    // =====================
+    // 2. RESERVAS ESPECIAIS
+    // =====================
+    secao('RESERVAS ESPECIAIS NA CASA', GOLD);
     if(!esp.length){
+        rr(ML, y, CW, 10, 2, CARD);
         sf(7.5, 'normal', SOFT);
-        doc.text('Nenhuma reserva especial', col1x+4, y1+5);
-        y1 += 12;
+        doc.text('Nenhuma reserva especial na casa', W/2, y+6.5, {align:'center'});
+        y += 14;
     } else {
         // cabecalho tabela
-        fr(col1x, y1, col1w, 6, [40,60,130]);
-        sf(6.5, 'bold', WHITE);
-        doc.text('Nome', col1x+4, y1+4.2);
-        doc.text('Diaria', col1x+col1w-22, y1+4.2);
-        y1 += 6;
-        esp.forEach((r,i) => {
-            if(i%2===0) fr(col1x, y1, col1w, 7, LGRAY);
-            sf(7.5, 'normal', TEXT);
-            const nome = (r.descricao||r.reserva||'-').slice(0,28);
-            doc.text(nome, col1x+4, y1+5);
-            doc.text(r.checkin||'-', col1x+col1w-22, y1+5);
-            y1 += 7;
-        });
-    }
-
-    // --- COLUNA 2: PREVISAO AMANHA ---
-    fr(col2x, ySnap, col2w, 7, BLUE);
-    line(col2x, ySnap, col2x, ySnap+7, GOLD, 2.5);
-    sf(7, 'bold', WHITE);
-    doc.text('PREVISAO AMANHA', col2x+6, ySnap+5);
-    let y2 = ySnap + 10;
-
-    // 2 mini cards: ocupacao + DM
-    const mc = col2w/2 - 2;
-    rr(col2x, y2, mc, 14, 2, LGRAY, MGRAY);
-    sf(6.5, 'bold', SOFT); doc.text('Ocupacao', col2x+mc/2, y2+5.5, {align:'center'});
-    sf(10, 'bold', NAVY); doc.text(g('prev-ocup')?.value||'-', col2x+mc/2, y2+12, {align:'center'});
-    rr(col2x+mc+4, y2, mc, 14, 2, LGRAY, MGRAY);
-    sf(6.5, 'bold', SOFT); doc.text('DM', col2x+mc+4+mc/2, y2+5.5, {align:'center'});
-    sf(10, 'bold', NAVY); doc.text(g('prev-diaria')?.value||'-', col2x+mc+4+mc/2, y2+12, {align:'center'});
-    y2 += 17;
-
-    // stats: entradas, diaria, saidas
-    const stats = [
-        {l:'Entradas', v: g('prev-ent')?.value||'-'},
-        {l:'Diaria',   v: g('prev-diaria')?.value||'-'},
-        {l:'Saidas',   v: g('prev-sai')?.value||'-'},
-    ];
-    const sw = col2w/3 - 1;
-    stats.forEach((s,i) => {
-        const sx = col2x + i*(sw+1.5);
-        sf(6, 'bold', SOFT); doc.text(s.l, sx+sw/2, y2+4, {align:'center'});
-        sf(9, 'bold', NAVY); doc.text(String(s.v), sx+sw/2, y2+9.5, {align:'center'});
-    });
-    y2 += 13;
-
-    // Entradas por categoria — mini grafico de barras
-    const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '');
-    if(catVals.length){
+        rr(ML, y, CW, 7, CARD2);
         sf(6, 'bold', SOFT);
-        doc.text('Entradas por Categoria', col2x, y2+4);
-        y2 += 7;
-        const maxVal = Math.max(...catVals.map(cv => parseInt(cv.val)||0), 1);
-        const barMaxH = 18, barW = Math.min((col2w - (catVals.length-1)*2) / catVals.length, 16);
-        catVals.forEach((cv,i) => {
-            const bx = col2x + i*(barW+2);
-            const bh = Math.max(((parseInt(cv.val)||0)/maxVal)*barMaxH, 1);
-            // barra
-            fr(bx, y2 + barMaxH - bh, barW, bh, BLUE);
-            // label categoria
-            sf(5.5, 'bold', SOFT);
-            doc.text(cv.cat.slice(0,4), bx+barW/2, y2+barMaxH+4, {align:'center'});
-            // valor
-            sf(6, 'bold', NAVY);
-            doc.text(String(cv.val), bx+barW/2, y2+barMaxH-bh-1, {align:'center'});
-        });
-        y2 += barMaxH + 7;
-    }
-
-    // avanca y para o maior dos dois lados
-    y = Math.max(y1, y2) + 6;
-    line(ML, y-3, W-MR, y-3);
-
-    // == TOTAL HOSPEDES + INFO ==
-    const totalHosp = g('prev-cafe')?.value || '-';
-    rr(ML, y, CW, 10, 2, [235,240,252], MGRAY);
-    sf(7.5, 'bold', SOFT);
-    doc.text('Total de Hospedes:', ML+6, y+6.5);
-    sf(9, 'bold', NAVY);
-    doc.text(totalHosp + ' hospedes', ML+46, y+6.5);
-    sf(7, 'normal', SOFT);
-    doc.text('Resumo gerado em ' + dataFmt, W-MR, y+6.5, {align:'right'});
-    y += 15;
-
-    // == CHECK-INS ESPECIAIS PREVISTOS ==
-    if(espCi.length){
-        if(y > 220){ doc.addPage(); y = 16; }
-        secBar('CHECK-INS ESPECIAIS PREVISTOS (' + espCi.length + ')');
-
-        // cabecalho
-        fr(ML, y, CW, 6.5, [40,60,130]);
-        sf(6.5, 'bold', WHITE);
-        const cols2 = [
-            {t:'CTG',  x:ML+3,    w:16},
-            {t:'Reserva', x:ML+19, w:24},
-            {t:'IN',   x:ML+43,   w:20},
-            {t:'OUT',  x:ML+63,   w:20},
-            {t:'Nome / Descricao', x:ML+83, w:70},
-            {t:'UH',   x:ML+153,  w:12},
-            {t:'C',    x:ML+165,  w:8},
-            {t:'M',    x:ML+173,  w:8},
-            {t:'E',    x:ML+181,  w:8},
-        ];
-        cols2.forEach(col => doc.text(col.t, col.x, y+4.8));
+        const tc = [ML+4, ML+30, ML+70, ML+115, ML+155];
+        ['RESERVA','UH','NOME','OBS','CTG'].forEach((h,i) => doc.text(h, tc[i], y+4.8));
         y += 7;
 
-        espCi.forEach((r,i) => {
-            if(y > 270){ doc.addPage(); y = 16; }
-            if(i%2===0) fr(ML, y, CW, 7, LGRAY);
+        const tipoMap = {
+            'long_stay':'Long Stay','returning':'Ret. Guest','habitue':'Habitue',
+            'vip':'VIP','lua_de_mel':'Lua de Mel','aniversario':'Aniversario'
+        };
+        const tipoCol = {
+            'vip':PURPLE,'long_stay':BLUE,'returning':TEAL,
+            'habitue':GOLD,'lua_de_mel':RED,'aniversario':GREEN
+        };
+
+        esp.forEach((r,i) => {
+            if(y > 270){ doc.addPage(); fr(0,0,W,297,BG); y = 8; }
+            if(i%2===0) rr(ML, y, CW, 7.5, 0, [30,38,58]);
             sf(7.5, 'normal', TEXT);
-            doc.text(r.ct||'-',        ML+3,   y+5);
-            doc.text(r.reserva||'-',   ML+19,  y+5);
-            doc.text(r.in||'-',        ML+43,  y+5);
-            doc.text(r.out||'-',       ML+63,  y+5);
-            const desc = (r.descricao||'-').slice(0,38);
-            doc.text(desc,             ML+83,  y+5);
-            doc.text(r.uh||'-',        ML+153, y+5);
-            sf(7.5, 'bold', BLUE);
-            doc.text(r.c?'v':'-',      ML+165, y+5);
-            doc.text(r.m?'v':'-',      ML+173, y+5);
-            doc.text(r.e?'v':'-',      ML+181, y+5);
-            y += 7;
+            doc.text(String(r.reserva||'-').slice(0,10), ML+4, y+5);
+            doc.text(String(r.uh||'-'), ML+30, y+5);
+            doc.text((r.descricao||'-').slice(0,26), ML+70, y+5);
+            // badge tipo
+            const tipo = r.tipo || 'long_stay';
+            const tipoLabel = tipoMap[tipo] || tipo;
+            const bCol = tipoCol[tipo] || BLUE;
+            badge(ML+115, y+5, tipoLabel, bCol);
+            doc.text(r.ct||'-', ML+155, y+5);
+            y += 7.5;
         });
         y += 4;
+    }
+
+    // =====================
+    // 3. PREVISAO DE AMANHA
+    // =====================
+    secao('PREVISAO DE AMANHA', BLUE);
+    rr(ML, y, CW, 44, 2, CARD);
+
+    // 2 colunas de 3 items cada
+    const col1 = [
+        {l:'Ocupacao prevista', v: g('prev-ocup')?.value||'-', c:GREEN},
+        {l:'Diaria media (DM)', v: g('prev-diaria')?.value||'-', c:GOLD},
+        {l:'UHs ocupadas',      v: g('prev-uh')?.value||'-', c:BLUE},
+    ];
+    const col2 = [
+        {l:'Entradas previstas', v: g('prev-ent')?.value||'-', c:GREEN},
+        {l:'Saidas previstas',   v: g('prev-sai')?.value||'-', c:RED},
+        {l:'Total hosp. na casa',v: g('prev-cafe')?.value||'-', c:PURPLE},
+    ];
+
+    const cx1 = ML + CW*0.25;
+    const cx2 = ML + CW*0.75;
+
+    // linha divisoria
+    ln(ML+CW*0.5, y+4, ML+CW*0.5, y+40, BORDER, 0.4);
+
+    col1.forEach((item, i) => {
+        const iy = y + 8 + i*12;
+        sf(14, 'bold', item.c);
+        doc.text(String(item.v), cx1, iy, {align:'center'});
+        sf(6, 'normal', SOFT);
+        doc.text(item.l, cx1, iy+5, {align:'center'});
+    });
+    col2.forEach((item, i) => {
+        const iy = y + 8 + i*12;
+        sf(14, 'bold', item.c);
+        doc.text(String(item.v), cx2, iy, {align:'center'});
+        sf(6, 'normal', SOFT);
+        doc.text(item.l, cx2, iy+5, {align:'center'});
+    });
+    y += 48;
+
+    // =====================
+    // 4. ENTRADAS POR CATEGORIA
+    // =====================
+    secao('ENTRADAS POR CATEGORIA', PURPLE);
+    const catVals = lerValoresCats().filter(cv => cv.val && cv.val !== '' && parseInt(cv.val) > 0);
+    if(!catVals.length){
+        rr(ML, y, CW, 10, 2, CARD);
+        sf(7.5, 'normal', SOFT);
+        doc.text('Sem dados de categoria', W/2, y+6.5, {align:'center'});
+        y += 14;
+    } else {
+        rr(ML, y, CW, catVals.length*9+6, 2, CARD);
+        const maxVal = Math.max(...catVals.map(cv=>parseInt(cv.val)||0), 1);
+        const barMaxW = CW - 50;
+
+        catVals.forEach((cv, i) => {
+            const iy = y + 5 + i*9;
+            const bw = Math.max((parseInt(cv.val)/maxVal)*barMaxW, 2);
+            const barColors = [BLUE, GREEN, PURPLE, TEAL, GOLD, RED];
+            const bc = barColors[i % barColors.length];
+
+            // label categoria
+            sf(7, 'bold', TEXT);
+            doc.text(cv.cat, ML+5, iy+4);
+            // barra
+            rr(ML+22, iy, bw, 6, 1.5, bc);
+            // valor ao lado
+            sf(7, 'bold', WHITE);
+            doc.text(String(cv.val) + ' apts', ML+22+bw+3, iy+4.5);
+        });
+        y += catVals.length*9 + 10;
+    }
+
+    // =====================
+    // 5. EVOLUCAO DO MES
+    // =====================
+    secao('EVOLUCAO DO MES - OCUPACAO', TEAL);
+
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+
+    if(hist.length < 2){
+        rr(ML, y, CW, 18, 2, CARD);
+        sf(7.5, 'normal', SOFT);
+        doc.text('Dados insuficientes - salve mais auditorias para ver a evolucao', W/2, y+10, {align:'center'});
+        y += 22;
+    } else {
+        // agrupa por mes
+        const porMes = {};
+        hist.forEach(h => {
+            if(!h.data || !h.ocupacao) return;
+            const mes = h.data.slice(0,7);
+            const dia = parseInt(h.data.slice(8,10));
+            const oc  = parseFloat(String(h.ocupacao).replace('%','').replace(',','.')) || 0;
+            if(!porMes[mes]) porMes[mes] = [];
+            porMes[mes].push({dia, oc});
+        });
+
+        const meses = Object.keys(porMes).sort().slice(-3); // ultimos 3 meses
+        if(!meses.length){
+            rr(ML, y, CW, 14, 2, CARD);
+            sf(7,'normal',SOFT); doc.text('Sem dados suficientes', W/2, y+9, {align:'center'});
+            y += 18;
+        } else {
+            const chartH = 35, chartW = CW - 10;
+            const chartX = ML + 5, chartY = y + 2;
+            rr(ML, y, CW, chartH+18, 2, CARD);
+
+            // eixo Y: 0 a 100%
+            const yScale = (oc) => chartY + chartH - (oc/100)*chartH;
+
+            // grade horizontal
+            [25,50,75,100].forEach(pct => {
+                const gy = yScale(pct);
+                ln(chartX, gy, chartX+chartW, gy, BORDER, 0.2);
+                sf(5, 'normal', SOFT);
+                doc.text(pct+'%', chartX-7, gy+1.5, {align:'right'});
+            });
+
+            // linhas por mes
+            const mesColors = [SOFT, TEAL, GOLD];
+            const mesLabels = [];
+
+            meses.forEach((mes, mi) => {
+                const dados = porMes[mes].sort((a,b)=>a.dia-b.dia);
+                if(dados.length < 1) return;
+                const col = mesColors[mi];
+                const maxDia = 31;
+
+                // linha do mes
+                doc.setDrawColor(...col);
+                doc.setLineWidth(mi === meses.length-1 ? 1 : 0.5);
+
+                for(let i=0; i<dados.length-1; i++){
+                    const x1 = chartX + (dados[i].dia/maxDia)*chartW;
+                    const y1 = yScale(dados[i].oc);
+                    const x2 = chartX + (dados[i+1].dia/maxDia)*chartW;
+                    const y2 = yScale(dados[i+1].oc);
+                    doc.line(x1,y1,x2,y2);
+                }
+                // ponto no ultimo dia
+                if(dados.length > 0){
+                    const last = dados[dados.length-1];
+                    const px = chartX + (last.dia/maxDia)*chartW;
+                    const py = yScale(last.oc);
+                    doc.setFillColor(...col);
+                    doc.circle(px, py, 1.2, 'F');
+                }
+
+                // label do mes para legenda
+                const [ano, m] = mes.split('-');
+                const mNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                mesLabels.push({label: mNomes[parseInt(m)-1]+'/'+ano.slice(2), col});
+            });
+
+            // legenda
+            const legY = chartY + chartH + 8;
+            let legX = chartX;
+            mesLabels.forEach(ml => {
+                doc.setFillColor(...ml.col);
+                doc.rect(legX, legY-2.5, 8, 3, 'F');
+                sf(6, 'normal', SOFT);
+                doc.text(ml.label, legX+10, legY);
+                legX += 30;
+            });
+
+            // eixo X - dias
+            [1,5,10,15,20,25,31].forEach(d => {
+                const gx = chartX + (d/31)*chartW;
+                ln(gx, chartY+chartH, gx, chartY+chartH+2, BORDER, 0.3);
+                sf(5, 'normal', SOFT);
+                doc.text(String(d), gx, chartY+chartH+5, {align:'center'});
+            });
+
+            y += chartH + 22;
+        }
+    }
+
+    // =====================
+    // 6. CHECK-INS ESPECIAIS PREVISTOS
+    // =====================
+    if(espCi.length){
+        if(y > 220){ doc.addPage(); fr(0,0,W,297,BG); y = 8; }
+        secao('CHECK-INS PREVISTOS - ENTRADAS ESPECIAIS', GOLD);
+
+        // cabecalho
+        rr(ML, y, CW, 7, 2, CARD2);
+        sf(6, 'bold', SOFT);
+        const hx = [ML+4, ML+22, ML+46, ML+70, ML+120, ML+152, ML+160, ML+168, ML+176];
+        ['CTG','RESERVA','IN / OUT','NOME E OBS','UH','C','M','E'].forEach((h,i) => doc.text(h, hx[i], y+4.8));
+        y += 7;
+
+        const tipoMapCI = {
+            'long_stay':'Long Stay','returning':'Ret.','habitue':'Hab.',
+            'vip':'VIP','lua_de_mel':'L.Mel','aniversario':'Aniv.'
+        };
+        const tipoColCI = {
+            'vip':[147,112,219],'long_stay':[66,135,245],'returning':[0,188,156],
+            'habitue':[255,193,68],'lua_de_mel':[255,80,80],'aniversario':[52,199,89]
+        };
+
+        espCi.forEach((r,i) => {
+            if(y > 268){ doc.addPage(); fr(0,0,W,297,BG); y = 8; }
+            if(i%2===0) rr(ML, y, CW, 8, 0, [26,32,50]);
+            // badge CTG
+            const bCol = tipoColCI[r.tipo||'long_stay'] || [66,135,245];
+            badge(ML+4, y+5.5, r.ct||'-', bCol);
+            sf(7, 'normal', TEXT);
+            doc.text(String(r.reserva||'-'), ML+22, y+5.5);
+            doc.text((r.in||'-')+' > '+(r.out||'-'), ML+46, y+5.5);
+            // nome com tipo
+            const tipoLabel = tipoMapCI[r.tipo||'long_stay'] || '-';
+            const nomeText = ((r.descricao||'-').slice(0,24) + ' - ' + tipoLabel).slice(0,34);
+            doc.text(nomeText, ML+70, y+5.5);
+            doc.text(String(r.uh||'-'), ML+120, y+5.5);
+            // checkboxes C M E
+            const chkCol = r.c ? GREEN : BORDER;
+            doc.setDrawColor(...BORDER); doc.setLineWidth(0.4);
+            doc.rect(ML+154, y+1.5, 5, 5, 'S');
+            if(r.c){ doc.setFillColor(...GREEN); doc.rect(ML+154.5, y+2, 4, 4, 'F'); }
+            doc.rect(ML+162, y+1.5, 5, 5, 'S');
+            if(r.m){ doc.setFillColor(...GREEN); doc.rect(ML+162.5, y+2, 4, 4, 'F'); }
+            doc.rect(ML+170, y+1.5, 5, 5, 'S');
+            if(r.e){ doc.setFillColor(...GREEN); doc.rect(ML+170.5, y+2, 4, 4, 'F'); }
+            y += 8;
+        });
+
+        // total
+        sf(7, 'bold', SOFT);
+        doc.text('Total: ' + espCi.length + ' hospede(s) especial(is)', ML+4, y+4);
+        y += 8;
     }
 
     // == RODAPE ==
     const pTotal = doc.getNumberOfPages();
     for(let p=1; p<=pTotal; p++){
         doc.setPage(p);
-        fr(0, 283, W, 14, NAVY);
-        line(0, 283, W, 283, GOLD, 1);
-        sf(7, 'normal', [160,175,210]);
-        doc.text(turno + ' (Auditor)', ML, 291);
-        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), W/2, 291, {align:'center'});
-        sf(7, 'bold', GOLD);
-        doc.text('AUDITORIA OPERACIONAL', W-MR, 291, {align:'right'});
+        ln(ML, 285, W-MR, 285, BORDER, 0.4);
+        sf(6.5, 'normal', SOFT);
+        doc.text('Relatorio gerado em ' + new Date().toLocaleString('pt-BR'), ML, 290);
+        sf(6.5, 'bold', SOFT);
+        doc.text('Concierge Dashboard', W-MR, 290, {align:'right'});
     }
 
     doc.save('Auditoria_' + (dataVal||'hoje') + '.pdf');
     toast('PDF gerado!');
 }
 
-// ══ EXPORTAR TXT ══
 function exportarTxt(){
     let txt='════════════════════════════════\n   AUDITORIA\n════════════════════════════════\n';
     txt+=`Turno: ${g('t-turno').value}\nData: ${fmtDate(g('t-data').value)}\n`;
