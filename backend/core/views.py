@@ -20,6 +20,7 @@ from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 from deep_translator import GoogleTranslator
 from .permissions import requer_gerente, requer_gerente_api, get_contexto_usuario
+from .log import registrar_log
 
 
 def to_float(valor):
@@ -416,6 +417,10 @@ def api_cambio(request, hotel_slug):
             if hasattr(t, 'cotacao_venda'):  t.cotacao_venda  = cotacao_venda
             if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido_calc
             t.save()
+            # ↓ ADICIONE AQUI
+            registrar_log(hotel, request.user, 'criar_cambio',
+                f"Câmbio {moeda}: {valor} × cotação {cotacao_compra}",
+                {'moeda': moeda, 'valor': valor, 'cotacao_compra': cotacao_compra})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
@@ -465,12 +470,18 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
             if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido_calc
     
             transacao.save()
+            registrar_log(hotel, request.user, 'editar_cambio',
+                f"Editou câmbio #{transacao_id} — {moeda}: {valor}",
+                {'id': transacao_id, 'moeda': moeda})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
     
     if request.method == "DELETE":
+        # ↓ ADICIONE ANTES do delete
+        registrar_log(hotel, request.user, 'deletar_cambio',
+            f"Deletou câmbio #{transacao_id} — {transacao.moeda}: {transacao.valor}")
         transacao.delete()
         return JsonResponse({"status": "removido"})
     
@@ -659,6 +670,9 @@ def api_reservas(request, hotel_slug, reserva_id=None):
                 mes_referencia=mes_referencia, pix_recebimentos=pix_recebimentos,
                 observacoes=obs,
             )
+            registrar_log(hotel, request.user, 'criar_reserva',
+                f"Nova reserva: {nome} — {passeio.nome if passeio else 'sem passeio'}",
+                {'nome_cliente': nome, 'valor_bruto': valor_bruto})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
@@ -698,13 +712,25 @@ def api_reservas(request, hotel_slug, reserva_id=None):
                 if hasattr(reserva, key):
                     setattr(reserva, key, value)
             reserva.save()
+            if body.get('status') == 'pago':
+                registrar_log(hotel, request.user, 'pagar_reserva',
+                    f"Pagamento registrado: {reserva.nome_cliente} — R$ {reserva.valor_bruto}",
+                    {'reserva_id': reserva_id, 'data_pagamento': body.get('data_pagamento')})
+            else:
+                registrar_log(hotel, request.user, 'editar_reserva',
+                    f"Editou reserva: {reserva.nome_cliente}",
+                    {'reserva_id': reserva_id})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
     
     if request.method == "DELETE" and reserva_id:
-        get_object_or_404(Reserva, id=reserva_id, hotel=hotel).delete()
+        r = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+        registrar_log(hotel, request.user, 'deletar_reserva',
+            f"Deletou reserva de {r.nome_cliente}",
+            {'reserva_id': reserva_id})
+        r.delete()
         return JsonResponse({"status": "ok"})
     
     return JsonResponse({"erro": "Método inválido"}, status=405)
