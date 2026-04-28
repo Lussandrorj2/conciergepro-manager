@@ -201,71 +201,59 @@
         .ocorr-del{background:none;border:none;color:var(--text-soft);cursor:pointer;margin-left:auto;font-size:14px;line-height:1;padding:0 2px}
         .ocorr-del:hover{color:#dc2626}
         .ocorr-add{display:flex;gap:8px;padding:0 16px 14px}
-        .ocorr-ta{flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px}
+        .ocorr-ta{flex:1;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:none;outline:none;min-height:56px}
         .ocorr-ta:focus{border-color:var(--gold)}
-        .btn-ocorr{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);color:#dc2626;padding:9px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;align-self:flex-end}
+        .btn-ocorr{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.25);color:#dc2626;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;align-self:flex-end}
         .btn-ocorr:hover{background:rgba(220,38,38,.12)}
-        /* ── HISTÓRICO ── */
+
+        /* ══ HISTÓRICO ══ */
         .hist-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
         .hist-item:last-child{border-bottom:none}
         .hist-item:hover{background:var(--bg-hover)}
         .hist-nome{font-size:13px;font-weight:600;color:var(--text-main)}
         .hist-info{font-size:11px;color:var(--text-soft);margin-top:1px}
         .hist-ocup{font-size:13px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap}
-        /* ── TOPBAR ── */
-        .audit-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
-        .audit-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-        .badge-data{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);font-size:12px;font-weight:700;color:var(--gold)}
-        .btn-a{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-hover);color:var(--text-muted);font-family:'Inter',sans-serif;transition:.15s}
-        .btn-a:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
-        .btn-a.prim{background:var(--gold);color:#0b0f19;border-color:var(--gold)}
-        .btn-a.prim:hover{filter:brightness(1.08)}
-        .btn-a.pdf{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.3);color:#dc2626}
-        .btn-a.pdf:hover{background:rgba(220,38,38,.15)}
-        /* ── 2 COLS ── */
-        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-        /* ── TAG BTN ── */
-        .btn-tp{background:none;border:1px solid var(--border);border-radius:4px;width:20px;height:20px;cursor:pointer;font-size:10px;color:var(--text-soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.12s}
-        .btn-tp:hover{border-color:var(--gold);color:var(--gold)}
-        /* ── BADGE TIPO ESP ── */
-        .esp-tipo-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
-        .tipo-ls{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
-        .tipo-esp{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
-        .tipo-lm{background:rgba(236,72,153,.1);color:#db2777;border:1px solid rgba(236,72,153,.25)}
-        .tipo-vip{background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.25)}
-        .tipo-aniv{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25)}
-        /* ── MODAL COLAR ── */
-        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;padding:16px}
+
+        /* ══ MODAL COLAR ══ */
+        .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:16px}
         .modal-ov.open{display:flex}
-        .modal-box{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.4);overflow:hidden}
+        .modal-box{background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;width:100%;max-width:680px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden}
         .modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg-hover);flex-shrink:0}
         .modal-head h3{font-size:14px;font-weight:700;color:var(--text-main)}
         .modal-body{padding:16px 20px;overflow-y:auto;flex:1;min-height:0}
-        .paste-hint{font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px}
+        .paste-tabs{display:flex;gap:2px;padding:3px;background:var(--bg-hover);border-radius:8px;margin-bottom:12px}
+        .paste-tab{flex:1;padding:7px 10px;border:none;background:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;transition:.15s}
+        .paste-tab.active{background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+        .paste-tab-pane{display:none}.paste-tab-pane.active{display:block}
+        .paste-hint{font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.6;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:10px 13px}
         .paste-hint strong{color:var(--text-main)}
-        .paste-ta{width:100%;min-height:120px;max-height:260px;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:vertical;outline:none;line-height:1.8}
+        .paste-ta{width:100%;min-height:120px;max-height:240px;background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);resize:vertical;outline:none;line-height:1.8}
         .paste-ta:focus{border-color:var(--gold)}
-        .paste-prev{margin-top:10px;font-size:11px;color:var(--text-soft);background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;display:none}
+        .paste-prev{margin-top:10px;font-size:11px;color:var(--text-soft);background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:none}
         .paste-prev.show{display:block}
         .paste-prev strong{color:var(--gold)}
         .modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg-card)}
-        .btn-ok{background:var(--gold);color:#0b0f19;border:none;padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
-        .btn-ok:hover{filter:brightness(1.1)}
-        .btn-cancel{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+        .btn-ok{background:#0f172a;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+        .btn-ok:hover{background:#1e293b}
+        .btn-cancel{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);padding:9px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
 
-        /* ── ESTATÍSTICAS ── */
+        /* ══ CHECKBOXES C/M/E ══ */
+        .td-cme{width:26px;text-align:center;padding:4px 2px!important}
+        .td-cme input{width:14px;height:14px;cursor:pointer;accent-color:var(--gold)}
+        .cme-head{font-size:10px;font-weight:700;color:var(--text-soft);text-align:center;padding:6px 2px!important}
+
+        /* ══ ESTATÍSTICAS ══ */
         .stats-top{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-        .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;border-top:3px solid transparent;text-align:center}
-        .stat-box.s-green{border-top-color:#15803d}.stat-box.s-blue{border-top-color:#2563eb}
+        .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;border-top:3px solid transparent;text-align:center}
+        .stat-box.s-green{border-top-color:#059669}.stat-box.s-blue{border-top-color:#2563eb}
         .stat-box.s-purple{border-top-color:#7c3aed}.stat-box.s-gold{border-top-color:var(--gold)}
         .stat-box-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:6px}
         .stat-box-val{font-size:26px;font-weight:700;color:var(--text-main);line-height:1}
         .stat-box-sub{font-size:10px;color:var(--text-soft);margin-top:4px}
         .stat-box-trend{font-size:11px;font-weight:700;margin-top:4px}
-        .trend-up{color:#15803d}.trend-down{color:#dc2626}.trend-eq{color:var(--text-soft)}
-        /* charts */
+        .trend-up{color:#059669}.trend-down{color:#dc2626}.trend-eq{color:var(--text-soft)}
         .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:start}
-        .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;min-width:0}
+        .chart-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;min-width:0}
         .chart-panel.full{grid-column:1/-1}
         .chart-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
         .chart-panel-title{font-size:11px;font-weight:700;color:var(--text-main);text-transform:uppercase;letter-spacing:.5px}
@@ -273,22 +261,11 @@
         .chart-canvas-wrap{position:relative;height:200px;width:100%}
         .chart-canvas-wrap canvas{display:block;width:100%!important;height:100%!important}
         .chart-canvas-wrap.tall{height:250px}
-
-
-
-
-
-
-
-        .stats-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px}
+        .stats-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:14px}
         .stats-filters label{font-size:11px;color:var(--text-soft);white-space:nowrap}
-        .stats-filters select,.stats-filters input{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none}
-        .stats-filters select:focus,.stats-filters input:focus{border-color:var(--gold)}
+        .stats-filters select{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none}
+        .stats-filters select:focus{border-color:var(--gold)}
         .stats-filters .sep{width:1px;height:20px;background:var(--border)}
-
-        .no-data-chart{display:flex;flex-direction:column;align-items:center;justify-content:center;height:180px;color:var(--text-soft);font-size:12px;gap:8px}
-        .no-data-chart span{font-size:28px;opacity:.3}
-
         .table-stats{width:100%;border-collapse:collapse}
         .table-stats th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);border-bottom:1px solid var(--border);background:var(--bg-hover)}
         .table-stats td{padding:9px 12px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border)}
@@ -296,236 +273,49 @@
         .table-stats tr:hover td{background:var(--bg-hover)}
         .table-stats .td-bold{font-weight:600;color:var(--text-main)}
         .table-stats .td-num{font-family:monospace;font-weight:600}
-
         .badge-comp{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700}
-        .bc-up{background:rgba(22,163,74,.1);color:#15803d}.bc-down{background:rgba(220,38,38,.1);color:#dc2626}.bc-eq{background:var(--bg-hover);color:var(--text-soft)}
+        .bc-up{background:rgba(5,150,105,.1);color:#059669}.bc-down{background:rgba(220,38,38,.1);color:#dc2626}.bc-eq{background:var(--bg-hover);color:var(--text-soft)}
 
-        @media(max-width:900px){.stats-top{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr!important}.chart-panel.full{grid-column:1!important}}
-        @media(max-width:768px){.stats-top{grid-template-columns:1fr 1fr}}
+        /* ══ TIPOS ESP ══ */
+        .t-ls{color:#d97706}.t-ret{color:#2563eb}.t-hab{color:#0891b2}.t-vip{color:#7c3aed}.t-lm{color:#db2777}.t-aniv{color:#059669}
+        .td-cme input,.td-chk input[type=checkbox]{cursor:pointer!important;pointer-events:all!important}
 
-        /* ── OBS INPUT — sem re-render ao digitar, não trava ── */
-        .obs-wrap { display:flex;align-items:center;gap:4px;width:100%; }
-        .obs-input-field {
-            flex:1; background:var(--bg-hover);
-            border:1px solid var(--border); border-radius:6px;
-            padding:6px 9px; font-size:12.5px;
-            font-family:'Inter',sans-serif; color:var(--text-main);
-            outline:none; transition:border-color .15s, background .15s;
-            min-width:0;
-        }
-        .obs-input-field:focus { border-color:var(--gold); background:var(--bg-card); }
-        .obs-input-field::placeholder { color:var(--border-light); font-style:italic; }
-
-        /* ── COLUNA SAIU ── */
-        .td-saiu { width:48px; text-align:center; padding:4px!important; }
-        .btn-saiu {
-            width:28px; height:28px; border-radius:50%;
-            border:2px solid var(--border); background:var(--bg-hover);
-            cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
-            font-size:13px; transition:all .15s; flex-shrink:0; color:transparent;
-        }
-        .btn-saiu:hover { border-color:#15803d; background:rgba(22,163,74,.1); }
-        .btn-saiu.saiu { background:rgba(22,163,74,.12); border-color:#15803d; color:#15803d; }
-        tr.row-saiu td { opacity:.5; text-decoration:line-through; }
-        tr.row-saiu .btn-saiu { opacity:1 !important; text-decoration:none !important; }
-        tr.row-saiu td:last-child { opacity:1; text-decoration:none; }
-
-        /* ── PREVISÃO — layout melhorado ── */
-        .prev-section-title {
-            padding:10px 16px 6px;
-            font-size:10px;font-weight:700;text-transform:uppercase;
-            letter-spacing:.5px;color:var(--text-soft);
-            border-bottom:1px solid var(--border);
-            display:flex;align-items:center;gap:6px;
-        }
-        .prev-main-grid {
-            display:grid; grid-template-columns:repeat(2,1fr);
-            gap:0; border-bottom:1px solid var(--border);
-        }
-        .prev-main-item {
-            padding:16px; text-align:center;
-            border-right:1px solid var(--border);
-        }
-        .prev-main-item:last-child { border-right:none; }
-        .prev-main-val {
-            font-size:28px; font-weight:700; line-height:1;
-            background:transparent; border:none; outline:none;
-            width:100%; text-align:center; font-family:'Inter',sans-serif;
-            padding:4px; border-radius:6px; transition:background .15s;
-        }
-        .prev-main-val:focus { background:var(--gold-dim); outline:1px solid rgba(181,132,58,.3); }
-        .prev-main-val::placeholder { color:var(--border-light); font-size:18px; }
-        .prev-main-lbl { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);margin-top:5px; }
-        .prev-main-sub { font-size:11px;color:var(--text-soft);margin-top:3px; }
-        .prev-dm-row {
-            display:flex; align-items:center; justify-content:center;
-            gap:8px; padding:10px 16px; border-bottom:1px solid var(--border);
-            background:var(--bg-hover);
-        }
-        .prev-dm-row label { font-size:11px;font-weight:600;color:var(--text-soft); }
-        .prev-dm-inp {
-            background:var(--bg-card); border:1px solid var(--border);
-            border-radius:var(--radius-sm); padding:6px 12px;
-            font-size:14px; font-weight:700; font-family:'Inter',sans-serif;
-            color:var(--gold); outline:none; width:160px; text-align:center;
-        }
-        .prev-dm-inp:focus { border-color:var(--gold); }
-        .cat-grid-new {
-            display:grid; grid-template-columns:repeat(4,1fr);
-            gap:0; border-bottom:1px solid var(--border);
-        }
-        .cat-new-item {
-            padding:12px 8px; text-align:center;
-            border-right:1px solid var(--border);
-        }
-        .cat-new-item:last-child { border-right:none; }
-        .cat-new-item label { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:6px; }
-        .cat-new-inp {
-            background:transparent; border:none; outline:none;
-            width:100%; text-align:center; font-size:22px; font-weight:700;
-            color:var(--text-main); font-family:'Inter',sans-serif; padding:2px;
-            border-radius:4px; transition:background .15s;
-        }
-        .cat-new-inp:focus { background:var(--gold-dim); }
-        .cat-new-inp::placeholder { color:var(--border-light); font-size:16px; }
-        .cafe-row {
-            display:flex; align-items:center; justify-content:center;
-            gap:10px; padding:12px 16px; background:rgba(217,119,6,.04);
-        }
-        .cafe-row label { font-size:11px;font-weight:600;color:#d97706; }
-        .cafe-inp {
-            background:transparent; border:none; outline:none;
-            font-size:22px; font-weight:700; color:#d97706;
-            font-family:'Inter',sans-serif; text-align:center;
-            width:80px; padding:2px; border-radius:4px;
-        }
-        .cafe-inp:focus { background:rgba(217,119,6,.08); }
-        .cafe-inp::placeholder { color:rgba(217,119,6,.3); font-size:16px; }
-
-        @media(max-width:768px){
-            .prev-main-grid{grid-template-columns:1fr 1fr}
-            .cat-grid-new{grid-template-columns:repeat(2,1fr)}
-        }
-
-        /* ── CATEGORIAS CONFIGURÁVEIS ── */
-        .cat-manager-wrap {
-            padding: 12px 16px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-            background: var(--bg-hover);
-        }
-        .cat-manager-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); }
-        .cat-tag {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 10px 3px 10px; border-radius: 999px;
-            background: var(--bg-card); border: 1px solid var(--border);
-            font-size: 12px; font-weight: 700; color: var(--text-main);
-        }
-        .cat-tag-del {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-soft); font-size: 13px; line-height: 1;
-            padding: 0; transition: color .12s;
-        }
-        .cat-tag-del:hover { color: #dc2626; }
-        .cat-add-row { display: flex; gap: 6px; align-items: center; }
-        .cat-add-input {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); padding: 5px 10px;
-            font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
-            color: var(--text-main); outline: none; width: 80px;
-            text-transform: uppercase;
-        }
-        .cat-add-input:focus { border-color: var(--gold); }
-        .btn-cat-add {
-            background: var(--gold-dim); border: 1px solid rgba(181,132,58,.3);
-            color: var(--gold); border-radius: var(--radius-sm);
-            padding: 5px 12px; font-size: 12px; font-weight: 700;
-            cursor: pointer; font-family: 'Inter', sans-serif; transition: .15s;
-        }
-        .btn-cat-add:hover { background: rgba(181,132,58,.18); }
-        .cat-grid-dyn {
-            display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border);
-        }
-        .cat-dyn-item {
-            flex: 1; min-width: 80px; padding: 12px 8px; text-align: center;
-            border-right: 1px solid var(--border);
-        }
-        .cat-dyn-item:last-child { border-right: none; }
-        .cat-dyn-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); display: block; margin-bottom: 6px; }
-        .cat-dyn-inp {
-            background: transparent; border: none; outline: none;
-            width: 100%; text-align: center; font-size: 22px; font-weight: 700;
-            color: var(--text-main); font-family: 'Inter', sans-serif; padding: 2px;
-            border-radius: 4px; transition: background .15s;
-        }
-        .cat-dyn-inp:focus { background: var(--gold-dim); }
-        .cat-dyn-inp::placeholder { color: var(--border-light); font-size: 16px; }
-
-        /* ── MODAL COLAR — imagem ── */
-        .paste-tabs { display:flex;gap:2px;padding:3px;background:var(--bg-hover);border-radius:var(--radius-sm);margin-bottom:12px; }
-        .paste-tab  { flex:1;padding:7px 10px;border:none;background:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;transition:.15s; }
-        .paste-tab.active { background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 3px rgba(0,0,0,.08); }
-        .paste-tab-pane { display:none; }
-        .paste-tab-pane.active { display:block; }
-
-        .img-drop-zone {
-            border:2px dashed var(--border-light);border-radius:var(--radius-md);
-            padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;
-            position:relative;background:var(--bg-hover);
-        }
-        .img-drop-zone:hover,.img-drop-zone.drag-over { border-color:var(--gold);background:var(--gold-dim); }
-        .img-drop-zone input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2; }
-        .img-preview-wrap { margin-top:10px;display:none;position:relative; }
-        .img-preview-wrap.show { display:block; }
-        .img-preview-wrap img { max-width:100%;max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--border);object-fit:contain; }
-        .img-preview-del { position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center; }
-        .img-preview-del:hover { background:#dc2626; }
-
-        .ai-inline-load { display:none;align-items:center;gap:10px;padding:12px;background:var(--gold-dim);border:1px solid rgba(181,132,58,.25);border-radius:var(--radius-sm);margin-top:10px; }
-        .ai-inline-load.show { display:flex; }
-        .ai-mini-spin { width:18px;height:18px;border:2px solid rgba(181,132,58,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0; }
-        .ai-inline-label { font-size:12px;font-weight:600;color:var(--gold); }
-
-        .paste-ctrl-v-hint {
-            display:flex;align-items:center;gap:8px;padding:8px 12px;
-            background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.15);
-            border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;color:#2563eb;
-        }
-        .paste-ctrl-v-hint kbd { background:#e8f0fe;border:1px solid #bfdbfe;border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace; }
-
-        /* ── STATS FIX — altura garantida e overflow hidden ── */
-
-        /* ── TIPOS DE RESERVA ESPECIAL ── */
-        .tipo-sel {
-            background:transparent;border:none;outline:none;
-            font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
-            cursor:pointer;padding:3px 6px;border-radius:4px;width:100%;
-            transition:background .12s;
-        }
-        .tipo-sel:focus { background:var(--gold-dim); }
-        .t-ls    { color:#d97706 } .t-esp { color:var(--gold) }
-        .t-lm    { color:#db2777 } .t-vip { color:#7c3aed }
-        .t-aniv  { color:#15803d } .t-ret { color:#2563eb }
-        .t-hab   { color:#0891b2 } .t-grp { color:#64748b }
-        .t-reent { color:#2563eb } .t-twin { color:#475569 }
-
-        /* ── CHECKBOXES C/M/E ── */
-        .td-cme { width:28px;text-align:center;padding:4px 2px!important; }
-        .td-cme input { width:14px;height:14px;cursor:pointer;accent-color:var(--gold); }
-        .cme-head { font-size:10px;font-weight:700;color:var(--text-soft);text-align:center;padding:6px 2px!important; }
-
-        /* ── BADGE TIPO COMPACTO ── */
-        .tipo-badge { display:inline-block;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap; }
+        /* ══ DATE INPUT ══ */
+        .ei-date-auto{width:106px;font-family:monospace;letter-spacing:.5px}
 
 
-        /* ── RESPONSIVE ── */
-        @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.turno-grid{grid-template-columns:1fr 1fr 1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:900px){.two-col{grid-template-columns:1fr}.prev-grid{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}.turno-grid{grid-template-columns:1fr 1fr}.tab-btn{padding:7px 10px;font-size:11px}}
-        /* ── PRINT PDF ── */
-        @media print{
-            .sidebar,.topbar,.tabs-nav,.tfoot,.audit-bar,.btn-del,.btn-tp,
-            .ed-t tr.r-blank,.turno-field input,.turno-field select,
-            .prev-inp,.cat-item input,.ei,.es{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+        /* ── HISTÓRICO AÇÕES ── */
+        .hist-item { position: relative; }
+        .hist-actions {
+            display: flex; gap: 4px; opacity: 0;
+            transition: opacity .15s; flex-shrink: 0;
+        }
+        .hist-item:hover .hist-actions { opacity: 1; }
+        .btn-hist {
+            background: none; border: 1px solid var(--border);
+            border-radius: 6px; cursor: pointer; font-size: 11px;
+            font-weight: 600; padding: 4px 8px; font-family: 'Inter', sans-serif;
+            transition: all .15s; white-space: nowrap;
+        }
+        .btn-hist-load { color: #2563eb; border-color: rgba(37,99,235,.25); }
+        .btn-hist-load:hover { background: rgba(37,99,235,.08); }
+        .btn-hist-del  { color: #dc2626; border-color: rgba(220,38,38,.25); }
+        .btn-hist-del:hover  { background: rgba(220,38,38,.08); }
+
+        /* ── AUTOSAVE INDICATOR ── */
+        .autosave-dot {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:10px; color:var(--text-soft); font-weight:500;
+        }
+        .autosave-dot::before {
+            content:''; width:6px; height:6px; border-radius:50%;
+            background:#059669; flex-shrink:0;
+            animation: pulse-save 2s ease-in-out infinite;
+        }
+        .autosave-dot.saving::before { background:#f59e0b; animation:none; }
+        .autosave-dot.error::before  { background:#dc2626; animation:none; }
+        @keyframes pulse-save {
+            0%,100%{ opacity:1; } 50%{ opacity:.3; }
         }
         /* ══ RESPONSIVE ══ */
         @media(max-width:1100px){.turno-bar{grid-template-columns:1fr 1fr 1fr}.stat-strip{grid-template-columns:repeat(3,1fr)}}
@@ -537,14 +327,14 @@
 </head>
 <body>
 <div class="layout">
-    <aside class="sidebar">
+     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
         <nav>
             <a href="/{{ hotel.slug }}/dashboard/"class="active">🏠 Início</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/" class="active">🏨 Hospedagem</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Auditoria</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
@@ -565,11 +355,10 @@
                         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
-                <span class="topbar-title">🏨 Hospedagem — Auditoria</span>
+                <span class="topbar-title">🏨 Auditoria</span>
             </div>
             <div class="topbar-right">
                 <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
-                <button class="btn-novo desktop-only" onclick="novaAuditoria()" style="display:none">＋ Nova</button>
                 <div class="topbar-actions-menu" id="actions-menu-wrap">
                     <button class="topbar-actions-btn" onclick="toggleActionsMenu()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -578,7 +367,6 @@
                     </button>
                     <div class="topbar-actions-dropdown" id="actions-dropdown">
                         <button class="actions-item actions-item-destaque" onclick="novaAuditoria();toggleActionsMenu()">＋ Nova Auditoria</button>
-                        <button class="actions-item" onclick="salvar();toggleActionsMenu()">💾 Salvar</button>
                         <button class="actions-item" onclick="gerarPDF();toggleActionsMenu()">📄 Gerar PDF</button>
                         <button class="actions-item" onclick="exportarTxt();toggleActionsMenu()">📋 Exportar .txt</button>
                     </div>
@@ -587,47 +375,115 @@
         </div>
 
         <div class="content">
-            <!-- TOPBAR -->
-            <div class="audit-bar">
-                <div class="audit-meta">
-                    <div class="badge-data">📅 <span id="lbl-data">—</span></div>
-                    <span id="lbl-amanha" style="font-size:11px;color:var(--text-soft)">—</span>
+
+            <!-- BARRA DE AÇÕES -->
+            <div class="aud-bar">
+                <div class="aud-bar-left" style="gap:12px">
+                    <div class="aud-date-badge">📅 <span id="lbl-data">—</span></div>
+                    <span class="aud-amanha" id="lbl-amanha"></span>
+                    <span class="autosave-dot" id="autosave-ind" title="Salvo automaticamente">salvo</span>
                 </div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <div class="aud-bar-right">
                     <button class="btn-a prim" onclick="novaAuditoria()">＋ Nova Auditoria</button>
-                    <button class="btn-a" onclick="salvar()">💾 Salvar</button>
-                    <button class="btn-a pdf" onclick="gerarPDF()">📄 Gerar PDF</button>
+                    <button class="btn-a pdf-btn" onclick="gerarPDF()">📄 PDF</button>
                     <button class="btn-a" onclick="exportarTxt()">📋 .txt</button>
                 </div>
             </div>
 
             <!-- TROCA DE TURNO -->
-            <div class="turno-grid">
-                <div class="turno-field"><label>Troca de Turno</label><input type="text" id="t-turno" placeholder="Ex: Margiore / Lussandro" oninput="syncUI()"></div>
-                <div class="turno-field"><label>Data</label><input type="date" id="t-data" oninput="syncUI();purgeEsp()"></div>
-                <div class="turno-field"><label>Ocupação (%)</label><input type="text" id="t-ocup" placeholder="98,18" oninput="syncUI()" onblur="fmtPctInput(this)"></div>
-                <div class="turno-field"><label>DM — Diária Média</label><input type="text" id="t-dm" placeholder="1.332,84" oninput="syncUI()" onblur="fmtDMInput(this)"></div>
-                <div class="turno-field"><label>UH Bloq.</label><input type="number" id="t-uh-bloq" value="0" min="0"></div>
+            <div class="turno-bar">
+                <div class="tf">
+                    <label>Troca de Turno</label>
+                    <input type="text" id="t-turno" oninput="syncUI()">
+                </div>
+                <div class="tf">
+                    <label>Data</label>
+                    <input type="date" id="t-data" oninput="syncUI();purgeEsp()">
+                </div>
+                <div class="tf">
+                    <label>Ocupação (%)</label>
+                    <input type="text" id="t-ocup" oninput="syncUI()" onblur="fmtPctInput(this)">
+                </div>
+                <div class="tf">
+                    <label>DM — Diária Média</label>
+                    <input type="text" id="t-dm" oninput="syncUI()" onblur="fmtDMInput(this)">
+                </div>
+                <div class="tf">
+                    <label>UH Bloq.</label>
+                    <input type="number" id="t-uh-bloq" value="0" min="0">
+                </div>
             </div>
 
-            <!-- KPIs -->
-            <div class="kpi-row">
-                <div class="kpi-card k-green"><div class="kpi-lbl">Ocupação</div><div class="kpi-val" id="kpi-ocup">—</div></div>
-                <div class="kpi-card k-blue"><div class="kpi-lbl">Check-outs Hoje</div><div class="kpi-val" id="kpi-co">0</div><div class="kpi-sub">saídas</div></div>
-                <div class="kpi-card k-purple"><div class="kpi-lbl">Late Check-out</div><div class="kpi-val" id="kpi-lco">0</div></div>
-                <div class="kpi-card k-amber"><div class="kpi-lbl">Reentradas</div><div class="kpi-val" id="kpi-reent">0</div></div>
-                <div class="kpi-card k-gold"><div class="kpi-lbl">Res. Especiais na Casa</div><div class="kpi-val" id="kpi-esp">0</div></div>
+            <!-- STAT STRIP -->
+            <div class="stat-strip">
+                <div class="ss-item ss-green">
+                    <div class="ss-lbl">Ocupação</div>
+                    <div class="ss-val" id="ss-ocup">—</div>
+                    <div class="ss-sub" id="ss-dm">DM: —</div>
+                </div>
+                <div class="ss-item ss-blue">
+                    <div class="ss-lbl">Check-outs Previstos</div>
+                    <div class="ss-val" id="ss-co">0</div>
+                    <div class="ss-sub" id="ss-co-sub">0 confirmados</div>
+                </div>
+                <div class="ss-item">
+                    <div class="ss-lbl">Late Check-out</div>
+                    <div class="ss-val" id="ss-lco">0</div>
+                    <div class="ss-sub">na lista</div>
+                </div>
+                <div class="ss-item">
+                    <div class="ss-lbl">Reentradas</div>
+                    <div class="ss-val" id="ss-reent">0</div>
+                    <div class="ss-sub">na lista</div>
+                </div>
+                <div class="ss-item ss-gold">
+                    <div class="ss-lbl">Especiais na Casa</div>
+                    <div class="ss-val" id="ss-esp">0</div>
+                    <div class="ss-sub">long stays e VIPs</div>
+                </div>
+            </div>
+
+            <!-- PREVIEW STRIP (Previsão + Especiais) -->
+            <div class="prev-strip">
+                <!-- Previsão Amanhã -->
+                <div class="pstrip-card">
+                    <div class="pstrip-title">🔮 Previsão — Amanhã</div>
+                    <div class="pstrip-grid">
+                        <div class="pstrip-num">
+                            <div class="pstrip-val c-green" id="ps-ocup">—</div>
+                            <div class="pstrip-sub">Ocupação</div>
+                        </div>
+                        <div class="pstrip-num">
+                            <div class="pstrip-val c-green" id="ps-ent">—</div>
+                            <div class="pstrip-sub">Entradas</div>
+                        </div>
+                        <div class="pstrip-num">
+                            <div class="pstrip-val c-red" id="ps-sai">—</div>
+                            <div class="pstrip-sub">Saídas</div>
+                        </div>
+                    </div>
+                    <div class="pstrip-dm">
+                        DM: <span id="ps-dm">—</span> &nbsp;|&nbsp; Café: <span id="ps-cafe">—</span> &nbsp;|&nbsp; UHs: <span id="ps-uh">—</span>
+                    </div>
+                </div>
+                <!-- Especiais check-ins previstos -->
+                <div class="pstrip-card">
+                    <div class="pstrip-title">🟡 Check-ins Especiais Previstos <span class="pbadge pb-purple" id="ps-esci-badge" style="margin-left:4px">0</span></div>
+                    <div class="pstrip-list" id="ps-esci-list">
+                        <span class="pstrip-empty">Nenhum check-in especial previsto</span>
+                    </div>
+                </div>
             </div>
 
             <!-- ABAS -->
             <div class="tabs-nav">
-                <button class="tab-btn active"  data-tab="checkout"    onclick="setTab('checkout')">🚪 Check-outs <span class="tbadge" id="tb-co">0</span></button>
-                <button class="tab-btn"          data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã <span class="tbadge" id="tb-prev">0</span></button>
-                <button class="tab-btn"          data-tab="especiais"  onclick="setTab('especiais')">⭐ Especiais na Casa <span class="tbadge" id="tb-esp">0</span></button>
-                <button class="tab-btn"          data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
-                <button class="tab-btn"          data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
-                <button class="tab-btn"          data-tab="historico"  onclick="setTab('historico')">📋 Histórico</button>
-                <button class="tab-btn"          data-tab="stats"      onclick="setTab('stats');renderStats()">📊 Estatísticas</button>
+                <button class="tab-btn active" data-tab="checkout"    onclick="setTab('checkout')">🚪 Check-outs <span class="tbadge" id="tb-co">0</span></button>
+                <button class="tab-btn"         data-tab="previsao"   onclick="setTab('previsao')">🔮 Previsão Amanhã</button>
+                <button class="tab-btn"         data-tab="especiais"  onclick="setTab('especiais')">⭐ Especiais na Casa <span class="tbadge" id="tb-esp">0</span></button>
+                <button class="tab-btn"         data-tab="checkins"   onclick="setTab('checkins')">🟡 Check-ins Pend. <span class="tbadge" id="tb-ci">0</span></button>
+                <button class="tab-btn"         data-tab="ocorrencias" onclick="setTab('ocorrencias')">🔴 Ocorrências <span class="tbadge" id="tb-oc">0</span></button>
+                <button class="tab-btn"         data-tab="historico"  onclick="setTab('historico')">📋 Histórico</button>
+                <button class="tab-btn"         data-tab="stats"      onclick="setTab('stats');renderStats()">📊 Estatísticas</button>
             </div>
 
             <!-- ══ CHECK-OUTS ══ -->
@@ -637,24 +493,26 @@
                         <div class="panel-title"><div class="dot dot-blue"></div> Check-outs do Dia</div>
                         <span class="pbadge pb-blue" id="b-co">0</span>
                     </div>
-                    <div class="ed-wrap"><table class="ed-t">
+                    <div class="ed-wrap"><table class="ed-t" id="table-co">
                         <thead><tr class="head-dark">
+                            <th style="width:20px"></th>
                             <th class="td-del"></th>
-                            <th class="td-saiu" title="Marcar como saiu">✓ Saiu</th>
-                            <th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
-                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
+                            <th class="td-saiu" title="Marcar como saiu">✓</th>
+                            <th class="td-chk">PRE</th>
+                            <th class="td-chk">TRIP</th>
+                            <th style="width:50px">UH</th>
+                            <th style="width:62px">CTG</th>
                             <th style="min-width:160px">Nome do Hóspede</th>
-                            <th>Observação / LCO / Reentrada</th>
+                            <th>Observação</th>
                         </tr></thead>
                         <tbody id="tbody-co"></tbody>
                     </table></div>
                     <div class="tfoot">
-                        <span class="leg">Legenda:</span>
+                        <span class="leg">Obs:</span>
                         <span class="itag xt-lco">🕐 LCO</span>
                         <span class="itag xt-reent">🔄 Reentrada</span>
-                        <span class="itag xt-esp">⭐ Especial</span>
                         <button class="btn-paste" onclick="abrirColar('co')">📋 Colar lista</button>
-                        <button class="btn-add" style="background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.3);color:#15803d" onclick="imprimirCheckouts()">🖨️ Imprimir lista</button>
+                        <button class="btn-add" style="background:rgba(5,150,105,.07);border-color:rgba(5,150,105,.3);color:#059669" onclick="imprimirCheckouts()">🖨️ Imprimir</button>
                         <button class="btn-add" onclick="addRow('co')">＋ Linha</button>
                     </div>
                 </div>
@@ -667,90 +525,48 @@
                         <div class="panel-title"><div class="dot dot-purple"></div> Previsão Geral — Amanhã</div>
                         <span id="lbl-prev-data" style="font-size:11px;color:var(--text-soft)">—</span>
                     </div>
-                    <!-- Ocupação + UHs + Entradas + Saídas -->
                     <div class="prev-main-grid">
                         <div class="prev-main-item" style="border-bottom:1px solid var(--border)">
                             <input class="prev-main-val c-green" id="prev-ocup" placeholder="92,59" oninput="syncUI()" onblur="fmtPctInput(this)">
                             <div class="prev-main-lbl">Taxa de Ocupação</div>
-                            <div class="prev-main-sub">previsão para amanhã</div>
                         </div>
                         <div class="prev-main-item" style="border-bottom:1px solid var(--border)">
-                            <input class="prev-main-val" id="prev-uh" placeholder="0" oninput="syncUI()" style="color:#2563eb">
+                            <input class="prev-main-val c-blue" id="prev-uh" placeholder="0" oninput="syncUI()">
                             <div class="prev-main-lbl">UHs Ocupadas</div>
-                            <div class="prev-main-sub">quartos ocupados</div>
                         </div>
                         <div class="prev-main-item">
                             <input class="prev-main-val c-green" id="prev-ent" placeholder="0" oninput="syncUI()">
                             <div class="prev-main-lbl">Entradas</div>
-                            <div class="prev-main-sub">total check-ins</div>
                         </div>
                         <div class="prev-main-item">
                             <input class="prev-main-val c-red" id="prev-sai" placeholder="0" oninput="syncUI()">
                             <div class="prev-main-lbl">Saídas</div>
-                            <div class="prev-main-sub">total check-outs</div>
                         </div>
                     </div>
-                    <!-- DM -->
                     <div class="prev-dm-row">
                         <label>💰 Diária Média (DM):</label>
                         <input class="prev-dm-inp" id="prev-diaria" placeholder="1.286,97" oninput="syncUI()" onblur="fmtDMInput(this)">
+                        <label style="margin-left:16px">☕ Café:</label>
+                        <input class="prev-dm-inp" id="prev-cafe" placeholder="0" oninput="syncUI()" style="width:80px">
                     </div>
-                    <!-- Entradas por categoria — dinâmico -->
-                    <div class="prev-section-title">
-                        🏨 Entradas por Categoria
-                        <span style="font-size:10px;font-weight:400;color:var(--text-soft);margin-left:4px">— configure as categorias do seu hotel</span>
-                    </div>
-                    <!-- Gerenciador de categorias -->
+                    <div class="prev-section-title">🏨 Entradas por Categoria <span style="font-size:10px;font-weight:400;margin-left:4px">— configure as categorias</span></div>
                     <div class="cat-manager-wrap">
                         <span class="cat-manager-label">Categorias:</span>
                         <div id="cat-tags-wrap" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"></div>
                         <div class="cat-add-row">
-                            <input class="cat-add-input" id="cat-nova-input" maxlength="5"
-                                placeholder="EX: DEL"
-                                onkeydown="if(event.key==='Enter')adicionarCategoria()"
-                                oninput="this.value=this.value.toUpperCase()">
+                            <input class="cat-add-input" id="cat-nova-input" maxlength="5" placeholder="DEL" onkeydown="if(event.key==='Enter')adicionarCategoria()" oninput="this.value=this.value.toUpperCase()">
                             <button class="btn-cat-add" onclick="adicionarCategoria()">＋ Add</button>
                         </div>
                     </div>
-                    <!-- Grid dinâmico -->
                     <div class="cat-grid-dyn" id="cat-grid-dyn"></div>
-                    <!-- Café da manhã -->
-                    <div class="cafe-row">
-                        <span style="font-size:20px">☕</span>
-                        <label>Café da Manhã:</label>
-                        <input class="cafe-inp" id="prev-cafe" placeholder="0" oninput="syncUI()">
-                        <span style="font-size:11px;color:#d97706">hóspedes esperados</span>
-                    </div>
+                    <div class="cafe-row" style="display:none"></div>
                 </div>
-                <!-- Check-outs amanhã -->
-                <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-purple"></div> Check-outs Previstos — Amanhã</div>
-                        <span class="pbadge pb-purple" id="b-prev">0</span>
-                    </div>
-                    <div class="ed-wrap"><table class="ed-t">
-                        <thead><tr class="head-purple">
-                            <th class="td-del"></th><th class="td-chk">PRE</th><th class="td-chk">TRIP</th>
-                            <th style="width:52px">UH</th><th style="width:64px">CTG</th>
-                            <th style="min-width:180px">Nome do Hóspede</th>
-                            <th>Observação / LCO / Reentrada</th>
-                        </tr></thead>
-                        <tbody id="tbody-prev"></tbody>
-                    </table></div>
-                    <div class="tfoot">
-                        <span class="itag xt-lco">🕐 LCO</span>
-                        <span class="itag xt-reent">🔄 Reentrada</span>
-                        <button class="btn-paste" onclick="abrirColar('prev')">📋 Colar lista</button>
-                        <button class="btn-add" onclick="addRow('prev')">＋ Linha</button>
-                    </div>
-                </div>
-
-                <!-- ══ RESERVAS ESPECIAIS — CHECK-INS PREVISTOS ══ -->
+                <!-- Reservas especiais check-ins previstos -->
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-purple"></div> Reservas Especiais — Check-ins Previstos</div>
                         <div style="display:flex;align-items:center;gap:8px">
-                            <span style="font-size:10px;color:var(--text-soft)">VIPs, Long Stay, Reentradas, Grupos, configuração de camas</span>
+                            <span style="font-size:10px;color:var(--text-soft)">VIPs, Long Stay, Reentradas, config. de camas</span>
                             <span class="pbadge pb-purple" id="b-esp-ci">0</span>
                         </div>
                     </div>
@@ -761,7 +577,7 @@
                             <th style="width:96px;color:#a5b4fc">Reserva</th>
                             <th style="width:96px;color:#a5b4fc">IN</th>
                             <th style="width:96px;color:#a5b4fc">OUT</th>
-                            <th style="color:#a5b4fc">Descrição / Nome — Tipo — Configuração</th>
+                            <th style="color:#a5b4fc">Descrição / Nome</th>
                             <th style="width:52px;color:#a5b4fc">UH</th>
                             <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">C</th>
                             <th class="cme-head" style="background:#1e1b4b;color:#a5b4fc">M</th>
@@ -770,8 +586,8 @@
                         <tbody id="tbody-esp-ci"></tbody>
                     </table></div>
                     <div class="tfoot" style="flex-wrap:wrap;gap:6px">
-                        <span style="font-size:10px;color:var(--text-soft)"><strong>C</strong>=Cama config. &nbsp;<strong>M</strong>=Mesa/berço &nbsp;<strong>E</strong>=Extra/solicitação</span>
-                        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto">
+                        <span style="font-size:10px;color:var(--text-soft)"><strong>C</strong>=Cama &nbsp;<strong>M</strong>=Mesa/berço &nbsp;<strong>E</strong>=Extra</span>
+                        <div style="display:flex;gap:4px;margin-left:auto">
                             <button class="btn-paste" onclick="abrirColar('esp-ci')">📋 Colar lista</button>
                             <button class="btn-add" onclick="addRow('esp-ci')">＋ Adicionar</button>
                         </div>
@@ -785,7 +601,7 @@
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-gold"></div> Reservas Especiais na Casa</div>
                         <div style="display:flex;align-items:center;gap:8px">
-                            <span style="font-size:10px;color:var(--text-soft)">Saem automaticamente no dia do check-out</span>
+                            <span style="font-size:10px;color:var(--text-soft)">Saem automaticamente no check-out</span>
                             <span class="pbadge pb-gold" id="b-esp">0</span>
                         </div>
                     </div>
@@ -797,12 +613,11 @@
                             <th style="width:100px">Check-in</th>
                             <th style="width:100px">Check-out</th>
                             <th>Nome / Descrição</th>
-                            <th style="width:120px">Tipo</th>
                         </tr></thead>
                         <tbody id="tbody-esp"></tbody>
                     </table></div>
                     <div class="tfoot">
-                        <span style="font-size:11px;color:var(--text-soft)">💡 Registre aqui os long stays, lua de mel, VIPs — saem automaticamente no check-out</span>
+                        <span style="font-size:11px;color:var(--text-soft)">💡 Long stays, Lua de mel, VIPs — saem automaticamente no check-out</span>
                         <button class="btn-add" style="margin-left:auto" onclick="addRow('esp')">＋ Adicionar</button>
                     </div>
                 </div>
@@ -853,20 +668,17 @@
                 <div class="panel">
                     <div class="panel-head">
                         <div class="panel-title"><div class="dot dot-gold"></div> Histórico de Auditorias</div>
-                        <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <button onclick="salvarNoHistorico()" style="background:var(--gold-dim);border:1px solid rgba(181,132,58,.3);color:var(--gold);padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">📌 Salvar no histórico</button>
+                            <button onclick="limparHist()" style="background:none;border:none;font-size:11px;color:var(--text-soft);cursor:pointer;font-family:'Inter',sans-serif">Limpar tudo</button>
+                        </div>
                     </div>
                     <div id="hist-list"><div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div></div>
                 </div>
             </div>
-        </div>
-    </main>
-</div>
-
 
             <!-- ══ ESTATÍSTICAS ══ -->
             <div class="tab-pane" id="pane-stats">
-
-                <!-- Filtros -->
                 <div class="stats-filters">
                     <label>Período:</label>
                     <select id="sf-periodo" onchange="renderStats()">
@@ -876,126 +688,36 @@
                         <option value="all">Todo o histórico</option>
                     </select>
                     <div class="sep"></div>
-                    <label>Comparar com:</label>
-                    <select id="sf-comp" onchange="renderStats()">
-                        <option value="prev">Mês anterior</option>
-                        <option value="year">Mesmo período ano passado</option>
-                    </select>
-                    <button class="btn-a" onclick="exportarStatsCSV()">📥 Exportar CSV</button>
-                    <button class="btn-a pdf" onclick="gerarPDFStats()">📄 PDF Estatísticas</button>
+                    <button class="btn-a" onclick="exportarStatsCSV()">📥 CSV</button>
+                    <button class="btn-a pdf-btn" onclick="gerarPDFStats()">📄 PDF Stats</button>
                 </div>
-
-                <!-- KPIs topo -->
                 <div class="stats-top">
-                    <div class="stat-box s-green">
-                        <div class="stat-box-lbl">Ocupação Média</div>
-                        <div class="stat-box-val" id="st-ocup-med">—</div>
-                        <div class="stat-box-trend" id="st-ocup-trend"></div>
-                        <div class="stat-box-sub">no período</div>
-                    </div>
-                    <div class="stat-box s-gold">
-                        <div class="stat-box-lbl">Diária Média (DM)</div>
-                        <div class="stat-box-val" id="st-dm-med">—</div>
-                        <div class="stat-box-trend" id="st-dm-trend"></div>
-                        <div class="stat-box-sub">no período</div>
-                    </div>
-                    <div class="stat-box s-blue">
-                        <div class="stat-box-lbl">Total Check-outs</div>
-                        <div class="stat-box-val" id="st-co-total">—</div>
-                        <div class="stat-box-trend" id="st-co-trend"></div>
-                        <div class="stat-box-sub">auditorias registradas</div>
-                    </div>
-                    <div class="stat-box s-purple">
-                        <div class="stat-box-lbl">Auditorias Salvas</div>
-                        <div class="stat-box-val" id="st-audit-total">—</div>
-                        <div class="stat-box-sub">no histórico</div>
-                    </div>
+                    <div class="stat-box s-green"><div class="stat-box-lbl">Ocupação Média</div><div class="stat-box-val" id="st-ocup-med">—</div><div class="stat-box-trend" id="st-ocup-trend"></div></div>
+                    <div class="stat-box s-gold"><div class="stat-box-lbl">Diária Média (DM)</div><div class="stat-box-val" id="st-dm-med">—</div><div class="stat-box-trend" id="st-dm-trend"></div></div>
+                    <div class="stat-box s-blue"><div class="stat-box-lbl">Total Check-outs</div><div class="stat-box-val" id="st-co-total">—</div><div class="stat-box-trend" id="st-co-trend"></div></div>
+                    <div class="stat-box s-purple"><div class="stat-box-lbl">Auditorias Salvas</div><div class="stat-box-val" id="st-audit-total">—</div></div>
                 </div>
-
-                <!-- Gráficos -->
                 <div class="charts-grid">
-
-                    <!-- Ocupação por dia -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">📈 Ocupação por Auditoria</div>
-                            <span style="font-size:10px;color:var(--text-soft)">% por dia</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-ocup"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Diária média por dia -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">💰 Diária Média (DM) por Auditoria</div>
-                            <span style="font-size:10px;color:var(--text-soft)">R$ por dia</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-dm"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Check-outs por mês (barras) -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">🚪 Check-outs por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">total de saídas</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-co-mes"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Ocupação média por mês -->
-                    <div class="chart-panel">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">📊 Ocupação Média por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">comparativo mensal</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap"><canvas id="chart-ocup-mes"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- DM média por mês (barras full) -->
-                    <div class="chart-panel full">
-                        <div class="chart-panel-head">
-                            <div class="chart-panel-title">💳 Evolução da Diária Média por Mês</div>
-                            <span style="font-size:10px;color:var(--text-soft)">comparativo de receita média</span>
-                        </div>
-                        <div class="chart-panel-body">
-                            <div class="chart-canvas-wrap tall"><canvas id="chart-dm-mes"></canvas></div>
-                        </div>
-                    </div>
-
+                    <div class="chart-panel"><div class="chart-panel-head"><div class="chart-panel-title">📈 Ocupação por Auditoria</div></div><div class="chart-panel-body"><div class="chart-canvas-wrap"><canvas id="chart-ocup"></canvas></div></div></div>
+                    <div class="chart-panel"><div class="chart-panel-head"><div class="chart-panel-title">💰 Diária Média por Auditoria</div></div><div class="chart-panel-body"><div class="chart-canvas-wrap"><canvas id="chart-dm"></canvas></div></div></div>
+                    <div class="chart-panel"><div class="chart-panel-head"><div class="chart-panel-title">🚪 Check-outs por Mês</div></div><div class="chart-panel-body"><div class="chart-canvas-wrap"><canvas id="chart-co-mes"></canvas></div></div></div>
+                    <div class="chart-panel"><div class="chart-panel-head"><div class="chart-panel-title">📊 Ocupação Média por Mês</div></div><div class="chart-panel-body"><div class="chart-canvas-wrap"><canvas id="chart-ocup-mes"></canvas></div></div></div>
+                    <div class="chart-panel full"><div class="chart-panel-head"><div class="chart-panel-title">💳 Evolução da Diária Média por Mês</div></div><div class="chart-panel-body"><div class="chart-canvas-wrap tall"><canvas id="chart-dm-mes"></canvas></div></div></div>
                 </div>
-
-                <!-- Tabela comparativa mensal -->
                 <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title"><div class="dot dot-gold"></div> Comparativo Mensal Detalhado</div>
-                        <span style="font-size:10px;color:var(--text-soft)">Dados extraídos das auditorias salvas</span>
-                    </div>
+                    <div class="panel-head"><div class="panel-title"><div class="dot dot-gold"></div> Comparativo Mensal</div></div>
                     <div style="overflow-x:auto">
                         <table class="table-stats" id="table-mensal">
-                            <thead><tr>
-                                <th>Mês</th>
-                                <th>Auditorias</th>
-                                <th>Ocupação Média</th>
-                                <th>DM Média</th>
-                                <th>Check-outs Total</th>
-                                <th>Res. Especiais</th>
-                                <th>vs Mês Anterior</th>
-                            </tr></thead>
+                            <thead><tr><th>Mês</th><th>Auditorias</th><th>Ocup. Média</th><th>DM Média</th><th>Check-outs</th><th>Especiais</th><th>vs Anterior</th></tr></thead>
                             <tbody id="tbody-mensal"></tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-            </div><!-- /pane-stats -->
-
+        </div><!-- /content -->
+    </main>
+</div><!-- /layout -->
 
 <!-- MODAL COLAR -->
 <div class="modal-ov" id="paste-modal">
@@ -1051,7 +773,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
                     <div>
                         <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);display:block;margin-bottom:5px">Observação <span style="font-weight:400;text-transform:none">(opcional)</span></label>
-                        <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada no SUP&#10;&#10;…"
+                        <textarea id="col-obs" class="paste-ta" placeholder="LCO&#10;Reentrada&#10;&#10;…"
                             style="min-height:70px;max-height:100px;font-family:monospace;font-size:13px"
                             oninput="previewColunas()"></textarea>
                     </div>
@@ -1086,12 +808,13 @@
 
 
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}";
-const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
+const HOTEL_SLUG  = "{{ hotel.slug }}" || window.location.pathname.split('/').filter(Boolean)[0] || 'hotel';
+const IS_GERENTE  = {{ is_gerente|yesno:"true,false" }};
+const LS_KEY      = `audit_v3_${HOTEL_SLUG}`;
+const LS_DRAFT    = `audit_draft_${HOTEL_SLUG}`;
 
 // ══ ESTADO ══
 let co      = [];
-let prev    = [];
 let esp     = [];   // especiais na casa (persistem entre auditorias)
 let espCi   = [];   // especiais de check-ins previstos
 let ci      = [];
@@ -1143,12 +866,24 @@ function toBr(iso){
 
 // ══ SYNC UI ══
 function syncUI(){
-    const ocup = g('t-ocup').value;
-    g('kpi-ocup').textContent = ocup||'—';
-    const di = g('t-data').value;
-    g('lbl-data').textContent     = fmtDate(di)||'—';
-    g('lbl-amanha').textContent   = dataAmanha(di);
-    g('lbl-prev-data').textContent = dataAmanha(di);
+    const di   = g('t-data')?.value || '';
+    const ocup = g('t-ocup')?.value || '';
+    const dm   = g('t-dm')?.value   || '';
+    if(g('lbl-data'))      g('lbl-data').textContent      = fmtDate(di)||'—';
+    if(g('lbl-amanha'))    g('lbl-amanha').textContent    = dataAmanha(di);
+    if(g('lbl-prev-data')) g('lbl-prev-data').textContent = dataAmanha(di);
+    // stat strip
+    if(g('ss-ocup')) g('ss-ocup').textContent = ocup||'—';
+    if(g('ss-dm'))   g('ss-dm').textContent   = 'DM: '+(dm||'—');
+    // preview strip — previsão
+    if(g('ps-ocup')) g('ps-ocup').textContent = g('prev-ocup')?.value||'—';
+    if(g('ps-ent'))  g('ps-ent').textContent  = g('prev-ent')?.value||'—';
+    if(g('ps-sai'))  g('ps-sai').textContent  = g('prev-sai')?.value||'—';
+    if(g('ps-dm'))   g('ps-dm').textContent   = g('prev-diaria')?.value||'—';
+    if(g('ps-cafe')) g('ps-cafe').textContent = g('prev-cafe')?.value||'—';
+    if(g('ps-uh'))   g('ps-uh').textContent   = g('prev-uh')?.value||'—';
+    syncStats();
+    autoSave();
 }
 
 // ══ RENDER ══
@@ -1156,14 +891,11 @@ function renderCo(){
     renderCoTable(co,'tbody-co','co');
     syncKpisCo();
 }
-function renderPrev(){
-    renderCoTable(prev,'tbody-prev','prev');
-    g('b-prev').textContent = g('tb-prev').textContent = prev.length;
-}
+
 function renderCoTable(arr,tbodyId,key){
     const tbody=g(tbodyId);
     const isCo = (key==='co'); // só checkout de hoje tem coluna "Saiu"
-    const cols  = isCo ? 8 : 7;
+    const cols  = isCo ? 9 : 5;
     if(!arr.length){
         tbody.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhum registro — clique em 📋 Colar lista ou ＋ Linha</td></tr>`;
         return;
@@ -1175,34 +907,76 @@ function renderCoTable(arr,tbodyId,key){
         let tags='';
         if(/lco|late/i.test(r.obs))       tags+='<span class="itag xt-lco">🕐 LCO</span> ';
         if(/reentrada|reent/i.test(r.obs)) tags+='<span class="itag xt-reent">🔄</span> ';
-        const saiuCol = isCo ? `<td class="td-saiu">
-            <button class="btn-saiu ${r.saiu?'saiu':''}"
-                onclick="toggleSaiu('${key}',${i})"
-                title="${r.saiu?'Desmarcar saída':'Marcar como saiu'}">✓</button>
-        </td>` : '';
-        return `<tr class="${cls}" data-key="${key}" data-i="${i}">
-            <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
-            ${saiuCol}
-            <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold)"></td>
-            <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold)"></td>
-            <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
-                oninput="setF('${key}',${i},'uh',this.value)"></td>
-            <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
-            <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
-                oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
-            <td>
-                <div class="obs-wrap">
-                    ${tags}
-                    <input class="obs-input-field"
-                        value="${esc(r.obs)}"
-                        placeholder="LCO / Reentrada no SUP / observação…"
-                        data-key="${key}" data-i="${i}"
-                        onblur="commitObs(this)"
-                        onkeydown="if(event.key==='Enter'){this.blur();}">
-                    <button class="btn-tp" onclick="tagMenu('${key}',${i},this)">＋</button>
-                </div>
-            </td>
-        </tr>`;
+
+        if(isCo){
+            // CHECK-OUTS DO DIA — com drag, Saiu, PRE, TRIP
+            const saiuCol = `<td class="td-saiu">
+                <button class="btn-saiu ${r.saiu?'saiu':''}"
+                    onclick="toggleSaiu('${key}',${i})"
+                    title="${r.saiu?'Desmarcar saída':'Marcar como saiu'}">✓</button>
+            </td>`;
+            return `<tr class="${cls}" data-key="${key}" data-i="${i}" draggable="true"
+                ondragstart="dragStart(event,${i})"
+                ondragover="dragOver(event)"
+                ondragleave="dragLeave(event)"
+                ondrop="dragDrop(event,${i})"
+                ondragend="dragEnd(event)">
+                <td style="padding:4px 2px!important;width:22px;text-align:center">
+                    <span class="drag-handle" title="Arrastar para reordenar">⠿</span>
+                </td>
+                <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
+                ${saiuCol}
+                <td class="td-chk"><input type="checkbox" ${r.pre?'checked':''} onchange="setF('${key}',${i},'pre',this.checked)" style="accent-color:var(--gold);cursor:pointer"></td>
+                <td class="td-chk"><input type="checkbox" ${r.trip?'checked':''} onchange="setF('${key}',${i},'trip',this.checked)" style="accent-color:var(--gold);cursor:pointer"></td>
+                <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
+                    oninput="setF('${key}',${i},'uh',this.value)"></td>
+                <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
+                    oninput="setF('${key}',${i},'nome',this.value)" style="min-width:140px"></td>
+                <td>
+                    <div class="obs-wrap">
+                        ${tags}
+                        <input class="obs-input-field"
+                            value="${esc(r.obs)}"
+                            placeholder="LCO / Reentrada / observação…"
+                            data-key="${key}" data-i="${i}"
+                            onblur="commitObs(this)"
+                            onkeydown="if(event.key==='Enter'){this.blur();}">
+                        ${r.obs
+                            ? `<button class="btn-tp" style="color:#dc2626;border-color:rgba(220,38,38,.3)"
+                                onclick="clearObs('${key}',${i})" title="Remover">✕</button>`
+                            : `<button class="btn-tp" onclick="tagMenu('${key}',${i},this)" title="Adicionar tag">＋</button>`
+                        }
+                    </div>
+                </td>
+            </tr>`;
+        } else {
+            // CHECK-OUTS PREVISTOS — sem Saiu, sem PRE/TRIP, só consulta+edição
+            return `<tr class="${cls}" data-key="${key}" data-i="${i}">
+                <td class="td-del"><button class="btn-del" onclick="delRow('${key}',${i})">✕</button></td>
+                <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH"
+                    oninput="setF('${key}',${i},'uh',this.value)"></td>
+                <td><select class="es" onchange="setF('${key}',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
+                <td><input class="ei" value="${esc(r.nome)}" placeholder="Sobrenome, Nome"
+                    oninput="setF('${key}',${i},'nome',this.value)" style="min-width:170px"></td>
+                <td>
+                    <div class="obs-wrap">
+                        ${tags}
+                        <input class="obs-input-field"
+                            value="${esc(r.obs)}"
+                            placeholder="LCO / Reentrada / observação…"
+                            data-key="${key}" data-i="${i}"
+                            onblur="commitObs(this)"
+                            onkeydown="if(event.key==='Enter'){this.blur();}">
+                        ${r.obs
+                            ? `<button class="btn-tp" style="color:#dc2626;border-color:rgba(220,38,38,.3)"
+                                onclick="clearObs('${key}',${i})" title="Remover">✕</button>`
+                            : `<button class="btn-tp" onclick="tagMenu('${key}',${i},this)" title="Adicionar tag">＋</button>`
+                        }
+                    </div>
+                </td>
+            </tr>`;
+        }
     }).join('');
 }
 
@@ -1219,23 +993,15 @@ function commitObs(input) {
     arr[i]._prevObs = val;
     if (precisaRender) re(key);
     else syncKpisCo();
+    autoSave();
 }
 
-function syncKpisCo() {
-    g('kpi-co').textContent    = co.length;
-    g('kpi-lco').textContent   = co.filter(r=>/lco|late/i.test(r.obs)).length;
-    g('kpi-reent').textContent = co.filter(r=>/reentrada|reent/i.test(r.obs)).length;
-    const saidos = co.filter(r=>r.saiu).length;
-    g('b-co').textContent = g('tb-co').textContent = co.length;
-    // atualiza badge com contador de saídas
-    const bco = g('b-co');
-    if (bco) bco.textContent = saidos > 0 ? `${co.length} (${saidos} saíram)` : co.length;
-}
+function syncKpisCo(){ syncStats(); }
 
 function toggleSaiu(key, i) {
     const arr = getData(key);
     arr[i].saiu = !arr[i].saiu;
-    re(key);
+    re(key); autoSave();
 }
 
 function renderEsp(){
@@ -1244,7 +1010,7 @@ function renderEsp(){
     const hoje = g('t-data').value;
     const ativas = esp; // já filtrado pelo purge
     if(!ativas.length){
-        tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial na casa — clique em ＋ para adicionar</td></tr>`;
+        tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:20px;font-size:12px">Nenhuma reserva especial na casa — clique em ＋ para adicionar</td></tr>`;
     } else {
         tbody.innerHTML=ativas.map((r,i)=>{
             // dias restantes
@@ -1267,17 +1033,14 @@ function renderEsp(){
                 <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="esp[${i}].uh=this.value;salvarEsp()"></td>
                 <td><select class="es" onchange="esp[${i}].ct=this.value;salvarEsp()">${ctOpts(r.ct)}</select></td>
                 <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="esp[${i}].reserva=this.value;salvarEsp()"></td>
-                <td><input class="ei ei-date" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkin=this.value;salvarEsp()"></td>
-                <td><input class="ei ei-date" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="esp[${i}].checkout=this.value;salvarEsp()">${diasRestantes}</td>
+                <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkin)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkin=this.value;salvarEsp()" maxlength="10" inputmode="numeric"></td>
+                <td><input class="ei ei-date ei-date-auto" value="${esc(r.checkout)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);esp[${i}].checkout=this.value;salvarEsp()" maxlength="10" inputmode="numeric">${diasRestantes}</td>
                 <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - Long stay / motivo" oninput="esp[${i}].descricao=this.value;salvarEsp()" style="min-width:160px"></td>
-                <td><select class="es" onchange="esp[${i}].tipo=this.value;salvarEsp();renderEsp()">
-                    ${[['long_stay','🏷️ Long Stay'],['returning','🔄 Returning Guest'],['habitue','⭐ Habitué'],['vip','👑 VIP'],['lua_de_mel','💑 Lua de Mel'],['aniversario','🎂 Aniversário'],['grupo','👥 Grupo'],['reentrada','↩️ Reentrada'],['twin','🛏️🛏️ Cama Twin'],['cama_adicional','➕ Cama Adicional'],['bercinho','🍼 Berço/Cama Bebê']].map(([v,l])=>`<option value="${v}" ${(r.tipo||'long_stay')===v?'selected':''}>${l}</option>`).join('')}
-                </select></td>
+
             </tr>`;
         }).join('');
     }
-    g('b-esp').textContent = g('tb-esp').textContent = ativas.length;
-    g('kpi-esp').textContent = ativas.length;
+    syncStats();
 }
 
 function renderCi(){
@@ -1304,10 +1067,10 @@ function renderOcorr(){
         : '<div style="font-size:12px;color:var(--text-soft)">Nenhuma ocorrência.</div>';
     g('b-oc').textContent = g('tb-oc').textContent = ocorr.length;
 }
-function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); }
-function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); }
+function addOcorr(){ const t=g('ocorr-input').value.trim(); if(!t)return; ocorr.push(t); g('ocorr-input').value=''; renderOcorr(); autoSave(); }
+function delOcorr(i){ ocorr.splice(i,1); renderOcorr(); autoSave(); }
 
-function renderTudo(){ renderCo(); renderPrev(); renderEsp(); renderCi(); renderOcorr(); }
+function renderTudo(){ renderCo(); renderEsp(); renderEspCi(); renderCi(); renderOcorr(); syncStats(); }
 
 // ══ HELPERS ══
 function ctOpts(sel) {
@@ -1315,18 +1078,17 @@ function ctOpts(sel) {
     const padrao = sel || cats[0] || 'SUP';
     return cats.map(o => `<option ${padrao === o ? 'selected' : ''}>${o}</option>`).join('');
 }
-function getData(k){ return k==='co'?co:k==='prev'?prev:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
-function setF(k,i,f,v){ getData(k)[i][f]=v; }
+function getData(k){ return k==='co'?co:k==='esp'?esp:k==='esp-ci'?espCi:ci; }
+function setF(k,i,f,v){ getData(k)[i][f]=v; autoSave(); }
 function addRow(k){
     const def = {
         co:   {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
-        prev: {uh:'',ct:'SUP',nome:'',obs:'',pre:false,trip:false,saiu:false},
         esp:  {uh:'',ct:'SUP',reserva:'',checkin:'',checkout:'',descricao:'',tipo:'long_stay'},
         ci:     {reserva:'',nome:'',uh:'',ct:'SUP',obs:''},
         'esp-ci': {ct:'SUP',reserva:'',in:'',out:'',descricao:'',uh:'',tipo:'long_stay',c:false,m:false,e:false},
     }[k];
     getData(k).push({...def});
-    re(k);
+    re(k); autoSave();
     setTimeout(()=>{
         const id = k==='esp'?'tbody-esp':k==='ci'?'tbody-ci':`tbody-${k}`;
         const rows=g(id)?.querySelectorAll('tr'); if(!rows?.length)return;
@@ -1336,23 +1098,18 @@ function addRow(k){
 function delRow(k,i){
     getData(k).splice(i,1);
     if(k==='esp') salvarEsp();
-    re(k);
+    re(k); autoSave();
 }
 function re(k){
-    ({co:renderCo,prev:renderPrev,esp:renderEsp,ci:renderCi}[k]||renderCi)();
+    ({co:renderCo,esp:renderEsp,'esp-ci':renderEspCi,ci:renderCi}[k]||renderCi)();
 }
 
 // ══ TAG MENU ══
 function tagMenu(k,i,btn){
     document.getElementById('__tm')?.remove();
     const opts=[
-        {l:'🕐 Late Check-out',v:'LCO'},
-        {l:'🔄 Reentrada no SUP',v:'Reentrada no SUP'},
-        {l:'🔄 Reentrada no STD',v:'Reentrada no STD'},
-        {l:'🔄 Reentrada no SUI',v:'Reentrada no SUI'},
-        {l:'⭐ Reserva Especial',v:'Reserva Especial'},
-        {l:'💑 Lua de Mel',v:'Lua de Mel'},
-        {l:'🎂 Aniversário',v:'Aniversário'},
+        {l:'🕐 Late Check-out (LCO)',v:'LCO'},
+        {l:'🔄 Reentrada',v:'Reentrada'},
     ];
     const m=document.createElement('div');
     m.id='__tm';
@@ -1377,11 +1134,10 @@ function tagMenu(k,i,btn){
 let colarKey='co';
 const HINTS={
     co:   '<strong>Check-outs do dia.</strong> Cole do Oracle — qualquer formato:<br>• <code>21  SUP  Manuel,Rui</code> (tudo junto)<br>• <code>Manuel,Rui</code> (só nome)<br>• Ou cole <strong>cada coluna separada</strong>: primeiro UH, depois CTG, depois Nome',
-    prev: '<strong>Check-outs previstos amanhã.</strong> Cole do Oracle — qualquer formato:<br>• <code>34  SUP  Ramos,Maria Luiza  Reentrada no STD</code><br>• Ou cole cada coluna separada: UH, CTG, Nome',
     'esp-ci': '<strong>Reservas Especiais — Check-ins Previstos.</strong> Cole da planilha ou Oracle.<br>Exemplo: <code>SUP  334532990  26/04/2026  27/04/2026  Almeida,Luis - 1 de 3</code>',
     ci:   '<strong>Check-ins pendentes.</strong> Cole do Oracle ou planilha.<br>• <code>336271347  Ramos,Maria Luiza</code><br>• <code>Ramos,Maria Luiza</code>',
 };
-const TITULOS={co:'📋 Colar — Check-outs do Dia',prev:'📋 Colar — Check-outs Amanhã',ci:'📋 Colar — Check-ins Pendentes'};
+const TITULOS={co:'📋 Colar — Check-outs do Dia',ci:'📋 Colar — Check-ins Pendentes'};
 
 function abrirColar(k){
     colarKey = k;
@@ -1529,6 +1285,7 @@ function confirmarColar(){
     parsed.forEach(r=>arr.push(r));
     re(colarKey);
     fecharColar();
+    autoSave();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
 }
 g('paste-modal').addEventListener('click',e=>{if(e.target===g('paste-modal'))fecharColar();});
@@ -1536,22 +1293,25 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharColar();});
 
 // ══ NOVA AUDITORIA ══
 function novaAuditoria(){
-    if(co.length+prev.length+ci.length>0){
+    if(co.length+ci.length+espCi.length+ocorr.length>0){
         if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
     }
-    co=[]; prev=[]; espCi=[]; ci=[]; ocorr=[];
+    co=[]; espCi=[]; ci=[]; ocorr=[];
     ['t-turno','t-ocup','t-dm','prev-ocup','prev-diaria','prev-uh','prev-ent','prev-sai','prev-cafe'].forEach(id=>{const el=g(id);if(el)el.value='';});
     limparValoresCats();
     g('t-data').value=new Date().toISOString().split('T')[0];
     g('t-uh-bloq').value='0';
+    limparRascunho();
     renderTudo(); syncUI(); setTab('checkout'); g('t-turno').focus();
-    purgeEsp(); // purge com nova data
+    purgeEsp();
 }
 
 // ══ SALVAR ══
-function salvar(){
+function salvar(){ salvarNoHistorico(); }
+function _salvarLegado(){
     const snap={
         id:Date.now(),
+        _hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
         turno:g('t-turno').value, data:g('t-data').value,
         ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
         prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
@@ -1559,7 +1319,6 @@ function salvar(){
         prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
         cats_vals: lerValoresCats(),
         co:JSON.parse(JSON.stringify(co)),
-        prev:JSON.parse(JSON.stringify(prev)),
         espCi:JSON.parse(JSON.stringify(espCi)),
         ci:JSON.parse(JSON.stringify(ci)),
         ocorr:[...ocorr],
@@ -1574,162 +1333,323 @@ function salvar(){
 // ══ GERAR PDF ══
 function gerarPDF(){
     const {jsPDF} = window.jspdf;
-    const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const hotNome = "{{ hotel.nome|striptags }}";
-    const data    = fmtDate(g('t-data').value)||'—';
-    const turno   = g('t-turno').value||'—';
-    const azul=[37,99,235], roxo=[124,58,237], amber=[180,90,0], dourado=[181,132,58], verm=[200,40,40];
-    const cinza=[100,100,100], escuro=[15,23,42];
+    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    const W = 210, ML = 12, MR = 12, CW = W - ML - MR;
 
-    // ── CABEÇALHO ──
-    doc.setFillColor(...escuro); doc.rect(0,0,210,28,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('AUDITORIA HOTELEIRA', 14, 12);
-    doc.setFontSize(9); doc.setFont('helvetica','normal');
-    doc.text(hotNome, 14, 18);
-    doc.setTextColor(181,132,58);
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text(data, 14, 24);
-    doc.setTextColor(255,255,255); doc.setFontSize(9);
-    doc.text(`Turno: ${turno}`, 80, 18);
-    doc.text(`Ocupação: ${g('t-ocup').value||'—'}`, 80, 23);
-    doc.text(`DM: ${g('t-dm').value||'—'}`, 140, 18);
-    doc.text(`UH Bloq: ${g('t-uh-bloq').value||'0'}`, 140, 23);
+    const hotNome  = "{{ hotel.nome|striptags }}";
+    const dataVal  = g('t-data')?.value || '';
+    const turno    = g('t-turno')?.value || '-';
+    const ocupacao = g('t-ocup')?.value  || '-';
+    const dm       = g('t-dm')?.value    || '-';
+    const uhBloq   = g('t-uh-bloq')?.value || '0';
+    const dataFmt  = dataVal
+        ? new Date(dataVal+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})
+        : '-';
 
-    let y = 34;
+    // == PALETA PRINT-FRIENDLY ==
+    // Regra: fundo sempre branco, cor só em textos e bordas finas
+    const NAVY   = [15, 35, 75];
+    const BLUE   = [30, 80, 160];
+    const GOLD   = [150, 110, 30];
+    const WHITE  = [255, 255, 255];
+    const LGRAY  = [248, 248, 248];   // fundo alternado linhas — quase branco
+    const MGRAY  = [210, 215, 225];   // bordas
+    const DGRAY  = [130, 140, 160];   // labels
+    const TEXT   = [25, 35, 65];
+    const GREEN  = [20, 130, 70];
+    const RED    = [180, 40, 40];
+    const PURPLE = [90, 50, 160];
+    const TEAL   = [0, 120, 105];
 
-    // ── FUNÇÃO SEÇÃO ──
-    function secao(titulo, cor){
-        doc.setFillColor(...cor); doc.rect(0,y,210,7,'F');
-        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-        doc.text(titulo, 14, y+5); y+=10;
+    const sf = (sz, st='normal', col=TEXT) => {
+        doc.setFontSize(sz); doc.setFont('helvetica', st); doc.setTextColor(...col);
+    };
+    const fr = (x,y,w,h,col) => { doc.setFillColor(...col); doc.rect(x,y,w,h,'F'); };
+    const ln = (x1,y1,x2,y2,col=MGRAY,lw=0.3) => {
+        doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,y1,x2,y2);
+    };
+    const box = (x,y,w,h,col=MGRAY,lw=0.3) => {
+        doc.setDrawColor(...col); doc.setLineWidth(lw); doc.rect(x,y,w,h,'S');
+    };
+
+    // == CABECALHO — faixa navy fina no topo, resto branco ==
+    fr(0, 0, W, 18, NAVY);
+    fr(0, 16, W, 2, GOLD);  // faixa dourada embaixo do header
+
+    sf(11, 'bold', WHITE);
+    doc.text('RELATORIO DE AUDITORIA', W/2, 8, {align:'center'});
+    sf(7.5, 'normal', [190, 205, 230]);
+    doc.text(hotNome + '   |   Auditoria: ' + dataFmt + '   |   Turno: ' + turno, W/2, 14, {align:'center'});
+
+    let y = 23;
+
+    // == HELPER SECAO — apenas texto colorido + linha, sem fundo ==
+    function secao(titulo, col=BLUE) {
+        if(y > 260){ doc.addPage(); y = 10; }
+        sf(7.5, 'bold', col);
+        doc.text(titulo, ML, y+4);
+        ln(ML, y+6, W-MR, y+6, col, 0.5);
+        y += 10;
     }
 
-    // ── CHECK-OUTS DO DIA ──
-    if(co.length){
-        secao(`CHECK-OUTS DO DIA (${co.length})`, azul);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Nome do Hóspede','Observação','PRE','TRIP']],
-            body:co.map(r=>[r.uh,r.ct,r.nome,r.obs,r.pre?'✓':'',r.trip?'✓':'']),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:azul,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[245,248,255]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:55},3:{cellWidth:70},4:{cellWidth:10,halign:'center'},5:{cellWidth:10,halign:'center'}},
-        });
-        y = doc.lastAutoTable.finalY + 6;
-    }
+    // =====================
+    // 1. SITUACAO ATUAL
+    // =====================
+    secao('1. SITUACAO ATUAL', NAVY);
 
-    // ── PREVISÃO ──
-    secao('PREVISÃO — AMANHÃ', roxo);
-    const prevRows=[
-        ['Ocupação',g('prev-ocup').value||'—','Diária Média',g('prev-diaria').value||'—'],
-        ['UHs Ocupadas',g('prev-uh').value||'—','Café da Manhã',g('prev-cafe').value||'—'],
-        ['Entradas',g('prev-ent').value||'—','Saídas',g('prev-sai').value||'—'],
-        ...lerValoresCats().map(cv => [cv.cat, cv.val||'—', '', '']),
-    ];
-    doc.autoTable({
-        startY:y, margin:{left:10,right:10},
-        head:[['Indicador','Valor','Indicador','Valor']],
-        body:prevRows,
-        styles:{fontSize:8,cellPadding:2},
-        headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
-        alternateRowStyles:{fillColor:[248,245,255]},
-        columnStyles:{0:{cellWidth:40,fontStyle:'bold'},1:{cellWidth:40},2:{cellWidth:40,fontStyle:'bold'},3:{cellWidth:40}},
+    // 3 colunas com apenas borda fina
+    const c3w = CW/3 - 2;
+    [[ocupacao,'Ocupacao Atual',GREEN],[dm,'Diaria Media (DM)',GOLD],['UH Bloq: '+uhBloq,'UHs Bloqueadas',NAVY]].forEach(([val,lbl,vc],i) => {
+        const cx = ML + i*(c3w+3);
+        box(cx, y, c3w, 16, MGRAY);
+        sf(6.5, 'normal', DGRAY); doc.text(lbl, cx+c3w/2, y+5.5, {align:'center'});
+        sf(13, 'bold', vc);       doc.text(String(val), cx+c3w/2, y+13, {align:'center'});
     });
-    y = doc.lastAutoTable.finalY + 6;
+    y += 20;
 
-    // ── CHECK-OUTS AMANHÃ ──
-    if(prev.length){
-        secao(`CHECK-OUTS PREVISTOS AMANHÃ (${prev.length})`, roxo);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Nome do Hóspede','Observação']],
-            body:prev.map(r=>[r.uh,r.ct,r.nome,r.obs]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:roxo,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[248,245,255]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:14},2:{cellWidth:60},3:{cellWidth:80}},
+    // =====================
+    // 2. RESERVAS ESPECIAIS
+    // =====================
+    secao('2. RESERVAS ESPECIAIS NA CASA' + (esp.length?' ('+esp.length+')':''), GOLD);
+
+    if(!esp.length){
+        sf(7.5, 'normal', DGRAY);
+        doc.text('Nenhuma reserva especial na casa', ML, y+4);
+        y += 8;
+    } else {
+        // cabecalho tabela
+        fr(ML, y, CW, 6.5, LGRAY);
+        ln(ML, y, W-MR, y, MGRAY, 0.3);
+        ln(ML, y+6.5, W-MR, y+6.5, MGRAY, 0.3);
+        sf(6, 'bold', DGRAY);
+        [[ML+3,'RESERVA'],[ML+30,'UH'],[ML+45,'NOME / DESCRICAO'],[ML+125,'CHECK-IN'],[ML+148,'CHECK-OUT'],[ML+170,'CTG']].forEach(([x,h]) => doc.text(h,x,y+4.5));
+        y += 6.5;
+
+        esp.forEach((r,i) => {
+            if(y > 272){ doc.addPage(); y = 10; }
+            if(i%2===0) fr(ML, y, CW, 7, LGRAY);
+            ln(ML, y+7, W-MR, y+7, MGRAY, 0.2);
+            sf(7.5, 'normal', TEXT);
+            doc.text(String(r.reserva||'-'), ML+3, y+5);
+            doc.text(String(r.uh||'-'), ML+30, y+5);
+            doc.text((r.descricao||'-').slice(0,36), ML+45, y+5);
+            doc.text(r.checkin||'-', ML+125, y+5);
+            doc.text(r.checkout||'-', ML+148, y+5);
+            sf(7.5, 'bold', BLUE); doc.text(r.ct||'-', ML+170, y+5);
+            y += 7;
         });
-        y = doc.lastAutoTable.finalY + 6;
+        y += 4;
     }
 
-    // ── RESERVAS ESPECIAIS ──
-    if(esp.length){
-        if(y>220){ doc.addPage(); y=14; }
-        secao(`RESERVAS ESPECIAIS NA CASA (${esp.length})`, dourado);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['UH','CTG','Reserva','Check-in','Check-out','Nome / Descrição','Tipo']],
-            body:esp.map(r=>[r.uh,r.ct,r.reserva,r.checkin,r.checkout,r.descricao,r.tipo?.replace('_',' ')||'']),
-            styles:{fontSize:7.5,cellPadding:2},
-            headStyles:{fillColor:dourado,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,252,245]},
-            columnStyles:{0:{cellWidth:12},1:{cellWidth:12},2:{cellWidth:22},3:{cellWidth:20},4:{cellWidth:20},5:{cellWidth:65},6:{cellWidth:19}},
+    // =====================
+    // 3. PREVISAO DE AMANHA
+    // =====================
+    secao('3. PREVISAO DE AMANHA', BLUE);
+
+    // 2 grupos de 3 colunas
+    const grupos = [
+        [{l:'Ocupacao',v:g('prev-ocup')?.value||'-',c:GREEN},{l:'DM',v:g('prev-diaria')?.value||'-',c:GOLD},{l:'UHs Ocup.',v:g('prev-uh')?.value||'-',c:BLUE}],
+        [{l:'Entradas',v:g('prev-ent')?.value||'-',c:GREEN},{l:'Saidas',v:g('prev-sai')?.value||'-',c:RED},{l:'Total Hosp.',v:g('prev-cafe')?.value||'-',c:PURPLE}],
+    ];
+    const gw = CW/2 - 4;
+    grupos.forEach((grp, gi) => {
+        const gx = ML + gi*(gw+8);
+        const iw = gw/3 - 1;
+        grp.forEach((item, ii) => {
+            const cx = gx + ii*(iw+1.5);
+            box(cx, y, iw, 15, MGRAY);
+            sf(6, 'normal', DGRAY); doc.text(item.l, cx+iw/2, y+5.5, {align:'center'});
+            sf(11, 'bold', item.c); doc.text(String(item.v), cx+iw/2, y+13, {align:'center'});
         });
-        y = doc.lastAutoTable.finalY + 6;
+    });
+    // linha divisoria entre grupos
+    ln(ML+gw+4, y+1, ML+gw+4, y+14, MGRAY, 0.4);
+    y += 19;
+
+    // =====================
+    // 4. ENTRADAS POR CATEGORIA
+    // =====================
+    const catVals = lerValoresCats().filter(cv=>cv.val&&cv.val!==''&&parseInt(cv.val)>0);
+    if(catVals.length){
+        secao('4. ENTRADAS POR CATEGORIA', PURPLE);
+        const barColors = [BLUE,GREEN,PURPLE,TEAL,GOLD,RED];
+        const maxVal = Math.max(...catVals.map(cv=>parseInt(cv.val)||0),1);
+        const barMaxW = CW - 40;
+
+        catVals.forEach((cv,i) => {
+            if(y > 272){ doc.addPage(); y = 10; }
+            const bw = Math.max((parseInt(cv.val)/maxVal)*barMaxW, 2);
+            const bc = barColors[i % barColors.length];
+            sf(7, 'bold', TEXT); doc.text(cv.cat, ML+3, y+5);
+            // trilha (só borda)
+            box(ML+22, y+1, barMaxW, 5, MGRAY, 0.2);
+            // barra preenchida — só 40% opacidade simulada com cor mais clara
+            const bcLight = bc.map(v=>Math.min(255, v+140));
+            fr(ML+22, y+1, bw, 5, bcLight);
+            // borda da barra na cor original
+            doc.setDrawColor(...bc); doc.setLineWidth(0.4); doc.rect(ML+22, y+1, bw, 5, 'S');
+            sf(7, 'bold', bc); doc.text(String(cv.val)+' apts', ML+22+bw+4, y+5.5);
+            y += 8;
+        });
+        y += 4;
     }
 
-    // ── CHECK-INS PENDENTES ──
-    if(ci.length){
-        if(y>230){ doc.addPage(); y=14; }
-        secao(`CHECK-INS PENDENTES (${ci.length})`, amber);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['Reserva','Nome do Hóspede','UH','CTG','Observação']],
-            body:ci.map(r=>[r.reserva,r.nome,r.uh,r.ct,r.obs]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:amber,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,252,235]},
-            columnStyles:{0:{cellWidth:24},1:{cellWidth:60},2:{cellWidth:12},3:{cellWidth:14},4:{cellWidth:56}},
+    // =====================
+    // 5. EVOLUCAO DO MES
+    // =====================
+    secao('5. EVOLUCAO DO MES - OCUPACAO', TEAL);
+
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+
+    if(hist.length < 2){
+        sf(7.5,'normal',DGRAY);
+        doc.text('Dados insuficientes - salve mais auditorias para ver a evolucao', ML, y+4);
+        y += 8;
+    } else {
+        const porMes = {};
+        hist.forEach(h=>{
+            if(!h.data||!h.ocupacao) return;
+            const mes=h.data.slice(0,7), dia=parseInt(h.data.slice(8,10));
+            const oc=parseFloat(String(h.ocupacao).replace('%','').replace(',','.'))||0;
+            if(!porMes[mes]) porMes[mes]=[];
+            porMes[mes].push({dia,oc});
         });
-        y = doc.lastAutoTable.finalY + 6;
+        const meses = Object.keys(porMes).sort().slice(-3);
+        const chartH=32, chartW=CW-12;
+        const chartX=ML+8, chartY=y+2;
+
+        box(ML, y, CW, chartH+18, MGRAY, 0.3);
+
+        const yScale = oc => chartY + chartH - (oc/100)*chartH;
+
+        // grade
+        [25,50,75,100].forEach(pct=>{
+            const gy=yScale(pct);
+            ln(chartX,gy,chartX+chartW,gy,[230,232,238],0.2);
+            sf(5,'normal',DGRAY); doc.text(pct+'%',chartX-2,gy+1.5,{align:'right'});
+        });
+
+        const mesColors = [[180,190,210],TEAL,NAVY];
+        const mesLabels = [];
+
+        meses.forEach((mes,mi)=>{
+            const dados=porMes[mes].sort((a,b)=>a.dia-b.dia);
+            if(!dados.length) return;
+            const col2=mesColors[mi], isLast=mi===meses.length-1;
+            doc.setDrawColor(...col2); doc.setLineWidth(isLast?1:0.5);
+            if(isLast){ // linha tracejada para os outros, solida para o atual
+                for(let i=0;i<dados.length-1;i++){
+                    const x1=chartX+(dados[i].dia/31)*chartW, y1=yScale(dados[i].oc);
+                    const x2=chartX+(dados[i+1].dia/31)*chartW, y2=yScale(dados[i+1].oc);
+                    doc.line(x1,y1,x2,y2);
+                }
+            } else {
+                doc.setLineDashPattern([1,1.5],0);
+                for(let i=0;i<dados.length-1;i++){
+                    const x1=chartX+(dados[i].dia/31)*chartW, y1=yScale(dados[i].oc);
+                    const x2=chartX+(dados[i+1].dia/31)*chartW, y2=yScale(dados[i+1].oc);
+                    doc.line(x1,y1,x2,y2);
+                }
+                doc.setLineDashPattern([],0);
+            }
+            if(dados.length){
+                const last=dados[dados.length-1];
+                const px=chartX+(last.dia/31)*chartW, py=yScale(last.oc);
+                doc.setFillColor(...col2); doc.circle(px,py,isLast?1.5:1,'F');
+                sf(5.5,isLast?'bold':'normal',col2);
+                doc.text(last.oc.toFixed(1)+'%',px+2,py-1);
+            }
+            const [ano,m]=mes.split('-');
+            const mNomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            mesLabels.push({label:mNomes[parseInt(m)-1]+'/'+ano.slice(2),col:col2,bold:isLast});
+        });
+
+        // eixo X
+        [1,5,10,15,20,25,31].forEach(d=>{
+            const gx=chartX+(d/31)*chartW;
+            ln(gx,chartY+chartH,gx,chartY+chartH+2,MGRAY,0.3);
+            sf(5,'normal',DGRAY); doc.text(String(d),gx,chartY+chartH+5,{align:'center'});
+        });
+
+        // legenda
+        let legX=chartX;
+        mesLabels.forEach(ml=>{
+            doc.setDrawColor(...ml.col); doc.setLineWidth(ml.bold?1:0.5);
+            if(!ml.bold) doc.setLineDashPattern([1,1.5],0);
+            doc.line(legX,chartY+chartH+12,legX+8,chartY+chartH+12);
+            doc.setLineDashPattern([],0);
+            sf(6,ml.bold?'bold':'normal',ml.col);
+            doc.text(ml.label+(ml.bold?' (atual)':''),legX+10,chartY+chartH+13);
+            legX+=38;
+        });
+
+        y += chartH+22;
     }
 
-    // ── OCORRÊNCIAS ──
-    if(ocorr.length){
-        if(y>240){ doc.addPage(); y=14; }
-        secao(`OCORRÊNCIAS (${ocorr.length})`, verm);
-        doc.autoTable({
-            startY:y, margin:{left:10,right:10},
-            head:[['#','Descrição']],
-            body:ocorr.map((o,i)=>[i+1,o]),
-            styles:{fontSize:8,cellPadding:2},
-            headStyles:{fillColor:verm,textColor:255,fontStyle:'bold'},
-            alternateRowStyles:{fillColor:[255,245,245]},
-            columnStyles:{0:{cellWidth:10},1:{cellWidth:160}},
+    // =====================
+    // 6. CHECK-INS ESPECIAIS
+    // =====================
+    if(espCi.length){
+        if(y>220){ doc.addPage(); y=10; }
+        secao('6. CHECK-INS PREVISTOS - ENTRADAS ESPECIAIS ('+espCi.length+')', GOLD);
+
+        fr(ML,y,CW,6.5,LGRAY);
+        ln(ML,y,W-MR,y,MGRAY,0.3); ln(ML,y+6.5,W-MR,y+6.5,MGRAY,0.3);
+        sf(6,'bold',DGRAY);
+        [[ML+3,'CTG'],[ML+18,'RESERVA'],[ML+42,'IN > OUT'],[ML+76,'NOME E OBS'],[ML+138,'UH'],[ML+148,'C'],[ML+156,'M'],[ML+164,'E']].forEach(([x,h])=>doc.text(h,x,y+4.5));
+        y+=6.5;
+
+        const tipoMapCI={'long_stay':'Long Stay','returning':'Ret.','habitue':'Hab.','vip':'VIP','lua_de_mel':'L.Mel','aniversario':'Aniv.'};
+        espCi.forEach((r,i)=>{
+            if(y>272){ doc.addPage(); y=10; }
+            if(i%2===0) fr(ML,y,CW,8,LGRAY);
+            ln(ML,y+8,W-MR,y+8,MGRAY,0.2);
+            sf(7,'bold',BLUE); doc.text(r.ct||'-',ML+3,y+5.5);
+            sf(7,'normal',TEXT);
+            doc.text(String(r.reserva||'-'),ML+18,y+5.5);
+            doc.text((r.in||'-')+' > '+(r.out||'-'),ML+42,y+5.5);
+            const tl=tipoMapCI[r.tipo||'long_stay']||'-';
+            doc.text(((r.descricao||'-').slice(0,28)+' - '+tl).slice(0,40),ML+76,y+5.5);
+            doc.text(String(r.uh||'-'),ML+138,y+5.5);
+            // checkboxes simples
+            [ML+146,ML+154,ML+162].forEach((cx,ci)=>{
+                box(cx,y+2,5,5,MGRAY,0.4);
+                if([r.c,r.m,r.e][ci]){
+                    sf(7,'bold',GREEN); doc.text('v',cx+1,y+6);
+                }
+            });
+            y+=8;
         });
-        y = doc.lastAutoTable.finalY + 6;
+        sf(7,'normal',DGRAY);
+        doc.text('Total: '+espCi.length+' hospede(s) especial(is)',ML,y+5);
+        y+=8;
     }
 
-    // ── RODAPÉ ──
+    // == RODAPE ==
     const pTotal=doc.getNumberOfPages();
     for(let p=1;p<=pTotal;p++){
         doc.setPage(p);
-        doc.setDrawColor(200,200,200); doc.line(10,285,200,285);
-        doc.setTextColor(150,150,150); doc.setFontSize(7); doc.setFont('helvetica','normal');
-        doc.text(`${hotNome} — Auditoria ${data} — Turno: ${turno}`, 10, 289);
-        doc.text(`Página ${p} de ${pTotal}`, 190, 289, {align:'right'});
+        ln(ML,286,W-MR,286,MGRAY,0.4);
+        sf(6.5,'normal',DGRAY);
+        doc.text('Relatorio gerado em '+new Date().toLocaleString('pt-BR'),ML,290);
+        sf(6.5,'bold',NAVY);
+        doc.text('AUDITORIA OPERACIONAL',W-MR,290,{align:'right'});
+        if(pTotal>1){ sf(6.5,'normal',DGRAY); doc.text(p+'/'+pTotal,W/2,290,{align:'center'}); }
     }
 
-    // Download + abrir para email
-    const filename=`Auditoria_${g('t-data').value||'hoje'}.pdf`;
-    doc.save(filename);
-    toast('📄 PDF gerado! Abra o arquivo para enviar por email.');
+    doc.save('Auditoria_'+(dataVal||'hoje')+'.pdf');
+    toast('PDF gerado!');
 }
 
-// ══ EXPORTAR TXT ══
 function exportarTxt(){
-    let txt='════════════════════════════════\n   AUDITORIA HOTELEIRA\n════════════════════════════════\n';
+    let txt='════════════════════════════════\n   AUDITORIA\n════════════════════════════════\n';
     txt+=`Turno: ${g('t-turno').value}\nData: ${fmtDate(g('t-data').value)}\n`;
     txt+=`Ocupação: ${g('t-ocup').value}  |  DM: ${g('t-dm').value}  |  UH Bloq: ${g('t-uh-bloq').value}\n\n`;
     txt+=`PREVISÃO AMANHÃ:\n  Ocupação: ${g('prev-ocup').value} | UHs: ${g('prev-uh').value} | Entradas: ${g('prev-ent').value} | Saídas: ${g('prev-sai').value} | Café: ${g('prev-cafe').value}\n`;
     txt+=`  Entradas por CTG: ${lerValoresCats().map(cv=>cv.cat+' '+cv.val).join(' | ')}\n\n`;
     txt+=`── CHECK-OUTS DO DIA (${co.length}) ──\n`;
     co.forEach(r=>{ const f=[/lco|late/i.test(r.obs)?'LCO':'',/reentrada/i.test(r.obs)?'REENTRADA':'',r.pre?'PRE':'',r.trip?'TRIP':''].filter(Boolean).join('|'); txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}${f?' ('+f+')':''}\n`; });
-    txt+=`\n── CHECK-OUTS PREVISTOS AMANHÃ (${prev.length}) ──\n`;
-    prev.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.nome}${r.obs?' — '+r.obs:''}\n`);
     txt+=`\n── RESERVAS ESPECIAIS NA CASA (${esp.length}) ──\n`;
     esp.forEach(r=>txt+=`  UH ${r.uh} [${r.ct}] ${r.reserva} | ${r.checkin}→${r.checkout} | ${r.descricao} | ${r.tipo||''}\n`);
     txt+=`\n── CHECK-INS PENDENTES (${ci.length}) ──\n`;
@@ -1748,23 +1668,41 @@ function renderHist(){
     const el=g('hist-list');
     if(!hist.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Nenhuma auditoria salva ainda.</div>';return;}
     el.innerHTML=hist.map((h,i)=>`
-        <div class="hist-item" onclick="carregarHist(${i})">
-            <span style="font-size:18px">📋</span>
-            <div>
-                <div class="hist-nome">${h.turno||'Auditoria'}</div>
-                <div class="hist-info">${fmtDate(h.data)} — CO: ${(h.co||[]).length} | Prev: ${(h.prev||[]).length} | CI: ${(h.ci||[]).length}</div>
+        <div class="hist-item">
+            <span style="font-size:18px;flex-shrink:0">📋</span>
+            <div style="flex:1;min-width:0">
+                <div class="hist-nome">${h.turno||'Auditoria'}${h._autoSaved?'<span style="font-size:9px;background:var(--bg-hover);color:var(--text-soft);padding:1px 5px;border-radius:4px;margin-left:6px;font-weight:400">auto</span>':''}</div>
+                <div class="hist-info">${fmtDate(h.data)}${h._hora ? ' <span style="color:var(--gold);font-weight:600">' + h._hora + '</span>' : ''} — CO: ${(h.co||[]).length} | CI: ${(h.ci||[]).length}</div>
             </div>
-            <div style="text-align:right">
+            <div style="text-align:right;flex-shrink:0;margin-right:10px">
                 <div class="hist-ocup">${h.ocupacao||'—'}</div>
                 <div style="font-size:10px;color:var(--text-soft);margin-top:2px">DM: ${h.dm||'—'}</div>
             </div>
+            <div class="hist-actions">
+                <button class="btn-hist btn-hist-load" onclick="carregarHist(${i})" title="Carregar auditoria">✏️ Editar</button>
+                ${IS_GERENTE ? `<button class="btn-hist btn-hist-del" onclick="apagarHist(${i})" title="Apagar esta auditoria">🗑️ Apagar</button>` : ''}
+            </div>
         </div>`).join('');
+}
+
+function apagarHist(i){
+    if(!IS_GERENTE){
+        toast('🔒 Apenas gerentes podem apagar auditorias do histórico');
+        return;
+    }
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    const h = hist[i];
+    const nome = h?.turno || fmtDate(h?.data) || 'esta auditoria';
+    if(!confirm(`Apagar "${nome}"? Esta ação não pode ser desfeita.`))return;
+    hist.splice(i,1);
+    localStorage.setItem(LS_KEY, JSON.stringify(hist));
+    renderHist();
+    toast('🗑️ Auditoria apagada');
 }
 function carregarHist(i){
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
     const h=hist[i]; if(!h)return;
     co    = h.co    ?JSON.parse(JSON.stringify(h.co))    :[];
-    prev  = h.prev  ?JSON.parse(JSON.stringify(h.prev))  :[];
     espCi = h.espCi ?JSON.parse(JSON.stringify(h.espCi)) :[];
     ci    = h.ci    ?JSON.parse(JSON.stringify(h.ci))    :[];
     ocorr = h.ocorr ?[...h.ocorr]:[];
@@ -1779,6 +1717,10 @@ function carregarHist(i){
     toast('📋 Auditoria carregada!');
 }
 function limparHist(){
+    if(!IS_GERENTE){
+        toast('🔒 Apenas gerentes podem limpar o histórico');
+        return;
+    }
     if(!confirm('Apagar todo o histórico?'))return;
     localStorage.removeItem(LS_KEY); renderHist();
 }
@@ -2409,89 +2351,6 @@ if (imgDz) {
         const f = e.dataTransfer.files[0];
         if (f && f.type.startsWith('image/')) processarImgFile(f);
     });
-
-    // Detecta modo "só UHs" — todas as linhas são apenas números
-    const soUHs = linhas.every(l => /^\d+$/.test(l.trim()));
-
-    // Detecta modo "só CTGs" — todas as linhas são siglas de categoria
-    const cats = getCats();
-    const isCatLine = l => cats.some(ct=>ct.toUpperCase()===l.trim().toUpperCase()) || /^(SUP|STD|SUI|DLX|PHO|SUT|DBL|SGL)$/i.test(l.trim());
-    const soCtgs = linhas.every(l => isCatLine(l));
-
-    const arr = getData(colarKey);
-
-    if (soNomes && arr.length > 0) {
-        // Cola só os nomes nas linhas já existentes (preenche campo nome)
-        linhas.forEach((nome, i) => {
-            if (i < arr.length) arr[i].nome = nome;
-            else arr.push({uh:'',ct:cats[0]||'SUP',nome,obs:'',pre:false,trip:false,saiu:false});
-        });
-        re(colarKey); fecharColar();
-        toast(`✅ ${linhas.length} nome(s) preenchido(s)!`);
-        return;
-    }
-    if (soUHs && arr.length > 0) {
-        linhas.forEach((uh, i) => { if(i<arr.length) arr[i].uh = uh; });
-        re(colarKey); fecharColar();
-        toast(`✅ ${linhas.length} UH(s) preenchido(s)!`);
-        return;
-    }
-    if (soCtgs && arr.length > 0) {
-        linhas.forEach((ct, i) => { if(i<arr.length) arr[i].ct = ct.toUpperCase(); });
-        re(colarKey); fecharColar();
-        toast(`✅ ${linhas.length} categoria(s) preenchida(s)!`);
-        return;
-    }
-
-    // Modo padrão — parse linha a linha
-    const parsed = linhas.map(l=>parseLinha(l,colarKey)).filter(Boolean);
-    if(!parsed.length){toast('⚠️ Nenhuma linha reconhecida');return;}
-    parsed.forEach(r=>arr.push(r));
-    re(colarKey);
-    fecharColar();
-    autoSave();
-    toast(`✅ ${parsed.length} linha(s) importada(s)!`);
-}
-g('paste-modal').addEventListener('click',e=>{if(e.target===g('paste-modal'))fecharColar();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharColar();});
-
-// ══ NOVA AUDITORIA ══
-function novaAuditoria(){
-    if(co.length+ci.length+espCi.length+ocorr.length>0){
-        if(!confirm('Criar nova auditoria limpa os dados atuais (check-outs, check-ins). As Reservas Especiais na Casa são mantidas. Continuar?'))return;
-    }
-    co=[]; espCi=[]; ci=[]; ocorr=[];
-    ['t-turno','t-ocup','t-dm','prev-ocup','prev-diaria','prev-uh','prev-ent','prev-sai','prev-cafe'].forEach(id=>{const el=g(id);if(el)el.value='';});
-    limparValoresCats();
-    g('t-data').value=new Date().toISOString().split('T')[0];
-    g('t-uh-bloq').value='0';
-    limparRascunho();
-    renderTudo(); syncUI(); setTab('checkout'); g('t-turno').focus();
-    purgeEsp();
-}
-
-// ══ SALVAR ══
-function salvar(){ salvarNoHistorico(); }
-function _salvarLegado(){
-    const snap={
-        id:Date.now(),
-        _hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
-        turno:g('t-turno').value, data:g('t-data').value,
-        ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
-        prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
-        prev_uh:g('prev-uh').value, prev_ent:g('prev-ent').value,
-        prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
-        cats_vals: lerValoresCats(),
-        co:JSON.parse(JSON.stringify(co)),
-        espCi:JSON.parse(JSON.stringify(espCi)),
-        ci:JSON.parse(JSON.stringify(ci)),
-        ocorr:[...ocorr],
-    };
-    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
-    hist.unshift(snap); if(hist.length>30)hist=hist.slice(0,30);
-    localStorage.setItem(LS_KEY,JSON.stringify(hist));
-    salvarEsp(); // especiais salvas separadamente e persistem
-    renderHist(); toast('✅ Auditoria salva!');
 }
 
 // Ctrl+V global — intercepta quando modal está aberto na aba imagem
@@ -2647,11 +2506,6 @@ const TIPOS_ESP = {
     'vip':            {l:'👑 VIP',                cls:'t-vip'},
     'lua_de_mel':     {l:'💑 Lua de Mel',         cls:'t-lm'},
     'aniversario':    {l:'🎂 Aniversário',        cls:'t-aniv'},
-    'grupo':          {l:'👥 Grupo',              cls:'t-grp'},
-    'reentrada':      {l:'↩️ Reentrada',          cls:'t-reent'},
-    'twin':           {l:'🛏️🛏️ Cama Twin',       cls:'t-twin'},
-    'cama_adicional': {l:'➕ Cama Adicional',     cls:'t-grp'},
-    'bercinho':       {l:'🍼 Berço/Cama Bebê',   cls:'t-grp'},
 };
 
 function tipoOpts(sel) {
@@ -2673,8 +2527,8 @@ function renderEspCi() {
             <td class="td-del"><button class="btn-del" onclick="delRow('esp-ci',${i})">✕</button></td>
             <td><select class="es" onchange="setF('esp-ci',${i},'ct',this.value)">${ctOpts(r.ct)}</select></td>
             <td><input class="ei ei-res" value="${esc(r.reserva)}" placeholder="Reserva" oninput="setF('esp-ci',${i},'reserva',this.value)"></td>
-            <td><input class="ei" style="width:88px" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'in',this.value)"></td>
-            <td><input class="ei" style="width:88px" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="setF('esp-ci',${i},'out',this.value)"></td>
+            <td><input class="ei ei-date-auto" value="${esc(r.in)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);setF('esp-ci',${i},'in',this.value)" maxlength="10" inputmode="numeric"></td>
+            <td><input class="ei ei-date-auto" value="${esc(r.out)}" placeholder="dd/mm/aaaa" oninput="maskDate(this);setF('esp-ci',${i},'out',this.value)" maxlength="10" inputmode="numeric"></td>
             <td><input class="ei" value="${esc(r.descricao)}" placeholder="Nome - ex: Maxwell,Josh - 1 de 5 - Cama twin" oninput="setF('esp-ci',${i},'descricao',this.value)" style="min-width:220px"></td>
             <td><input class="ei ei-num" value="${esc(r.uh)}" placeholder="UH" oninput="setF('esp-ci',${i},'uh',this.value)"></td>
             <td class="td-cme"><input type="checkbox" ${r.c?'checked':''} onchange="setF('esp-ci',${i},'c',this.checked)" title="Configuração de cama confirmada"></td>
@@ -2684,6 +2538,8 @@ function renderEspCi() {
     }
     const badge = g('b-esp-ci');
     if (badge) badge.textContent = espCi.length;
+    syncStats();
+    autoSave();
 }
 
 // ══ HINTS para colar lista esp-ci ══
@@ -2802,6 +2658,7 @@ function confirmarColarLivre() {
     parsed.forEach(r => getData(colarKey).push(r));
     re(colarKey);
     fecharColar();
+    autoSave();
     toast(`✅ ${parsed.length} linha(s) importada(s)!`);
 }
 
@@ -2885,12 +2742,305 @@ function confirmarColarColunas() {
     toast(`✅ ${qtd} linha(s) importada(s)!`);
 }
 
+
+// ══ MÁSCARA DE DATA AUTOMÁTICA ══
+function maskDate(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length >= 5)      v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+    else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    input.value = v;
+}
+
+
+// ══ DRAG & DROP — check-outs do dia ══
+let dragIdx = null;
+
+function dragStart(e, i) {
+    dragIdx = i;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
+function dragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+function dragDrop(e, toIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (dragIdx === null || dragIdx === toIdx) return;
+    const item = co.splice(dragIdx, 1)[0];
+    co.splice(toIdx, 0, item);
+    dragIdx = null;
+    renderCo();
+}
+function dragEnd(e) {
+    e.currentTarget.classList.remove('dragging', 'drag-over');
+    dragIdx = null;
+}
+
+
+function clearObs(key, i) {
+    getData(key)[i].obs = '';
+    getData(key)[i]._prevObs = '';
+    re(key); autoSave();
+}
+
+
+
+
+// ══ STATS STRIP ══
+function syncStats() {
+    const saidos = co.filter(r=>r.saiu).length;
+    if(g('ss-co'))    g('ss-co').textContent    = co.length;
+    if(g('ss-co-sub'))g('ss-co-sub').textContent= saidos + ' confirmados';
+    if(g('ss-lco'))   g('ss-lco').textContent   = co.filter(r=>/lco|late/i.test(r.obs)).length;
+    if(g('ss-reent')) g('ss-reent').textContent  = co.filter(r=>/reentrada|reent/i.test(r.obs)).length;
+    if(g('ss-esp'))   g('ss-esp').textContent   = esp.length;
+    const bco = g('b-co'); if(bco) bco.textContent = saidos>0?`${co.length} (${saidos} ✓)`:co.length;
+    const tco = g('tb-co'); if(tco) tco.textContent = co.length;
+    // preview strip especiais
+    const esciList = g('ps-esci-list');
+    if(esciList) {
+        if(!espCi.length) {
+            esciList.innerHTML = '<span class="pstrip-empty">Nenhum check-in especial previsto</span>';
+        } else {
+            esciList.innerHTML = espCi.slice(0,4).map(r=>
+                `<div class="pstrip-item"><div class="pstrip-dot"></div>${(r.descricao||r.reserva||'').slice(0,32)}</div>`
+            ).join('') + (espCi.length>4?`<div class="pstrip-item" style="opacity:.5">+${espCi.length-4} mais</div>`:'');
+        }
+    }
+    if(g('ps-esci-badge')) g('ps-esci-badge').textContent = espCi.length;
+    if(g('tb-esp'))  g('tb-esp').textContent  = esp.length;
+}
+
+
+// ══ AUTOSAVE — RASCUNHO ══
+let _autoSaveTimer = null;
+
+function salvarRascunho() {
+    // Não salva se não há dados (evita sobrescrever com estado vazio)
+    if (!co.length && !ci.length && !espCi.length && !ocorr.length
+        && !g('t-turno')?.value && !g('t-ocup')?.value) {
+        return;
+    }
+    const ind = document.getElementById('autosave-ind');
+    if(ind){ ind.className='autosave-dot saving'; ind.textContent='salvando…'; }
+    try {
+        let catsVals = [];
+        try { catsVals = lerValoresCats(); } catch(e) {}
+        const draft = {
+            turno:       g('t-turno')?.value    || '',
+            data:        g('t-data')?.value     || '',
+            ocupacao:    g('t-ocup')?.value     || '',
+            dm:          g('t-dm')?.value       || '',
+            uh_bloq:     g('t-uh-bloq')?.value  || '0',
+            prev_ocup:   g('prev-ocup')?.value   || '',
+            prev_diaria: g('prev-diaria')?.value || '',
+            prev_uh:     g('prev-uh')?.value     || '',
+            prev_ent:    g('prev-ent')?.value    || '',
+            prev_sai:    g('prev-sai')?.value    || '',
+            prev_cafe:   g('prev-cafe')?.value   || '',
+            cats_vals: catsVals,
+            co:    JSON.parse(JSON.stringify(co    || [])),
+            espCi: JSON.parse(JSON.stringify(espCi || [])),
+            ci:    JSON.parse(JSON.stringify(ci    || [])),
+            ocorr: [...(ocorr || [])],
+            _ts:   Date.now(),
+            _slug: HOTEL_SLUG,
+        };
+        const json = JSON.stringify(draft);
+        localStorage.setItem(LS_DRAFT, json);
+        // double-check: lê de volta para confirmar
+        const check = localStorage.getItem(LS_DRAFT);
+        if (!check) throw new Error('localStorage não gravou');
+        if(ind){ ind.className='autosave-dot'; ind.textContent='salvo'; }
+        console.log('[autosave] OK — slug:', HOTEL_SLUG, '— co:', co.length, 'linhas');
+    } catch(e) {
+        console.error('[autosave] ERRO:', e);
+        if(ind){ ind.className='autosave-dot error'; ind.textContent='erro ao salvar'; }
+    }
+}
+
+let _histTimer = null;
+
+function autoSave() {
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(salvarRascunho, 400);
+    // Salva no histórico automaticamente se tem dados suficientes
+    clearTimeout(_histTimer);
+    _histTimer = setTimeout(autoSalvarHistorico, 5000);
+}
+
+function autoSalvarHistorico() {
+    // Só salva se tiver turno + data preenchidos e pelo menos 1 checkout
+    const turno = g('t-turno')?.value?.trim();
+    const data  = g('t-data')?.value?.trim();
+    if (!turno || !data || co.length === 0) return;
+
+    try {
+        let hist = []; 
+        try { hist = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
+        
+        // Verifica se já existe entrada para esse turno+data nos últimos 10 min
+        const agora = Date.now();
+        const jaExiste = hist.some(h => 
+            h.data === data && 
+            h.turno === turno && 
+            (agora - (h.id || 0)) < 600000 // 10 minutos
+        );
+        if (jaExiste) {
+            // Atualiza a entrada existente em vez de criar nova
+            const idx = hist.findIndex(h => h.data === data && h.turno === turno);
+            if (idx >= 0) {
+                hist[idx] = {
+                    ...hist[idx],
+                    ocupacao: g('t-ocup')?.value || hist[idx].ocupacao,
+                    dm:       g('t-dm')?.value   || hist[idx].dm,
+                    uh_bloq:  g('t-uh-bloq')?.value || hist[idx].uh_bloq,
+                    prev_ocup:   g('prev-ocup')?.value   || '',
+                    prev_diaria: g('prev-diaria')?.value || '',
+                    prev_uh:     g('prev-uh')?.value     || '',
+                    prev_ent:    g('prev-ent')?.value    || '',
+                    prev_sai:    g('prev-sai')?.value    || '',
+                    prev_cafe:   g('prev-cafe')?.value   || '',
+                    cats_vals: lerValoresCats(),
+                    co:    JSON.parse(JSON.stringify(co)),
+                    espCi: JSON.parse(JSON.stringify(espCi)),
+                    ci:    JSON.parse(JSON.stringify(ci)),
+                    ocorr: [...ocorr],
+                    _autoSaved: true,
+                };
+                localStorage.setItem(LS_KEY, JSON.stringify(hist));
+                renderHist();
+            }
+            return;
+        }
+
+        // Cria nova entrada
+        const snap = {
+            id:       Date.now(),
+            _hora:    new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+            turno, data,
+            ocupacao: g('t-ocup')?.value   || '',
+            dm:       g('t-dm')?.value     || '',
+            uh_bloq:  g('t-uh-bloq')?.value || '0',
+            prev_ocup:   g('prev-ocup')?.value   || '',
+            prev_diaria: g('prev-diaria')?.value || '',
+            prev_uh:     g('prev-uh')?.value     || '',
+            prev_ent:    g('prev-ent')?.value    || '',
+            prev_sai:    g('prev-sai')?.value    || '',
+            prev_cafe:   g('prev-cafe')?.value   || '',
+            cats_vals: lerValoresCats(),
+            co:    JSON.parse(JSON.stringify(co)),
+            espCi: JSON.parse(JSON.stringify(espCi)),
+            ci:    JSON.parse(JSON.stringify(ci)),
+            ocorr: [...ocorr],
+            _autoSaved: true,
+        };
+        hist.unshift(snap);
+        if (hist.length > 30) hist = hist.slice(0, 30);
+        localStorage.setItem(LS_KEY, JSON.stringify(hist));
+        salvarEsp();
+        renderHist();
+        // Mostra indicador discreto
+        const ind = document.getElementById('autosave-ind');
+        if(ind){ 
+            ind.textContent = '📌 histórico salvo';
+            setTimeout(() => { ind.textContent = 'salvo'; }, 2000);
+        }
+    } catch(e) {
+        console.warn('[autoSalvarHistorico] erro:', e);
+    }
+}
+
+function carregarRascunho() {
+    try {
+        const raw = localStorage.getItem(LS_DRAFT);
+        if (!raw) { console.log('[rascunho] nenhum draft encontrado para', LS_DRAFT); return false; }
+        const d = JSON.parse(raw);
+        if (!d) return false;
+        // verifica se o draft é do mesmo hotel
+        if (d._slug && d._slug !== HOTEL_SLUG) {
+            console.warn('[rascunho] draft de outro hotel, ignorando');
+            return false;
+        }
+        console.log('[rascunho] restaurando —', (d.co||[]).length, 'checkouts, turno:', d.turno);
+        // restaura campos de texto
+        if(g('t-turno'))   g('t-turno').value   = d.turno   || '';
+        if(g('t-data'))    g('t-data').value     = d.data    || new Date().toISOString().split('T')[0];
+        if(g('t-ocup'))    g('t-ocup').value     = d.ocupacao|| '';
+        if(g('t-dm'))      g('t-dm').value       = d.dm      || '';
+        if(g('t-uh-bloq')) g('t-uh-bloq').value  = d.uh_bloq || '0';
+        if(g('prev-ocup'))   g('prev-ocup').value   = d.prev_ocup   || '';
+        if(g('prev-diaria')) g('prev-diaria').value = d.prev_diaria || '';
+        if(g('prev-uh'))     g('prev-uh').value     = d.prev_uh     || '';
+        if(g('prev-ent'))    g('prev-ent').value    = d.prev_ent    || '';
+        if(g('prev-sai'))    g('prev-sai').value    = d.prev_sai    || '';
+        if(g('prev-cafe'))   g('prev-cafe').value   = d.prev_cafe   || '';
+        // restaura arrays
+        co    = d.co    ? JSON.parse(JSON.stringify(d.co))    : [];
+        espCi = d.espCi ? JSON.parse(JSON.stringify(d.espCi)) : [];
+        ci    = d.ci    ? JSON.parse(JSON.stringify(d.ci))    : [];
+        ocorr = d.ocorr ? [...d.ocorr] : [];
+        if (d.cats_vals) carregarValoresCats(d.cats_vals);
+        return true;
+    } catch(e) { console.warn('carregarRascunho falhou:', e); return false; }
+}
+
+function limparRascunho() {
+    localStorage.removeItem(LS_DRAFT);
+}
+
+
+function salvarNoHistorico(){
+    const snap={
+        id:Date.now(),
+        _hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+        turno:g('t-turno').value, data:g('t-data').value,
+        ocupacao:g('t-ocup').value, dm:g('t-dm').value, uh_bloq:g('t-uh-bloq').value,
+        prev_ocup:g('prev-ocup').value, prev_diaria:g('prev-diaria').value,
+        prev_uh:g('prev-uh').value, prev_ent:g('prev-ent').value,
+        prev_sai:g('prev-sai').value, prev_cafe:g('prev-cafe').value,
+        cats_vals: lerValoresCats(),
+        co:JSON.parse(JSON.stringify(co)),
+        espCi:JSON.parse(JSON.stringify(espCi)),
+        ci:JSON.parse(JSON.stringify(ci)),
+        ocorr:[...ocorr],
+    };
+    let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
+    // evita duplicata da mesma data/turno em menos de 1 minuto
+    hist = hist.filter(h => !(h.data===snap.data && h.turno===snap.turno && snap.id-h.id<60000));
+    hist.unshift(snap); if(hist.length>30)hist=hist.slice(0,30);
+    localStorage.setItem(LS_KEY,JSON.stringify(hist));
+    salvarEsp();
+    renderHist();
+    toast('📌 Salvo no histórico!');
+}
+
 // ══ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
-    g('t-data').value=new Date().toISOString().split('T')[0];
+    console.log('[hospedagem] HOTEL_SLUG =', HOTEL_SLUG, '| LS_DRAFT =', LS_DRAFT);
     carregarEsp();
-    renderCats(); // categorias configuráveis
+    renderCats();
+    const restaurou = carregarRascunho();
+    if (!restaurou) {
+        g('t-data').value = new Date().toISOString().split('T')[0];
+    }
     syncUI(); renderTudo(); renderHist();
+
+    // Salva imediatamente ao sair da página
+    window.addEventListener('beforeunload', () => {
+        salvarRascunho();
+    });
+
+    // Salva ao trocar de aba/visibilidade
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') salvarRascunho();
+    });
 });
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
