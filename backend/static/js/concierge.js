@@ -28,11 +28,11 @@ var detFotos      = [];
 
 var i18n = {
     pt: {
-        btn: 'Ver detalhes', vazio: 'Nenhuma experiencia disponivel.', erro: 'Erro ao carregar.',
-        explorar: 'Explorar', secao_label: 'Passeios', secao_titulo: 'Experiencias disponiveis',
+        btn: 'Ver detalhes', vazio: 'Nenhuma experiência disponível.', erro: 'Erro ao carregar.',
+        explorar: 'Explorar', secao_label: 'Passeios', secao_titulo: 'Experiências disponíveis',
         sob_consulta: 'Sob consulta', por_pessoa: '/ pessoa', modal_eyebrow: 'Interesse no Passeio',
-        det_eyebrow: 'Experiencia', lbl_data: 'Data desejada', lbl_horario: 'Horario desejado',
-        lbl_nome: 'Nome completo', lbl_tel: 'Telefone', lbl_qtd: 'Numero de pessoas',
+        det_eyebrow: 'Experiência', lbl_data: 'Data desejada', lbl_horario: 'Horário desejado',
+        lbl_nome: 'Nome completo', lbl_tel: 'Telefone', lbl_qtd: 'Número de pessoas',
         resumo_passeio: 'Passeio', resumo_qtd: 'Pessoas', resumo_total: 'Total estimado',
         btn_confirmar: 'Falar no WhatsApp', btn_reservar_det: 'Reservar agora',
         btn_voltar: 'Voltar aos detalhes', sucesso: 'Redirecionando para o WhatsApp!',
