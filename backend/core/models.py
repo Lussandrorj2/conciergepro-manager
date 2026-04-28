@@ -408,6 +408,23 @@ class LugarSugerido(models.Model):
     instagram  = models.CharField(max_length=100, blank=True)
     telefone   = models.CharField(max_length=30, blank=True)
 
+# ==========================================
+# 📋 LOG DE OPERAÇÕES
+# ==========================================
+class LogOperacao(models.Model):
+    hotel     = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='logs')
+    usuario   = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    acao      = models.CharField(max_length=50)
+    descricao = models.TextField()
+    dados_extra = models.JSONField(default=dict, blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-criado_em']
+
+    def __str__(self):
+        return f"[{self.criado_em:%d/%m/%Y %H:%M}] {self.usuario} — {self.acao}"
+
     class Meta:
         ordering = ['ordem', 'nome']
 
