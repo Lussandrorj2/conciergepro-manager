@@ -8,43 +8,111 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .log-filtros{display:flex;gap:10px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;align-items:center}
-        .log-filtros select,.log-filtros input{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none}
-        .log-filtros select:focus,.log-filtros input:focus{border-color:var(--gold)}
-        .log-filtros input{min-width:220px}
+        /* ══ STATS BAR ══ */
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+        .stat-mini{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+        .stat-mini-icon{font-size:20px;flex-shrink:0}
+        .stat-mini-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:2px}
+        .stat-mini-val{font-size:20px;font-weight:800;color:var(--text-main);line-height:1}
 
+        /* ══ FILTROS ══ */
+        .filtros-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+        .filtros-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .filtros-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .filtro-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+        .filtro-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)}
+        .filtro-sel,.filtro-inp{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none;width:100%;transition:border-color .15s}
+        .filtro-sel:focus,.filtro-inp:focus{border-color:var(--gold)}
+        .btn-limpar{background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;white-space:nowrap;align-self:flex-end;transition:.15s}
+        .btn-limpar:hover{border-color:var(--gold);color:var(--gold)}
+
+        /* ══ ABAS DE CATEGORIA ══ */
+        .cat-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+        .cat-tab{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--bg-hover);font-size:11px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap}
+        .cat-tab:hover{border-color:var(--gold);color:var(--gold)}
+        .cat-tab.active{background:#0f172a;border-color:#0f172a;color:#fff}
+        .cat-tab.active.cat-reserva{background:#2563eb;border-color:#2563eb}
+        .cat-tab.active.cat-cambio{background:#0891b2;border-color:#0891b2}
+        .cat-tab.active.cat-usuario{background:#7c3aed;border-color:#7c3aed}
+        .cat-tab.active.cat-auditoria{background:var(--gold);border-color:var(--gold);color:#fff}
+        .cat-tab.active.cat-financeiro{background:#059669;border-color:#059669}
+
+        /* ══ PAINEL DE LOGS ══ */
         .log-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
         .log-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
-        .log-head h2{font-size:13px;font-weight:700;color:var(--text-main)}
+        .log-head-title{font-size:12px;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:8px}
+        .log-count-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
 
-        .log-row{display:grid;grid-template-columns:160px 130px 1fr;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .12s}
+        /* ══ LINHA DE LOG ══ */
+        .log-row{display:grid;grid-template-columns:140px 120px 110px 1fr;gap:0;border-bottom:1px solid var(--border);align-items:stretch;transition:background .12s;cursor:default}
         .log-row:last-child{border-bottom:none}
         .log-row:hover{background:var(--bg-hover)}
+        .log-cell{padding:11px 14px;display:flex;align-items:center}
+        .log-cell-border{border-right:1px solid var(--border)}
 
-        .log-data{font-size:11px;color:var(--text-soft);font-family:monospace}
+        .log-data{font-size:11px;color:var(--text-soft);font-family:monospace;line-height:1.4}
+        .log-data-hora{font-size:10px;color:var(--border-light)}
         .log-usuario{font-size:12px;font-weight:600;color:var(--text-main)}
-        .log-desc{font-size:12px;color:var(--text-muted)}
+        .log-cargo-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;margin-top:2px;display:inline-block}
+        .lcb-gerente{background:var(--gold-dim);color:var(--gold)}
+        .lcb-recep{background:rgba(37,99,235,.08);color:#2563eb}
 
-        .log-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;margin-right:8px}
+        /* ══ BADGES DE AÇÃO ══ */
+        .log-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
+        /* Reservas */
         .lb-criar_reserva   {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
         .lb-pagar_reserva   {background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
         .lb-editar_reserva  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
         .lb-deletar_reserva {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* Câmbio */
         .lb-criar_cambio    {background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2)}
         .lb-editar_cambio   {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
         .lb-deletar_cambio  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* Usuários */
         .lb-criar_usuario   {background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
         .lb-editar_usuario  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
         .lb-deletar_usuario {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
         .lb-toggle_usuario  {background:rgba(181,132,58,.1);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
-        .lb-default         {background:var(--bg-hover);color:var(--text-soft);border:1px solid var(--border)}
+        /* Auditoria */
+        .lb-salvar_auditoria  {background:rgba(181,132,58,.12);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
+        .lb-apagar_auditoria  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-nova_auditoria    {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        /* Default */
+        .lb-default{background:var(--bg-hover);color:var(--text-soft);border:1px solid var(--border)}
 
+        /* ══ DESCRIÇÃO ══ */
+        .log-desc-wrap{display:flex;flex-direction:column;gap:3px}
+        .log-desc-main{font-size:12px;color:var(--text-muted)}
+        .log-desc-meta{font-size:10px;color:var(--text-soft)}
+
+        /* ══ EMPTY / LOAD ══ */
         .log-empty{padding:48px;text-align:center;color:var(--text-soft);font-size:13px}
         .log-empty-icon{font-size:32px;margin-bottom:10px;opacity:.4;display:block}
 
-        @media(max-width:768px){
-            .log-row{grid-template-columns:1fr;gap:4px;padding:12px}
-        }
+        /* ══ PAGINAÇÃO ══ */
+        .pag-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-top:1px solid var(--border)}
+        .pag-btn{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text-muted);transition:.15s}
+        .pag-btn:hover{border-color:var(--gold);color:var(--gold)}
+        .pag-btn:disabled{opacity:.35;cursor:not-allowed}
+        .pag-info{font-size:12px;color:var(--text-soft)}
+
+        /* ══ TIMELINE AUDITORIA ══ */
+        .audit-timeline{padding:16px}
+        .audit-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+        .audit-item:last-child{border-bottom:none}
+        .audit-line{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
+        .audit-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px}
+        .audit-connector{width:1px;background:var(--border);flex:1;min-height:20px;margin-top:4px}
+        .audit-body{flex:1;min-width:0}
+        .audit-turno{font-size:13px;font-weight:700;color:var(--text-main)}
+        .audit-meta{font-size:11px;color:var(--text-soft);margin-top:2px;display:flex;gap:12px;flex-wrap:wrap}
+        .audit-meta span{display:flex;align-items:center;gap:4px}
+        .audit-stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+        .audit-stat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg-hover);border:1px solid var(--border);color:var(--text-soft)}
+
+        /* ══ RESPONSIVE ══ */
+        @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.log-row{grid-template-columns:1fr 1fr}}
+        @media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.log-row{grid-template-columns:1fr;gap:4px}.log-cell-border{border-right:none;border-bottom:1px solid var(--border)}.filtros-row{flex-direction:column}}
     </style>
 </head>
 <body>
@@ -85,36 +153,101 @@
 
         <div class="content">
 
-            <!-- FILTROS -->
-            <div class="log-filtros">
-                <select id="f-acao" onchange="carregar()">
-                    <option value="">Todas as ações</option>
-                    <option value="criar_reserva">Criar Reserva</option>
-                    <option value="pagar_reserva">Pagar Reserva</option>
-                    <option value="editar_reserva">Editar Reserva</option>
-                    <option value="deletar_reserva">Deletar Reserva</option>
-                    <option value="criar_cambio">Criar Câmbio</option>
-                    <option value="editar_cambio">Editar Câmbio</option>
-                    <option value="deletar_cambio">Deletar Câmbio</option>
-                    <option value="criar_usuario">Criar Usuário</option>
-                    <option value="editar_usuario">Editar Usuário</option>
-                    <option value="deletar_usuario">Deletar Usuário</option>
-                </select>
-                <input type="text" id="f-usuario" placeholder="Filtrar por usuário…" oninput="debounce()">
-                <span id="log-count" style="font-size:12px;color:var(--text-soft);margin-left:auto"></span>
+            <!-- STATS -->
+            <div class="stats-row" id="stats-row">
+                <div class="stat-mini"><span class="stat-mini-icon">📋</span><div><div class="stat-mini-lbl">Total hoje</div><div class="stat-mini-val" id="st-hoje">—</div></div></div>
+                <div class="stat-mini"><span class="stat-mini-icon">📅</span><div><div class="stat-mini-lbl">Esta semana</div><div class="stat-mini-val" id="st-semana">—</div></div></div>
+                <div class="stat-mini"><span class="stat-mini-icon">👤</span><div><div class="stat-mini-lbl">Usuários ativos</div><div class="stat-mini-val" id="st-usuarios">—</div></div></div>
+                <div class="stat-mini"><span class="stat-mini-icon">🏨</span><div><div class="stat-mini-lbl">Auditorias salvas</div><div class="stat-mini-val" id="st-auditorias">—</div></div></div>
             </div>
 
-            <!-- TABELA -->
+            <!-- FILTROS -->
+            <div class="filtros-card">
+                <div class="filtros-title">🔍 Filtros</div>
+                <div class="filtros-row">
+                    <div class="filtro-group" style="max-width:200px">
+                        <div class="filtro-label">Ação</div>
+                        <select class="filtro-sel" id="f-acao" onchange="carregar()">
+                            <option value="">Todas as ações</option>
+                            <optgroup label="── Reservas">
+                                <option value="criar_reserva">Criar Reserva</option>
+                                <option value="pagar_reserva">Pagar Reserva</option>
+                                <option value="editar_reserva">Editar Reserva</option>
+                                <option value="deletar_reserva">Deletar Reserva</option>
+                            </optgroup>
+                            <optgroup label="── Câmbio">
+                                <option value="criar_cambio">Criar Câmbio</option>
+                                <option value="editar_cambio">Editar Câmbio</option>
+                                <option value="deletar_cambio">Deletar Câmbio</option>
+                            </optgroup>
+                            <optgroup label="── Usuários">
+                                <option value="criar_usuario">Criar Usuário</option>
+                                <option value="editar_usuario">Editar Usuário</option>
+                                <option value="deletar_usuario">Deletar Usuário</option>
+                                <option value="toggle_usuario">Ativar/Desativar Usuário</option>
+                            </optgroup>
+                            <optgroup label="── Auditoria">
+                                <option value="salvar_auditoria">Salvar Auditoria</option>
+                                <option value="apagar_auditoria">Apagar Auditoria</option>
+                                <option value="nova_auditoria">Nova Auditoria</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="filtro-group" style="max-width:200px">
+                        <div class="filtro-label">Usuário</div>
+                        <input class="filtro-inp" type="text" id="f-usuario" placeholder="Buscar por usuário…" oninput="debounce()">
+                    </div>
+                    <div class="filtro-group" style="max-width:160px">
+                        <div class="filtro-label">Data inicial</div>
+                        <input class="filtro-inp" type="date" id="f-data-ini" onchange="carregar()">
+                    </div>
+                    <div class="filtro-group" style="max-width:160px">
+                        <div class="filtro-label">Data final</div>
+                        <input class="filtro-inp" type="date" id="f-data-fim" onchange="carregar()">
+                    </div>
+                    <button class="btn-limpar" onclick="limparFiltros()">✕ Limpar</button>
+                </div>
+            </div>
+
+            <!-- ABAS DE CATEGORIA -->
+            <div class="cat-tabs" id="cat-tabs">
+                <button class="cat-tab active" data-cat="" onclick="setCategoria(this,'')">Tudo</button>
+                <button class="cat-tab cat-reserva" data-cat="reserva" onclick="setCategoria(this,'reserva')">📅 Reservas</button>
+                <button class="cat-tab cat-financeiro" data-cat="financeiro" onclick="setCategoria(this,'financeiro')">💰 Pagamentos</button>
+                <button class="cat-tab cat-cambio" data-cat="cambio" onclick="setCategoria(this,'cambio')">💱 Câmbio</button>
+                <button class="cat-tab cat-usuario" data-cat="usuario" onclick="setCategoria(this,'usuario')">👥 Usuários</button>
+                <button class="cat-tab cat-auditoria" data-cat="auditoria" onclick="setCategoria(this,'auditoria')">🏨 Auditoria</button>
+            </div>
+
+            <!-- PAINEL PRINCIPAL -->
             <div class="log-panel">
                 <div class="log-head">
-                    <h2>Histórico de Operações</h2>
+                    <div class="log-head-title">
+                        Histórico de Operações
+                        <span class="log-count-badge" id="log-count-badge">—</span>
+                    </div>
                     <span style="font-size:11px;color:var(--text-soft)">Últimas 200 operações</span>
                 </div>
+
+                <!-- CABEÇALHO DA TABELA -->
+                <div id="table-header" class="log-row" style="background:var(--bg-hover);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);cursor:default">
+                    <div class="log-cell log-cell-border">Data / Hora</div>
+                    <div class="log-cell log-cell-border">Usuário</div>
+                    <div class="log-cell log-cell-border">Ação</div>
+                    <div class="log-cell">Descrição</div>
+                </div>
+
                 <div id="log-body">
                     <div class="log-empty">
-                        <span class="log-empty-icon">📋</span>
+                        <span class="log-empty-icon">⏳</span>
                         Carregando…
                     </div>
+                </div>
+
+                <div class="pag-row" id="pag-row" style="display:none">
+                    <button class="pag-btn" id="pag-prev" onclick="mudarPag(-1)">← Anterior</button>
+                    <span class="pag-info" id="pag-info">Página 1</span>
+                    <button class="pag-btn" id="pag-next" onclick="mudarPag(1)">Próxima →</button>
                 </div>
             </div>
 
@@ -124,68 +257,304 @@
 
 <script>
 const HOTEL_SLUG = "{{ hotel.slug }}";
+const LS_KEY_AUDIT = `audit_v3_${HOTEL_SLUG}`;
 
+// ── MAPEAMENTOS ──
 const ACAO_EMOJI = {
-    criar_reserva:   '➕', pagar_reserva: '💰', editar_reserva: '✏️', deletar_reserva: '🗑️',
-    criar_cambio:    '💱', editar_cambio: '✏️', deletar_cambio: '🗑️',
-    criar_usuario:   '👤', editar_usuario: '✏️', deletar_usuario: '🗑️', toggle_usuario: '🔄',
+    criar_reserva:   '➕', pagar_reserva:   '💰', editar_reserva:  '✏️', deletar_reserva: '🗑️',
+    criar_cambio:    '💱', editar_cambio:   '✏️', deletar_cambio:  '🗑️',
+    criar_usuario:   '👤', editar_usuario:  '✏️', deletar_usuario: '🗑️', toggle_usuario:  '🔄',
+    salvar_auditoria:'📌', apagar_auditoria:'🗑️', nova_auditoria:  '🆕',
 };
 const ACAO_LABEL = {
-    criar_reserva:   'Nova Reserva',   pagar_reserva:   'Pagamento',
-    editar_reserva:  'Editar Reserva', deletar_reserva: 'Deletar Reserva',
-    criar_cambio:    'Novo Câmbio',    editar_cambio:   'Editar Câmbio',    deletar_cambio:  'Deletar Câmbio',
-    criar_usuario:   'Novo Usuário',   editar_usuario:  'Editar Usuário',
-    deletar_usuario: 'Deletar Usuário',toggle_usuario:  'Toggle Usuário',
+    criar_reserva:   'Nova Reserva',    pagar_reserva:   'Pagamento',
+    editar_reserva:  'Editar Reserva',  deletar_reserva: 'Deletar Reserva',
+    criar_cambio:    'Novo Câmbio',     editar_cambio:   'Editar Câmbio',    deletar_cambio:  'Deletar Câmbio',
+    criar_usuario:   'Novo Usuário',    editar_usuario:  'Editar Usuário',
+    deletar_usuario: 'Deletar Usuário', toggle_usuario:  'Toggle Usuário',
+    salvar_auditoria:'Salvar Auditoria',apagar_auditoria:'Apagar Auditoria', nova_auditoria:  'Nova Auditoria',
+};
+const CAT_ACOES = {
+    reserva:    ['criar_reserva','editar_reserva','deletar_reserva'],
+    financeiro: ['pagar_reserva'],
+    cambio:     ['criar_cambio','editar_cambio','deletar_cambio'],
+    usuario:    ['criar_usuario','editar_usuario','deletar_usuario','toggle_usuario'],
+    auditoria:  ['salvar_auditoria','apagar_auditoria','nova_auditoria'],
 };
 
-let _debounceTimer = null;
-function debounce() {
-    clearTimeout(_debounceTimer);
-    _debounceTimer = setTimeout(carregar, 500);
-}
+// ── ESTADO ──
+let todosLogs    = [];   // logs do backend
+let logsAudit    = [];   // logs de auditoria (localStorage)
+let logsFiltrados = [];
+let paginaAtual  = 1;
+const POR_PAG    = 50;
+let catAtiva     = '';
+let _debTimer    = null;
 
-async function carregar() {
-    const acao    = document.getElementById('f-acao').value;
-    const usuario = document.getElementById('f-usuario').value;
-    const params  = new URLSearchParams();
-    if (acao)    params.append('acao', acao);
-    if (usuario) params.append('usuario', usuario);
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+    // Define datas padrão: últimos 7 dias
+    const hoje = new Date();
+    const sete = new Date(hoje); sete.setDate(sete.getDate() - 7);
+    document.getElementById('f-data-ini').value = sete.toISOString().split('T')[0];
+    document.getElementById('f-data-fim').value = hoje.toISOString().split('T')[0];
 
-    document.getElementById('log-body').innerHTML =
-        '<div class="log-empty"><span class="log-empty-icon">⏳</span>Carregando…</div>';
+    carregarAuditoriaLocal();
+    carregar();
+});
 
+// ── CARREGAR AUDITORIAS DO LOCALSTORAGE ──
+function carregarAuditoriaLocal() {
     try {
-        const res  = await fetch(`/api/admin/${HOTEL_SLUG}/logs/?${params}`);
-        const logs = await res.json();
-
-        document.getElementById('log-count').textContent = `${logs.length} registro(s)`;
-
-        if (!logs.length) {
-            document.getElementById('log-body').innerHTML =
-                '<div class="log-empty"><span class="log-empty-icon">📋</span>Nenhuma operação encontrada.</div>';
-            return;
-        }
-
-        document.getElementById('log-body').innerHTML = logs.map(l => {
-            const badgeCls = `lb-${l.acao}`;
-            const emoji    = ACAO_EMOJI[l.acao] || '🔹';
-            const label    = ACAO_LABEL[l.acao]  || l.acao;
-            return `<div class="log-row">
-                <span class="log-data">${l.criado_em}</span>
-                <span class="log-usuario">👤 ${l.usuario}</span>
-                <span class="log-desc">
-                    <span class="log-badge ${badgeCls}">${emoji} ${label}</span>
-                    ${l.descricao}
-                </span>
-            </div>`;
-        }).join('');
+        const hist = JSON.parse(localStorage.getItem(LS_KEY_AUDIT)) || [];
+        logsAudit = hist.map(h => ({
+            id:         h.id || 0,
+            acao:       'salvar_auditoria',
+            usuario:    h._usuario || 'Sistema',
+            cargo:      h._cargo   || '',
+            descricao:  `Auditoria do dia ${fmtDataLog(h.data)} — Turno: ${h.turno||'—'} | Ocup: ${h.ocupacao||'—'} | CO: ${(h.co||[]).length} check-outs | CI: ${(h.ci||[]).length} check-ins`,
+            criado_em:  h._hora ? `${fmtDataLog(h.data)} ${h._hora}` : fmtDataLog(h.data),
+            criado_ts:  h.id || 0,
+            // dados extras p/ exibição
+            _turno:     h.turno    || '—',
+            _data:      h.data     || '',
+            _ocupacao:  h.ocupacao || '—',
+            _co:        (h.co||[]).length,
+            _ci:        (h.ci||[]).length,
+            _esp:       (h.esp||[]).length,
+            _autoSaved: h._autoSaved || false,
+        }));
+        // Atualiza stat de auditorias
+        document.getElementById('st-auditorias').textContent = hist.length;
     } catch(e) {
-        document.getElementById('log-body').innerHTML =
-            '<div class="log-empty"><span class="log-empty-icon">⚠️</span>Erro ao carregar logs.</div>';
+        logsAudit = [];
+        document.getElementById('st-auditorias').textContent = '0';
     }
 }
 
-document.addEventListener('DOMContentLoaded', carregar);
+function fmtDataLog(iso) {
+    if (!iso) return '—';
+    try {
+        return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'});
+    } catch { return iso; }
+}
+
+// ── CARREGAR LOGS DO BACKEND ──
+async function carregar() {
+    const acao    = document.getElementById('f-acao').value;
+    const usuario = document.getElementById('f-usuario').value;
+    const ini     = document.getElementById('f-data-ini').value;
+    const fim     = document.getElementById('f-data-fim').value;
+
+    document.getElementById('log-body').innerHTML =
+        '<div class="log-empty"><span class="log-empty-icon">⏳</span>Carregando…</div>';
+    document.getElementById('pag-row').style.display = 'none';
+
+    try {
+        const params = new URLSearchParams();
+        if (acao)    params.append('acao', acao);
+        if (usuario) params.append('usuario', usuario);
+        if (ini)     params.append('data_ini', ini);
+        if (fim)     params.append('data_fim', fim);
+
+        const res  = await fetch(`/api/admin/${HOTEL_SLUG}/logs/?${params}`);
+        todosLogs  = await res.json();
+    } catch(e) {
+        todosLogs = [];
+    }
+
+    // Mescla logs do backend com logs de auditoria local
+    aplicarFiltros();
+    calcularStats();
+}
+
+// ── FILTROS E CATEGORIA ──
+function setCategoria(btn, cat) {
+    catAtiva = cat;
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // limpa o select de ação quando muda categoria
+    document.getElementById('f-acao').value = '';
+    aplicarFiltros();
+}
+
+function aplicarFiltros() {
+    const acao    = document.getElementById('f-acao').value;
+    const usuario = document.getElementById('f-usuario').value.toLowerCase();
+    const ini     = document.getElementById('f-data-ini').value;
+    const fim     = document.getElementById('f-data-fim').value;
+
+    // Decide quais fontes incluir
+    let fontes = [];
+
+    if (!catAtiva || catAtiva === 'auditoria') {
+        fontes = fontes.concat(logsAudit);
+    }
+    if (!catAtiva || catAtiva !== 'auditoria') {
+        fontes = fontes.concat(todosLogs);
+    }
+
+    // Filtra por categoria
+    if (catAtiva && catAtiva !== 'auditoria') {
+        const acoesCat = CAT_ACOES[catAtiva] || [];
+        fontes = fontes.filter(l => acoesCat.includes(l.acao));
+    } else if (catAtiva === 'auditoria') {
+        fontes = logsAudit;
+    }
+
+    // Filtra por ação específica
+    if (acao) fontes = fontes.filter(l => l.acao === acao);
+
+    // Filtra por usuário
+    if (usuario) fontes = fontes.filter(l => (l.usuario||'').toLowerCase().includes(usuario));
+
+    // Filtra por data (para logs de auditoria local)
+    // Os do backend já foram filtrados pela API; aqui filtramos os locais
+    if (ini || fim) {
+        fontes = fontes.filter(l => {
+            if (!l._data) return true; // log do backend, já filtrado
+            if (ini && l._data < ini) return false;
+            if (fim && l._data > fim) return false;
+            return true;
+        });
+    }
+
+    // Ordena por timestamp decrescente
+    fontes.sort((a, b) => (b.criado_ts || 0) - (a.criado_ts || 0));
+
+    logsFiltrados = fontes;
+    paginaAtual   = 1;
+    renderLogs();
+}
+
+function debounce() {
+    clearTimeout(_debTimer);
+    _debTimer = setTimeout(aplicarFiltros, 400);
+}
+
+function limparFiltros() {
+    document.getElementById('f-acao').value    = '';
+    document.getElementById('f-usuario').value = '';
+    const hoje = new Date();
+    const sete = new Date(hoje); sete.setDate(sete.getDate() - 7);
+    document.getElementById('f-data-ini').value = sete.toISOString().split('T')[0];
+    document.getElementById('f-data-fim').value  = hoje.toISOString().split('T')[0];
+    catAtiva = '';
+    document.querySelectorAll('.cat-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+    carregar();
+}
+
+// ── RENDER ──
+function renderLogs() {
+    const badge = document.getElementById('log-count-badge');
+    badge.textContent = `${logsFiltrados.length} registro(s)`;
+
+    if (!logsFiltrados.length) {
+        document.getElementById('log-body').innerHTML =
+            '<div class="log-empty"><span class="log-empty-icon">📋</span>Nenhuma operação encontrada.<br><span style="font-size:11px;margin-top:6px;display:block">Tente ajustar os filtros ou o período.</span></div>';
+        document.getElementById('pag-row').style.display = 'none';
+        return;
+    }
+
+    const total = logsFiltrados.length;
+    const totalPags = Math.ceil(total / POR_PAG);
+    const inicio = (paginaAtual - 1) * POR_PAG;
+    const pagina = logsFiltrados.slice(inicio, inicio + POR_PAG);
+
+    document.getElementById('log-body').innerHTML = pagina.map(l => renderLinha(l)).join('');
+
+    // Paginação
+    if (total > POR_PAG) {
+        document.getElementById('pag-row').style.display  = 'flex';
+        document.getElementById('pag-info').textContent   = `Página ${paginaAtual} de ${totalPags}`;
+        document.getElementById('pag-prev').disabled      = paginaAtual <= 1;
+        document.getElementById('pag-next').disabled      = paginaAtual >= totalPags;
+    } else {
+        document.getElementById('pag-row').style.display  = 'none';
+    }
+}
+
+function renderLinha(l) {
+    const badgeCls = `lb-${l.acao}` ;
+    const emoji    = ACAO_EMOJI[l.acao] || '🔹';
+    const label    = ACAO_LABEL[l.acao]  || l.acao;
+    const cargo    = l.cargo === 'gerente'
+        ? '<div class="log-cargo-badge lcb-gerente">Gerente</div>'
+        : l.cargo ? '<div class="log-cargo-badge lcb-recep">Recep.</div>' : '';
+
+    // Data: tenta separar data e hora
+    const partes   = (l.criado_em || '').split(' ');
+    const dataFmt  = partes[0] || '—';
+    const horaFmt  = partes[1] || '';
+
+    // Descrição extra para auditoria local
+    let metaExtra = '';
+    if (l._turno && l._co !== undefined) {
+        metaExtra = `<div class="log-desc-meta">CO: ${l._co} check-outs &nbsp;|&nbsp; CI: ${l._ci} check-ins &nbsp;|&nbsp; Ocup: ${l._ocupacao}${l._autoSaved?' &nbsp;<span style="color:var(--text-soft)">(auto)</span>':''}</div>`;
+    }
+
+    return `<div class="log-row">
+        <div class="log-cell log-cell-border">
+            <div>
+                <div class="log-data">${dataFmt}</div>
+                <div class="log-data-hora">${horaFmt}</div>
+            </div>
+        </div>
+        <div class="log-cell log-cell-border">
+            <div>
+                <div class="log-usuario">👤 ${esc(l.usuario)}</div>
+                ${cargo}
+            </div>
+        </div>
+        <div class="log-cell log-cell-border">
+            <span class="log-badge ${badgeCls}">${emoji} ${label}</span>
+        </div>
+        <div class="log-cell">
+            <div class="log-desc-wrap">
+                <div class="log-desc-main">${esc(l.descricao || '')}</div>
+                ${metaExtra}
+            </div>
+        </div>
+    </div>`;
+}
+
+function mudarPag(dir) {
+    const totalPags = Math.ceil(logsFiltrados.length / POR_PAG);
+    paginaAtual = Math.max(1, Math.min(totalPags, paginaAtual + dir));
+    renderLogs();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ── STATS ──
+function calcularStats() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const sete = new Date(); sete.setDate(sete.getDate() - 7);
+
+    const todos = [...todosLogs, ...logsAudit];
+
+    // Hoje (logs do backend — verificar campo criado_em)
+    const hojeCount = todos.filter(l => {
+        const d = (l.criado_em||'').split(' ')[0];
+        // Tenta match no formato dd/mm/aaaa ou aaaa-mm-dd
+        const dIso = l._data || (d.includes('/') ? d.split('/').reverse().join('-') : d);
+        return dIso === hoje;
+    }).length;
+    document.getElementById('st-hoje').textContent = hojeCount;
+
+    const semanaCount = todos.filter(l => {
+        if (l._data) return new Date(l._data + 'T12:00:00') >= sete;
+        return true; // logs do backend já filtrados
+    }).length;
+    document.getElementById('st-semana').textContent = semanaCount;
+
+    const usuariosUnicos = new Set(todos.map(l => l.usuario)).size;
+    document.getElementById('st-usuarios').textContent = usuariosUnicos || '—';
+}
+
+// ── UTILS ──
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 <script src="{% static 'js/mobile-menu.js' %}"></script>
 </body>
