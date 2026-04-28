@@ -808,9 +808,10 @@
 
 
 <script>
-const HOTEL_SLUG = "{{ hotel.slug }}" || window.location.pathname.split('/').filter(Boolean)[0] || 'hotel';
-const LS_KEY     = `audit_v3_${HOTEL_SLUG}`;
-const LS_DRAFT   = `audit_draft_${HOTEL_SLUG}`; // rascunho atual — persiste entre navegações
+const HOTEL_SLUG  = "{{ hotel.slug }}" || window.location.pathname.split('/').filter(Boolean)[0] || 'hotel';
+const IS_GERENTE  = {{ is_gerente|yesno:"true,false" }};
+const LS_KEY      = `audit_v3_${HOTEL_SLUG}`;
+const LS_DRAFT    = `audit_draft_${HOTEL_SLUG}`;
 
 // ══ ESTADO ══
 let co      = [];
@@ -1679,12 +1680,16 @@ function renderHist(){
             </div>
             <div class="hist-actions">
                 <button class="btn-hist btn-hist-load" onclick="carregarHist(${i})" title="Carregar auditoria">✏️ Editar</button>
-                <button class="btn-hist btn-hist-del"  onclick="apagarHist(${i})"  title="Apagar esta auditoria">🗑️ Apagar</button>
+                ${IS_GERENTE ? `<button class="btn-hist btn-hist-del" onclick="apagarHist(${i})" title="Apagar esta auditoria">🗑️ Apagar</button>` : ''}
             </div>
         </div>`).join('');
 }
 
 function apagarHist(i){
+    if(!IS_GERENTE){
+        toast('🔒 Apenas gerentes podem apagar auditorias do histórico');
+        return;
+    }
     let hist=[]; try{hist=JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{}
     const h = hist[i];
     const nome = h?.turno || fmtDate(h?.data) || 'esta auditoria';
@@ -1712,6 +1717,10 @@ function carregarHist(i){
     toast('📋 Auditoria carregada!');
 }
 function limparHist(){
+    if(!IS_GERENTE){
+        toast('🔒 Apenas gerentes podem limpar o histórico');
+        return;
+    }
     if(!confirm('Apagar todo o histórico?'))return;
     localStorage.removeItem(LS_KEY); renderHist();
 }
