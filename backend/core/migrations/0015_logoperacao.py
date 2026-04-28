@@ -2,11 +2,10 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0014_alter_perfil_options_perfil_and_more'),
+        ('core', '0014_alter_perfil_options_perfil_ativo_perfil_cargo_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
