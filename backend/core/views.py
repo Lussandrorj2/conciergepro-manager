@@ -976,6 +976,14 @@ def salvar_hero(request, hotel_slug):
         banner = request.FILES.get('banner')
         if banner:
             hotel.foto_capa = banner
+
+        tema_id = request.POST.get('tema_id', '').strip()
+        if tema_id:
+            hotel.tema_id = tema_id
+        
+        tema_vars = request.POST.get('tema_vars', '').strip()
+        if tema_vars:
+            hotel.tema_vars = tema_vars
     
         try:
             hotel.save()
@@ -997,6 +1005,8 @@ def obter_hero(request, hotel_slug):
         "banner": get_media_url(hotel.foto_capa),
         "whatsapp": hotel.whatsapp or "",
         "mapa_embed": hotel.mapa_embed or "",
+        "tema_id":    hotel.tema_id   or "gold",
+        "tema_vars":  hotel.tema_vars or "",
     })
 
 @csrf_exempt
