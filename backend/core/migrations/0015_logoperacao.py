@@ -6,7 +6,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0014_alter_perfil_options_per...'),  # ← ajuste para o nome exato do seu 0014
+        ('core', '0014_alter_perfil_options_perfil_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
