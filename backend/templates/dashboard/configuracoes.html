@@ -532,23 +532,6 @@ async function salvarTema() {
     btn.disabled = false;
     btn.textContent = 'Salvar tema';
 }
-
-// ══ APLICAR TEMA NA PÁGINA DO HÓSPEDE ══
-// O index.html deve chamar esta função no carregamento:
-// Coloque este snippet no <head> do index.html (antes do style.css):
-//
-// <script>
-// (function(){
-//   var slug = window.hotelSlug || location.pathname.split('/').filter(Boolean)[0];
-//   var key  = 'hotel_tema_' + slug;
-//   var id   = localStorage.getItem(key);
-//   if (!id || id === 'gold') return; // gold é o padrão do style.css
-//   var temas = { /* cole o objeto TEMAS aqui ou faça fetch */ };
-//   // ...aplica vars no :root
-// })();
-// </script>
-
-// ══ BANNER ══
 const bannerBox   = document.getElementById('bannerBox');
 const bannerInput = document.getElementById('bannerInput');
 bannerBox.onclick = () => bannerInput.click();
