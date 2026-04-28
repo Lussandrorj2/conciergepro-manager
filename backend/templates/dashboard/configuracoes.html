@@ -214,7 +214,7 @@
 <script>
 const hotelSlug = "{{ hotel.slug }}";
 const csrfToken = "{{ csrf_token }}";
-const LS_TEMA   = `hotel_tema_${hotelSlug}`;
+const LS_TEMA   = 'hotel_tema_' + hotelSlug;
 
 // ══ DEFINIÇÃO DOS TEMAS ══
 const TEMAS = [
@@ -514,7 +514,7 @@ async function salvarTema() {
         const form = new FormData();
         form.append('tema_id',   temaAtivo);
         form.append('tema_vars', JSON.stringify(vars));
-        const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
+        const res = await fetch('/api/admin/' + hotelSlug + '/hero/', {
             method:  'POST',
             headers: { 'X-CSRFToken': csrfToken },
             body:    form
@@ -565,7 +565,7 @@ bannerInput.addEventListener('change', e => {
 // ══ CARREGAR DADOS ══
 async function carregar() {
     try {
-        const res  = await fetch(`/api/admin/${hotelSlug}/hero/get/`);
+        const res  = await fetch('/api/admin/' + hotelSlug + '/hero/get/');
         if (!res.ok) return;
         const data = await res.json();
         document.getElementById('titulo').value    = data.titulo    || '';
@@ -605,7 +605,7 @@ async function salvarHero() {
         form.append('subtitulo', document.getElementById('subtitulo').value);
         const file = bannerInput.files[0];
         if (file) form.append('banner', file);
-        const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
+        const res = await fetch('/api/admin/' + hotelSlug + '/hero/', {
             method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: form
         });
         if (!res.ok) { toast('❌ Erro ao salvar aparência', 'err'); return; }
@@ -624,7 +624,7 @@ async function salvarContato() {
         if (!numero.startsWith('55')) numero = '55' + numero;
         const form = new FormData();
         form.append('whatsapp', numero);
-        const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
+        const res = await fetch('/api/admin/' + hotelSlug + '/hero/', {
             method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: form
         });
         if (!res.ok) { toast('❌ Erro ao salvar contato', 'err'); return; }
@@ -641,7 +641,7 @@ async function salvarLocalizacao() {
     try {
         const form = new FormData();
         form.append('mapa_embed', document.getElementById('hotel-mapa-embed').value.trim());
-        const res = await fetch(`/api/admin/${hotelSlug}/hero/`, {
+        const res = await fetch('/api/admin/' + hotelSlug + '/hero/', {
             method: 'POST', headers: { 'X-CSRFToken': csrfToken }, body: form
         });
         if (!res.ok) { toast('❌ Erro ao salvar', 'err'); return; }
