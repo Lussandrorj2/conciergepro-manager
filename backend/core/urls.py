@@ -3,7 +3,7 @@ from . import views
 from . import views_usuarios
 from django.conf import settings
 from django.conf.urls.static import static
-
+from . import views_logs
 
 urlpatterns = [
 
@@ -34,6 +34,8 @@ urlpatterns = [
     path('<slug:hotel_slug>/dashboard/hospedagem/', views.dashboard_hospedagem, name='dashboard_hospedagem'),
     path('<slug:hotel_slug>/dashboard/reservas-hotel/', views.dashboard_reservas_hotel, name='dashboard_reservas_hotel'),
     path('<slug:hotel_slug>/dashboard/lugares/', views.dashboard_lugares, name='dashboard_lugares'),
+    path('<slug:hotel_slug>/dashboard/logs/', views_logs.dashboard_logs, name='dashboard_logs'),
+    path('api/admin/<slug:hotel_slug>/logs/', views_logs.api_logs, name='api_logs'),
 
     # =========================
     # GESTÃO DE USUÁRIOS (GERENTE)
