@@ -10,6 +10,20 @@
     <title>Concierge Digital | {{ hotel.nome|default:"Bem-vindo" }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    {% if hotel.tema_id and hotel.tema_id != 'gold' %}
+    <script>
+    (function(){
+        var slug = "{{ hotel.slug }}";
+        var id   = "{{ hotel.tema_id }}";
+        var vars = JSON.parse('{{ hotel.tema_vars|default:"{}"|escapejs }}');
+        // Salva no localStorage para que o snippet existente funcione
+        localStorage.setItem('hotel_tema_' + slug, id);
+        if (id === 'custom' && typeof vars === 'object') {
+            localStorage.setItem('hotel_tema_' + slug + '_custom', JSON.stringify(vars));
+        }
+    })();
+    </script>
+    {% endif %}
     <script>
     (function(){
         var slug = (window.hotelSlug || '');
