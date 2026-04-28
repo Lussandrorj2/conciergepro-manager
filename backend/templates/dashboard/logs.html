@@ -31,11 +31,13 @@
         .cat-tab{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--bg-hover);font-size:11px;font-weight:600;cursor:pointer;color:var(--text-soft);font-family:'Inter',sans-serif;transition:.15s;white-space:nowrap}
         .cat-tab:hover{border-color:var(--gold);color:var(--gold)}
         .cat-tab.active{background:#0f172a;border-color:#0f172a;color:#fff}
-        .cat-tab.active.cat-reserva{background:#2563eb;border-color:#2563eb}
-        .cat-tab.active.cat-cambio{background:#0891b2;border-color:#0891b2}
-        .cat-tab.active.cat-usuario{background:#7c3aed;border-color:#7c3aed}
-        .cat-tab.active.cat-auditoria{background:var(--gold);border-color:var(--gold);color:#fff}
+        .cat-tab.active.cat-reserva   {background:#2563eb;border-color:#2563eb}
+        .cat-tab.active.cat-cambio    {background:#0891b2;border-color:#0891b2}
+        .cat-tab.active.cat-usuario   {background:#7c3aed;border-color:#7c3aed}
+        .cat-tab.active.cat-auditoria {background:var(--gold);border-color:var(--gold);color:#fff}
         .cat-tab.active.cat-financeiro{background:#059669;border-color:#059669}
+        .cat-tab.active.cat-passeio   {background:#d97706;border-color:#d97706}
+        .cat-tab.active.cat-config    {background:#6b7280;border-color:#6b7280}
 
         /* ══ PAINEL DE LOGS ══ */
         .log-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -60,23 +62,43 @@
         /* ══ BADGES DE AÇÃO ══ */
         .log-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
         /* Reservas */
-        .lb-criar_reserva   {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
-        .lb-pagar_reserva   {background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
-        .lb-editar_reserva  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
-        .lb-deletar_reserva {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-criar_reserva,.lb-criar_reserva_hotel{background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .lb-pagar_reserva                         {background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+        .lb-editar_reserva,.lb-editar_reserva_hotel{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_reserva,.lb-deletar_reserva_hotel{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* Passeios */
+        .lb-criar_passeio  {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .lb-editar_passeio,.lb-traduzir_passeio,.lb-traduzir_hotel{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_passeio,.lb-deletar_imagem{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* Agenda */
+        .lb-criar_agenda   {background:rgba(99,102,241,.1);color:#6366f1;border:1px solid rgba(99,102,241,.2)}
+        .lb-deletar_agenda {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
         /* Câmbio */
-        .lb-criar_cambio    {background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2)}
-        .lb-editar_cambio   {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
-        .lb-deletar_cambio  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
-        /* Usuários */
-        .lb-criar_usuario   {background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
-        .lb-editar_usuario  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
-        .lb-deletar_usuario {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
-        .lb-toggle_usuario  {background:rgba(181,132,58,.1);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
+        .lb-criar_cambio   {background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2)}
+        .lb-editar_cambio  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_cambio {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
         /* Auditoria */
-        .lb-salvar_auditoria  {background:rgba(181,132,58,.12);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
-        .lb-apagar_auditoria  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
-        .lb-nova_auditoria    {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .lb-salvar_auditoria{background:rgba(181,132,58,.12);color:var(--gold);border:1px solid rgba(181,132,58,.25)}
+        .lb-apagar_auditoria{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-nova_auditoria  {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        /* Tarefas */
+        .lb-criar_tarefa   {background:rgba(99,102,241,.1);color:#6366f1;border:1px solid rgba(99,102,241,.2)}
+        .lb-editar_tarefa  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_tarefa {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-concluir_tarefa{background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        /* Lugares */
+        .lb-criar_lugar    {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .lb-editar_lugar   {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_lugar  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        /* Financeiro */
+        .lb-salvar_adiantamento,.lb-salvar_divisao{background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+        /* Configurações */
+        .lb-salvar_hero    {background:rgba(107,114,128,.1);color:#6b7280;border:1px solid rgba(107,114,128,.2)}
+        /* Usuários */
+        .lb-criar_usuario  {background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
+        .lb-editar_usuario {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_usuario{background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-toggle_usuario {background:rgba(181,132,58,.1);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
         /* Default */
         .lb-default{background:var(--bg-hover);color:var(--text-soft);border:1px solid var(--border)}
 
@@ -169,27 +191,73 @@
                         <div class="filtro-label">Ação</div>
                         <select class="filtro-sel" id="f-acao" onchange="carregar()">
                             <option value="">Todas as ações</option>
-                            <optgroup label="── Reservas">
+
+                            <optgroup label="📅 Reservas Concierge">
                                 <option value="criar_reserva">Criar Reserva</option>
-                                <option value="pagar_reserva">Pagar Reserva</option>
+                                <option value="pagar_reserva">Registrar Pagamento</option>
                                 <option value="editar_reserva">Editar Reserva</option>
                                 <option value="deletar_reserva">Deletar Reserva</option>
                             </optgroup>
-                            <optgroup label="── Câmbio">
+
+                            <optgroup label="🛏️ Reservas Hotel">
+                                <option value="criar_reserva_hotel">Criar Reserva Hotel</option>
+                                <option value="editar_reserva_hotel">Editar Reserva Hotel</option>
+                                <option value="deletar_reserva_hotel">Deletar Reserva Hotel</option>
+                            </optgroup>
+
+                            <optgroup label="🗺️ Experiências / Passeios">
+                                <option value="criar_passeio">Criar Passeio</option>
+                                <option value="editar_passeio">Editar Passeio</option>
+                                <option value="deletar_passeio">Deletar Passeio</option>
+                                <option value="deletar_imagem">Deletar Imagem</option>
+                                <option value="traduzir_passeio">Traduzir Passeio</option>
+                            </optgroup>
+
+                            <optgroup label="📆 Agenda">
+                                <option value="criar_agenda">Criar Agenda</option>
+                                <option value="deletar_agenda">Deletar Agenda</option>
+                            </optgroup>
+
+                            <optgroup label="💱 Câmbio">
                                 <option value="criar_cambio">Criar Câmbio</option>
                                 <option value="editar_cambio">Editar Câmbio</option>
                                 <option value="deletar_cambio">Deletar Câmbio</option>
                             </optgroup>
-                            <optgroup label="── Usuários">
+
+                            <optgroup label="🏨 Auditoria">
+                                <option value="salvar_auditoria">Salvar Auditoria</option>
+                                <option value="apagar_auditoria">Apagar Auditoria</option>
+                                <option value="nova_auditoria">Nova Auditoria</option>
+                            </optgroup>
+
+                            <optgroup label="📋 Tarefas">
+                                <option value="criar_tarefa">Criar Tarefa</option>
+                                <option value="editar_tarefa">Editar Tarefa</option>
+                                <option value="deletar_tarefa">Deletar Tarefa</option>
+                                <option value="concluir_tarefa">Concluir Tarefa</option>
+                            </optgroup>
+
+                            <optgroup label="📍 Lugares Sugeridos">
+                                <option value="criar_lugar">Criar Lugar</option>
+                                <option value="editar_lugar">Editar Lugar</option>
+                                <option value="deletar_lugar">Deletar Lugar</option>
+                            </optgroup>
+
+                            <optgroup label="💰 Financeiro">
+                                <option value="salvar_adiantamento">Salvar Adiantamento</option>
+                                <option value="salvar_divisao">Salvar Divisão de Lucros</option>
+                            </optgroup>
+
+                            <optgroup label="⚙️ Configurações">
+                                <option value="salvar_hero">Salvar Configurações Hero</option>
+                                <option value="traduzir_hotel">Traduzir Hotel</option>
+                            </optgroup>
+
+                            <optgroup label="👥 Usuários">
                                 <option value="criar_usuario">Criar Usuário</option>
                                 <option value="editar_usuario">Editar Usuário</option>
                                 <option value="deletar_usuario">Deletar Usuário</option>
                                 <option value="toggle_usuario">Ativar/Desativar Usuário</option>
-                            </optgroup>
-                            <optgroup label="── Auditoria">
-                                <option value="salvar_auditoria">Salvar Auditoria</option>
-                                <option value="apagar_auditoria">Apagar Auditoria</option>
-                                <option value="nova_auditoria">Nova Auditoria</option>
                             </optgroup>
                         </select>
                     </div>
@@ -212,11 +280,13 @@
             <!-- ABAS DE CATEGORIA -->
             <div class="cat-tabs" id="cat-tabs">
                 <button class="cat-tab active" data-cat="" onclick="setCategoria(this,'')">Tudo</button>
-                <button class="cat-tab cat-reserva" data-cat="reserva" onclick="setCategoria(this,'reserva')">📅 Reservas</button>
-                <button class="cat-tab cat-financeiro" data-cat="financeiro" onclick="setCategoria(this,'financeiro')">💰 Pagamentos</button>
-                <button class="cat-tab cat-cambio" data-cat="cambio" onclick="setCategoria(this,'cambio')">💱 Câmbio</button>
-                <button class="cat-tab cat-usuario" data-cat="usuario" onclick="setCategoria(this,'usuario')">👥 Usuários</button>
+                <button class="cat-tab cat-reserva"   data-cat="reserva"   onclick="setCategoria(this,'reserva')">📅 Reservas</button>
+                <button class="cat-tab cat-financeiro" data-cat="financeiro" onclick="setCategoria(this,'financeiro')">💰 Financeiro</button>
+                <button class="cat-tab cat-cambio"    data-cat="cambio"    onclick="setCategoria(this,'cambio')">💱 Câmbio</button>
+                <button class="cat-tab cat-passeio"   data-cat="passeio"   onclick="setCategoria(this,'passeio')">🗺️ Passeios</button>
+                <button class="cat-tab cat-usuario"   data-cat="usuario"   onclick="setCategoria(this,'usuario')">👥 Usuários</button>
                 <button class="cat-tab cat-auditoria" data-cat="auditoria" onclick="setCategoria(this,'auditoria')">🏨 Auditoria</button>
+                <button class="cat-tab cat-config"    data-cat="config"    onclick="setCategoria(this,'config')">⚙️ Config.</button>
             </div>
 
             <!-- PAINEL PRINCIPAL -->
@@ -261,25 +331,67 @@ const LS_KEY_AUDIT = `audit_v3_${HOTEL_SLUG}`;
 
 // ── MAPEAMENTOS ──
 const ACAO_EMOJI = {
-    criar_reserva:   '➕', pagar_reserva:   '💰', editar_reserva:  '✏️', deletar_reserva: '🗑️',
-    criar_cambio:    '💱', editar_cambio:   '✏️', deletar_cambio:  '🗑️',
-    criar_usuario:   '👤', editar_usuario:  '✏️', deletar_usuario: '🗑️', toggle_usuario:  '🔄',
-    salvar_auditoria:'📌', apagar_auditoria:'🗑️', nova_auditoria:  '🆕',
+    // Reservas Concierge
+    criar_reserva:        '➕', pagar_reserva:         '💰',
+    editar_reserva:       '✏️', deletar_reserva:       '🗑️',
+    // Reservas Hotel
+    criar_reserva_hotel:  '➕', editar_reserva_hotel:  '✏️', deletar_reserva_hotel: '🗑️',
+    // Passeios
+    criar_passeio:        '🗺️', editar_passeio:        '✏️', deletar_passeio:       '🗑️',
+    deletar_imagem:       '🖼️', traduzir_passeio:      '🌐',
+    // Agenda
+    criar_agenda:         '📆', deletar_agenda:        '🗑️',
+    // Câmbio
+    criar_cambio:         '💱', editar_cambio:         '✏️', deletar_cambio:        '🗑️',
+    // Auditoria
+    salvar_auditoria:     '📌', apagar_auditoria:      '🗑️', nova_auditoria:        '🆕',
+    // Tarefas
+    criar_tarefa:         '📋', editar_tarefa:         '✏️', deletar_tarefa:        '🗑️', concluir_tarefa: '✅',
+    // Lugares
+    criar_lugar:          '📍', editar_lugar:          '✏️', deletar_lugar:         '🗑️',
+    // Financeiro
+    salvar_adiantamento:  '💸', salvar_divisao:        '📊',
+    // Configurações
+    salvar_hero:          '⚙️', traduzir_hotel:        '🌐',
+    // Usuários
+    criar_usuario:        '👤', editar_usuario:        '✏️', deletar_usuario:       '🗑️', toggle_usuario: '🔄',
 };
 const ACAO_LABEL = {
-    criar_reserva:   'Nova Reserva',    pagar_reserva:   'Pagamento',
-    editar_reserva:  'Editar Reserva',  deletar_reserva: 'Deletar Reserva',
-    criar_cambio:    'Novo Câmbio',     editar_cambio:   'Editar Câmbio',    deletar_cambio:  'Deletar Câmbio',
-    criar_usuario:   'Novo Usuário',    editar_usuario:  'Editar Usuário',
-    deletar_usuario: 'Deletar Usuário', toggle_usuario:  'Toggle Usuário',
-    salvar_auditoria:'Salvar Auditoria',apagar_auditoria:'Apagar Auditoria', nova_auditoria:  'Nova Auditoria',
+    // Reservas Concierge
+    criar_reserva:        'Nova Reserva',       pagar_reserva:        'Pagamento',
+    editar_reserva:       'Editar Reserva',     deletar_reserva:      'Deletar Reserva',
+    // Reservas Hotel
+    criar_reserva_hotel:  'Reserva Hotel',      editar_reserva_hotel: 'Editar Res. Hotel',  deletar_reserva_hotel: 'Deletar Res. Hotel',
+    // Passeios
+    criar_passeio:        'Novo Passeio',       editar_passeio:       'Editar Passeio',     deletar_passeio:       'Deletar Passeio',
+    deletar_imagem:       'Deletar Imagem',     traduzir_passeio:     'Traduzir Passeio',
+    // Agenda
+    criar_agenda:         'Nova Agenda',        deletar_agenda:       'Deletar Agenda',
+    // Câmbio
+    criar_cambio:         'Novo Câmbio',        editar_cambio:        'Editar Câmbio',      deletar_cambio:        'Deletar Câmbio',
+    // Auditoria
+    salvar_auditoria:     'Salvar Auditoria',   apagar_auditoria:     'Apagar Auditoria',   nova_auditoria:        'Nova Auditoria',
+    // Tarefas
+    criar_tarefa:         'Nova Tarefa',        editar_tarefa:        'Editar Tarefa',      deletar_tarefa:        'Deletar Tarefa',       concluir_tarefa: 'Tarefa Concluída',
+    // Lugares
+    criar_lugar:          'Novo Lugar',         editar_lugar:         'Editar Lugar',       deletar_lugar:         'Deletar Lugar',
+    // Financeiro
+    salvar_adiantamento:  'Adiantamento',       salvar_divisao:       'Divisão de Lucros',
+    // Configurações
+    salvar_hero:          'Config. Hero',       traduzir_hotel:       'Traduzir Hotel',
+    // Usuários
+    criar_usuario:        'Novo Usuário',       editar_usuario:       'Editar Usuário',     deletar_usuario:       'Deletar Usuário',      toggle_usuario: 'Toggle Usuário',
 };
 const CAT_ACOES = {
-    reserva:    ['criar_reserva','editar_reserva','deletar_reserva'],
-    financeiro: ['pagar_reserva'],
+    reserva:    ['criar_reserva','editar_reserva','deletar_reserva',
+                 'criar_reserva_hotel','editar_reserva_hotel','deletar_reserva_hotel'],
+    financeiro: ['pagar_reserva','salvar_adiantamento','salvar_divisao'],
     cambio:     ['criar_cambio','editar_cambio','deletar_cambio'],
+    passeio:    ['criar_passeio','editar_passeio','deletar_passeio','deletar_imagem','traduzir_passeio',
+                 'criar_agenda','deletar_agenda','criar_lugar','editar_lugar','deletar_lugar'],
     usuario:    ['criar_usuario','editar_usuario','deletar_usuario','toggle_usuario'],
     auditoria:  ['salvar_auditoria','apagar_auditoria','nova_auditoria'],
+    config:     ['salvar_hero','traduzir_hotel','criar_tarefa','editar_tarefa','deletar_tarefa','concluir_tarefa'],
 };
 
 // ── ESTADO ──
