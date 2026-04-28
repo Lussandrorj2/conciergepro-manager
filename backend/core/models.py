@@ -60,6 +60,8 @@ class Hotel(models.Model):
     subtitulo_hero_es = models.CharField(max_length=255, blank=True)
     titulo_hero_fr    = models.CharField(max_length=255, blank=True)
     subtitulo_hero_fr = models.CharField(max_length=255, blank=True)
+    tema_id   = models.CharField(max_length=30, default='gold', blank=True)
+    tema_vars = models.TextField(blank=True, default='')
 
     whatsapp   = models.CharField(max_length=20, blank=True, null=True)
     mapa_embed = models.TextField(blank=True)
