@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Logs — {{ hotel.nome }}</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .log-filtros{display:flex;gap:10px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;align-items:center}
+        .log-filtros select,.log-filtros input{background:var(--bg-hover);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);outline:none}
+        .log-filtros select:focus,.log-filtros input:focus{border-color:var(--gold)}
+        .log-filtros input{min-width:220px}
+
+        .log-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+        .log-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+        .log-head h2{font-size:13px;font-weight:700;color:var(--text-main)}
+
+        .log-row{display:grid;grid-template-columns:160px 130px 1fr;gap:0;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .12s}
+        .log-row:last-child{border-bottom:none}
+        .log-row:hover{background:var(--bg-hover)}
+
+        .log-data{font-size:11px;color:var(--text-soft);font-family:monospace}
+        .log-usuario{font-size:12px;font-weight:600;color:var(--text-main)}
+        .log-desc{font-size:12px;color:var(--text-muted)}
+
+        .log-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;margin-right:8px}
+        .lb-criar_reserva   {background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.2)}
+        .lb-pagar_reserva   {background:rgba(37,99,235,.1);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+        .lb-editar_reserva  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_reserva {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-criar_cambio    {background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2)}
+        .lb-editar_cambio   {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_cambio  {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-criar_usuario   {background:rgba(124,58,237,.1);color:#7c3aed;border:1px solid rgba(124,58,237,.2)}
+        .lb-editar_usuario  {background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2)}
+        .lb-deletar_usuario {background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+        .lb-toggle_usuario  {background:rgba(181,132,58,.1);color:var(--gold);border:1px solid rgba(181,132,58,.2)}
+        .lb-default         {background:var(--bg-hover);color:var(--text-soft);border:1px solid var(--border)}
+
+        .log-empty{padding:48px;text-align:center;color:var(--text-soft);font-size:13px}
+        .log-empty-icon{font-size:32px;margin-bottom:10px;opacity:.4;display:block}
+
+        @media(max-width:768px){
+            .log-row{grid-template-columns:1fr;gap:4px;padding:12px}
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">🔔 Concierge</div>
+        <nav>
+            <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
+            <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Auditoria</a>
+            <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
+            <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
+            <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
+            <a href="/{{ hotel.slug }}/dashboard/usuarios/">👥 Usuários</a>
+            <a href="/{{ hotel.slug }}/dashboard/logs/" class="active">📋 Logs</a>
+            <hr>
+            <a href="/logout/">↩ Sair</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger-btn" id="hamburger-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <span class="topbar-title">📋 Log de Operações</span>
+            </div>
+            <div class="topbar-right">
+                <div class="hotel-badge"><div class="hotel-dot"></div><span>{{ hotel.nome|striptags }}</span></div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- FILTROS -->
+            <div class="log-filtros">
+                <select id="f-acao" onchange="carregar()">
+                    <option value="">Todas as ações</option>
+                    <option value="criar_reserva">Criar Reserva</option>
+                    <option value="pagar_reserva">Pagar Reserva</option>
+                    <option value="editar_reserva">Editar Reserva</option>
+                    <option value="deletar_reserva">Deletar Reserva</option>
+                    <option value="criar_cambio">Criar Câmbio</option>
+                    <option value="editar_cambio">Editar Câmbio</option>
+                    <option value="deletar_cambio">Deletar Câmbio</option>
+                    <option value="criar_usuario">Criar Usuário</option>
+                    <option value="editar_usuario">Editar Usuário</option>
+                    <option value="deletar_usuario">Deletar Usuário</option>
+                </select>
+                <input type="text" id="f-usuario" placeholder="Filtrar por usuário…" oninput="debounce()">
+                <span id="log-count" style="font-size:12px;color:var(--text-soft);margin-left:auto"></span>
+            </div>
+
+            <!-- TABELA -->
+            <div class="log-panel">
+                <div class="log-head">
+                    <h2>Histórico de Operações</h2>
+                    <span style="font-size:11px;color:var(--text-soft)">Últimas 200 operações</span>
+                </div>
+                <div id="log-body">
+                    <div class="log-empty">
+                        <span class="log-empty-icon">📋</span>
+                        Carregando…
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+const HOTEL_SLUG = "{{ hotel.slug }}";
+
+const ACAO_EMOJI = {
+    criar_reserva:   '➕', pagar_reserva: '💰', editar_reserva: '✏️', deletar_reserva: '🗑️',
+    criar_cambio:    '💱', editar_cambio: '✏️', deletar_cambio: '🗑️',
+    criar_usuario:   '👤', editar_usuario: '✏️', deletar_usuario: '🗑️', toggle_usuario: '🔄',
+};
+const ACAO_LABEL = {
+    criar_reserva:   'Nova Reserva',   pagar_reserva:   'Pagamento',
+    editar_reserva:  'Editar Reserva', deletar_reserva: 'Deletar Reserva',
+    criar_cambio:    'Novo Câmbio',    editar_cambio:   'Editar Câmbio',    deletar_cambio:  'Deletar Câmbio',
+    criar_usuario:   'Novo Usuário',   editar_usuario:  'Editar Usuário',
+    deletar_usuario: 'Deletar Usuário',toggle_usuario:  'Toggle Usuário',
+};
+
+let _debounceTimer = null;
+function debounce() {
+    clearTimeout(_debounceTimer);
+    _debounceTimer = setTimeout(carregar, 500);
+}
+
+async function carregar() {
+    const acao    = document.getElementById('f-acao').value;
+    const usuario = document.getElementById('f-usuario').value;
+    const params  = new URLSearchParams();
+    if (acao)    params.append('acao', acao);
+    if (usuario) params.append('usuario', usuario);
+
+    document.getElementById('log-body').innerHTML =
+        '<div class="log-empty"><span class="log-empty-icon">⏳</span>Carregando…</div>';
+
+    try {
+        const res  = await fetch(`/api/admin/${HOTEL_SLUG}/logs/?${params}`);
+        const logs = await res.json();
+
+        document.getElementById('log-count').textContent = `${logs.length} registro(s)`;
+
+        if (!logs.length) {
+            document.getElementById('log-body').innerHTML =
+                '<div class="log-empty"><span class="log-empty-icon">📋</span>Nenhuma operação encontrada.</div>';
+            return;
+        }
+
+        document.getElementById('log-body').innerHTML = logs.map(l => {
+            const badgeCls = `lb-${l.acao}`;
+            const emoji    = ACAO_EMOJI[l.acao] || '🔹';
+            const label    = ACAO_LABEL[l.acao]  || l.acao;
+            return `<div class="log-row">
+                <span class="log-data">${l.criado_em}</span>
+                <span class="log-usuario">👤 ${l.usuario}</span>
+                <span class="log-desc">
+                    <span class="log-badge ${badgeCls}">${emoji} ${label}</span>
+                    ${l.descricao}
+                </span>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        document.getElementById('log-body').innerHTML =
+            '<div class="log-empty"><span class="log-empty-icon">⚠️</span>Erro ao carregar logs.</div>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', carregar);
+</script>
+<script src="{% static 'js/mobile-menu.js' %}"></script>
+</body>
+</html>

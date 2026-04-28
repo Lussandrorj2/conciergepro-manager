@@ -7,7 +7,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -----------------------
 # AMBIENTE
 # -----------------------
-# Railway define RAILWAY_ENVIRONMENT automaticamente
 IS_PROD = os.getenv("DJANGO_ENV") == "production"
 
 # -----------------------
@@ -15,7 +14,6 @@ IS_PROD = os.getenv("DJANGO_ENV") == "production"
 # -----------------------
 DEBUG      = not IS_PROD
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-inseguro-trocar-em-producao")
-
 ALLOWED_HOSTS = ["*"]
 
 # -----------------------
@@ -38,7 +36,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # -----------------------
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',       # ← CORRIGIDO
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,8 +46,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF      = 'backend.urls'
-WSGI_APPLICATION  = 'backend.wsgi.application'
+ROOT_URLCONF     = 'backend.urls'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 # -----------------------
 # TEMPLATES
@@ -93,7 +91,7 @@ USE_TZ        = True
 STATIC_URL       = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT      = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'  # ← CORRIGIDO
 
 # -----------------------
 # MEDIA — Cloudinary
@@ -103,28 +101,20 @@ CLOUDINARY_STORAGE = {
     'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'  # ← CORRIGIDO
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # -----------------------
 # CSRF & SESSÃO
-# Railway usa proxy HTTPS — precisa dessas configs para login funcionar
 # -----------------------
 CSRF_TRUSTED_ORIGINS = [
     "https://conciergerio.up.railway.app",
     "https://*.up.railway.app",
 ]
-
-# Proxy reverso do Railway: informa ao Django que a requisição é HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Cookies seguros APENAS em produção
-# Em dev local (IS_PROD=False) fica False para não bloquear HTTP
 CSRF_COOKIE_SECURE    = IS_PROD
 SESSION_COOKIE_SECURE = IS_PROD
-
-# SameSite Lax — compatível com redirect de login
 CSRF_COOKIE_SAMESITE    = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 

@@ -19,6 +19,9 @@ from rest_framework.response import Response
 from django.db.models import Sum, Count, F
 from django.db.models.functions import TruncMonth
 from deep_translator import GoogleTranslator
+from .permissions import requer_gerente, requer_gerente_api, get_contexto_usuario
+from .log import registrar_log
+
 
 def to_float(valor):
     try:
@@ -181,45 +184,65 @@ def logout_view(request):
 
 # =========================
 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+# Função auxiliar para evitar repetição de código
+def render_com_contexto(request, hotel_slug, template, extra_context=None):
+    hotel = get_object_or_404(Hotel, slug=hotel_slug)
+    # Pega o is_gerente e outras permissões
+    ctx = get_contexto_usuario(request, hotel)
+    
+    contexto = {'hotel': hotel, **ctx}
+    if extra_context:
+        contexto.update(extra_context)
+        
+    return render(request, template, contexto)
+
 @login_required
 def dashboard_home(request, hotel_slug):
-    return render(request, 'dashboard/dashboard_home.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/dashboard_home.html')
 
 @login_required
 def dashboard_criar(request, hotel_slug):
-    return render(request, "dashboard/criar_passeios.html", {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, "dashboard/criar_passeios.html")
 
 @login_required
 def dashboard_listar(request, hotel_slug):
-    return render(request, 'dashboard/gerenciar_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/gerenciar_passeios.html')
 
 @login_required
 def dashboard_relatorios(request, hotel_slug):
-    return render(request, 'dashboard/relatorios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/relatorios.html')
 
 @login_required
 def dashboard_config(request, hotel_slug):
-    return render(request, 'dashboard/configuracoes.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/configuracoes.html')
 
 @login_required
 def dashboard_agenda(request, hotel_slug):
-    return render(request, 'dashboard/agenda_passeios.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/agenda_passeios.html')
 
 @login_required
 def dashboard_reservas(request, hotel_slug):
-    return render(request, 'dashboard/reservas.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/reservas.html')
 
 @login_required
 def dashboard_cambio(request, hotel_slug):
-    return render(request, 'dashboard/cambio.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/cambio.html')
 
 @login_required
 def dashboard_quadro(request, hotel_slug):
-    return render(request, 'dashboard/quadro.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/quadro.html')
 
 @login_required
+#@requer_permissao('hospedagem')
 def dashboard_hospedagem(request, hotel_slug):
-    return render(request, 'dashboard/hospedagem.html', {'hotel': get_object_or_404(Hotel, slug=hotel_slug)})
+    return render_com_contexto(request, hotel_slug, 'dashboard/hospedagem.html')
+
+@login_required
+def dashboard_reservas_hotel(request, hotel_slug):
+    return render_com_contexto(request, hotel_slug, 'dashboard/reservas-hotel.html')
 
 # =========================
 
@@ -394,6 +417,10 @@ def api_cambio(request, hotel_slug):
             if hasattr(t, 'cotacao_venda'):  t.cotacao_venda  = cotacao_venda
             if hasattr(t, 'valor_recebido'): t.valor_recebido = valor_recebido_calc
             t.save()
+            # ↓ ADICIONE AQUI
+            registrar_log(hotel, request.user, 'criar_cambio',
+                f"Câmbio {moeda}: {valor} × cotação {cotacao_compra}",
+                {'moeda': moeda, 'valor': valor, 'cotacao_compra': cotacao_compra})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
@@ -443,12 +470,18 @@ def api_cambio_detail(request, hotel_slug, transacao_id):
             if hasattr(transacao, 'valor_recebido'): transacao.valor_recebido = valor_recebido_calc
     
             transacao.save()
+            registrar_log(hotel, request.user, 'editar_cambio',
+                f"Editou câmbio #{transacao_id} — {moeda}: {valor}",
+                {'id': transacao_id, 'moeda': moeda})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
     
     if request.method == "DELETE":
+        # ↓ ADICIONE ANTES do delete
+        registrar_log(hotel, request.user, 'deletar_cambio',
+            f"Deletou câmbio #{transacao_id} — {transacao.moeda}: {transacao.valor}")
         transacao.delete()
         return JsonResponse({"status": "removido"})
     
@@ -637,6 +670,9 @@ def api_reservas(request, hotel_slug, reserva_id=None):
                 mes_referencia=mes_referencia, pix_recebimentos=pix_recebimentos,
                 observacoes=obs,
             )
+            registrar_log(hotel, request.user, 'criar_reserva',
+                f"Nova reserva: {nome} — {passeio.nome if passeio else 'sem passeio'}",
+                {'nome_cliente': nome, 'valor_bruto': valor_bruto})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
@@ -676,13 +712,25 @@ def api_reservas(request, hotel_slug, reserva_id=None):
                 if hasattr(reserva, key):
                     setattr(reserva, key, value)
             reserva.save()
+            if body.get('status') == 'pago':
+                registrar_log(hotel, request.user, 'pagar_reserva',
+                    f"Pagamento registrado: {reserva.nome_cliente} — R$ {reserva.valor_bruto}",
+                    {'reserva_id': reserva_id, 'data_pagamento': body.get('data_pagamento')})
+            else:
+                registrar_log(hotel, request.user, 'editar_reserva',
+                    f"Editou reserva: {reserva.nome_cliente}",
+                    {'reserva_id': reserva_id})
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(traceback.format_exc())
             return JsonResponse({"erro": str(e)}, status=500)
     
     if request.method == "DELETE" and reserva_id:
-        get_object_or_404(Reserva, id=reserva_id, hotel=hotel).delete()
+        r = get_object_or_404(Reserva, id=reserva_id, hotel=hotel)
+        registrar_log(hotel, request.user, 'deletar_reserva',
+            f"Deletou reserva de {r.nome_cliente}",
+            {'reserva_id': reserva_id})
+        r.delete()
         return JsonResponse({"status": "ok"})
     
     return JsonResponse({"erro": "Método inválido"}, status=405)

@@ -14,17 +14,22 @@
 <div class="layout">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+     <aside class="sidebar">
         <div class="sidebar-logo">🔔 Concierge</div>
         <nav>
-            <a href="/{{ hotel.slug }}/dashboard/">🏠 Início</a>
+            <a href="/{{ hotel.slug }}/dashboard/"class="active">🏠 Início</a>
             <a href="/{{ hotel.slug }}/dashboard/listar/">🗺️ Experiências</a>
             <a href="/{{ hotel.slug }}/dashboard/reservas/">📅 Reservas Concierge</a>
-            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Hospedagem</a>
+            <a href="/{{ hotel.slug }}/dashboard/reservas-hotel/">🛏️ Reservas Hotel</a>
+            <a href="/{{ hotel.slug }}/dashboard/hospedagem/">🏨 Auditoria</a>
             <a href="/{{ hotel.slug }}/dashboard/cambio/">💱 Câmbio</a>
             <a href="/{{ hotel.slug }}/dashboard/quadro/">📋 Tarefas</a>
             <a href="/{{ hotel.slug }}/dashboard/relatorios/">📊 Relatórios</a>
-            <a href="/{{ hotel.slug }}/dashboard/configuracoes/"class="active">⚙️ Configurações</a>
+            <a href="/{{ hotel.slug }}/dashboard/configuracoes/">⚙️ Configurações</a>
+            {% if is_gerente %}
+            <a href="/{{ hotel.slug }}/dashboard/usuarios/">👥 Usuários</a>
+            <a href="/{{ hotel.slug }}/dashboard/logs/">📋 Logs</a>
+            {% endif %}
             <hr>
             <a href="/logout/">↩ Sair</a>
         </nav>
